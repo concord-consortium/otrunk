@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-01-25 16:19:41 $
+ * $Revision: 1.7 $
+ * $Date: 2005-03-10 06:01:38 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -31,6 +31,13 @@ public class ReflectionTypeDefinitions
 {
 	public static void registerTypes(Vector classNames, TypeService typeService,
 			XMLDatabase xmlDB)
+	throws Exception
+	{
+	    registerTypes(classNames, typeService, xmlDB, true);
+	}
+    
+	public static void registerTypes(Vector classNames, TypeService typeService,
+			XMLDatabase xmlDB, boolean addShortcuts)
 		throws Exception 
 	{
 		ClassLoader classloader = ReflectionTypeDefinitions.class.getClassLoader();
@@ -81,9 +88,12 @@ public class ReflectionTypeDefinitions
 						xmlDB);
 						
 			typeService.registerUserType(className, objectType);
-			int lastDot = className.lastIndexOf(".");
-			String localClassName = className.substring(lastDot+1,className.length());
-			typeService.registerUserType(localClassName, objectType);
+			
+			if(addShortcuts) {
+			    int lastDot = className.lastIndexOf(".");
+			    String localClassName = className.substring(lastDot+1,className.length());
+			    typeService.registerUserType(localClassName, objectType);
+			}
 		}
 	}
 	

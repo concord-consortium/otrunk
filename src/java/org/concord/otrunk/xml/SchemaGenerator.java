@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-12-13 07:45:42 $
+ * $Revision: 1.2 $
+ * $Date: 2005-03-10 06:01:38 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -65,7 +65,7 @@ public class SchemaGenerator
 		}		
 		
 		ReflectionTypeDefinitions.registerTypes(importedOTObjectClasses, typeService,
-				null);	
+				null, false);	
 		
 		// the type service should now have all registers types so we can write out
 		// the schema
