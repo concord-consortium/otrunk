@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2005-03-14 05:05:43 $
+ * $Revision: 1.13 $
+ * $Date: 2005-03-18 18:38:30 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -96,7 +96,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			}
 			
 			try {
-				Object resValue = handleChildResource(attribName, attrib.getValue());
+				Object resValue = handleChildResource(element, attribName, attrib.getValue());
 				obj.setResource(attribName, resValue);
 			} catch (HandleElementException e) {
 				System.err.println(e.getMessage() + " in attribute: " +
@@ -109,7 +109,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		    OTXMLElement child = (OTXMLElement)childIter.next();
 
 			try {
-				Object resValue = handleChildResource(child.getName(), child);
+				Object resValue = handleChildResource(element, child.getName(), child);
 				obj.setResource(child.getName(),resValue);
 			} catch (HandleElementException e) {
 				System.err.println("error in element: " +
@@ -133,12 +133,13 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	 * if the element is "&lt;myText>hi this is my text&lt;/myText>"
 	 * and myText is defined as a "string" in the parentType then
 	 * this element will be turned into a string.
-	 * 
+	 * @param parentElement TODO
 	 * @param parentType
 	 * @param child
+	 * 
 	 * @return
 	 */
-	public Object handleChildResource(String childName, Object childObj)
+	public Object handleChildResource(OTXMLElement parentElement, String childName, Object childObj)
 		throws HandleElementException
 	{
 		Properties elementProps;
@@ -154,13 +155,24 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		String resPrimitiveType = resourceDef.getType();	
 
 		String resourceType = resPrimitiveType;
+		if(resPrimitiveType.equals("object") &&
+		        childObj instanceof String){
+		    
+		    // this is an object reference
+			String refid = (String)childObj;
+			if(refid != null && refid.length() > 0){
+				return new XMLDataObjectRef(refid, parentElement);
+			}		    
+		}
+		
 		if(resPrimitiveType.equals("object")) {
 			if(!(childObj instanceof OTXMLElement)) {
-				System.err.println("child of type object must be an element");
+				System.err.println("child of type object must be an element or string");
 				return null;
 			}
 			OTXMLElement child = (OTXMLElement)childObj;
-			
+
+			// This is causes some stange advantage 
 			String childRefId = child.getAttributeValue("refid");
 			
 			// If this element doesn't have a reference id then 
