@@ -9,9 +9,9 @@ package org.concord.otrunk.datamodel.ozone;
 import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTResourceCollection;
+import org.concord.framework.otrunk.OTResourceList;
 import org.concord.otrunk.datamodel.OTObjectRevision;
-import org.concord.otrunk.datamodel.OTResourceCollection;
-import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTUUID;
 import org.ozoneDB.OzoneObject;
 

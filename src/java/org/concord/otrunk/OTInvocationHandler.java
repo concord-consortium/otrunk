@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-01-11 07:51:05 $
+ * $Revision: 1.7 $
+ * $Date: 2005-01-12 04:19:54 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -17,9 +17,9 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
+import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
-import org.concord.otrunk.datamodel.OTResourceList;
-import org.concord.otrunk.datamodel.OTResourceMap;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-12 04:19:55 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -14,10 +14,10 @@ import java.util.Date;
 import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTResourceCollection;
+import org.concord.framework.otrunk.OTResourceList;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTObjectRevision;
-import org.concord.otrunk.datamodel.OTResourceCollection;
-import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTUUID;
 
 

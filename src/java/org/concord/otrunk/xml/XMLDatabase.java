@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2004-12-17 20:09:18 $
+ * $Revision: 1.6 $
+ * $Date: 2005-01-12 04:19:54 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -21,12 +21,12 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTResourceCollection;
+import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
-import org.concord.otrunk.datamodel.OTResourceCollection;
-import org.concord.otrunk.datamodel.OTResourceList;
-import org.concord.otrunk.datamodel.OTResourceMap;
 import org.concord.otrunk.datamodel.OTUUID;
 import org.jdom.Document;
 import org.jdom.Element;

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-01-11 07:51:05 $
+ * $Revision: 1.5 $
+ * $Date: 2005-01-12 04:19:55 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -10,6 +10,7 @@
 package org.concord.otrunk.datamodel;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTResourceCollection;
 
 
 /**
