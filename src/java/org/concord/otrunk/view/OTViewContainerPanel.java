@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2005-01-25 16:19:41 $
+ * $Revision: 1.2 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -18,6 +18,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.OTFrame;
+import org.concord.framework.otrunk.view.OTViewContainer;
 
 
 /**

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2005-01-25 16:19:41 $
+ * $Revision: 1.10 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -20,6 +20,7 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
+import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
@@ -106,6 +107,7 @@ public class TypeService
 		return handler;
 	}
 
+
 	public static String elementPath(Element element)
 	{
 		String path = element.getName();
@@ -124,6 +126,14 @@ public class TypeService
 		
 		return path;
 	}
+
+	public static String attributePath(Attribute attribute)
+	{
+		Element parent = attribute.getParent();
+		String parentPath = elementPath(parent);
+		return parentPath + "@" + attribute.getName();
+	}
+
 	
 	/**
 	 * There is no information about the element.  So in this case the 
@@ -148,7 +158,13 @@ public class TypeService
 			return null;
 		}
 		
-		return handler.handleElement(child, null);		
+		try {
+			return handler.handleElement(child, null);
+		} catch (HandleElementException e) {
+			System.err.println("Error reading element: " + TypeService.elementPath(child));
+			return null;
+		}
+		
 	}
 	
 	public Hashtable getHandlerMap()

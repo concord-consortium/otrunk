@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-01-25 16:19:41 $
+ * $Revision: 1.5 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -29,7 +29,7 @@ import org.jdom.Element;
  * @author scott<p>
  *
  */
-public class BlobTypeHandler extends ResourceTypeHandler
+public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 {
 	URL contextURL;
 	
@@ -42,18 +42,15 @@ public class BlobTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.xml.ResourceTypeHandler#handleElement(org.jdom.Element, java.util.Properties)
 	 */	
-	public Object handleElement(Element element, Properties elementProps)
-	{
-		String urlStr = element.getTextTrim();
-		
+	public Object handleElement(String urlStr, Properties elementProps)
+		throws HandleElementException
+	{		
 		try {
 			URL url = new URL(contextURL, urlStr);
 			return new XMLBlobResource(url);			
 		} catch(Exception e) {
-			e.printStackTrace();
-		} 
-		
-		return null;
+			throw new HandleElementException("malformed url for blob");
+		} 		
 	}
 
 }

@@ -54,6 +54,13 @@ public class OzResourceListImpl extends OzoneObject
 		list.add(index, object);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceList#set(int, java.lang.Object)
+	 */
+	public void set(int index, Object object) 
+	{
+		list.set(index, object);
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#removeAll()

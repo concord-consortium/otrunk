@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-01-11 07:51:05 $
+ * $Revision: 1.9 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.concord.otrunk.OTrunkImpl;
+import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
@@ -85,13 +86,39 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		}
 
 		obj.setResource(OTrunkImpl.RES_CLASS_NAME, getClassName());
-		List children = element.getChildren();
 		
+		List attributes = element.getAttributes();
+		for(Iterator attIter = attributes.iterator(); attIter.hasNext(); ) {
+			Attribute attrib = (Attribute)attIter.next();
+			String attribName = attrib.getName();
+			if(attribName.equals("id") ||
+					attribName.equals("refid") ||
+					attribName.equals("local_id")) {
+				continue;
+			}
+			
+			try {
+				Object resValue = handleChildResource(attribName, attrib.getValue());
+				obj.setResource(attribName, resValue);
+			} catch (HandleElementException e) {
+				System.err.println("error in attribute: " +
+						TypeService.attributePath(attrib));
+				e.printStackTrace();
+			}
+		}
+		
+		List children = element.getChildren();		
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {
 			Element child = (Element)childIter.next();
 
-			Object resValue = handleChildResource(child);
-			obj.setResource(child.getName(),resValue);
+			try {
+				Object resValue = handleChildResource(child.getName(), child);
+				obj.setResource(child.getName(),resValue);
+			} catch (HandleElementException e) {
+				System.err.println("error in element: " +
+						TypeService.elementPath(child));
+				e.printStackTrace();				
+			}
 		}
 		
 		return obj;
@@ -114,9 +141,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	 * @param child
 	 * @return
 	 */
-	public Object handleChildResource(Element child)
+	public Object handleChildResource(String childName, Object childObj)
+		throws HandleElementException
 	{
-		String childName = child.getName();
 		Properties elementProps;
 
 		ResourceDefinition resourceDef = getResourceDefinition(childName);
@@ -131,6 +158,12 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 
 		String resourceType = resPrimitiveType;
 		if(resPrimitiveType.equals("object")) {
+			if(!(childObj instanceof Element)) {
+				System.err.println("child of type object must be an element");
+				return null;
+			}
+			Element child = (Element)childObj;
+			
 			String childRefId = child.getAttributeValue("refid");
 			
 			// If this element doesn't have a reference id then 
@@ -143,8 +176,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 							TypeService.elementPath(child));
 					return null;
 				}
-				child = (Element)children.get(0);
-				resourceType = child.getName();
+				childObj = children.get(0);
+				resourceType = ((Element)childObj).getName();
 			}			
 		}
 		
@@ -156,8 +189,16 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			return null;
 		}
 		
-		
-		return resHandler.handleElement(child, elementProps);
+		if(childObj instanceof String) {
+			if(resHandler instanceof PrimitiveResourceTypeHandler){
+				return ((PrimitiveResourceTypeHandler)resHandler).
+				handleElement((String)childObj, elementProps);
+			} else {
+				throw new HandleElementException("Can't use an attribute for a non-primitive type");
+			}
+		} else {
+			return resHandler.handleElement((Element)childObj, elementProps);
+		}
 	}
 	
 	public ObjectTypeHandler getParentType()

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -26,13 +26,22 @@ public abstract class ResourceTypeHandler
 {
 	protected String primitiveName = null;
 	
-	abstract public Object handleElement(Element element, Properties elementProps);
-
 	public ResourceTypeHandler(String primitiveName)
 	{
 		this.primitiveName = primitiveName;
 	}
 	
+	/**
+	 * You must override this method if this resource needs more than a string
+	 * so objects, lists, and maps need to override this method.
+	 * 
+	 * @param element
+	 * @param elementProps
+	 * @return
+	 */
+	public abstract Object handleElement(Element element, Properties elementProps)
+		throws HandleElementException;
+
 	public String getPrimitiveName()
 	{
 		return primitiveName;

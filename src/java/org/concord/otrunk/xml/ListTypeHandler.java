@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -50,5 +50,4 @@ public class ListTypeHandler extends ResourceTypeHandler
 
 		return list;
 	}
-
 }

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-01-25 16:19:41 $
+ * $Revision: 1.8 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -168,7 +168,13 @@ public class XMLDatabase
     		String localIdStr = element.getAttributeValue("local_id");
     		if(localIdStr != null && localIdStr.length() > 0) {
     			dataObject.setLocalId(localIdStr);
-    			localIdMap.put(localIdStr, dataObject.getGlobalId());
+
+    			// this is probably a temporary hack
+    			dataObject.setResource("localId", localIdStr);
+    			Object oldId = localIdMap.put(localIdStr, dataObject.getGlobalId());
+    			if(oldId != null) {
+    				System.err.println("repeated local id: " + localIdStr);
+    			}
     		}
     	} else {
     		System.err.println("null element in createDataObject");
