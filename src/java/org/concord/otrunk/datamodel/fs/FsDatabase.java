@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.4 $
+ * $Date: 2005-01-11 07:51:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -28,10 +28,6 @@ import org.concord.otrunk.datamodel.OTResourceCollection;
 import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTResourceMap;
 import org.concord.otrunk.datamodel.OTUUID;
-import org.concord.otrunk.datamodel.OTUser;
-import org.concord.otrunk.datamodel.OTUserDataObject;
-
-
 /**
  * FsDatabase
  * Class name and description
@@ -259,20 +255,7 @@ public class FsDatabase implements OTDatabase
 	public OTDataObject getOTDataObject(OTDataObject dataParent, OTID childID)
 		throws Exception
 	{
-		// if the mode is authoring then just return the requested object
-		// if the mode is student then the requested node needs to be looked up
-		// in the users object table.  Then that object is setup to reference 
-		// the authoring object.
-		OTDataObject childDataObject = (OTDataObject)dbIndex.get(childID);
-		if ( (dataParent == null) || 
-				!(dataParent instanceof OTUserDataObject)) {
-			return childDataObject;
-		}	
-		
-		OTUserDataObject userObject;
-		OTUser user = ((OTUserDataObject)dataParent).getUser();	
-		
-		return user.getUserDataObject(childDataObject);
+		return (OTDataObject)dbIndex.get(childID);
 	}
 
 	/* (non-Javadoc)

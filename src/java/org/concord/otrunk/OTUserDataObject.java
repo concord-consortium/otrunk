@@ -1,17 +1,18 @@
 /*
  * Last modification information:
  * $Revision: 1.3 $
- * $Date: 2005-01-11 05:52:42 $
+ * $Date: 2005-01-11 07:51:05 $
  * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
-package org.concord.otrunk.datamodel;
+package org.concord.otrunk;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTrunk;
-import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTObjectRevision;
+import org.concord.otrunk.datamodel.OTResourceList;
 
 
 /**
@@ -28,7 +29,7 @@ public class OTUserDataObject
 {
 	private OTID userId;
 	private OTDataObject authoringObject;
-	private OTUser user;
+	private OTUserStateMap user;
 	private OTrunkImpl otDatabase;
 	
 	private final class OtUserResourceList 
@@ -91,7 +92,7 @@ public class OTUserDataObject
 		}				
 	}
 	
-	public OTUserDataObject(OTDataObject authoringObject, OTUser user, OTrunkImpl db)
+	public OTUserDataObject(OTDataObject authoringObject, OTUserStateMap user, OTrunkImpl db)
 	{
 		this.authoringObject = authoringObject;
 		this.user = user;
@@ -108,7 +109,7 @@ public class OTUserDataObject
 		return user.getUserStateObject(authoringObject);
 	}
 			
-	public OTUser getUser()
+	public OTUserStateMap getUser()
 	{
 		return user;
 	}
