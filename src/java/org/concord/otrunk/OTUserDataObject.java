@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-01-27 16:45:29 $
- * $Author: scytacki $
+ * $Revision: 1.6 $
+ * $Date: 2005-03-10 03:52:25 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -95,6 +95,15 @@ public class OTUserDataObject
 		public int size()
 		{
 			return authoredList.size();
+		}
+
+		/* (non-Javadoc)
+		 * @see org.concord.framework.otrunk.OTResourceList#remove(int)
+		 */
+		public void remove(int index)
+		{
+			// this is read only
+			return;
 		}				
 	}
 	

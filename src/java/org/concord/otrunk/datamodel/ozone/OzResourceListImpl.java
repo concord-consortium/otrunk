@@ -89,8 +89,7 @@ public class OzResourceListImpl extends OzoneObject
 		// TODO Auto-generated method stub
 
 	}
-	
-	
+		
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.ozone.OzResourceList#getObject(int)
 	 */
@@ -98,5 +97,14 @@ public class OzResourceListImpl extends OzoneObject
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.OTResourceList#remove(int)
+	 */
+	public void remove(int index)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }
