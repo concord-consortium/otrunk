@@ -10,11 +10,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceCollection;
+import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
@@ -31,12 +34,28 @@ public class OTrunkImpl implements OTrunk
 	public static final String RES_CLASS_NAME = "otObjectClass";
 
 	protected Hashtable loadedObjects = new Hashtable();
+	protected Vector services = null;
 	
 	protected OTDatabase db;
 	
 	public OTrunkImpl(OTDatabase db)
 	{
 		this.db = db;
+		
+		// We should look up if there are any sevices.
+		try {
+			OTObject root = getRealRoot();
+			if(!(root instanceof OTSystem)) {
+				return;
+			}
+			
+			OTObjectList serviceList = ((OTSystem)root).getServices();
+			
+			services = serviceList.getVector();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/* (non-Javadoc)
@@ -65,14 +84,16 @@ public class OTrunkImpl implements OTrunk
 	{
 		return db.createCollection(dataObject, collectionClass);
 	}
-	
+		
 	public void setRoot(OTObject obj) throws Exception
 	{
+		// FIXME this doesn't do a good job if there
+		// is an OTSystem
 		OTID id = obj.getGlobalId();
 		db.setRoot(id);
 	}
-	
-	public OTObject getRoot() throws Exception
+		
+	protected OTObject getRealRoot() throws Exception
 	{
 		OTDataObject rootDO = getRootDataObject();
 		if(rootDO == null) {
@@ -81,6 +102,15 @@ public class OTrunkImpl implements OTrunk
 		return getOTObject(rootDO);
 	}
 	
+	public OTObject getRoot() throws Exception
+	{
+		OTObject root = getRealRoot();
+		if(root instanceof OTSystem) {
+			return ((OTSystem)root).getRoot();
+		}
+		
+		return root;
+	}
 	/**
 	 * The dataParent must be set so the database can correctly look up the 
 	 * child object.
@@ -138,6 +168,8 @@ public class OTrunkImpl implements OTrunk
 				((DefaultOTObject)otObject).setOTDatabase(this);
 			}
 		}
+		
+		otObject.init();
 		
 		loadedObjects.put(dataObject, otObject);
 		return otObject;		
@@ -231,23 +263,71 @@ public class OTrunkImpl implements OTrunk
 		Constructor resourceConstructor = memberConstructors[0]; 
 		Class [] params = resourceConstructor.getParameterTypes();
 		
-		if(memberConstructors.length > 1 || params == null ||
-				params.length != 1) {
-			System.err.println("OTObjects should only have 1 constructor" + "\n" +
-					" that takes one argument which is the resource interface");
+		if(memberConstructors.length > 1) {
+			System.err.println("OTObjects should only have 1 constructor");
 			return null;
 		}
 		
-		Class schemaClass = params[0];
+		if(params == null | params.length == 0) {
+			try {
+				return (OTObject)otObjectClass.newInstance();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+		Object constructorParams [] = new Object [params.length];
+		int nextParam = 0;
+		if(params[0].isInterface() && 
+				OTResourceSchema.class.isAssignableFrom(params[0])){
+			Class schemaClass = params[0];
+				
+			InvocationHandler handler = 
+				new OTInvocationHandler(dataObject, this);
 
-		InvocationHandler handler = new OTInvocationHandler(dataObject, this);
-
-	    Object resources = Proxy.newProxyInstance(schemaClass.getClassLoader(),
-	    		new Class[] { schemaClass }, handler);
+			Class [] interfaceList = new Class[] { schemaClass };
+			
+			Object resources = 
+				Proxy.newProxyInstance(schemaClass.getClassLoader(),
+					interfaceList, handler);
+			
+			constructorParams[0] = resources;
+			nextParam++;
+		}
 	    
+		for(int i=nextParam; i<params.length; i++) {
+			// look for a service in the services list to can 
+			// be used for this param
+			if(services == null) {
+				System.err.println("There are no services defined and the current\n" +
+						"object needs at least one: " + otObjectClass);
+				// we should be careful that this isn't service
+				// itself.  In this case the services vector will
+				// be null, but the error message will be incorrect
+				return null;
+			}
+			
+			constructorParams[i] = null;
+			for(int j=0; j<services.size(); j++) {
+				OTObject service = (OTObject)services.get(j);
+				if(params[i].isInstance(service)) {
+					constructorParams[i] = service;
+					break;
+				}
+			}
+			
+			if(constructorParams[i] == null) {
+				System.err.println("No service could be found to handle the\n" +
+						" requirement of: " + otObjectClass + "\n" +
+						" for: " + params[i]);				
+				return null;				
+			}
+		}
+		
 	    OTObject otObject = null;
 	    try {
-	    	otObject = (OTObject)resourceConstructor.newInstance(new Object[] { resources });
+	    	otObject = (OTObject)resourceConstructor.newInstance(constructorParams);
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    	return null;
@@ -289,6 +369,4 @@ public class OTrunkImpl implements OTrunk
 	{
 		return db.getRoot();
 	}
-
-	
 }

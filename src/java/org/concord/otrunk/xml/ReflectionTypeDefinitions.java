@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-01-11 05:52:42 $
+ * $Revision: 1.5 $
+ * $Date: 2005-01-13 03:14:45 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -49,11 +49,12 @@ public class ReflectionTypeDefinitions
 				Constructor [] memberConstructors = otObjectClass.getConstructors();
 				Constructor resourceConstructor = memberConstructors[0]; 
 				Class [] params = resourceConstructor.getParameterTypes();
-				
+								
 				if(memberConstructors.length > 1 || params == null ||
-						params.length != 1) {
+						!OTResourceSchema.class.isAssignableFrom(params[0])) {
+					System.err.println("Invlaid constructor for OTrunk Object: " + className);
 					throw new RuntimeException("OTObjects should only have 1 constructor" + "\n" +
-							" that takes one argument which is the resource interface");
+							" whose first argument is the resource schema");
 				}
 				
 				resourceSchemaClass = params[0];
@@ -113,8 +114,10 @@ public class ReflectionTypeDefinitions
 		// follow and which ones to skip...
 		// It looks like we can just follow ones that extend
 		// OTObject or OTResourceSchema
+		// This has been changed we now follow all interfaces.
 		Class [] interfaces = resourceSchemaClass.getInterfaces();
 		for(int i=0; i<interfaces.length; i++) {
+			/*
 			if(OTObject.class.isAssignableFrom(interfaces[i]) ||
 					OTResourceSchema.class.isAssignableFrom(interfaces[i])) {
 				addResources(resources, interfaces[i]);
@@ -122,6 +125,8 @@ public class ReflectionTypeDefinitions
 				System.err.println("resource class implements invalid interface: " +
 						interfaces[i].getName());
 			}
+			*/
+			addResources(resources, interfaces[i]);
 		}
 		
 		// we will keep the parameters for now but just leave them
