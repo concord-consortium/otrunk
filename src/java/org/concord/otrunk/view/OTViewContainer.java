@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-12-15 22:52:15 $
+ * $Revision: 1.2 $
+ * $Date: 2005-01-25 16:18:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -25,7 +25,7 @@ import org.concord.framework.otrunk.OTObject;
  */
 public interface OTViewContainer
 {
-	public void setCurrentObject(OTObject pfObject);
+	public void setCurrentObject(OTObject pfObject, OTFrame otFrame);
 	
 	public JComponent getComponent(OTObject pfObject, 
 			OTViewContainer container, boolean editable);

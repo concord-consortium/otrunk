@@ -56,10 +56,9 @@ public class OTResourceListNode implements SimpleTreeNode
 	 */
 	public SimpleTreeNode getChild(int index) 
 	{
-		String name = "anon " + index;
 		Object child = list.get(index);
 		try {
-			return owner.getNodeFromObject(name, child);
+			return owner.getNodeFromObject(null, child);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -83,6 +82,6 @@ public class OTResourceListNode implements SimpleTreeNode
 
 	public String toString()
 	{
-		return name;
+		return name + " <list>";
 	}
 }

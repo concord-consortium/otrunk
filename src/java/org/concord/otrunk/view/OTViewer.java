@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-01-15 16:11:42 $
+ * $Revision: 1.4 $
+ * $Date: 2005-01-25 16:18:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -18,6 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.URL;
+import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -28,6 +29,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -56,12 +58,12 @@ import org.concord.view.SwingUserMessageHandler;
  *
  */
 public class OTViewer extends JFrame
-	implements TreeSelectionListener, OTViewContainer
+	implements TreeSelectionListener, OTFrameManager
 {
 	private static OTrunkImpl db;
 	private static OTViewFactory otViewFactory;
 	
-	JComponent bodyComponent;
+	OTViewContainerPanel bodyPanel;
 	JTree folderTreeArea;
 	SimpleTreeModel folderTreeModel;
 	JTree dataTreeArea;
@@ -76,10 +78,13 @@ public class OTViewer extends JFrame
 	XMLDatabase xmlDB;
 	File currentFile = null;
 	
+	Hashtable otContainers = new Hashtable();
+	
 	boolean showTree = false;
 	
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
+		OTViewContainerPanel.setOTViewFactory(factory);
 		otViewFactory = factory;
 	}
 		
@@ -97,9 +102,8 @@ public class OTViewer extends JFrame
 				
 		setJMenuBar(menuBar);
 
-		bodyComponent = new JPanel(); 
-		bodyComponent.setLayout(new BorderLayout());
-		
+		bodyPanel = new OTViewContainerPanel(this, null);
+				
 		if(showTree) {
 		
 			dataTreeModel = new SimpleTreeModel();
@@ -125,7 +129,7 @@ public class OTViewer extends JFrame
 			
 			//	Create a split pane with the two scroll panes in it.
 			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-					tabbedPane, bodyComponent);
+					tabbedPane, bodyPanel);
 			splitPane.setOneTouchExpandable(true);
 			splitPane.setDividerLocation(200);
 			
@@ -134,11 +138,11 @@ public class OTViewer extends JFrame
 			folderTreeScrollPane.setMinimumSize(minimumSize);
 			dataTreeScrollPane.setMinimumSize(minimumSize);
 			tabbedPane.setMinimumSize(minimumSize);
-			bodyComponent.setMinimumSize(minimumSize);
+			bodyPanel.setMinimumSize(minimumSize);
 			
 			getContentPane().add(splitPane);
 		} else {
-			getContentPane().add(bodyComponent);
+			getContentPane().add(bodyPanel);
 		}
 		
         setBounds(100, 100, 800, 600);
@@ -182,7 +186,7 @@ public class OTViewer extends JFrame
 			folderTreeModel.setRoot(new OTFolderNode(root));
 		}
 		
-		setCurrentObject(db.getRoot());
+		bodyPanel.setCurrentObject(db.getRoot(), null);
 		
 		if(showTree) {
 			folderTreeModel.fireTreeStructureChanged((SimpleTreeNode)folderTreeModel.getRoot());
@@ -249,7 +253,7 @@ public class OTViewer extends JFrame
 
 			OTObject pfObject = node.getPfObject();
 
-			setCurrentObject(pfObject);
+			bodyPanel.setCurrentObject(pfObject, null);
 		} else if (event.getSource() == dataTreeArea) {
 			SimpleTreeNode node = (SimpleTreeNode)
 				dataTreeArea.getLastSelectedPathComponent();
@@ -269,24 +273,29 @@ public class OTViewer extends JFrame
 		}
 	}
 	
-	public void setCurrentObject(OTObject pfObject)
+	public void setFrameObject(OTObject otObject, OTFrame otFrame)
 	{
-		JComponent newComponent = null;
-		if(pfObject != null) {
-			newComponent = getComponent(pfObject, this, true);
-			 
-		} else {
-			newComponent = new JLabel("Null object");
-		}
-		bodyComponent.removeAll();
-		bodyComponent.add(newComponent, BorderLayout.CENTER);
-		bodyComponent.revalidate();
-	}
+		// look up view container with the frame.
+		OTViewContainerPanel otContainer = (OTViewContainerPanel)otContainers.get(otFrame.getGlobalId());
+		
+		if(otContainer == null) {
 
-	public JComponent getComponent(OTObject pfObject, 
-			OTViewContainer container, boolean editable)
-	{
-		return otViewFactory.getComponent(pfObject, container, editable);
+			JFrame jFrame = new JFrame(otFrame.getTitle());
+
+			otContainer = new OTViewContainerPanel(this, jFrame);
+
+			jFrame.getContentPane().setLayout(new BorderLayout());
+
+			jFrame.getContentPane().add(otContainer, BorderLayout.CENTER);
+			jFrame.setSize(otFrame.getWidth(), otFrame.getHeight());
+			
+			otContainers.put(otFrame.getGlobalId(), otContainer);
+		}
+		
+		// call setCurrentObject on that view container with a null
+		// frame
+		otContainer.setCurrentObject(otObject, null);
+		otContainer.showFrame();
 	}
 	
 	/**
