@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:10:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -13,7 +13,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.io.StringWriter;
 import java.util.Vector;
 
 import org.concord.otrunk.OTrunk;

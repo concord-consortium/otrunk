@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:10:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -9,7 +9,6 @@
 */
 package org.concord.otrunk.xml;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Vector;
@@ -17,10 +16,6 @@ import java.util.Vector;
 import org.concord.otrunk.OTInvocationHandler;
 import org.concord.otrunk.OTObject;
 import org.concord.otrunk.OTResourceSchema;
-import org.concord.otrunk.xml.dod.DoDescription;
-import org.concord.otrunk.xml.dod.Pfobjects;
-import org.concord.otrunk.xml.dod.PfobjectsDocument;
-import org.concord.otrunk.xml.dod.ResourceType;
 
 
 /**
