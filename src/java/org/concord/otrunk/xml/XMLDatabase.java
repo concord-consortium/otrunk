@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2005-03-31 21:07:26 $
+ * $Revision: 1.11 $
+ * $Date: 2005-04-05 16:39:54 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -173,8 +173,6 @@ public class XMLDatabase
     				System.err.println("repeated local id: " + localIdStr);
     			}
     		}
-    	} else {
-    		System.err.println("null element in createDataObject");
     	}
     		
     	return dataObject;		
