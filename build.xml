@@ -1,0 +1,16 @@
+<project name="OTrunk" default="jar" basedir =".">
+	<import file="../ProjectSets/standard-ant-targets.xml"/>
+
+	<property name="jar-name" value="otrunk"/>
+	
+	<path id="run-classpath">
+    	<pathelement location="../thirdparty/ozoneServer-1.2.x-dev.jar"/>
+    	<pathelement location="jug.jar"/>
+    	<pathelement location="sc-api-j2se.jar"/>
+		
+	</path>
+
+	<path id="build-classpath">
+		<path refid="run-classpath"/>
+	</path>	
+</project>
