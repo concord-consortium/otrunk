@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-01-13 03:14:44 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-15 16:11:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -38,11 +38,12 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
-import org.concord.swing.tree.SimpleTreeModel;
-import org.concord.swing.tree.SimpleTreeNode;
+import org.concord.view.SimpleTreeModel;
+import org.concord.view.SwingUserMessageHandler;
 
 
 /**
@@ -170,7 +171,8 @@ public class OTViewer extends JFrame
 		throws Exception
 	{
 		xmlDB = new XMLDatabase(url);
-		db = new OTrunkImpl(xmlDB);
+		db = new OTrunkImpl(xmlDB,
+				new Object [] {new SwingUserMessageHandler(this)});
 	
 		if(showTree) {
 			dataTreeModel.setRoot(new OTDataObjectNode("root", 

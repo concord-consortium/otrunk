@@ -8,9 +8,9 @@ package org.concord.otrunk.view;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
-import org.concord.swing.tree.SimpleTreeNode;
 
 public class OTDataObjectNode 
 	implements SimpleTreeNode
