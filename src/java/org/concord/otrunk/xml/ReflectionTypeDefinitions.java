@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-03-10 06:01:38 $
+ * $Revision: 1.8 $
+ * $Date: 2005-03-31 21:07:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -15,6 +15,7 @@ import java.util.Vector;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTResourceSchema;
+import org.concord.framework.otrunk.OTWrappedObject;
 import org.concord.otrunk.OTInvocationHandler;
 
 
@@ -41,17 +42,33 @@ public class ReflectionTypeDefinitions
 		throws Exception 
 	{
 		ClassLoader classloader = ReflectionTypeDefinitions.class.getClassLoader();
+		Vector typeClasses = new Vector();
 		
 		for(int i=0; i<classNames.size(); i++) {
-			String className = (String)classNames.get(i);
-			Class otObjectClass = classloader.loadClass(className);
+	        String className = (String)classNames.get(i);			
+		    try {
+		        Class typeClass = classloader.loadClass(className);
+		        typeClasses.add(typeClass);
+		    } catch (Exception e) {
+		        System.err.println("Error importing class: " + className);
+		        e.printStackTrace();
+		    }
+		}		
+		
+		for(int i=0; i<typeClasses.size(); i++) {
+			Class otObjectClass = (Class)typeClasses.get(i); 
+			String className = otObjectClass.getName();
+			
 			// do our magic here to register the type
 			// first figure out if it uses a seperate schema object
 			// get that object, otherwise use the class itself
 			Class resourceSchemaClass = null;
-			if(otObjectClass.isInterface() &&
-					OTObject.class.isAssignableFrom(otObjectClass)) {
-				resourceSchemaClass = otObjectClass;
+			if(otObjectClass.isInterface()){
+			    if(OTWrappedObject.class.isAssignableFrom(otObjectClass)) {
+			        
+			    } else if (OTObject.class.isAssignableFrom(otObjectClass)){
+						resourceSchemaClass = otObjectClass;
+			    }
 			} else {
 				Constructor [] memberConstructors = otObjectClass.getConstructors();
 				Constructor resourceConstructor = memberConstructors[0]; 
@@ -73,7 +90,7 @@ public class ReflectionTypeDefinitions
 			}
 			
 			Vector resourceDefs = new Vector();
-			addResources(resourceDefs, resourceSchemaClass);
+			addResources(resourceDefs, resourceSchemaClass, typeClasses);
 			ResourceDefinition [] resourceDefsArray = new ResourceDefinition[resourceDefs.size()];
 			for(int j=0; j<resourceDefsArray.length; j++) {
 				resourceDefsArray[j] = (ResourceDefinition)resourceDefs.get(j);
@@ -97,7 +114,8 @@ public class ReflectionTypeDefinitions
 		}
 	}
 	
-	public static void addResources(Vector resources, Class resourceSchemaClass)
+	public static void addResources(Vector resources, Class resourceSchemaClass,
+	        Vector typeClasses)
 	{
 		// Then look for all the getters and their types
 		Method [] methods = resourceSchemaClass.getMethods();
@@ -114,9 +132,22 @@ public class ReflectionTypeDefinitions
 			String resourceName = OTInvocationHandler.getResourceName(3,methodName);
 			Class resourceClass = methods[j].getReturnType();
 			String resourceType = TypeService.getPrimitiveType(resourceClass);
+
+			if(resourceType == null){
+			    // This resource type might be an interface that on of the other
+			    // typeClasses implements.  
+			    for(int k=0; k<typeClasses.size(); k++){
+			        Class typeClass = (Class)typeClasses.get(k);
+			        if(resourceClass.isAssignableFrom(typeClass)){
+			            resourceType = "object";
+			        }
+			    }
+			}			
+
 			if(resourceType == null){
 				System.err.println("Unknown resourceType: " + resourceClass);
 			}
+			
 			ResourceDefinition resourceDef = new ResourceDefinition(resourceName,
 					resourceType, null);
 			resources.add(resourceDef);
@@ -131,6 +162,9 @@ public class ReflectionTypeDefinitions
 		Class [] interfaces = resourceSchemaClass.getInterfaces();
 		for(int i=0; i<interfaces.length; i++) {
 			/*
+			 * FIXME: this should be re-enabled.  We need to figure out
+			 * what this was breaking before.
+			 * 
 			if(OTObject.class.isAssignableFrom(interfaces[i]) ||
 					OTResourceSchema.class.isAssignableFrom(interfaces[i])) {
 				addResources(resources, interfaces[i]);
@@ -139,7 +173,7 @@ public class ReflectionTypeDefinitions
 						interfaces[i].getName());
 			}
 			*/
-			addResources(resources, interfaces[i]);
+			addResources(resources, interfaces[i], typeClasses);
 		}
 		
 		// we will keep the parameters for now but just leave them

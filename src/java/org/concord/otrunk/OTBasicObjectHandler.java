@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-01-13 03:14:44 $
+ * $Revision: 1.4 $
+ * $Date: 2005-03-31 21:07:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -23,7 +23,7 @@ import org.concord.otrunk.datamodel.OTDataObject;
  * @author scott<p>
  *
  */
-public class OTBasicObjectHandler extends OTInvocationHandler
+public class OTBasicObjectHandler extends OTResourceSchemaHandler
 {
 	public OTBasicObjectHandler(OTDataObject dataObject, OTrunkImpl db)
 	{

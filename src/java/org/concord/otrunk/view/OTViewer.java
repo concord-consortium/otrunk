@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-03-18 05:53:49 $
+ * $Revision: 1.9 $
+ * $Date: 2005-03-31 21:07:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -42,9 +42,12 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.util.SimpleTreeNode;
+import org.concord.otrunk.OTUserObject;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.view.SimpleTreeModel;
@@ -63,8 +66,11 @@ import org.concord.view.SwingUserMessageHandler;
 public class OTViewer extends JFrame
 	implements TreeSelectionListener, OTFrameManager
 {
-	private static OTrunkImpl db;
+	private static OTrunkImpl otrunk;
 	private static OTViewFactory otViewFactory;
+	
+	OTUserObject currentUser = null;
+	URL currentURL = null;
 	
 	OTViewContainerPanel bodyPanel;
 	JTree folderTreeArea;
@@ -84,6 +90,7 @@ public class OTViewer extends JFrame
 	Hashtable otContainers = new Hashtable();
 	
 	boolean showTree = false;
+    private AbstractAction saveUserDataAsAction;
 	
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
@@ -193,18 +200,23 @@ public class OTViewer extends JFrame
 		throws Exception
 	{
 		xmlDB = new XMLDatabase(url);
-		db = new OTrunkImpl(xmlDB,
+		otrunk = new OTrunkImpl(xmlDB,
 				new Object [] {new SwingUserMessageHandler(this)});
 	
+		OTObject root = otrunk.getRoot();
+		if(currentUser != null) {
+		    root = otrunk.getUserRuntimeObject(root, currentUser);			    
+		}
+		
 		if(showTree) {
+		    OTDataObject rootDataObject = otrunk.getRootDataObject();
 			dataTreeModel.setRoot(new OTDataObjectNode("root", 
-					db.getRootDataObject(), db));
+					otrunk.getRootDataObject(), otrunk));
 			
-			OTObject root = db.getRoot();
 			folderTreeModel.setRoot(new OTFolderNode(root));
 		}
 		
-		bodyPanel.setCurrentObject(db.getRoot(), null);
+		bodyPanel.setCurrentObject(root, null);
 		
 		if(showTree) {
 			folderTreeModel.fireTreeStructureChanged((SimpleTreeNode)folderTreeModel.getRoot());
@@ -213,11 +225,52 @@ public class OTViewer extends JFrame
 		
 		Frame frame = (Frame)SwingUtilities.getRoot(this);
 
+		currentURL = url;
 		frame.setTitle(url.toString());
 	}
 		
+	public void reload()
+		throws Exception
+	{
+	    loadURL(currentURL);
+	}
+	
+	public OTUserObject createUser(String name)
+		throws Exception
+	{
+	    OTUserObject user = (OTUserObject)otrunk.createObject(OTUserObject.class); 
+	    user.setName(name);
+	    return user;
+	}
 
+	
+	public void setCurrentUser(OTUserObject userObject)
+	{
+	    OTUserObject oldUser = currentUser;
+	    currentUser = userObject;
+	    if(!currentUser.equals(oldUser)) {
+	        try {
+	    		OTObject root = otrunk.getRoot();
+	    		if(currentUser != null) {
+	    		    root = otrunk.getUserRuntimeObject(root, currentUser);			    
+	    		}
+	    		
+	    		if(showTree) {
+	    			folderTreeModel.setRoot(new OTFolderNode(root));
+	    		}
+	    		
+	    		bodyPanel.setCurrentObject(root, null);
 
+	    		if(showTree) {
+	    			folderTreeModel.fireTreeStructureChanged((SimpleTreeNode)folderTreeModel.getRoot());
+	    			dataTreeModel.fireTreeStructureChanged((SimpleTreeNode)dataTreeModel.getRoot());
+	    		}	    		
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	}
 	
 	public static void main(String [] args)
 	{
@@ -249,7 +302,7 @@ public class OTViewer extends JFrame
 		public void actionPerformed(ActionEvent e) 
 		{
 			try {
-				db.close();
+				otrunk.close();
 			} catch (Exception exp) {
 				exp.printStackTrace();
 				// exit anyhow 
@@ -272,6 +325,10 @@ public class OTViewer extends JFrame
 			OTObject pfObject = node.getPfObject();
 
 			bodyPanel.setCurrentObject(pfObject, null);
+			
+			if(splitPane.getRightComponent() != bodyPanel){
+			    splitPane.setRightComponent(bodyPanel);
+			}
 		} else if (event.getSource() == dataTreeArea) {
 			SimpleTreeNode node = (SimpleTreeNode)
 				dataTreeArea.getLastSelectedPathComponent();
@@ -421,8 +478,49 @@ public class OTViewer extends JFrame
 				}
 			};
 			saveAsAction.putValue(Action.NAME, "Save As...");			
-			saveAsAction.setEnabled(false);
+			// saveAsAction.setEnabled(false);
 			menu.add(saveAsAction);
+
+			saveUserDataAsAction = new AbstractAction(){
+				
+				/* (non-Javadoc)
+				 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+				 */
+				public void actionPerformed(ActionEvent arg0)
+				{
+					Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+					FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
+					if(currentFile != null) {
+						dialog.setDirectory(currentFile.getParentFile().getAbsolutePath());
+						dialog.setFile(currentFile.getName());
+					}
+					dialog.show();
+						
+					String fileName = dialog.getFile();
+					if(fileName == null) {
+						return;
+					}
+
+					fileName = dialog.getDirectory() + fileName;
+					currentFile = new File(fileName);
+
+					if(!fileName.toLowerCase().endsWith(".otml")){
+						currentFile = new File(currentFile.getAbsolutePath()+".otml");
+					}
+					if(!currentFile.exists() || checkForReplace(currentFile)){
+						try {
+						    
+						    OTDataObject userDataObject = otrunk.getOTDataObject(null, currentUser.getGlobalId());
+							Exporter.export(currentFile, userDataObject, xmlDB);
+						} catch(Exception e){
+							e.printStackTrace();
+						}	                    	
+					}				
+				}
+			};
+			saveUserDataAsAction.putValue(Action.NAME, "Save User Data As...");			
+			// saveAsAction.setEnabled(false);
+			menu.add(saveUserDataAsAction);
 
 			JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem("Debug Mode");
 			debugItem.addActionListener(new ActionListener(){

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2005-01-25 16:19:41 $
+ * $Revision: 1.2 $
+ * $Date: 2005-03-31 21:07:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -11,6 +11,7 @@ package org.concord.otrunk.xml;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
@@ -31,6 +32,7 @@ import org.concord.domain.Transfer;
 public class XMLBlobResource
 {
 	URL blobURL;
+	byte [] bytes;
 	
 	public XMLBlobResource(URL url)
 	{
@@ -39,6 +41,8 @@ public class XMLBlobResource
 	
 	public byte [] getBytes()
 	{
+	    if(bytes != null) return bytes;
+	    
 		InputStream urlStream = null;
 		try {
 			urlStream = blobURL.openStream();
@@ -51,10 +55,14 @@ public class XMLBlobResource
 
 			urlStream = null;
 			
-			return outStream.toByteArray();
+			bytes = outStream.toByteArray();
+			return bytes;
 		} catch (SocketException sockExcp)
 		{
 			System.err.println(sockExcp.toString());
+		} catch (FileNotFoundException e){
+		    System.err.println("error loading xml resource: ");
+		    System.err.println("   " + e.toString());
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -71,5 +79,10 @@ public class XMLBlobResource
 		
 
 		return null;
+	}
+	
+	public URL getBlobURL()
+	{
+	    return blobURL;
 	}
 }
