@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.4 $
+ * $Date: 2004-11-22 23:10:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -10,26 +10,18 @@
 package org.concord.otrunk.xml;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.concord.otrunk.OTObject;
 import org.concord.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTResourceMap;
 import org.doomdark.uuid.UUID;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
 
 
 /**

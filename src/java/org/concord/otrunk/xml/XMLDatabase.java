@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:10:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -11,7 +11,6 @@ package org.concord.otrunk.xml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
@@ -26,9 +25,6 @@ import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTResourceCollection;
 import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTResourceMap;
-import org.concord.otrunk.datamodel.fs.FsDataObject;
-import org.concord.otrunk.datamodel.fs.FsResourceList;
-import org.concord.otrunk.datamodel.fs.FsResourceMap;
 import org.doomdark.uuid.EthernetAddress;
 import org.doomdark.uuid.NativeInterfaces;
 import org.doomdark.uuid.UUID;
