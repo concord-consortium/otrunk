@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.5 $
+ * $Date: 2004-12-17 20:09:18 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -72,8 +72,11 @@ public class XMLDataObject
 	 */
 	public void setResource(String key, Object resource)
 	{
-		// What should we do if the resource is null??
-		resources.put(key, resource);
+		if(resource != null) {
+			// Hashtables can't know the different between null and empty
+			// so if it is null we'll just leave it empty
+			resources.put(key, resource);			
+		}
 	}
 	
 	/* (non-Javadoc)

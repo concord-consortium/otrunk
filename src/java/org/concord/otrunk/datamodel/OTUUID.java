@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.2 $
+ * $Date: 2004-12-17 20:09:18 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -29,6 +29,9 @@ import org.doomdark.uuid.UUIDGenerator;
 public class OTUUID extends UUID
 	implements OTID 
 {
+	private static boolean noEthernetInterfaces;
+	private static EthernetAddress hwAddress = null;
+	
 	static {
 		// tell the UUID code to use the standard paths 
 		// to find native library
@@ -40,14 +43,51 @@ public class OTUUID extends UUID
 		super(id);
 	}
 	
+	public static EthernetAddress getHWAddress()	
+	{
+		if(noEthernetInterfaces) {
+			return null;
+		}
+		
+		if(hwAddress != null) {
+			return hwAddress;
+		}
+		
+    	hwAddress = NativeInterfaces.getPrimaryInterface();
+
+    	if(hwAddress == null) {
+    		System.err.println("primary interface is null");
+    		EthernetAddress [] addressArray = NativeInterfaces.getAllInterfaces();
+    		for(int i=0; i<addressArray.length; i++) {
+    			if(addressArray[i] != null) {
+    				hwAddress = addressArray[i];
+    			}  			
+    		}
+    		if(hwAddress == null) {
+    			System.err.println("Can't find a native interface");
+    		}
+    	}
+    	
+		if(hwAddress == null) {
+			noEthernetInterfaces = true;
+		}
+		
+		return hwAddress;
+	}
+	
 	public static OTID createOTUUID()
 	{
+		EthernetAddress hwAddress = getHWAddress();
+				
 		UUIDGenerator generator = UUIDGenerator.getInstance();
-    	EthernetAddress hwAddress = NativeInterfaces.getPrimaryInterface();
-    	
     	// FIXME: there has to be a better way to do this without
     	// making a throw away object.
-    	UUID id = generator.generateTimeBasedUUID(hwAddress);
+    	UUID id;   	
+    	if(hwAddress != null) {
+    		id = generator.generateTimeBasedUUID(hwAddress);
+    	} else {
+    		id = generator.generateTimeBasedUUID();
+    	}
     	return new OTUUID(id.toString());
 	}
 }

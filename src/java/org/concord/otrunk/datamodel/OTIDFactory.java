@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.2 $
+ * $Date: 2004-12-17 20:09:18 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -25,6 +25,10 @@ public class OTIDFactory
 {
 	public static OTID createOTID(String id)
 	{
-		return new OTUUID(id);
+		try {
+			return new OTUUID(id);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }

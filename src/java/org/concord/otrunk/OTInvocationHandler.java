@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2004-12-06 03:51:34 $
+ * $Revision: 1.4 $
+ * $Date: 2004-12-17 20:09:18 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -156,6 +156,8 @@ public class OTInvocationHandler
 		} else if(methodName.startsWith("removeAll")) {
 			System.err.println("Dont' handle remove All yet");
 			return null;
+		} else if(methodName.equals("toString")) {
+			return dataObject.getResource(OTrunk.RES_CLASS_NAME) + "@" +  dataObject.getGlobalId();
 		} else {
 			String resourceName = getResourceName(3, methodName); 
 			Object resourceValue = args[0];

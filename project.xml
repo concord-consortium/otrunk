@@ -33,6 +33,13 @@
       <groupId>xmltypes</groupId>
       <artifactId>xmltypes</artifactId>
       <version>1.0</version>
+      <jar>${basedir}/xmlbeans/xmltypes-1.0.jar</jar>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>domain</groupId>
+      <artifactId>domain</artifactId>
+      <version>1.0</version>
       <type>jar</type>
     </dependency>
     <dependency>
@@ -48,8 +55,8 @@
       <type>jar</type>
     </dependency>
     <dependency>
-      <groupId>domain</groupId>
-      <artifactId>domain</artifactId>
+      <groupId>framework</groupId>
+      <artifactId>framework</artifactId>
       <version>1.0</version>
       <type>jar</type>
     </dependency>
