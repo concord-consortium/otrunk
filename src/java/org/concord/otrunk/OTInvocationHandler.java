@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2004-12-17 20:09:18 $
+ * $Revision: 1.5 $
+ * $Date: 2005-01-11 05:52:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,9 +34,9 @@ public class OTInvocationHandler
 	implements InvocationHandler
 {
 	OTDataObject dataObject;
-	OTrunk db;
+	OTrunkImpl db;
 	
-	public OTInvocationHandler(OTDataObject dataObject, OTrunk db)
+	public OTInvocationHandler(OTDataObject dataObject, OTrunkImpl db)
 	{
 		this.dataObject = dataObject;
 		this.db = db;
@@ -157,7 +157,7 @@ public class OTInvocationHandler
 			System.err.println("Dont' handle remove All yet");
 			return null;
 		} else if(methodName.equals("toString")) {
-			return dataObject.getResource(OTrunk.RES_CLASS_NAME) + "@" +  dataObject.getGlobalId();
+			return dataObject.getResource(OTrunkImpl.RES_CLASS_NAME) + "@" +  dataObject.getGlobalId();
 		} else {
 			String resourceName = getResourceName(3, methodName); 
 			Object resourceValue = args[0];

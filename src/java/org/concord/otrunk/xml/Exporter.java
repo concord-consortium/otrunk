@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.4 $
+ * $Date: 2005-01-11 05:52:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -16,7 +16,8 @@ import java.io.PrintStream;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.otrunk.OTrunk;
+import org.concord.framework.otrunk.OTrunk;
+import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTResourceList;
@@ -139,7 +140,7 @@ public class Exporter
 		}
 		
 		
-		String objectClass = (String)dataObj.getResource(OTrunk.RES_CLASS_NAME);
+		String objectClass = (String)dataObj.getResource(OTrunkImpl.RES_CLASS_NAME);
 		if(!writtenClasses.contains(objectClass)) {
 			writtenClasses.add(objectClass);
 		}
@@ -152,7 +153,7 @@ public class Exporter
 		String resourceKeys [] = dataObj.getResourceKeys();
 		int resourceIndent = indent;
 		for(int i=0; i<resourceKeys.length; i++) {
-			if(resourceKeys[i].equals(OTrunk.RES_CLASS_NAME) ||
+			if(resourceKeys[i].equals(OTrunkImpl.RES_CLASS_NAME) ||
 					resourceKeys[i].equals("currentRevision")) {
 				continue;
 			}

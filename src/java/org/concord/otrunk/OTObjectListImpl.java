@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-12-06 03:51:34 $
+ * $Revision: 1.2 $
+ * $Date: 2005-01-11 05:52:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -28,12 +28,12 @@ import org.concord.otrunk.datamodel.OTResourceList;
  */
 public class OTObjectListImpl implements OTObjectList
 {
-	OTrunk oTrunk;
+	OTrunkImpl oTrunk;
 	OTResourceList list;
 	OTDataObject owner;
 	
 	public OTObjectListImpl(OTResourceList resList, OTDataObject owner, 
-		OTrunk oTrunk)
+		OTrunkImpl oTrunk)
 	{
 		this.oTrunk = oTrunk;
 		this.list = resList;
