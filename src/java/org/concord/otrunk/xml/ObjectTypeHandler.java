@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2005-01-31 17:43:20 $
+ * $Revision: 1.11 $
+ * $Date: 2005-02-09 06:15:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -171,9 +171,13 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			if(childRefId == null) {
 				List children = child.getChildren();
 				if(children.size() != 1) {
-					// invalid object tag
+					// empty object tag
+					// this happens a lot in the current xml so
+					// I'm taking this out for now
+					/*
 					System.err.println("empty object field: " + 
 							TypeService.elementPath(child));
+							*/
 					return null;
 				}
 				childObj = children.get(0);
