@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-01-25 16:18:41 $
+ * $Revision: 1.5 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -40,6 +40,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.xml.Exporter;

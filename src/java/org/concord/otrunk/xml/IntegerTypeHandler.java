@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-12-15 22:52:15 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -22,7 +22,7 @@ import org.jdom.Element;
  * @author scott<p>
  *
  */
-public class IntegerTypeHandler extends ResourceTypeHandler
+public class IntegerTypeHandler extends PrimitiveResourceTypeHandler
 {
 	public IntegerTypeHandler()
 	{
@@ -32,15 +32,13 @@ public class IntegerTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	public Object handleElement(Element element, Properties elementProps)
+	public Object handleElement(String value, Properties elementProps)
+		throws HandleElementException
 	{
-		String value = element.getTextTrim();
 		try {
 			return Integer.decode(value);
 		} catch (Throwable e) {
-			
-			throw new RuntimeException("syntax error in: " + 
-					TypeService.elementPath(element), e);
+			throw new HandleElementException("malformed integer");
 		}
 	}
 

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-01-12 04:19:55 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -93,6 +93,19 @@ public class FsResourceList
 		list.add(index, object);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceList#set(int, java.lang.Object)
+	 */
+	public void set(int index, Object object) 
+	{
+		if(readOnly) {
+			// TODO should throw an exception
+			return;
+		}
+
+		updateModifiedTime();
+		list.set(index, object);
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#removeAll()

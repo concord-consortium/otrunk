@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -25,13 +25,18 @@ import org.jdom.output.XMLOutputter;
  * @author scott<p>
  *
  */
-public class StringTypeHandler extends ResourceTypeHandler
+public class StringTypeHandler extends PrimitiveResourceTypeHandler
 {
 	public StringTypeHandler()
 	{
 		super("string");
 	}
 		
+	public Object handleElement(String value, Properties elementProps)
+	{
+		return value;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */

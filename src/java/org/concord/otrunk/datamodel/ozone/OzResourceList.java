@@ -24,6 +24,8 @@ public interface OzResourceList extends OTResourceList, OzoneRemote
 	
 	public void add(int index, Object object);/*update*/
 	
+	public void set(int index, Object object);/*update*/
+
 	public OTObject getObject(int index);
 	
 	public void add(OTObject object);/*update*/

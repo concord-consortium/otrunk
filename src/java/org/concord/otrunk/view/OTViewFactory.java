@@ -9,6 +9,7 @@ package org.concord.otrunk.view;
 import javax.swing.JComponent;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.OTViewContainer;
 
 /**
  * @author Informaiton Services

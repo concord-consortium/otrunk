@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-01-12 04:19:54 $
+ * $Revision: 1.5 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -41,6 +41,12 @@ public class OTUserDataObject
 			this.authoredList = authoredList;
 		}
 				
+		public void set(int index, Object object)
+		{
+			// this is read only
+			return;
+		}
+
 		/* (non-Javadoc)
 		 * @see org.concord.otrunk.OTResourceList#add(int, java.lang.Object)
 		 */

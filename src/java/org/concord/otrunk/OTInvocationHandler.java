@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-01-25 16:19:41 $
+ * $Revision: 1.9 $
+ * $Date: 2005-01-27 16:45:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -93,6 +93,20 @@ public class OTInvocationHandler
 				}
 				
 				return new OTObjectMapImpl(map, dataObject, db);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			return null;				
+		} else if(OTResourceList.class.isAssignableFrom(returnType)) {
+			try {					
+				OTResourceList list = (OTResourceList)dataObject.getResource(resourceName);
+				if(list == null) {
+					list = (OTResourceList)db.createCollection(dataObject, OTResourceList.class);
+					dataObject.setResource(resourceName, list);
+				}
+				
+				return list;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
