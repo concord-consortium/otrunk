@@ -7,7 +7,7 @@
 package org.concord.otrunk.view;
 
 import org.concord.framework.otrunk.OTResourceList;
-import org.concord.swing.tree.SimpleTreeNode;
+import org.concord.framework.util.SimpleTreeNode;
 
 
 /**

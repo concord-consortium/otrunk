@@ -40,7 +40,18 @@ public class OTrunkImpl implements OTrunk
 	
 	public OTrunkImpl(OTDatabase db)
 	{
+		this(db, null);
+	}
+
+	public OTrunkImpl(OTDatabase db, Object [] services)
+	{		
 		this.db = db;
+		if(services != null) {
+			this.services = new Vector();
+			for(int i=0; i<services.length; i++) {
+				this.services.add(services[i]);
+			}
+		}
 		
 		// We should look up if there are any sevices.
 		try {
@@ -51,7 +62,10 @@ public class OTrunkImpl implements OTrunk
 			
 			OTObjectList serviceList = ((OTSystem)root).getServices();
 			
-			services = serviceList.getVector();
+			if(this.services == null) {
+				this.services = new Vector();
+			}
+			this.services.addAll(serviceList.getVector());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -310,7 +324,7 @@ public class OTrunkImpl implements OTrunk
 			
 			constructorParams[i] = null;
 			for(int j=0; j<services.size(); j++) {
-				OTObject service = (OTObject)services.get(j);
+				Object service = services.get(j);
 				if(params[i].isInstance(service)) {
 					constructorParams[i] = service;
 					break;
