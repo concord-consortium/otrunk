@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -169,12 +169,25 @@ public class FsDatabase implements OTDatabase
     	EthernetAddress hwAddress = NativeInterfaces.getPrimaryInterface();
     	UUID id = generator.generateTimeBasedUUID(hwAddress);
 
+    	return createDataObject(id);
+	}
+	
+	/** 
+	 * This should verify the id wasn't used before
+	 */
+	public OTDataObject createDataObject(UUID id)
+		throws Exception
+	{
     	OTDataObject dataObject = new FsDataObject(id);
     	((FsDataObject)dataObject).creationInit();
     	
-    	dbIndex.put(dataObject.getGlobalId(), dataObject);
+    	Object oldValue = dbIndex.put(dataObject.getGlobalId(), dataObject);
+    	if(oldValue != null) {
+    		dbIndex.put(dataObject.getGlobalId(), oldValue);
+    		throw new Exception("repeated unique id");
+    	}
 
-    	return dataObject;
+    	return dataObject;		
 	}
 	
 	public OTDataObject createDataObject(byte [] objectBytes)

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -24,12 +24,17 @@ import org.jdom.Element;
  */
 public abstract class ResourceTypeHandler
 {
-	protected TypeService typeService = null;
+	protected String primitiveName = null;
 	
 	abstract public Object handleElement(Element element, Properties elementProps);
 
-	public ResourceTypeHandler(TypeService dots)
+	public ResourceTypeHandler(String primitiveName)
 	{
-		typeService = dots;
+		this.primitiveName = primitiveName;
+	}
+	
+	public String getPrimitiveName()
+	{
+		return primitiveName;
 	}
 }

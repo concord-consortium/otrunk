@@ -25,10 +25,9 @@ public class OzDatabaseIndexImpl extends OzoneObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OzDatabaseIndex#put(org.concord.otrunk.OTDataObjectID, org.concord.portfolio.OzonePfDataObject)
 	 */
-	public void put(UUID id, OzDataObject dataObject) 
+	public OzDataObject put(UUID id, OzDataObject dataObject) 
 	{
-		// TODO Auto-generated method stub
-		databaseIndex.put(id, dataObject);
+		return (OzDataObject)databaseIndex.put(id, dataObject);
 	}
 
 	/* (non-Javadoc)
@@ -36,7 +35,6 @@ public class OzDatabaseIndexImpl extends OzoneObject
 	 */
 	public OzDataObject get(UUID id) 
 	{
-		// TODO Auto-generated method stub
 		return (OzDataObject)databaseIndex.get(id);
 	}
 
@@ -52,7 +50,6 @@ public class OzDatabaseIndexImpl extends OzoneObject
 	 * @see org.concord.portfolio.OzonePfDatabaseIndex#getRoot()
 	 */
 	public UUID getRoot() {
-		// TODO Auto-generated method stub
 		return rootID;
 	}
 

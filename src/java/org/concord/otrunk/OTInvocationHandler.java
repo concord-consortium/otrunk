@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:05:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -127,7 +127,7 @@ public class OTInvocationHandler
 		
 	}
 
-	public String getResourceName(int prefixLen, String methodName)
+	public static String getResourceName(int prefixLen, String methodName)
 	{
 		String resourceName = methodName.substring(prefixLen, methodName.length());
 		resourceName = resourceName.substring(0,1).toLowerCase() + 

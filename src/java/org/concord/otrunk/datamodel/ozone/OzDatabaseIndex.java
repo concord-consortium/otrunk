@@ -17,7 +17,7 @@ import org.ozoneDB.OzoneRemote;
  */
 public interface OzDatabaseIndex extends OzoneRemote
 {
-	public void put(UUID id, OzDataObject dataObject); /*update*/
+	public OzDataObject put(UUID id, OzDataObject dataObject); /*update*/
 	public OzDataObject get(UUID id);
 	
 	public void setRoot(UUID rootID);	/*update*/

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.3 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -52,6 +52,11 @@ public class XMLResourceList
 		list.add(index, object);
 	}
 
+	public void set(int index, Object object)
+	{
+		list.set(index, object);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceCollection#size()
 	 */
