@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2004-12-14 22:54:34 $
+ * $Revision: 1.7 $
+ * $Date: 2004-12-15 22:52:15 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -103,7 +103,7 @@ public class TypeService
 		return handler;
 	}
 
-	public String elementPath(Element element)
+	public static String elementPath(Element element)
 	{
 		String path = element.getName();
 		Element parent = element.getParentElement();

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.3 $
+ * $Date: 2004-12-15 22:52:15 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -35,7 +35,14 @@ public class BooleanTypeHandler extends ResourceTypeHandler
 	public Object handleElement(Element element, Properties elementProps)
 	{
 		String value = element.getTextTrim();
-		return Boolean.valueOf(value);
+		try {
+			return Boolean.valueOf(value);
+		} catch (Throwable e) {
+			
+			throw new RuntimeException("syntax error in: " + 
+					TypeService.elementPath(element), e);
+		}
+
 	}
 
 }
