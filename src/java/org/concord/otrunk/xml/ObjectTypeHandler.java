@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.10 $
+ * $Date: 2005-01-31 17:43:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -192,7 +192,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		if(childObj instanceof String) {
 			if(resHandler instanceof PrimitiveResourceTypeHandler){
 				return ((PrimitiveResourceTypeHandler)resHandler).
-				handleElement((String)childObj, elementProps);
+					handleElement((String)childObj, elementProps);
 			} else {
 				throw new HandleElementException("Can't use an attribute for a non-primitive type");
 			}

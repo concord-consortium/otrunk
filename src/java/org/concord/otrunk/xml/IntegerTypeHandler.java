@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.4 $
+ * $Date: 2005-01-31 17:43:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -26,7 +26,7 @@ public class IntegerTypeHandler extends PrimitiveResourceTypeHandler
 {
 	public IntegerTypeHandler()
 	{
-		super("boolean");
+		super("int");
 	}
 	
 	/* (non-Javadoc)

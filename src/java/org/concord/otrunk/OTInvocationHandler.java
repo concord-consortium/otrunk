@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.10 $
+ * $Date: 2005-01-31 17:43:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -55,10 +55,10 @@ public class OTInvocationHandler
 		if(OTObject.class.isAssignableFrom(returnType)) {
 			OTObject object;
 			try {
-				OTID objId = (OTID)resourceValue;
-				if(objId == null) {
+				if(resourceValue == null) {
 					return null;
 				}
+				OTID objId = (OTID)resourceValue;
 				
 				object = (OTObject)db.getOTObject(dataObject, objId);
 				
