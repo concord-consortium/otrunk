@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2004-12-17 20:09:18 $
+ * $Revision: 1.6 $
+ * $Date: 2005-01-25 16:19:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -84,6 +84,14 @@ public class XMLDataObject
 	 */
 	public Object getResource(String key)
 	{
+		Object resource = resources.get(key);
+		
+		if(resource instanceof XMLBlobResource) {
+			byte [] bytes = ((XMLBlobResource)resource).getBytes();
+			setResource(key, bytes);
+			return bytes;
+		}
+
 		return resources.get(key);
 	}
 

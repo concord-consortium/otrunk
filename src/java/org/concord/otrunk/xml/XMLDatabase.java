@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-01-12 04:19:54 $
+ * $Revision: 1.7 $
+ * $Date: 2005-01-25 16:19:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -254,17 +254,46 @@ public class XMLDatabase
 					newResourceValue = getOTID((XMLDataObject)resourceValue);
 					xmlDObj.setResource((String)resourceEntry.getKey(), newResourceValue);
 				} else if(resourceValue instanceof XMLResourceList) {
-					XMLResourceList oldList = (XMLResourceList)resourceValue;
-					for(int j=0; j<oldList.size(); j++) {
-						Object oldElement = oldList.get(j);
+					XMLResourceList list = (XMLResourceList)resourceValue;
+					for(int j=0; j<list.size(); j++) {
+						Object oldElement = list.get(j);
 						if(oldElement instanceof XMLDataObject) {
 							OTID newElement = getOTID((XMLDataObject)oldElement);
-							oldList.set(j, newElement);
-						} 
+							list.set(j, newElement);
+						}
+						if(oldElement instanceof XMLParsableString) {
+							newResourceValue = ((XMLParsableString)oldElement).parse(localIdMap);
+							list.set(j, newResourceValue);							
+						}
 					}
 					// the resource list value doesn't need to be updated
 				} else if(resourceValue instanceof XMLResourceMap) {
-					// FIXME should parse the map just like the list 
+					XMLResourceMap map = (XMLResourceMap)resourceValue;
+					String [] keys = map.getKeys();
+					for(int j=0; j<keys.length; j++) {
+						Object oldElement = map.get(keys[j]);
+						
+						// Check if the key is a local id reference
+						// if it is then replace it with the string
+						// representation of this key
+						if(keys[j].startsWith("${")){
+							OTID globalId = getGlobalId(keys[j]);
+							if(globalId != null) {
+								map.remove(keys[j]);
+								keys[j] = globalId.toString();
+								map.put(keys[j], oldElement);
+							}
+						}
+
+						if(oldElement instanceof XMLDataObject) {
+							OTID newElement = getOTID((XMLDataObject)oldElement);
+							map.put(keys[j], newElement);
+						}
+						if(oldElement instanceof XMLParsableString) {
+							newResourceValue = ((XMLParsableString)oldElement).parse(localIdMap);
+							map.put(keys[j], newResourceValue);							
+						}
+					}
 				} else if(resourceValue instanceof XMLParsableString) {
 					// replace the local ids from the string
 					newResourceValue = ((XMLParsableString)resourceValue).parse(localIdMap);

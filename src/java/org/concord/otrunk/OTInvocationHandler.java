@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-01-12 04:19:54 $
+ * $Revision: 1.8 $
+ * $Date: 2005-01-25 16:19:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -173,6 +173,22 @@ public class OTInvocationHandler
 			return null;
 		} else if(methodName.equals("toString")) {
 			return dataObject.getResource(OTrunkImpl.RES_CLASS_NAME) + "@" +  dataObject.getGlobalId();
+		} else if(methodName.equals("equals")) {
+			Object other = args[0];
+			if(!(other instanceof OTObject)){
+				return Boolean.FALSE;
+			}
+			
+			if(proxy == other) {
+				return Boolean.TRUE;
+			}
+			
+			if(((OTObject)other).getGlobalId().equals(dataObject.getGlobalId())) {
+				System.err.println("compared two ot objects with the same ID but different instances");
+				return Boolean.TRUE;
+			}
+			return Boolean.FALSE;
+
 		} else {
 			String resourceName = getResourceName(3, methodName); 
 			Object resourceValue = args[0];

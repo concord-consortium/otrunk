@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-01-12 04:19:54 $
+ * $Revision: 1.9 $
+ * $Date: 2005-01-25 16:19:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -17,6 +17,7 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.jdom.Element;
@@ -51,7 +52,8 @@ public class TypeService
 		} else if(OTResourceList.class.isAssignableFrom(klass) ||
 				OTObjectList.class.isAssignableFrom(klass)) {
 			return "list";
-		} else if(OTResourceMap.class.isAssignableFrom(klass)) {
+		} else if(OTResourceMap.class.isAssignableFrom(klass) ||
+				OTObjectMap.class.isAssignableFrom(klass)) {
 			return "map";
 		} else if(OTID.class.isAssignableFrom(klass) ||
 				OTObject.class.isAssignableFrom(klass) ) {
@@ -75,6 +77,7 @@ public class TypeService
 		handlerMap.put("string", new StringTypeHandler());
 		handlerMap.put("blob", new BlobTypeHandler(contextURL));
 		handlerMap.put("list", new ListTypeHandler(this));
+		handlerMap.put("map", new MapTypeHandler(this));
 	}
 	
 	public void registerUserType(String name, ResourceTypeHandler handler)

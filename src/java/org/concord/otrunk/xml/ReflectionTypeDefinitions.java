@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-01-13 03:14:45 $
+ * $Revision: 1.6 $
+ * $Date: 2005-01-25 16:19:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -104,6 +104,9 @@ public class ReflectionTypeDefinitions
 			String resourceName = OTInvocationHandler.getResourceName(3,methodName);
 			Class resourceClass = methods[j].getReturnType();
 			String resourceType = TypeService.getPrimitiveType(resourceClass);
+			if(resourceType == null){
+				System.err.println("Unknown resourceType: " + resourceClass);
+			}
 			ResourceDefinition resourceDef = new ResourceDefinition(resourceName,
 					resourceType, null);
 			resources.add(resourceDef);
