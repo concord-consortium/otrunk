@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-12 04:19:54 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -9,7 +9,7 @@
 */
 package org.concord.otrunk.xml;
 
-import org.concord.otrunk.datamodel.OTResourceMap;
+import org.concord.framework.otrunk.OTResourceMap;
 
 
 /**

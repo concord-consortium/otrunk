@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.2 $
+ * $Date: 2005-01-12 04:19:55 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -12,7 +12,7 @@ package org.concord.otrunk.datamodel.fs;
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.concord.otrunk.datamodel.OTResourceList;
+import org.concord.framework.otrunk.OTResourceList;
 
 
 /**

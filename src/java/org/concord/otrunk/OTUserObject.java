@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2005-01-11 07:51:05 $
+ * $Revision: 1.2 $
+ * $Date: 2005-01-12 04:19:54 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -13,9 +13,9 @@ import java.util.Hashtable;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.otrunk.datamodel.OTDataObject;
-import org.concord.otrunk.datamodel.OTResourceMap;
 
 /**
  * PfUserObject

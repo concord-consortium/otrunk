@@ -7,7 +7,7 @@
 package org.concord.otrunk.datamodel.ozone;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.otrunk.datamodel.OTResourceList;
+import org.concord.framework.otrunk.OTResourceList;
 import org.ozoneDB.OzoneRemote;
 
 /**

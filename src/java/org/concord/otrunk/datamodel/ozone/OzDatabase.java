@@ -7,9 +7,9 @@
 package org.concord.otrunk.datamodel.ozone;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
-import org.concord.otrunk.datamodel.OTResourceCollection;
 import org.ozoneDB.ExternalDatabase;
 
 /**

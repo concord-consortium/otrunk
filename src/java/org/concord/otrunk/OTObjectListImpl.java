@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-01-11 05:52:42 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-12 04:19:54 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -14,8 +14,8 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTResourceList;
 import org.concord.otrunk.datamodel.OTDataObject;
-import org.concord.otrunk.datamodel.OTResourceList;
 
 /**
  * OTObjectList
