@@ -14,12 +14,11 @@ import java.util.Hashtable;
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTResourceCollection;
-import org.concord.otrunk.datamodel.OTUser;
-import org.concord.otrunk.datamodel.OTUserDataObject;
 
 /**
  * @author scott
@@ -99,7 +98,21 @@ public class OTrunkImpl implements OTrunk
 			throw new Exception("Null child Id");
 		}
 		// 
-		return db.getOTDataObject(dataParent, childID);
+		OTDataObject childDataObject = db.getOTDataObject(dataParent, childID);
+		
+		// if the mode is authoring then just return the requested object
+		// if the mode is student then the requested node needs to be looked up
+		// in the users object table.  Then that object is setup to reference 
+		// the authoring object.
+		if ( (dataParent == null) || 
+				!(dataParent instanceof OTUserDataObject)) {
+			return childDataObject;
+		}	
+		
+		OTUserDataObject userObject;
+		OTUserStateMap user = ((OTUserDataObject)dataParent).getUser();	
+		
+		return user.getUserDataObject(childDataObject);
 	}
 	
 	public void close()
@@ -147,7 +160,7 @@ public class OTrunkImpl implements OTrunk
 	public OTObject getOTObject(OTID referingId , OTID childID)
 		throws Exception
 	{
-		OTDataObject referingObj = db.getOTDataObject(null, referingId);
+		OTDataObject referingObj = getOTDataObject(null, referingId);
 		return getOTObject(referingObj, childID);
 	}
 	
@@ -247,9 +260,9 @@ public class OTrunkImpl implements OTrunk
 		throws Exception
 	{
 		OTID authoredId = authoredObject.getGlobalId();
-		OTDataObject authoredDataObj = db.getOTDataObject(null, authoredId);
+		OTDataObject authoredDataObj = getOTDataObject(null, authoredId);
 		OTUserDataObject userData = 
-			new OTUserDataObject(authoredDataObj, user, this);
+			new OTUserDataObject(authoredDataObj, (OTUserStateMap)user, this);
 
 		// this is a hack it should get the class from the authoring root
 		// and use that to make the portfolio object

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-01-11 05:52:42 $
+ * $Revision: 1.5 $
+ * $Date: 2005-01-11 07:51:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -16,7 +16,6 @@ import java.io.PrintStream;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;

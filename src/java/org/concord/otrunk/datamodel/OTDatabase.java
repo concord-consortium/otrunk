@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.4 $
+ * $Date: 2005-01-11 07:51:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -52,6 +52,10 @@ public interface OTDatabase
 	/**
 	 * The dataParent must be set so the database can correctly look up the 
 	 * child object.
+	 * 
+	 * This should only be used if you want the lowlevel view of the data
+	 * it will not handle users correctly.  You must use the OTrunkImpl version
+	 * of this method for that.
 	 *  
 	 * @param dataParent
 	 * @param childID

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-01-11 05:52:42 $
+ * $Revision: 1.6 $
+ * $Date: 2005-01-11 07:51:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTResourceMap;
@@ -83,6 +84,20 @@ public class OTInvocationHandler
 			}
 			
 			return null;
+		} else if(OTObjectMap.class.isAssignableFrom(returnType)) {
+			try {					
+				OTResourceMap map = (OTResourceMap)dataObject.getResource(resourceName);
+				if(map == null) {
+					map = (OTResourceMap)db.createCollection(dataObject, OTResourceList.class);
+					dataObject.setResource(resourceName, map);
+				}
+				
+				return new OTObjectMapImpl(map, dataObject, db);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			return null;				
 		} else if(OTObjectList.class.isAssignableFrom(returnType)) {
 			try {					
 				OTResourceList list = (OTResourceList)dataObject.getResource(resourceName);

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-01-11 05:52:42 $
+ * $Revision: 1.8 $
+ * $Date: 2005-01-11 07:51:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.OTrunkImpl;
 import org.jdom.Element;
 
