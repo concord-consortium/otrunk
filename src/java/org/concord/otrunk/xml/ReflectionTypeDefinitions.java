@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:10:05 $
+ * $Revision: 1.3 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -13,8 +13,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTObject;
 import org.concord.otrunk.OTInvocationHandler;
-import org.concord.otrunk.OTObject;
 import org.concord.otrunk.OTResourceSchema;
 
 

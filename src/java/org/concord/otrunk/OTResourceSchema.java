@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.2 $
+ * $Date: 2004-12-06 03:51:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -9,7 +9,8 @@
 */
 package org.concord.otrunk;
 
-import org.doomdark.uuid.UUID;
+import org.concord.framework.otrunk.OTID;
+
 
 
 /**
@@ -23,7 +24,7 @@ import org.doomdark.uuid.UUID;
  */
 public interface OTResourceSchema
 {
-	public UUID getGlobalId();
+	public OTID getGlobalId();
 	
 	public String getName();
 	public void setName(String name);

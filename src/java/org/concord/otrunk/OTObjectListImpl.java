@@ -1,7 +1,7 @@
 /*
  * Last modification information:
  * $Revision: 1.1 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Date: 2004-12-06 03:51:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -11,10 +11,11 @@ package org.concord.otrunk;
 
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTResourceList;
-import org.doomdark.uuid.UUID;
-
 
 /**
  * OTObjectList
@@ -25,13 +26,13 @@ import org.doomdark.uuid.UUID;
  * @author scott<p>
  *
  */
-public class OTObjectList
+public class OTObjectListImpl implements OTObjectList
 {
 	OTrunk oTrunk;
 	OTResourceList list;
 	OTDataObject owner;
 	
-	public OTObjectList(OTResourceList resList, OTDataObject owner, 
+	public OTObjectListImpl(OTResourceList resList, OTDataObject owner, 
 		OTrunk oTrunk)
 	{
 		this.oTrunk = oTrunk;
@@ -42,7 +43,7 @@ public class OTObjectList
 	public OTObject get(int index)
 	{
 		try {
-			UUID id = (UUID)list.get(index);
+			OTID id = (OTID)list.get(index);
 			if(id == null) {
 				System.err.println("Null item in object list index: " + index);
 				return null;
@@ -60,7 +61,7 @@ public class OTObjectList
 
 		for(int i=0; i<list.size(); i++) {
 			try {	
-				UUID childID = (UUID)list.get(i);
+				OTID childID = (OTID)list.get(i);
 				childVector.add(oTrunk.getOTObject(owner, childID));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -72,7 +73,7 @@ public class OTObjectList
 			
 	public void add(OTObject obj)
 	{
-		UUID id = obj.getGlobalId();
+		OTID id = obj.getGlobalId();
 		if(id == null) {
 			throw new RuntimeException("adding null id object list");
 		}
@@ -82,7 +83,7 @@ public class OTObjectList
 	
 	public void add(int index, OTObject obj)
 	{
-		UUID id = obj.getGlobalId();
+		OTID id = obj.getGlobalId();
 		if(id == null) {
 			throw new RuntimeException("adding null id object list");
 		}
@@ -95,7 +96,7 @@ public class OTObjectList
 	 * it would be best if the users of this list could have all ids hidden from
 	 * them.
 	 */
-	public void add(UUID id)
+	public void add(OTID id)
 	{
 		list.add(id);
 	}

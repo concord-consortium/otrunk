@@ -6,10 +6,10 @@
  */
 package org.concord.otrunk.datamodel.ozone;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTResourceCollection;
-import org.doomdark.uuid.UUID;
 import org.ozoneDB.ExternalDatabase;
 
 /**
@@ -24,7 +24,7 @@ public class OzDatabase implements OTDatabase
 
 	// we need to save and restore these two things
 	private OzDatabaseIndex dbIndex;
-	private UUID rootID;
+	private OTID rootID;
 	
 	public OzDatabase()
 	{
@@ -79,7 +79,7 @@ public class OzDatabase implements OTDatabase
 		
 		((OzDataObject)dataObject).generateID();
 
-		UUID newID = dataObject.getGlobalId();
+		OTID newID = dataObject.getGlobalId();
 		if(newID == null) {
 			throw new Exception("null id");
 		}
@@ -88,7 +88,7 @@ public class OzDatabase implements OTDatabase
 		return dataObject;
 	}
 
-	public OTDataObject createDataObject(UUID id)
+	public OTDataObject createDataObject(OTID id)
 		throws Exception
 	{
 		OzDataObject dataObject = (OzDataObject)db.createObject( OzDataObjectImpl.class.getName());
@@ -119,7 +119,7 @@ public class OzDatabase implements OTDatabase
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDatabase#setRoot(org.concord.otrunk.OTObject)
 	 */
-	public void setRoot(UUID rootId) {		
+	public void setRoot(OTID rootId) {		
 		dbIndex.setRoot(rootId);
 	}
 
@@ -141,7 +141,7 @@ public class OzDatabase implements OTDatabase
 		}
 	}
 
-	public OTDataObject getOTDataObject(OTDataObject dataParent, UUID childID)
+	public OTDataObject getOTDataObject(OTDataObject dataParent, OTID childID)
 	throws Exception 
 	{
 		if(childID == null) throw new Exception("null id");

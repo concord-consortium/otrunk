@@ -7,9 +7,9 @@
 package org.concord.otrunk.datamodel.ozone;
 
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTResourceCollection;
-import org.doomdark.uuid.UUID;
 import org.ozoneDB.OzoneRemote;
 
 /**
@@ -23,7 +23,7 @@ public interface OzDataObject
 {
 	public void setResource(String name, Object resource); /*update*/
 	public void generateID(); /*update*/
-	public void setGlobalId(UUID id); /*update*/
+	public void setGlobalId(OTID id); /*update*/
 	public OTResourceCollection getResourceCollection(String key); /*update*/
 
 }

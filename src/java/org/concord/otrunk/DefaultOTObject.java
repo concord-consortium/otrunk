@@ -6,8 +6,10 @@
  */
 package org.concord.otrunk;
 
+import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTObject;
 
-import org.doomdark.uuid.UUID;
+
 
 
 /**
@@ -27,7 +29,7 @@ public class DefaultOTObject implements OTObject
 		this.resources = resources;		
 	}
 			
-	public UUID getGlobalId()
+	public OTID getGlobalId()
 	{
 		return resources.getGlobalId();
 	}
@@ -64,7 +66,7 @@ public class DefaultOTObject implements OTObject
 	{
 	}
 	
-	public OTObject getReferencedObject(UUID id)
+	public OTObject getReferencedObject(OTID id)
 	{
     	try {
     		OTrunk db = getOTDatabase();

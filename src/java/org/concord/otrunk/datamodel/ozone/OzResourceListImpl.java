@@ -8,7 +8,7 @@ package org.concord.otrunk.datamodel.ozone;
 
 import java.util.Vector;
 
-import org.concord.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObject;
 import org.ozoneDB.OzoneObject;
 
 

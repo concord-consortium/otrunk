@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.3 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -9,7 +9,7 @@
 */
 package org.concord.otrunk.datamodel;
 
-import org.doomdark.uuid.UUID;
+import org.concord.framework.otrunk.OTID;
 
 
 /**
@@ -23,7 +23,7 @@ import org.doomdark.uuid.UUID;
  */
 public interface OTDatabase
 {
-	public abstract void setRoot(UUID rootId) 
+	public abstract void setRoot(OTID rootId) 
 		throws Exception;
 	
 	public abstract OTDataObject getRoot() 
@@ -43,7 +43,7 @@ public interface OTDatabase
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract OTDataObject createDataObject(UUID id) 
+	public abstract OTDataObject createDataObject(OTID id) 
 		throws Exception;
 
 	public abstract OTResourceCollection createCollection(OTDataObject parent, Class collectionClass) 
@@ -58,7 +58,7 @@ public interface OTDatabase
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract OTDataObject getOTDataObject(OTDataObject dataParent, UUID childID)
+	public abstract OTDataObject getOTDataObject(OTDataObject dataParent, OTID childID)
 		throws Exception;
 	
 	public abstract void close();

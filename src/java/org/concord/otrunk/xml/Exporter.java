@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:10:05 $
+ * $Revision: 1.3 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -15,12 +15,12 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTResourceMap;
-import org.doomdark.uuid.UUID;
 
 
 /**
@@ -95,10 +95,10 @@ public class Exporter
 			PrintStream output, Object item, int indent)
 	throws Exception
 	{
-		if(item instanceof UUID) {
+		if(item instanceof OTID) {
 			// this is an object reference
 			// recurse
-			OTDataObject childObject = otDb.getOTDataObject(parentDataObj, (UUID)item);
+			OTDataObject childObject = otDb.getOTDataObject(parentDataObj, (OTID)item);
 			exportObject(output, childObject, indent);
 		} else if(item instanceof OTResourceList  ||
 				item instanceof OTResourceMap) {
@@ -128,7 +128,7 @@ public class Exporter
 	public static void exportObject(PrintStream output, OTDataObject dataObj, int indent)
 	throws Exception
 	{
-		UUID id = dataObj.getGlobalId();
+		OTID id = dataObj.getGlobalId();
 		if(writtenIds.contains(id)) {
 			// we've seen this object for so just write a reference
 			indentPrint(indent, 
@@ -159,10 +159,10 @@ public class Exporter
 			
 			indentPrint(resourceIndent, "<" + resourceKeys[i] + ">", output);
 			Object resource = dataObj.getResource(resourceKeys[i]);
-			if(resource instanceof UUID) {
+			if(resource instanceof OTID) {
 				// this is an object reference
 				// recurse
-				OTDataObject childObject = otDb.getOTDataObject(dataObj, (UUID)resource);
+				OTDataObject childObject = otDb.getOTDataObject(dataObj, (OTID)resource);
 				exportObject(output, childObject, resourceIndent+1);
 			} else if(resource instanceof OTResourceList) {
 				OTResourceList list = (OTResourceList)resource;

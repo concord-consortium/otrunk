@@ -8,5 +8,6 @@
 	<classpathentry kind="var" path="MAVEN_REPO/ozone/jars/ozoneServer-1.2.x-dev.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/jdom/jars/jdom-1.0.jar"/>
 	<classpathentry kind="lib" path="xmlbeans/xmltypes-1.0.jar"/>
+	<classpathentry kind="src" path="/Framework"/>
 	<classpathentry kind="output" path="lib"/>
 </classpath>

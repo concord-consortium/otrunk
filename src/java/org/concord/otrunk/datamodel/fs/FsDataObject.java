@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.2 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -13,11 +13,12 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Hashtable;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTObjectRevision;
 import org.concord.otrunk.datamodel.OTResourceCollection;
 import org.concord.otrunk.datamodel.OTResourceList;
-import org.doomdark.uuid.UUID;
+import org.concord.otrunk.datamodel.OTUUID;
 
 
 /**
@@ -32,14 +33,14 @@ import org.doomdark.uuid.UUID;
 public class FsDataObject
 	implements OTDataObject, Serializable
 {
-	private UUID globalId;
+	private OTID globalId;
 	Hashtable resources = new Hashtable();
 	Date creationTime = null;
 	Date modifiedTime = null;
 		
 	public final static String CURRENT_REVISION = "currentRevision";
 	
-	public FsDataObject(UUID id)
+	public FsDataObject(OTUUID id)
 	{
 		globalId = id;
 	}
@@ -47,7 +48,7 @@ public class FsDataObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#getGlobalId()
 	 */
-	public UUID getGlobalId()
+	public OTID getGlobalId()
 	{
 		return globalId;
 	}

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:05:41 $
+ * $Revision: 1.3 $
+ * $Date: 2004-12-06 03:51:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -13,10 +13,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTResourceMap;
-import org.doomdark.uuid.UUID;
 
 
 /**
@@ -52,7 +54,7 @@ public class OTInvocationHandler
 		if(OTObject.class.isAssignableFrom(returnType)) {
 			OTObject object;
 			try {
-				UUID objId = (UUID)resourceValue;
+				OTID objId = (OTID)resourceValue;
 				if(objId == null) {
 					return null;
 				}
@@ -89,7 +91,7 @@ public class OTInvocationHandler
 					dataObject.setResource(resourceName, list);
 				}
 				
-				return new OTObjectList(list, dataObject, db);
+				return new OTObjectListImpl(list, dataObject, db);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -160,7 +162,7 @@ public class OTInvocationHandler
 			
 			if(resourceValue instanceof OTObject) {
 				OTObject child = (OTObject)resourceValue;
-				UUID childId = child.getGlobalId();
+				OTID childId = child.getGlobalId();
 				resourceValue = childId;
 			} 
 			dataObject.setResource(resourceName, resourceValue);			

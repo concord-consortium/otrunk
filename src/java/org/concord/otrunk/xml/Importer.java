@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2004-11-22 23:10:05 $
+ * $Revision: 1.5 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -16,12 +16,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTResourceMap;
-import org.doomdark.uuid.UUID;
 
 
 /**
@@ -163,7 +164,7 @@ public class Importer
 			if(xmlDObj instanceof XMLDataObjectRef) {
 				// need to resolve the id of the reference
 				// it could be local or global
-				getUUID(importMap, localIdMap, db, xmlDObj);
+				getOTID(importMap, localIdMap, db, xmlDObj);
 				continue;
 			}
 			
@@ -177,7 +178,7 @@ public class Importer
 				Object resourceValue = resourceEntry.getValue();
 				Object newResourceValue = null;
 				if(resourceValue instanceof XMLDataObject) {
-					newResourceValue = getUUID(importMap, localIdMap, db,
+					newResourceValue = getOTID(importMap, localIdMap, db,
 							(XMLDataObject)resourceValue);
 				} else if(resourceValue instanceof XMLResourceList) {
 					XMLResourceList oldList = (XMLResourceList)resourceValue;
@@ -186,7 +187,7 @@ public class Importer
 						Object oldElement = oldList.get(j);
 						Object newElement = null;
 						if(oldElement instanceof XMLDataObject) {
-							newElement = getUUID(importMap, localIdMap, db,
+							newElement = getOTID(importMap, localIdMap, db,
 									(XMLDataObject)oldElement);
 						} else {
 							newElement = oldElement;
@@ -215,21 +216,21 @@ public class Importer
 		}			
 	}
 
-	public static UUID getGlobalId(String idStr, Hashtable localIdMap)
+	public static OTID getGlobalId(String idStr, Hashtable localIdMap)
 	{
 		if(idStr.startsWith("${")) {
 			String localId = idStr.substring(2,idStr.length()-1);
-			UUID globalId = (UUID)localIdMap.get(localId);
+			OTID globalId = (OTID)localIdMap.get(localId);
 			if(globalId == null) {
 				System.err.println("Can't find local id: " + localId);
 			}
 			return globalId;
 		} else {
-			return new UUID(idStr);
+			return OTIDFactory.createOTID(idStr);
 		}		
 	}
 	
-	public static UUID getUUID(Hashtable importMap, Hashtable localIdMap,
+	public static OTID getOTID(Hashtable importMap, Hashtable localIdMap,
 			OTDatabase db, XMLDataObject xmlDObj)
 	{
 		OTDataObject newChildDO = (OTDataObject)importMap.get(xmlDObj);
@@ -237,7 +238,7 @@ public class Importer
 			// this is probably a reference
 			if(xmlDObj instanceof XMLDataObjectRef) {
 				String refId = ((XMLDataObjectRef)xmlDObj).getRefId();
-				UUID globalId = getGlobalId(refId, localIdMap);
+				OTID globalId = getGlobalId(refId, localIdMap);
 				try {
 					newChildDO = db.getOTDataObject(null, globalId);
 					
