@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2004-12-13 07:45:42 $
+ * $Revision: 1.5 $
+ * $Date: 2004-12-17 20:09:18 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -124,6 +124,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		if(resourceDef == null) {
 			System.err.println("error reading childName: " + childName +
 					" in type: " + getObjectName());
+			return null;
 		}
 		elementProps = getResourceProperties(resourceDef);
 		String resPrimitiveType = resourceDef.getType();	

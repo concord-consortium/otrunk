@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2004-12-14 22:54:34 $
+ * $Revision: 1.5 $
+ * $Date: 2004-12-17 20:09:18 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -109,6 +109,8 @@ public class XMLDatabase
 		// Recusively load all the data objects
 		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode);
 		
+		System.err.println("loaded all the objects");
+		
 		// Need to handle local_id this will be stored as XMLDataObjectRef with in the
 		// tree. this is what the objectReferences vector is for
 		// each references stores the source object and the key within that object
@@ -151,7 +153,7 @@ public class XMLDatabase
 		throws Exception
 	{
 		if(id == null) {
-			id = OTUUID.createOTUUID();			
+			id = OTUUID.createOTUUID();
 		}
 
     	XMLDataObject dataObject = new XMLDataObject(element, id);
