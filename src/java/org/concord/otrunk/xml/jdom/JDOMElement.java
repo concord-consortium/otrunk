@@ -125,6 +125,8 @@ public class JDOMElement
     public OTXMLElement getParentElement()
     {
         Element parent = element.getParentElement();
+     
+        if(parent == null) return null;
         
         return new JDOMElement(parent);
     }
