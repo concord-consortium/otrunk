@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2004-12-13 07:45:42 $
+ * $Revision: 1.6 $
+ * $Date: 2004-12-14 22:54:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -103,6 +103,25 @@ public class TypeService
 		return handler;
 	}
 
+	public String elementPath(Element element)
+	{
+		String path = element.getName();
+		Element parent = element.getParentElement();
+		while(parent != null) {
+			String elementString = parent.getName();
+			
+			String idStr = parent.getAttributeValue("local_id");
+			if(idStr != null && idStr.length() > 0) {
+				elementString += "@" + idStr;
+			}
+			
+			path = elementString + "/" + path;
+			parent = parent.getParentElement();			
+		}
+		
+		return path;
+	}
+	
 	/**
 	 * There is no information about the element.  So in this case the 
 	 * element is treated literally.  The name of the element is used
@@ -116,8 +135,8 @@ public class TypeService
 		Properties elementProps;
 
 		ResourceTypeHandler handler = getElementHandler(childName);
-		if(handler == null) {
-			throw new RuntimeException("can't find handler for: " + childName);
+		if(handler == null) {			
+			throw new RuntimeException("can't find handler for: " + elementPath(child));
 		}
 		String childTypeName = handler.getPrimitiveName();
 		

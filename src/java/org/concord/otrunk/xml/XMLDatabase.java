@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.4 $
+ * $Date: 2004-12-14 22:54:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -137,10 +137,14 @@ public class XMLDatabase
 		return (OTDataObject)dataObjects.get(rootId);
 	}
 
-	protected XMLDataObject createDataObject(Element element, String id)
+	protected XMLDataObject createDataObject(Element element, String idStr)
 		throws Exception
 	{
-		return createDataObject(element, OTIDFactory.createOTID(id)); 
+		OTID id = null;
+		if(idStr != null) {
+			id = OTIDFactory.createOTID(idStr);
+		}
+		return createDataObject(element, id); 
 	}
 		
 	protected XMLDataObject createDataObject(Element element, OTID id)
