@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.4 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -12,9 +12,10 @@ package org.concord.otrunk.xml;
 import java.util.Collection;
 import java.util.Hashtable;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTObjectRevision;
-import org.doomdark.uuid.UUID;
 import org.jdom.Element;
 
 
@@ -30,13 +31,13 @@ import org.jdom.Element;
 public class XMLDataObject
 	implements OTDataObject
 {
-	private UUID globalId;
+	private OTID globalId;
 	private Element element;
 	private String localId = null;
 	
 	Hashtable resources = new Hashtable();
 
-	public XMLDataObject(Element element, UUID id)
+	public XMLDataObject(Element element, OTID id)
 	{
 		this.element = element;
 		globalId = id;
@@ -50,7 +51,7 @@ public class XMLDataObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#getGlobalId()
 	 */
-	public UUID getGlobalId()
+	public OTID getGlobalId()
 	{
 		// TODO Auto-generated method stub
 		return globalId;
@@ -58,10 +59,10 @@ public class XMLDataObject
 
 	public void setGlobalId(String id)
 	{
-		setGlobalId(new UUID(id));
+		setGlobalId(OTIDFactory.createOTID(id));
 	}
 	
-	public void setGlobalId(UUID id)
+	public void setGlobalId(OTID id)
 	{
 		globalId = id;
 	}

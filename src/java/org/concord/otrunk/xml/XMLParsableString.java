@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Revision: 1.2 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -13,8 +13,7 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.doomdark.uuid.UUID;
-
+import org.concord.framework.otrunk.OTID;
 
 /**
  * XMLParsableString
@@ -55,7 +54,7 @@ public class XMLParsableString
 		StringBuffer parsed = new StringBuffer();
 		while(m.find()) {
 			String localId = m.group(1);
-			UUID globalId = (UUID)localIdMap.get(localId);
+			OTID globalId = (OTID)localIdMap.get(localId);
 			if(globalId != null) {
 				String globalIdStr = globalId.toString();
 				m.appendReplacement(parsed, globalIdStr);

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.2 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -9,8 +9,8 @@
 */
 package org.concord.otrunk.datamodel;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.OTrunk;
-import org.doomdark.uuid.UUID;
 
 
 /**
@@ -25,7 +25,7 @@ import org.doomdark.uuid.UUID;
 public class OTUserDataObject
 	implements OTDataObject
 {
-	private UUID userId;
+	private OTID userId;
 	private OTDataObject authoringObject;
 	private OTUser user;
 	private OTrunk otDatabase;
@@ -115,7 +115,7 @@ public class OTUserDataObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#getGlobalId()
 	 */
-	public UUID getGlobalId()
+	public OTID getGlobalId()
 	{
 		// FIXME I'm not sure if this is the right thing to do here
 		// in most cases returning the authoring id is the best thing

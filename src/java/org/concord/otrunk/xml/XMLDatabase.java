@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:10:05 $
+ * $Revision: 1.3 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -20,15 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTResourceCollection;
 import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTResourceMap;
-import org.doomdark.uuid.EthernetAddress;
-import org.doomdark.uuid.NativeInterfaces;
-import org.doomdark.uuid.UUID;
-import org.doomdark.uuid.UUIDGenerator;
+import org.concord.otrunk.datamodel.OTUUID;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -46,7 +45,7 @@ import org.jdom.input.SAXBuilder;
 public class XMLDatabase
 	implements OTDatabase
 {
-	UUID rootId = null;
+	OTID rootId = null;
 	
 	Hashtable dataObjects = new Hashtable();
 	Vector objectReferences = new Vector();
@@ -123,7 +122,7 @@ public class XMLDatabase
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.datamodel.OTDatabase#setRoot(org.doomdark.uuid.UUID)
 	 */
-	public void setRoot(UUID rootId)
+	public void setRoot(OTID rootId)
 		throws Exception
 	{
 		this.rootId = rootId;
@@ -141,16 +140,14 @@ public class XMLDatabase
 	protected XMLDataObject createDataObject(Element element, String id)
 		throws Exception
 	{
-		return createDataObject(element, new UUID(id));
+		return createDataObject(element, OTIDFactory.createOTID(id)); 
 	}
 		
-	protected XMLDataObject createDataObject(Element element, UUID id)
+	protected XMLDataObject createDataObject(Element element, OTID id)
 		throws Exception
 	{
 		if(id == null) {
-			UUIDGenerator generator = UUIDGenerator.getInstance();
-	    	EthernetAddress hwAddress = NativeInterfaces.getPrimaryInterface();
-	    	id = generator.generateTimeBasedUUID(hwAddress);			
+			id = OTUUID.createOTUUID();			
 		}
 
     	XMLDataObject dataObject = new XMLDataObject(element, id);
@@ -180,13 +177,13 @@ public class XMLDatabase
 	public OTDataObject createDataObject()
 		throws Exception
 	{
-		return createDataObject(null, (UUID)null);
+		return createDataObject(null, (OTID)null);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.datamodel.OTDatabase#createDataObject(org.doomdark.uuid.UUID)
 	 */
-	public OTDataObject createDataObject(UUID id)
+	public OTDataObject createDataObject(OTID id)
 		throws Exception
 	{
 		return createDataObject(null, id);		
@@ -211,7 +208,7 @@ public class XMLDatabase
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.datamodel.OTDatabase#getOTDataObject(org.concord.otrunk.datamodel.OTDataObject, org.doomdark.uuid.UUID)
 	 */
-	public OTDataObject getOTDataObject(OTDataObject dataParent, UUID childID)
+	public OTDataObject getOTDataObject(OTDataObject dataParent, OTID childID)
 		throws Exception
 	{
 		// we are going to ignore the dataParent for now
@@ -248,14 +245,14 @@ public class XMLDatabase
 				Object resourceValue = resourceEntry.getValue();
 				Object newResourceValue = null;
 				if(resourceValue instanceof XMLDataObject) {
-					newResourceValue = getUUID((XMLDataObject)resourceValue);
+					newResourceValue = getOTID((XMLDataObject)resourceValue);
 					xmlDObj.setResource((String)resourceEntry.getKey(), newResourceValue);
 				} else if(resourceValue instanceof XMLResourceList) {
 					XMLResourceList oldList = (XMLResourceList)resourceValue;
 					for(int j=0; j<oldList.size(); j++) {
 						Object oldElement = oldList.get(j);
 						if(oldElement instanceof XMLDataObject) {
-							UUID newElement = getUUID((XMLDataObject)oldElement);
+							OTID newElement = getOTID((XMLDataObject)oldElement);
 							oldList.set(j, newElement);
 						} 
 					}
@@ -271,21 +268,21 @@ public class XMLDatabase
 		}			
 	}
 
-	public UUID getGlobalId(String idStr)
+	public OTID getGlobalId(String idStr)
 	{
 		if(idStr.startsWith("${")) {
 			String localId = idStr.substring(2,idStr.length()-1);
-			UUID globalId = (UUID)localIdMap.get(localId);
+			OTID globalId = (OTID)localIdMap.get(localId);
 			if(globalId == null) {
 				System.err.println("Can't find local id: " + localId);
 			}
 			return globalId;
 		} else {
-			return new UUID(idStr);
+			return OTIDFactory.createOTID(idStr); 
 		}		
 	}
 	
-	public UUID getUUID(XMLDataObject xmlDObj)
+	public OTID getOTID(XMLDataObject xmlDObj)
 	{
 		if(xmlDObj instanceof XMLDataObjectRef) {
 			String refId = ((XMLDataObjectRef)xmlDObj).getRefId();

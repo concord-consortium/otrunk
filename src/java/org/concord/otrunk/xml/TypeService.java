@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.4 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -14,11 +14,11 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.concord.otrunk.OTObject;
-import org.concord.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTResourceMap;
-import org.doomdark.uuid.UUID;
 import org.jdom.Element;
 
 /**
@@ -53,7 +53,7 @@ public class TypeService
 			return "list";
 		} else if(OTResourceMap.class.isAssignableFrom(klass)) {
 			return "map";
-		} else if(UUID.class.isAssignableFrom(klass) ||
+		} else if(OTID.class.isAssignableFrom(klass) ||
 				OTObject.class.isAssignableFrom(klass) ) {
 			return "object";
 		}

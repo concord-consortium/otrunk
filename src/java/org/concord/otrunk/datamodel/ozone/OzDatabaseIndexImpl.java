@@ -1,7 +1,7 @@
 package org.concord.otrunk.datamodel.ozone;
 import java.util.Hashtable;
 
-import org.doomdark.uuid.UUID;
+import org.concord.framework.otrunk.OTID;
 import org.ozoneDB.OzoneObject;
 /*
  * Created on Aug 17, 2004
@@ -20,12 +20,12 @@ public class OzDatabaseIndexImpl extends OzoneObject
 		implements OzDatabaseIndex 
 {
 	private Hashtable databaseIndex = new Hashtable();
-	private UUID rootID;
+	private OTID rootID;
 	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OzDatabaseIndex#put(org.concord.otrunk.OTDataObjectID, org.concord.portfolio.OzonePfDataObject)
 	 */
-	public OzDataObject put(UUID id, OzDataObject dataObject) 
+	public OzDataObject put(OTID id, OzDataObject dataObject) 
 	{
 		return (OzDataObject)databaseIndex.put(id, dataObject);
 	}
@@ -33,7 +33,7 @@ public class OzDatabaseIndexImpl extends OzoneObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OzDatabaseIndex#get(org.concord.otrunk.OTDataObjectID)
 	 */
-	public OzDataObject get(UUID id) 
+	public OzDataObject get(OTID id) 
 	{
 		return (OzDataObject)databaseIndex.get(id);
 	}
@@ -41,7 +41,7 @@ public class OzDatabaseIndexImpl extends OzoneObject
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.OzonePfDatabaseIndex#putRoot(org.concord.otrunk.OTDataObjectID)
 	 */
-	public void setRoot(UUID rootID) 
+	public void setRoot(OTID rootID) 
 	{
 		this.rootID = rootID;				
 	}
@@ -49,7 +49,7 @@ public class OzDatabaseIndexImpl extends OzoneObject
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.OzonePfDatabaseIndex#getRoot()
 	 */
-	public UUID getRoot() {
+	public OTID getRoot() {
 		return rootID;
 	}
 

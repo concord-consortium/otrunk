@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.2 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -12,10 +12,7 @@ package org.concord.otrunk.datamodel;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.doomdark.uuid.EthernetAddress;
-import org.doomdark.uuid.NativeInterfaces;
-import org.doomdark.uuid.UUID;
-import org.doomdark.uuid.UUIDGenerator;
+import org.concord.framework.otrunk.OTID;
 
 
 /**
@@ -30,7 +27,7 @@ import org.doomdark.uuid.UUIDGenerator;
 public class OTObjectRevision
 	implements Serializable
 {
-	UUID revisionId = null;
+	OTID revisionId = null;
 	OTObjectRevision ancestor;
 	Date modifiedTime;
 	boolean synced;
@@ -41,9 +38,7 @@ public class OTObjectRevision
 		// from eclipse
 		this.ancestor = ancestor;
 
-		UUIDGenerator generator = UUIDGenerator.getInstance();
-    	EthernetAddress hwAddress = NativeInterfaces.getPrimaryInterface();
-    	revisionId = generator.generateTimeBasedUUID(hwAddress);
+		revisionId = OTUUID.createOTUUID();
     	
     	modifiedTime = new Date();
     	
@@ -81,7 +76,7 @@ public class OTObjectRevision
 	/**
 	 * @return Returns the revisionId.
 	 */
-	protected UUID getRevisionId()
+	protected OTID getRevisionId()
 	{
 		return revisionId;
 	}

@@ -6,7 +6,7 @@
  */
 package org.concord.otrunk.datamodel.ozone;
 
-import org.doomdark.uuid.UUID;
+import org.concord.framework.otrunk.OTID;
 import org.ozoneDB.OzoneRemote;
 
 /**
@@ -17,9 +17,9 @@ import org.ozoneDB.OzoneRemote;
  */
 public interface OzDatabaseIndex extends OzoneRemote
 {
-	public OzDataObject put(UUID id, OzDataObject dataObject); /*update*/
-	public OzDataObject get(UUID id);
+	public OzDataObject put(OTID id, OzDataObject dataObject); /*update*/
+	public OzDataObject get(OTID id);
 	
-	public void setRoot(UUID rootID);	/*update*/
-	public UUID getRoot();
+	public void setRoot(OTID rootID);	/*update*/
+	public OTID getRoot();
 }

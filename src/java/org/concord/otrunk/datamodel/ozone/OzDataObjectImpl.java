@@ -8,13 +8,11 @@ package org.concord.otrunk.datamodel.ozone;
 
 import java.util.Hashtable;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTObjectRevision;
 import org.concord.otrunk.datamodel.OTResourceCollection;
 import org.concord.otrunk.datamodel.OTResourceList;
-import org.doomdark.uuid.EthernetAddress;
-import org.doomdark.uuid.NativeInterfaces;
-import org.doomdark.uuid.UUID;
-import org.doomdark.uuid.UUIDGenerator;
+import org.concord.otrunk.datamodel.OTUUID;
 import org.ozoneDB.OzoneObject;
 
 /**
@@ -29,16 +27,14 @@ public class OzDataObjectImpl extends OzoneObject
     final static long serialVersionUID = 1L;
 
     Hashtable resources = new Hashtable();
-	UUID id;
+	OTID id;
     
 	public void generateID()
 	{
-    	UUIDGenerator generator = UUIDGenerator.getInstance();
-    	EthernetAddress hwAddress = NativeInterfaces.getPrimaryInterface();
-    	id = generator.generateTimeBasedUUID(hwAddress);
+		id = OTUUID.createOTUUID();
 	}
 	
-	public void setGlobalId(UUID id)
+	public void setGlobalId(OTID id)
 	{
 		this.id = id;
 	}
@@ -93,7 +89,7 @@ public class OzDataObjectImpl extends OzoneObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#getGlobalId()
 	 */
-	public UUID getGlobalId() 
+	public OTID getGlobalId() 
 	{
 		return id;
 	}

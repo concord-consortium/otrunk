@@ -11,12 +11,13 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Hashtable;
 
+import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTObject;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTResourceCollection;
 import org.concord.otrunk.datamodel.OTUser;
 import org.concord.otrunk.datamodel.OTUserDataObject;
-import org.doomdark.uuid.UUID;
 
 /**
  * @author scott
@@ -24,10 +25,10 @@ import org.doomdark.uuid.UUID;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class OTrunk 
+public class OTrunk
 {
-	public final static String RES_CLASS_NAME = "otObjectClass"; 
-	
+	public static final String RES_CLASS_NAME = "otObjectClass";
+
 	protected Hashtable loadedObjects = new Hashtable();
 	
 	protected OTDatabase db;
@@ -66,7 +67,7 @@ public class OTrunk
 	
 	public void setRoot(OTObject obj) throws Exception
 	{
-		UUID id = obj.getGlobalId();
+		OTID id = obj.getGlobalId();
 		db.setRoot(id);
 	}
 	
@@ -88,13 +89,14 @@ public class OTrunk
 	 * @return
 	 * @throws Exception
 	 */
-	public OTDataObject getOTDataObject(OTDataObject dataParent, UUID childID)
+	public OTDataObject getOTDataObject(OTDataObject dataParent, OTID childID)
 		throws Exception
 	{
 		// sanity check
 		if(childID == null) {
 			throw new Exception("Null child Id");
 		}
+		// 
 		return db.getOTDataObject(dataParent, childID);
 	}
 	
@@ -117,7 +119,9 @@ public class OTrunk
 			otObject = setResourcesFromSchema(dataObject, otObjectClass);
 			
 			// this is a necessary evil for the time being
-			otObject.setOTDatabase(this);
+			if(otObject instanceof DefaultOTObject) {
+				((DefaultOTObject)otObject).setOTDatabase(this);
+			}
 		}
 		
 		loadedObjects.put(dataObject, otObject);
@@ -132,13 +136,13 @@ public class OTrunk
 	 * @return
 	 * @throws Exception
 	 */
-	public OTObject getOTObject(UUID childID)
+	public OTObject getOTObject(OTID childID)
 		throws Exception
 	{
 		return getOTObject(getRootDataObject(), childID);
 	}
 	
-	public OTObject getOTObject(UUID referingId , UUID childID)
+	public OTObject getOTObject(OTID referingId , OTID childID)
 		throws Exception
 	{
 		OTDataObject referingObj = db.getOTDataObject(null, referingId);
@@ -153,7 +157,7 @@ public class OTrunk
 	 * @return the requested object or null if there is a problem
 	 * @throws Exception
 	 */
-	public OTObject getOTObject(OTDataObject referingDataObject, UUID childID)
+	public OTObject getOTObject(OTDataObject referingDataObject, OTID childID)
 	throws Exception
 	{
 		// sanity check
@@ -240,7 +244,7 @@ public class OTrunk
 	public OTObject getUserRuntimeObject(OTObject authoredObject, OTUser user)
 		throws Exception
 	{
-		UUID authoredId = authoredObject.getGlobalId();
+		OTID authoredId = authoredObject.getGlobalId();
 		OTDataObject authoredDataObj = db.getOTDataObject(null, authoredId);
 		OTUserDataObject userData = 
 			new OTUserDataObject(authoredDataObj, user, this);

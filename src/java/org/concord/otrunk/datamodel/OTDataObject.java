@@ -6,7 +6,7 @@
  */
 package org.concord.otrunk.datamodel;
 
-import org.doomdark.uuid.UUID;
+import org.concord.framework.otrunk.OTID;
 
 /**
  * @author scott
@@ -16,7 +16,7 @@ import org.doomdark.uuid.UUID;
  */
 public interface OTDataObject 
 {
-	public UUID getGlobalId();
+	public OTID getGlobalId();
 	
 	public void setResource(String key, Object resource);
 	public Object getResource(String key);

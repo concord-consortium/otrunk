@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.3 $
+ * $Date: 2004-12-06 03:51:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -20,17 +20,16 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTResourceCollection;
 import org.concord.otrunk.datamodel.OTResourceList;
 import org.concord.otrunk.datamodel.OTResourceMap;
+import org.concord.otrunk.datamodel.OTUUID;
 import org.concord.otrunk.datamodel.OTUser;
 import org.concord.otrunk.datamodel.OTUserDataObject;
-import org.doomdark.uuid.EthernetAddress;
-import org.doomdark.uuid.NativeInterfaces;
-import org.doomdark.uuid.UUID;
-import org.doomdark.uuid.UUIDGenerator;
 
 
 /**
@@ -50,7 +49,7 @@ public class FsDatabase implements OTDatabase
 
 	// This needs to be initialized and saved in the db folder
 	// index file.
-	UUID rootId;
+	OTID rootId;
 
 	File databaseFolder;
 	
@@ -82,7 +81,7 @@ public class FsDatabase implements OTDatabase
 			dbPropStream.close();
 			String rootStr = dbProp.getProperty("root-id", null);
 			if (rootStr != null) {
-				rootId = new UUID(rootStr);
+				rootId = OTIDFactory.createOTID(rootStr);
 			}			
 		}
 		
@@ -97,7 +96,7 @@ public class FsDatabase implements OTDatabase
 			}
 			
 			OTDataObject obj;			
-			UUID childId = new UUID(childName);
+			OTID childId = OTIDFactory.createOTID(childName);
 			try {
 				FileInputStream inStream = new FileInputStream(children[i]);
 				ObjectInputStream objInStream = new ObjectInputStream(inStream);
@@ -145,7 +144,7 @@ public class FsDatabase implements OTDatabase
 		Enumeration elements = dbIndex.elements();
 		while (elements.hasMoreElements()) {
 			FsDataObject dataObject = (FsDataObject)(elements.nextElement());
-			UUID id = dataObject.getGlobalId();
+			OTID id = dataObject.getGlobalId();
 			String fileName = id.toString();
 			File dataFile = new File(dbFolder, fileName);
 			FileOutputStream outStream = new FileOutputStream(dataFile);
@@ -165,20 +164,18 @@ public class FsDatabase implements OTDatabase
 	public OTDataObject createDataObject()
 		throws Exception
 	{
-		UUIDGenerator generator = UUIDGenerator.getInstance();
-    	EthernetAddress hwAddress = NativeInterfaces.getPrimaryInterface();
-    	UUID id = generator.generateTimeBasedUUID(hwAddress);
-
+		OTID id = OTUUID.createOTUUID();
+		
     	return createDataObject(id);
 	}
 	
 	/** 
 	 * This should verify the id wasn't used before
 	 */
-	public OTDataObject createDataObject(UUID id)
+	public OTDataObject createDataObject(OTID id)
 		throws Exception
 	{
-    	OTDataObject dataObject = new FsDataObject(id);
+    	OTDataObject dataObject = new FsDataObject((OTUUID)id);
     	((FsDataObject)dataObject).creationInit();
     	
     	Object oldValue = dbIndex.put(dataObject.getGlobalId(), dataObject);
@@ -239,7 +236,7 @@ public class FsDatabase implements OTDatabase
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.datamodel.OTDatabase#setRoot(org.concord.otrunk.datamodel.OTDataObject)
 	 */
-	public void setRoot(UUID rootId)
+	public void setRoot(OTID rootId)
 		throws Exception
 	{
 		this.rootId = rootId;
@@ -259,7 +256,7 @@ public class FsDatabase implements OTDatabase
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDatabase#getOTDataObject(org.concord.otrunk.OTDataObject, org.doomdark.uuid.UUID)
 	 */
-	public OTDataObject getOTDataObject(OTDataObject dataParent, UUID childID)
+	public OTDataObject getOTDataObject(OTDataObject dataParent, OTID childID)
 		throws Exception
 	{
 		// if the mode is authoring then just return the requested object
