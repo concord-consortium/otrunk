@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2005-03-31 21:07:26 $
+ * $Revision: 1.10 $
+ * $Date: 2005-04-01 19:15:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -44,6 +44,8 @@ import javax.swing.event.TreeSelectionListener;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTFrame;
+import org.concord.framework.otrunk.view.OTViewContainer;
+import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTUserObject;
 import org.concord.otrunk.OTrunkImpl;
@@ -64,7 +66,8 @@ import org.concord.view.SwingUserMessageHandler;
  *
  */
 public class OTViewer extends JFrame
-	implements TreeSelectionListener, OTFrameManager
+	implements TreeSelectionListener, OTFrameManager,
+		OTViewContainerListener
 {
 	private static OTrunkImpl otrunk;
 	private static OTViewFactory otViewFactory;
@@ -156,7 +159,9 @@ public class OTViewer extends JFrame
 		setJMenuBar(menuBar);
 
 		bodyPanel = new OTViewContainerPanel(this, null);
-				
+		
+		bodyPanel.addViewContainerListener(this);
+		
 		if(showTree) {
 		
 			dataTreeModel = new SimpleTreeModel();
@@ -311,6 +316,22 @@ public class OTViewer extends JFrame
 	    }
 	}
 
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.view.OTViewContainerListener#currentObjectChanged(org.concord.framework.otrunk.view.OTViewContainer)
+     */
+    public void currentObjectChanged(OTViewContainer container)
+    {
+        // TODO Auto-generated method stub
+        OTObject currentObject = container.getCurrentObject();
+        if(folderTreeArea != null) {
+			OTFolderNode node = (OTFolderNode)folderTreeArea.getLastSelectedPathComponent();
+			if(node == null) return;
+            if(node.getPfObject() != currentObject) {
+                folderTreeArea.setSelectionPath(null);
+            }
+        }
+    }
+	
 	/* (non-Javadoc)
 	 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
 	 */
