@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.4 $
+ * $Date: 2005-01-11 05:52:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -14,8 +14,8 @@ import java.lang.reflect.Method;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.otrunk.OTInvocationHandler;
-import org.concord.otrunk.OTResourceSchema;
 
 
 /**

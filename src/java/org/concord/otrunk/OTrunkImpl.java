@@ -11,8 +11,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Hashtable;
 
+import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTResourceCollection;
@@ -25,7 +27,7 @@ import org.concord.otrunk.datamodel.OTUserDataObject;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class OTrunk
+public class OTrunkImpl implements OTrunk
 {
 	public static final String RES_CLASS_NAME = "otObjectClass";
 
@@ -33,7 +35,7 @@ public class OTrunk
 	
 	protected OTDatabase db;
 	
-	public OTrunk(OTDatabase db)
+	public OTrunkImpl(OTDatabase db)
 	{
 		this.db = db;
 	}

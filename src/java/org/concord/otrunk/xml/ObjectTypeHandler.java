@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2004-12-17 20:58:14 $
+ * $Revision: 1.7 $
+ * $Date: 2005-01-11 05:52:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -13,7 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.concord.otrunk.OTrunk;
+import org.concord.framework.otrunk.OTrunk;
+import org.concord.otrunk.OTrunkImpl;
 import org.jdom.Element;
 
 /**
@@ -84,7 +85,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			return null;
 		}
 
-		obj.setResource(OTrunk.RES_CLASS_NAME, getClassName());
+		obj.setResource(OTrunkImpl.RES_CLASS_NAME, getClassName());
 		List children = element.getChildren();
 		
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {

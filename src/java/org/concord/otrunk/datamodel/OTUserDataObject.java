@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-11 05:52:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -10,7 +10,8 @@
 package org.concord.otrunk.datamodel;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.otrunk.OTrunk;
+import org.concord.framework.otrunk.OTrunk;
+import org.concord.otrunk.OTrunkImpl;
 
 
 /**
@@ -28,7 +29,7 @@ public class OTUserDataObject
 	private OTID userId;
 	private OTDataObject authoringObject;
 	private OTUser user;
-	private OTrunk otDatabase;
+	private OTrunkImpl otDatabase;
 	
 	private final class OtUserResourceList 
 		implements OTResourceList {
@@ -90,7 +91,7 @@ public class OTUserDataObject
 		}				
 	}
 	
-	public OTUserDataObject(OTDataObject authoringObject, OTUser user, OTrunk db)
+	public OTUserDataObject(OTDataObject authoringObject, OTUser user, OTrunkImpl db)
 	{
 		this.authoringObject = authoringObject;
 		this.user = user;

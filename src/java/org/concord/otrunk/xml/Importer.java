@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.6 $
+ * $Date: 2005-01-11 05:52:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.otrunk.OTrunk;
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
