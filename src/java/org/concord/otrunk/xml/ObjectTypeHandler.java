@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2004-12-17 20:09:18 $
+ * $Revision: 1.6 $
+ * $Date: 2004-12-17 20:58:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -137,6 +137,12 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			// then the first child of this element is object 
 			if(childRefId == null) {
 				List children = child.getChildren();
+				if(children.size() != 1) {
+					// invalid object tag
+					System.err.println("empty object field: " + 
+							TypeService.elementPath(child));
+					return null;
+				}
 				child = (Element)children.get(0);
 				resourceType = child.getName();
 			}			
