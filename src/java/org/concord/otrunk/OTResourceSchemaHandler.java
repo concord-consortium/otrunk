@@ -44,6 +44,10 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        return dataObject.getGlobalId();
 	    }
 	    
+	    if(resourceName.equals("oTDatabase")) {
+	        return db;
+	    }
+	    
 	    Object resourceValue = dataObject.getResource(resourceName);
 	    
 	    // we can't rely on the returnType here because it could be an
