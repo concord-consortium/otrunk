@@ -9,6 +9,6 @@
 	<classpathentry kind="lib" path="xmlbeans/xmltypes-1.0.jar"/>
 	<classpathentry kind="src" path="/Framework"/>
 	<classpathentry kind="src" path="/FrameworkView"/>
-	<classpathentry kind="var" path="MAVEN_REPO/domain/jars/domain-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/domain/jars/domain-1.0.jar"/>
 	<classpathentry kind="output" path="lib"/>
 </classpath>
