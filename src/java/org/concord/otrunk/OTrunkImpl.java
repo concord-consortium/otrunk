@@ -6,11 +6,14 @@
  */
 package org.concord.otrunk;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.WeakHashMap;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
@@ -19,6 +22,7 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTUser;
+import org.concord.framework.otrunk.OTWrapper;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -36,6 +40,7 @@ public class OTrunkImpl implements OTrunk
 
 	protected Hashtable loadedObjects = new Hashtable();
 	protected Hashtable userDataObjects = new Hashtable();
+	protected WeakHashMap objectWrappers = new WeakHashMap();
 	protected Vector services = null;
 	
 	protected OTDatabase db;
@@ -97,7 +102,7 @@ public class OTrunkImpl implements OTrunk
     	OTDataObject dataObject = createDataObject();
     	
 		OTObject newObject = loadOTObject(dataObject, objectClass);
-		dataObject.setResource("otObjectClass", objectClass.getName());
+		dataObject.setResource(RES_CLASS_NAME, objectClass.getName());
 		newObject.init();
 		
 		return newObject;
@@ -201,7 +206,25 @@ public class OTrunkImpl implements OTrunk
 		otObject.init();
 		
 		loadedObjects.put(dataObject, otObject);
+		
+		if(otObject instanceof OTWrapper){
+		    // save the wrapped object in a weak hashmap
+		    // so it can be searched out later
+		    Method getWrappedObject = otObjectClass.getMethod("getWrappedObject", null);
+		    Object wrappedObject = getWrappedObject.invoke(otObject, null);
+		    objectWrappers.put(wrappedObject, new WeakReference(otObject));
+		}
 		return otObject;		
+	}
+	
+	public OTWrapper getWrapper(Object wrappedObject)
+	{
+	    WeakReference objRef = (WeakReference)objectWrappers.get(wrappedObject);
+	    if(objRef != null){
+	        return (OTWrapper)objRef.get();
+	    }
+	    
+	    return null;
 	}
 	
 	/**
@@ -269,7 +292,8 @@ public class OTrunkImpl implements OTrunk
 			return otObject;
 		}
 		
-		String otObjectClassStr = (String)childDataObject.getResource("otObjectClass");
+		String otObjectClassStr = 
+		    (String)childDataObject.getResource(RES_CLASS_NAME);
 		if(otObjectClassStr == null) {
 			return null;
 		}
