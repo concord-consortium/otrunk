@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.5 $
+ * $Date: 2004-12-13 07:45:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -127,5 +127,10 @@ public class TypeService
 		}
 		
 		return handler.handleElement(child, null);		
-	}	
+	}
+	
+	public Hashtable getHandlerMap()
+	{
+		return handlerMap;
+	}
 }

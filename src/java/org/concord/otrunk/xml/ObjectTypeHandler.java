@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.4 $
+ * $Date: 2004-12-13 07:45:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -166,6 +166,11 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			return parentType;
 		}
 		return null;		
+	}
+	
+	public ResourceDefinition [] getResourceDefinitions()
+	{
+		return resources;
 	}
 	
 	public ResourceDefinition getResourceDefinition(String name)
