@@ -1,14 +1,15 @@
 /*
  * Last modification information:
  * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Date: 2004-11-12 02:02:51 $
  * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
-package org.concord.otrunk;
+package org.concord.otrunk.datamodel;
 
+import org.concord.otrunk.OTrunk;
 import org.doomdark.uuid.UUID;
 
 
@@ -27,7 +28,7 @@ public class OTUserDataObject
 	private UUID userId;
 	private OTDataObject authoringObject;
 	private OTUser user;
-	private OTDatabase otDatabase;
+	private OTrunk otDatabase;
 	
 	private final class OtUserResourceList 
 		implements OTResourceList {
@@ -86,10 +87,10 @@ public class OTUserDataObject
 		public int size()
 		{
 			return authoredList.size();
-		}
+		}				
 	}
 	
-	public OTUserDataObject(OTDataObject authoringObject, OTUser user, OTDatabase db)
+	public OTUserDataObject(OTDataObject authoringObject, OTUser user, OTrunk db)
 	{
 		this.authoringObject = authoringObject;
 		this.user = user;

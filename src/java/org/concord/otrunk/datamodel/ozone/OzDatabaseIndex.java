@@ -4,11 +4,9 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-package org.concord.otrunk.ozone;
+package org.concord.otrunk.datamodel.ozone;
 
-
-import org.concord.otrunk.OTDataObject;
-import org.concord.otrunk.OTResourceCollection;
+import org.doomdark.uuid.UUID;
 import org.ozoneDB.OzoneRemote;
 
 /**
@@ -17,11 +15,11 @@ import org.ozoneDB.OzoneRemote;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public interface OzDataObject 
-	extends OTDataObject, OzoneRemote 
+public interface OzDatabaseIndex extends OzoneRemote
 {
-	public void setResource(String name, Object resource); /*update*/
-	public void generateID(); /*update*/
-	public OTResourceCollection getResourceCollection(String key); /*update*/
-
+	public void put(UUID id, OzDataObject dataObject); /*update*/
+	public OzDataObject get(UUID id);
+	
+	public void setRoot(UUID rootID);	/*update*/
+	public UUID getRoot();
 }

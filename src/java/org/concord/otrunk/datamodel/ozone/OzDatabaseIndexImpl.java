@@ -1,4 +1,4 @@
-package org.concord.otrunk.ozone;
+package org.concord.otrunk.datamodel.ozone;
 import java.util.Hashtable;
 
 import org.doomdark.uuid.UUID;

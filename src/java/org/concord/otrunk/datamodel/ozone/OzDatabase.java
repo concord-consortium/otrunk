@@ -4,12 +4,11 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-package org.concord.otrunk.ozone;
+package org.concord.otrunk.datamodel.ozone;
 
-import org.concord.otrunk.OTDataObject;
-import org.concord.otrunk.OTDatabase;
-import org.concord.otrunk.OTResourceCollection;
-import org.concord.otrunk.OTObject;
+import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.datamodel.OTResourceCollection;
 import org.doomdark.uuid.UUID;
 import org.ozoneDB.ExternalDatabase;
 
@@ -19,7 +18,7 @@ import org.ozoneDB.ExternalDatabase;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class OzDatabase extends OTDatabase 
+public class OzDatabase implements OTDatabase
 {
 	private ExternalDatabase db;
 
@@ -104,22 +103,22 @@ public class OzDatabase extends OTDatabase
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDatabase#setRoot(org.concord.otrunk.OTObject)
 	 */
-	public void setRoot(OTObject obj) {		
-		dbIndex.setRoot(obj.getGlobalId());
+	public void setRoot(UUID rootId) {		
+		dbIndex.setRoot(rootId);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDatabase#getRoot()
 	 */
-	public OTObject getRoot() 
-	throws Exception
+	public OTDataObject getRoot() 
+		throws Exception
 	{
 		try {
 			if(rootID == null) {
 				return null;
 			}
 			
-			return getOTObject(null, rootID);
+			return getOTDataObject(null, rootID);
 		} catch(Exception e) {
 			e.printStackTrace();
 			return null;

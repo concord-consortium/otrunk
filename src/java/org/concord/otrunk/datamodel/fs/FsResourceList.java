@@ -1,18 +1,18 @@
 /*
  * Last modification information:
  * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Date: 2004-11-12 02:02:51 $
  * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
-package org.concord.otrunk.fs;
+package org.concord.otrunk.datamodel.fs;
 
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.concord.otrunk.OTResourceList;
+import org.concord.otrunk.datamodel.OTResourceList;
 
 
 /**
@@ -24,7 +24,7 @@ import org.concord.otrunk.OTResourceList;
  * @author scott<p>
  *
  */
-public class FsResourceList 
+public class FsResourceList
 	implements OTResourceList, Serializable
 {
 	Vector list = new Vector();

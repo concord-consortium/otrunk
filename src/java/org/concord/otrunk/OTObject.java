@@ -26,12 +26,11 @@ public interface OTObject
 
 	public boolean getInput();
 
-	public OTDataObject getDataObject();
+	public void setOTDatabase(OTrunk otDatabase);	
 	
-	public void setDataObject(OTDataObject dataObject);
-			
-	public void setOTDatabase(OTDatabase otDatabase);	
-	
-	public void init();
-	
+	/**
+	 * This method is called when an object like this is created. 
+	 * That is created for the first time ever.
+	 */
+	public void init();	
 }
