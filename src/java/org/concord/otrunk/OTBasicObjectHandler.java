@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-01-11 05:52:42 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-13 03:14:44 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -40,6 +40,11 @@ public class OTBasicObjectHandler extends OTInvocationHandler
 		
 		if(methodName.equals("setOTDatabase")) {
 			throw new RuntimeException("shouldn't be calling setDataObject");
+		}
+		
+		// skip the init call if this is a basic object that is being proxied
+		if(methodName.equals("init")) {
+			return null;
 		}
 		
 		return super.invoke(proxy, method, args);

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2005-01-12 04:19:54 $
+ * $Revision: 1.2 $
+ * $Date: 2005-01-13 03:14:44 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -154,11 +154,6 @@ public class OTViewer extends JFrame
         		return;
         	}
         } 
-        	
-        File testFile = new File("/home/scott/Projects/Teemss/project-db-export-12-17-2004.xml");
-        //        File testFile = new File("test_import.xml");
-        //    	File testFile = new File("test_xhtml.xml");
-        loadFile(testFile);    				
     }
 
 	private void loadFile(File file)
@@ -181,7 +176,8 @@ public class OTViewer extends JFrame
 			dataTreeModel.setRoot(new OTDataObjectNode("root", 
 					db.getRootDataObject(), db));
 			
-			folderTreeModel.setRoot(new OTFolderNode(db.getRoot()));
+			OTObject root = db.getRoot();
+			folderTreeModel.setRoot(new OTFolderNode(root));
 		}
 		
 		setCurrentObject(db.getRoot());
