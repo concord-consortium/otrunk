@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-12-06 03:51:35 $
+ * $Revision: 1.3 $
+ * $Date: 2005-01-25 16:19:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -49,7 +49,7 @@ public class XMLParsableString
 	
 	public String parse(Hashtable localIdMap)
 	{
-		Pattern p = Pattern.compile("\\$\\{(.*)\\}");
+		Pattern p = Pattern.compile("\\$\\{([^}]*)\\}");
 		Matcher m = p.matcher(content);
 		StringBuffer parsed = new StringBuffer();
 		while(m.find()) {

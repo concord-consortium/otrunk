@@ -1,13 +1,15 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-01-12 04:19:54 $
+ * $Revision: 1.4 $
+ * $Date: 2005-01-25 16:19:41 $
  * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.xml;
+
+import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTResourceMap;
 
@@ -23,14 +25,14 @@ import org.concord.framework.otrunk.OTResourceMap;
  */
 public class XMLResourceMap implements OTResourceMap
 {
-
+	Hashtable hTable = new Hashtable();
+	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceMap#put(java.lang.String, java.lang.Object)
 	 */
 	public void put(String key, Object resource)
 	{
-		// TODO Auto-generated method stub
-		
+		hTable.put(key, resource);		
 	}
 
 	/* (non-Javadoc)
@@ -38,8 +40,7 @@ public class XMLResourceMap implements OTResourceMap
 	 */
 	public Object get(String key)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return hTable.get(key);
 	}
 
 	/* (non-Javadoc)
@@ -47,8 +48,10 @@ public class XMLResourceMap implements OTResourceMap
 	 */
 	public String[] getKeys()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		Object [] keys = hTable.keySet().toArray();
+		String [] strKeys = new String [keys.length];
+		System.arraycopy(keys, 0, strKeys, 0, keys.length);
+		return strKeys;
 	}
 
 	/* (non-Javadoc)
@@ -56,8 +59,7 @@ public class XMLResourceMap implements OTResourceMap
 	 */
 	public int size()
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		return hTable.size();
 	}
 
 	/* (non-Javadoc)
@@ -65,8 +67,11 @@ public class XMLResourceMap implements OTResourceMap
 	 */
 	public void removeAll()
 	{
-		// TODO Auto-generated method stub
-		
+		hTable.clear();		
 	}
 	
+	void remove(String key)
+	{
+		hTable.remove(key);
+	}
 }
