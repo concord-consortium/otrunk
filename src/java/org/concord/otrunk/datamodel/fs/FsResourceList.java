@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-01-27 16:45:29 $
- * $Author: scytacki $
+ * $Revision: 1.4 $
+ * $Date: 2005-03-10 03:52:25 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -114,5 +114,14 @@ public class FsResourceList
 	{
 		updateModifiedTime();
 		list.removeAllElements();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.OTResourceList#remove(int)
+	 */
+	public void remove(int index)
+	{
+		updateModifiedTime();
+		list.remove(index);
 	}
 }
