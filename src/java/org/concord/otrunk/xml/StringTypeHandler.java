@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -27,9 +27,9 @@ import org.jdom.output.XMLOutputter;
  */
 public class StringTypeHandler extends ResourceTypeHandler
 {
-	public StringTypeHandler(TypeService dots)
+	public StringTypeHandler()
 	{
-		super(dots);
+		super("string");
 	}
 		
 	/* (non-Javadoc)
@@ -47,12 +47,18 @@ public class StringTypeHandler extends ResourceTypeHandler
 			e.printStackTrace();
 			return null;
 		}
-		String contentStr = stringWriter.toString();
+		String contentStr = stringWriter.toString().trim();
 		
-		if(elementProps.getProperty("parse") != null) {
+		return new XMLParsableString(contentStr);
+		
+		/*
+		 * parse all strings because we no longer have a way to add params
+		if(elementProps != null &&
+				elementProps.getProperty("parse") != null) {
 			return new XMLParsableString(contentStr);
 		}
 		
 		return contentStr;
+		*/
 	}
 }

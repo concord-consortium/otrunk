@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -42,8 +42,26 @@ public class XMLDataObjectRef extends XMLDataObject
 	
 	public XMLDataObjectRef(String id, Element element)
 	{
-		super(element);
+		super(element, null);
 		
 		setRefId(id);		
+	}
+	/**
+	 * @param obj
+	 * @param name
+	 */
+	public void setReferenceSource(XMLDataObject obj, String name)
+	{
+		// TODO Auto-generated method stub		
+	}
+	
+	public void setReferenceSource(XMLResourceList list, int index)
+	{
+		// TODO
+	}
+	
+	public void setReferenceSource(XMLResourceMap map, String key)
+	{
+		// TODO
 	}
 }

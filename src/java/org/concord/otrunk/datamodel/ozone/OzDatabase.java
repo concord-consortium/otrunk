@@ -88,6 +88,22 @@ public class OzDatabase implements OTDatabase
 		return dataObject;
 	}
 
+	public OTDataObject createDataObject(UUID id)
+		throws Exception
+	{
+		OzDataObject dataObject = (OzDataObject)db.createObject( OzDataObjectImpl.class.getName());
+
+		dataObject.setGlobalId(id);
+
+		OzDataObject oldObject = dbIndex.put(id, (OzDataObject) dataObject);
+		if(oldObject != null) {
+			dbIndex.put(id, oldObject);
+			throw new Exception("repeated unique id");
+		}
+
+		return null;
+	}
+
 	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDatabase#createCollection(org.concord.otrunk.OTDataObject, java.lang.Class)

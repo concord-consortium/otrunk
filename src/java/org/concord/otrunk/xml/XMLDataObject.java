@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.3 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -36,9 +36,10 @@ public class XMLDataObject
 	
 	Hashtable resources = new Hashtable();
 
-	public XMLDataObject(Element element)
+	public XMLDataObject(Element element, UUID id)
 	{
 		this.element = element;
+		globalId = id;
 	}
 	
 	public Element getElement()
@@ -70,6 +71,7 @@ public class XMLDataObject
 	 */
 	public void setResource(String key, Object resource)
 	{
+		// What should we do if the resource is null??
 		resources.put(key, resource);
 	}
 	

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -29,10 +29,23 @@ public interface OTDatabase
 	public abstract OTDataObject getRoot() 
 		throws Exception;	
 	
-	// This is used by the user data object.  perhaps we can restrict it to that usage
+	/**
+	 * Make a brand new data object and create an id for it
+	 * @return
+	 * @throws Exception
+	 */
 	public abstract OTDataObject createDataObject() 
 		throws Exception;
 	
+	/**
+	 * Make a brand new data object and use an existing id
+	 * this is required so objects can be imported into this database
+	 * @return
+	 * @throws Exception
+	 */
+	public abstract OTDataObject createDataObject(UUID id) 
+		throws Exception;
+
 	public abstract OTResourceCollection createCollection(OTDataObject parent, Class collectionClass) 
 		throws Exception;
 	

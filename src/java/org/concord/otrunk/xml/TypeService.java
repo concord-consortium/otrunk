@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.3 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -14,9 +14,11 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Vector;
 
-import org.concord.otrunk.xml.dod.DoDescription;
-import org.concord.otrunk.xml.dod.Pfobjects;
-import org.concord.otrunk.xml.dod.ResourceType;
+import org.concord.otrunk.OTObject;
+import org.concord.otrunk.OTObjectList;
+import org.concord.otrunk.datamodel.OTResourceList;
+import org.concord.otrunk.datamodel.OTResourceMap;
+import org.doomdark.uuid.UUID;
 import org.jdom.Element;
 
 /**
@@ -30,134 +32,77 @@ import org.jdom.Element;
  */
 public class TypeService
 {
-	Pfobjects pfObjects = null;
-	Hashtable handlerMap = new Hashtable();
-	URL contextURL;
-	Vector dataObjects = new Vector();
-	
-	public TypeService(Pfobjects pfObjects, URL contextURL)
+	public static String getPrimitiveType(Class klass)
 	{
-		this.pfObjects = pfObjects;
-		this.contextURL = contextURL;
-		
+		if(String.class.isAssignableFrom(klass)) {
+			return "string";
+		} else if(Boolean.class.isAssignableFrom(klass) ||
+				Boolean.TYPE.equals(klass)) {
+			return "boolean";
+		} else if(Integer.class.isAssignableFrom(klass) ||
+				Integer.TYPE.equals(klass)) {
+			return "integer";
+		} else if(Float.class.isAssignableFrom(klass) ||
+				Float.TYPE.equals(klass)) {
+			return "float";
+		} else if(klass.isArray() && 
+				klass.getComponentType().equals(Byte.TYPE)) {
+			return "blob";
+		} else if(OTResourceList.class.isAssignableFrom(klass) ||
+				OTObjectList.class.isAssignableFrom(klass)) {
+			return "list";
+		} else if(OTResourceMap.class.isAssignableFrom(klass)) {
+			return "map";
+		} else if(UUID.class.isAssignableFrom(klass) ||
+				OTObject.class.isAssignableFrom(klass) ) {
+			return "object";
+		}
+	
+		return null;
+	}
+	
+	Hashtable handlerMap = new Hashtable();
+	Vector dataObjects = new Vector();
+
+	public TypeService(URL contextURL)
+	{	
 		// This should be done automatically so we don't need to 
 		// define them here.  The name can be looked up when it
 		// is requested.
-		handlerMap.put("boolean", new BooleanTypeHandler(this));
-		handlerMap.put("float", new FloatTypeHandler(this));
-		handlerMap.put("string", new StringTypeHandler(this));
+		handlerMap.put("boolean", new BooleanTypeHandler());
+		handlerMap.put("integer", new IntegerTypeHandler());
+		handlerMap.put("float", new FloatTypeHandler());
+		handlerMap.put("string", new StringTypeHandler());
+		handlerMap.put("blob", new BlobTypeHandler(contextURL));
 		handlerMap.put("list", new ListTypeHandler(this));
-		handlerMap.put("blob", new BlobTypeHandler(this));
-		handlerMap.put("object", new ObjectTypeHandler(this));
 	}
 	
-	public ResourceTypeHandler getHandler(String typeName) 
+	public void registerUserType(String name, ResourceTypeHandler handler)
 	{
-		return (ResourceTypeHandler)handlerMap.get(typeName);
-	}
-	
-	public URL getContextURL()
-	{
-		return contextURL;
-	}
-	
-	public String getElementType(String nodeName)
-	{
-		ResourceTypeHandler typeHandler = (ResourceTypeHandler) handlerMap.get(nodeName);
-		String type = null;
-		
-		// Is this a predefined type?
-		if(typeHandler != null){
-			return nodeName;
-		} 
-		
-		
-		// This isn't a predefined type so check for it in the user types
-		DoDescription dod = getDod(nodeName);
-		if(dod != null) {
-			return "object";
-		}
-		
-		// this isn't a valid type
-		return null;		
-	}
-		
-	public DoDescription getDod(String name)
-	{
-		DoDescription [] dods = (DoDescription [])pfObjects.getDoDescriptionArray();
-		for(int i=0; i<dods.length; i++) {
-			if(dods[i].getName().equals(name)) {
-				return dods[i];
-			}
-		}
-		
-		return null;
-	}	
-
-	public ResourceType getResourceDefinition(DoDescription dod, 
-			String name)
-	{
-		ResourceType [] resources = (ResourceType [])dod.getResourceArray();
-		for(int i=0; i<resources.length; i++) {
-			if(resources[i].getName().equals(name)) {
-				return resources[i];
-			}
-		}
-
-		String parentName = dod.getExtends();
-		if(parentName != null && parentName.length() > 0) {
-			DoDescription parentDod = getDod(parentName);
-			if(parentDod == null) {
-				System.err.println("can't find parent: " + parentName +
-						" of: " + dod.getName());
-			}
-			return getResourceDefinition(parentDod, name);
-		}
-		
-		return null;
-	}
-	
-	public Properties getResourceProperties(ResourceType resType)
-	{
-		// TODO need to go through the resource type object and make a properties
-		// object that descriptes the type both the type of the resource and
-		// any extra paramaters of the type
-		Properties props = new Properties();
-		props.setProperty("type", resType.getType());
-		ResourceType.Param []  params = resType.getParamArray();
-		for(int i=0; i<params.length; i++){
-			ResourceType.Param param = params[i];
-			props.setProperty(param.getName(), param.getValue());
-		}
-		return props;		
-	}
-	
-	public String getClassName(DoDescription dod)
-	{
-		return "org.concord.portfolio.objects." + dod.getName();
+		handlerMap.put(name, handler);
 	}
 	
 	/**
-	 * This method handles xml elements.  The elements can come from
-	 * two places so far: resources in a data object or items in
-	 * a list.  
-	 * If the element is a resource in a data object than there
-	 * will be more information about it based on the definition of the
-	 * data object type.  This "type" is the DoDescription that is passed
-	 * to this method.
-	 * If the element is an item in a list then there is no information
-	 * about the element.  So in this case the element must be treated 
-	 * literally. 
-	 * @param parentType
-	 * @param child
+	 * look for the primitive type handler
+	 * 
+	 * @param nodeName
 	 * @return
 	 */
-	protected Object handleElement(Element child, Properties elementProps)
+	public ResourceTypeHandler getElementHandler(String nodeName)
 	{
-		String typeName = elementProps.getProperty("type");
-		ResourceTypeHandler handler = getHandler(typeName);
-		return handler.handleElement(child, elementProps);		
+		ResourceTypeHandler handler = (ResourceTypeHandler) handlerMap.get(nodeName);
+		
+		// temporary hack
+		String packageName = "org.concord.portfolio.objects.";
+		
+		if(handler == null && nodeName.startsWith(packageName)) {
+			nodeName = nodeName.substring(packageName.length(), nodeName.length());
+			handler = (ResourceTypeHandler) handlerMap.get(nodeName);
+		}
+		
+		return handler;
 	}
+
 	/**
 	 * There is no information about the element.  So in this case the 
 	 * element is treated literally.  The name of the element is used
@@ -170,64 +115,17 @@ public class TypeService
 		String childName = child.getName();
 		Properties elementProps;
 
-		String childTypeName = getElementType(childName);
+		ResourceTypeHandler handler = getElementHandler(childName);
+		if(handler == null) {
+			throw new RuntimeException("can't find handler for: " + childName);
+		}
+		String childTypeName = handler.getPrimitiveName();
 		
 		if(childTypeName == null) {
 			System.err.println("unknown element: " + childTypeName);
 			return null;
 		}
 		
-		elementProps = new Properties();
-		elementProps.setProperty("type", childTypeName);
-
-		return handleElement(child, elementProps);
-	}
-	
-	/**
-	 * This element comes with extra information.  The name of 
-	 * the element identifies it as a resource in the parentType
-	 * The resource in the parent type has type information.  So
-	 * if the element is "&lt;myText>hi this is my text&lt;/myText>"
-	 * and myText is defined as a "string" in the parentType then
-	 * this element will be turned into a string.
-	 * 
-	 * @param parentType
-	 * @param child
-	 * @return
-	 */
-	public Object handleChildResource(DoDescription parentType,
-			Element child)
-	{
-		String childName = child.getName();
-		Properties elementProps;
-
-		ResourceType resourceDef = getResourceDefinition(parentType, childName);
-		
-		if(resourceDef == null) {
-			System.err.println("error reading childName: " + childName +
-					" in type: " + parentType.getName());
-		}
-		elementProps = getResourceProperties(resourceDef);
-		if(elementProps.getProperty("type","").equals("object")) {
-			String childRefId = child.getAttributeValue("refid");
-			
-			// If this element doesn't have a reference id then 
-			// then the first child of this element is object 
-			if(childRefId == null) {
-				child = (Element)(child.getContent(0));
-			}
-		}
-
-		return handleElement(child, elementProps);
-	}
-	
-	public void addDataObject(XMLDataObject object)
-	{
-		dataObjects.add(object);
-	}
-	
-	public Vector getDataObjects()
-	{
-		return dataObjects;
-	}
+		return handler.handleElement(child, null);		
+	}	
 }

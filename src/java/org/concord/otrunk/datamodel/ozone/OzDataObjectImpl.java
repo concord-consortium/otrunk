@@ -38,6 +38,11 @@ public class OzDataObjectImpl extends OzoneObject
     	id = generator.generateTimeBasedUUID(hwAddress);
 	}
 	
+	public void setGlobalId(UUID id)
+	{
+		this.id = id;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.OzDataObject#addResource(java.lang.String, java.lang.Object)
 	 */

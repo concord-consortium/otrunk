@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -29,9 +29,12 @@ import org.jdom.Element;
  */
 public class BlobTypeHandler extends ResourceTypeHandler
 {
-	public BlobTypeHandler(TypeService dots)
+	URL contextURL;
+	
+	public BlobTypeHandler(URL context)
 	{
-		super(dots);
+		super("blob");
+		contextURL = context;
 	}
 	
 	/* (non-Javadoc)
@@ -44,7 +47,7 @@ public class BlobTypeHandler extends ResourceTypeHandler
 		// TODO add relative url to type service so relative urls can
 		// be used.
 		try {
-			URL url = new URL(typeService.getContextURL(), urlStr);
+			URL url = new URL(contextURL, urlStr);
 			InputStream urlStream = url.openStream();
 			BufferedInputStream inStream = new BufferedInputStream(urlStream);
 			Transfer trans = new Transfer();

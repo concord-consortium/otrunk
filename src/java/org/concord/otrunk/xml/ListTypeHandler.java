@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -26,9 +26,12 @@ import org.jdom.Element;
  */
 public class ListTypeHandler extends ResourceTypeHandler
 {
+	TypeService typeService;
+	
 	public ListTypeHandler(TypeService dots)
 	{
-		super(dots);
+		super("list");
+		typeService = dots;
 	}
 	
 	/* (non-Javadoc)
@@ -41,8 +44,8 @@ public class ListTypeHandler extends ResourceTypeHandler
 		List children = element.getChildren();
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			
 			Element child = (Element)childIter.next();
-			Object childObj = typeService.handleLiteralElement(child);
-			list.add(childObj);
+			Object resValue = typeService.handleLiteralElement(child);
+			list.add(resValue);
 		}
 
 		return list;

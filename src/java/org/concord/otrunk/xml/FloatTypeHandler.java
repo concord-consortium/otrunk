@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-11-12 02:02:51 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -25,9 +25,9 @@ import org.jdom.Element;
  */
 public class FloatTypeHandler extends ResourceTypeHandler
 {
-	public FloatTypeHandler(TypeService dots)
+	public FloatTypeHandler()
 	{
-		super(dots);
+		super("float");
 	}
 	
 	/* (non-Javadoc)

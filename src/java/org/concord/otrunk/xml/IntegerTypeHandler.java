@@ -1,6 +1,6 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
+ * $Revision: 1.1 $
  * $Date: 2004-11-22 23:05:40 $
  * $Author: scytacki $
  *
@@ -22,9 +22,9 @@ import org.jdom.Element;
  * @author scott<p>
  *
  */
-public class BooleanTypeHandler extends ResourceTypeHandler
+public class IntegerTypeHandler extends ResourceTypeHandler
 {
-	public BooleanTypeHandler()
+	public IntegerTypeHandler()
 	{
 		super("boolean");
 	}
@@ -35,7 +35,11 @@ public class BooleanTypeHandler extends ResourceTypeHandler
 	public Object handleElement(Element element, Properties elementProps)
 	{
 		String value = element.getTextTrim();
-		return Boolean.valueOf(value);
+		try {
+			return Integer.decode(value);
+		} catch (Throwable e) {
+			throw new RuntimeException("syntax error in: " + element.getName(), e);
+		}
 	}
 
 }
