@@ -1,18 +1,24 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-03-10 03:52:25 $
- * $Author: imoncada $
+ * $Revision: 1.7 $
+ * $Date: 2005-03-31 21:07:26 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk;
 
+import java.util.Hashtable;
+
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTObjectRevision;
+import org.concord.otrunk.xml.XMLResourceList;
+import org.concord.otrunk.xml.XMLResourceMap;
 
 
 /**
@@ -25,19 +31,22 @@ import org.concord.otrunk.datamodel.OTObjectRevision;
  *
  */
 public class OTUserDataObject
-	implements OTDataObject
+	implements OTDataObject, OTID
 {
 	private OTID userId;
 	private OTDataObject authoringObject;
 	private OTUserStateMap user;
 	private OTrunkImpl otDatabase;
+	private Hashtable resourceCollections = new Hashtable();
 	
-	private final class OtUserResourceList 
+	private final class OTUserResourceList 
 		implements OTResourceList {
+		private OTUserDataObject parent;
 		private OTResourceList authoredList;
 		
-		OtUserResourceList(OTResourceList authoredList)
+		OTUserResourceList(OTUserDataObject parent, OTResourceList authoredList)
 		{
+		    this.parent = parent;
 			this.authoredList = authoredList;
 		}
 				
@@ -78,6 +87,9 @@ public class OTUserDataObject
 		 */
 		public Object get(int index)
 		{
+		    // FIXME this should check the user object
+		    if(authoredList == null) return null;
+		    
 			return authoredList.get(index);
 		}
 				
@@ -94,6 +106,8 @@ public class OTUserDataObject
 		 */
 		public int size()
 		{
+		    if(authoredList == null) return 0;
+		    
 			return authoredList.size();
 		}
 
@@ -107,6 +121,65 @@ public class OTUserDataObject
 		}				
 	}
 	
+	private final class OTUserResourceMap
+		implements OTResourceMap
+	{
+	    OTUserDataObject parent;
+	    OTResourceMap authoredMap;
+	    
+	    public OTUserResourceMap(OTUserDataObject parent, OTResourceMap authoredMap)
+	    {
+	        this.parent = parent;
+	        this.authoredMap = authoredMap;
+	    }
+	    
+	    /* (non-Javadoc)
+         * @see org.concord.framework.otrunk.OTResourceMap#get(java.lang.String)
+         */
+        public Object get(String key)
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+        /* (non-Javadoc)
+         * @see org.concord.framework.otrunk.OTResourceMap#getKeys()
+         */
+        public String[] getKeys()
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+        /* (non-Javadoc)
+         * @see org.concord.framework.otrunk.OTResourceMap#put(java.lang.String, java.lang.Object)
+         */
+        public void put(String key, Object resource)
+        {
+            // TODO Auto-generated method stub
+
+        }
+        
+        /* (non-Javadoc)
+         * @see org.concord.framework.otrunk.OTResourceCollection#removeAll()
+         */
+        public void removeAll()
+        {
+            // TODO Auto-generated method stub
+
+        }
+        
+        /* (non-Javadoc)
+         * @see org.concord.framework.otrunk.OTResourceCollection#size()
+         */
+        public int size()
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+	}
+	
+		
 	public OTUserDataObject(OTDataObject authoringObject, OTUserStateMap user, OTrunkImpl db)
 	{
 		this.authoringObject = authoringObject;
@@ -134,10 +207,13 @@ public class OTUserDataObject
 	 */
 	public OTID getGlobalId()
 	{
-		// FIXME I'm not sure if this is the right thing to do here
-		// in most cases returning the authoring id is the best thing
-		// but I imagine that there can be problems with this
-		return authoringObject.getGlobalId();		
+	    // FIXME we need to verify this will work.  Instead of returning
+	    // a reall globalId we'll just return ourselves. 
+	    
+	    // one important note is that this means when an object is
+	    // requested the returned object might not have id as the requested
+	    // object
+	    return this;	    
 	}
 	
 	
@@ -207,7 +283,23 @@ public class OTUserDataObject
 	 */
 	public void setResource(String key, Object resource)
 	{
-		OTDataObject userObject = getUserObject();
+	    Object oldObject = getResource(key);
+	    if(oldObject != null &&
+	            oldObject.equals(resource)){
+	        return;
+	    }
+	    
+	    // special hack for -0.0 and 0.0 
+	    // see the docs for Float.equals()
+	    if(oldObject instanceof Float && 
+	            resource instanceof Float) {
+	        if(((Float)oldObject).floatValue() == 
+	            ((Float)resource).floatValue()){
+	            return;
+	        }
+	    }
+	    
+	    OTDataObject userObject = getUserObject();
 		
 		if(userObject == null) {
 			userObject = createUserObject();
@@ -215,4 +307,32 @@ public class OTUserDataObject
 		// add the resource to the user object not the author object
 		userObject.setResource(key, resource);
 	}
+	
+	public OTResourceCollection getResourceCollection(String key, Class collectionClass)
+	{
+	    OTResourceCollection collection = 
+	        (OTResourceCollection)resourceCollections.get(key);
+	    if(collection != null) {
+	        return collection;
+	    }
+	    
+	    // This might need to be getResourceCollection instead of 
+	    // getResource.  But I wanted to know if the list has been
+	    // set yet.
+		Object resourceObj = authoringObject.getResource(key);
+
+		// Here is the tricky part.  We want to make a pseudo
+		// list so that the real list isn't created unless it is really
+		// used.
+		if(collectionClass.equals(OTResourceList.class)) {
+			collection =  new OTUserResourceList(this, (OTResourceList)resourceObj);
+		} else if(collectionClass.equals(OTResourceMap.class)) {
+			collection =  new OTUserResourceMap(this, (OTResourceMap)resourceObj);
+		}
+
+		resourceCollections.put(key, collection);
+
+	    return collection;
+	}
+
 }

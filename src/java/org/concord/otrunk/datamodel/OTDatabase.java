@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-01-12 04:19:55 $
+ * $Revision: 1.6 $
+ * $Date: 2005-03-31 21:07:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -47,9 +47,6 @@ public interface OTDatabase
 	public abstract OTDataObject createDataObject(OTID id) 
 		throws Exception;
 
-	public abstract OTResourceCollection createCollection(OTDataObject parent, Class collectionClass) 
-		throws Exception;
-	
 	/**
 	 * The dataParent must be set so the database can correctly look up the 
 	 * child object.

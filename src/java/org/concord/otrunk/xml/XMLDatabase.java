@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2005-03-14 05:05:43 $
+ * $Revision: 1.10 $
+ * $Date: 2005-03-31 21:07:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -248,14 +248,20 @@ public class XMLDatabase
 			}
 						
 			Collection entries = xmlDObj.getResourceEntries(); 
-
+			Vector removedKeys = new Vector();
+			
 			for(Iterator entriesIter = entries.iterator(); entriesIter.hasNext(); )  {
 				Map.Entry resourceEntry = (Map.Entry)entriesIter.next();
 				Object resourceValue = resourceEntry.getValue();
 				Object newResourceValue = null;
+				String resourceKey = (String)resourceEntry.getKey();
 				if(resourceValue instanceof XMLDataObject) {
 					newResourceValue = getOTID((XMLDataObject)resourceValue);
-					xmlDObj.setResource((String)resourceEntry.getKey(), newResourceValue);
+					if(newResourceValue == null) {
+					    removedKeys.add(resourceKey);
+					} else {
+					    xmlDObj.setResource(resourceKey, newResourceValue);
+					}
 				} else if(resourceValue instanceof XMLResourceList) {
 					XMLResourceList list = (XMLResourceList)resourceValue;
 					for(int j=0; j<list.size(); j++) {
@@ -300,9 +306,16 @@ public class XMLDatabase
 				} else if(resourceValue instanceof XMLParsableString) {
 					// replace the local ids from the string
 					newResourceValue = ((XMLParsableString)resourceValue).parse(localIdMap);
-					xmlDObj.setResource((String)resourceEntry.getKey(), newResourceValue);
-				} 					
-			}			
+					xmlDObj.setResource(resourceKey, newResourceValue);
+				}				
+			}	
+			
+			// remove the keys that have null values
+			// this can't be done in the previous loop because that screws up the
+			// the Iterator
+			for(int keyIndex=0; keyIndex<removedKeys.size(); keyIndex++){
+			    xmlDObj.setResource((String)removedKeys.get(keyIndex), null);
+			}
 		}			
 	}
 

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-03-14 05:05:43 $
+ * $Revision: 1.8 $
+ * $Date: 2005-03-31 21:07:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -13,6 +13,9 @@ import java.util.Collection;
 import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTResourceCollection;
+import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTObjectRevision;
@@ -71,9 +74,11 @@ public class XMLDataObject
 	 */
 	public void setResource(String key, Object resource)
 	{
-		if(resource != null) {
-			// Hashtables can't know the different between null and empty
-			// so if it is null we'll just leave it empty
+		// Hashtables can't know the different between null and empty
+		// so if it is null we'll just remove it
+	    if(resource == null) {
+	        resources.remove(key);
+	    } else {
 			resources.put(key, resource);			
 		}
 	}
@@ -87,13 +92,22 @@ public class XMLDataObject
 		
 		if(resource instanceof XMLBlobResource) {
 			byte [] bytes = ((XMLBlobResource)resource).getBytes();
-			setResource(key, bytes);
 			return bytes;
 		}
 
 		return resources.get(key);
 	}
 
+	public boolean isBlobResource(String key)
+	{
+		return resources.get(key) instanceof XMLBlobResource;	    
+	}
+	
+	public XMLBlobResource getBlobResource(String key)
+	{
+	    return (XMLBlobResource)resources.get(key);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#getResourceKeys()
 	 */
@@ -131,5 +145,25 @@ public class XMLDataObject
 	public void setLocalId(String localId)
 	{
 		this.localId = localId;
+	}
+	
+	public OTResourceCollection getResourceCollection(String key, Class collectionClass)
+	{
+		Object listObj = getResource(key);
+		if(collectionClass.isInstance(listObj)) {
+			return (OTResourceCollection)listObj;
+		}
+
+	    OTResourceCollection collection = null;
+		if(collectionClass.equals(OTResourceList.class)) {
+			collection =  new XMLResourceList();
+		} else if(collectionClass.equals(OTResourceMap.class)) {
+			collection =  new XMLResourceMap();
+		}
+		
+		if(collection != null) {
+		    setResource(key, collection);
+		}
+	    return collection;
 	}
 }

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-01-12 04:19:55 $
+ * $Revision: 1.4 $
+ * $Date: 2005-03-31 21:07:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -16,6 +16,7 @@ import java.util.Hashtable;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTObjectRevision;
 import org.concord.otrunk.datamodel.OTUUID;
@@ -114,10 +115,10 @@ public class FsDataObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#getResourceList(java.lang.String)
 	 */
-	public OTResourceCollection getResourceCollection(String key)
+	public OTResourceCollection getResourceCollection(String key, Class collectionClass)
 	{
 		Object listObj = resources.get(key);
-		if(listObj instanceof OTResourceList) {
+		if(collectionClass.isInstance(listObj)) {
 			return (OTResourceCollection)listObj;
 		}
 		
@@ -129,9 +130,18 @@ public class FsDataObject
 		
 		// create a resource list object
 		// add it as a resource with this name
-		FsResourceList list = new FsResourceList(this);
-		resources.put(key, list);
-		return list;
+		if(collectionClass == OTResourceList.class) {
+		    FsResourceList list = new FsResourceList(this);
+		    resources.put(key, list);
+		    return list;
+		} else if(collectionClass == OTResourceMap.class) {
+		    FsResourceMap map = new FsResourceMap(this);
+		    resources.put(key, map);
+		    return map;
+		}
+		
+		return null;
 	}
 
+	
 }

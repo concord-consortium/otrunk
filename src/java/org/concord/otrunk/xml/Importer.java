@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-01-12 04:19:54 $
+ * $Revision: 1.8 $
+ * $Date: 2005-03-31 21:07:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -182,7 +182,10 @@ public class Importer
 							(XMLDataObject)resourceValue);
 				} else if(resourceValue instanceof XMLResourceList) {
 					XMLResourceList oldList = (XMLResourceList)resourceValue;
-					OTResourceList newList = (OTResourceList)db.createCollection(otDObj, OTResourceList.class);
+					// FIXME we should handle this differently so we dont' set it 
+					// twice
+					OTResourceList newList = (OTResourceList)otDObj.
+						getResourceCollection((String)resourceEntry.getKey(), OTResourceList.class);
 					for(int j=0; j<oldList.size(); j++) {
 						Object oldElement = oldList.get(j);
 						Object newElement = null;
@@ -196,7 +199,9 @@ public class Importer
 					}
 					newResourceValue = newList;
 				} else if(resourceValue instanceof XMLResourceMap) {
-					OTResourceMap newMap = (OTResourceMap)db.createCollection(otDObj, OTResourceMap.class);
+				    
+					OTResourceMap newMap = (OTResourceMap)otDObj.
+						getResourceCollection((String)resourceEntry.getKey(), OTResourceMap.class);
 					newResourceValue = newMap;
 				} else if(resourceValue instanceof XMLParsableString) {
 					System.out.println("got parsable string");

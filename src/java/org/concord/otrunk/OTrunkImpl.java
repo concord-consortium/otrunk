@@ -22,6 +22,7 @@ import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.datamodel.OTIDFactory;
 
 /**
  * @author scott
@@ -34,6 +35,7 @@ public class OTrunkImpl implements OTrunk
 	public static final String RES_CLASS_NAME = "otObjectClass";
 
 	protected Hashtable loadedObjects = new Hashtable();
+	protected Hashtable userDataObjects = new Hashtable();
 	protected Vector services = null;
 	
 	protected OTDatabase db;
@@ -72,6 +74,21 @@ public class OTrunkImpl implements OTrunk
 		
 	}
 	
+	/**
+	 *  (non-Javadoc)
+     * @see org.concord.framework.otrunk.OTrunk#getOTID(java.lang.String)
+     */
+    public OTID getOTID(String otidStr)
+    {
+        // TODO Auto-generated method stub
+        OTID id = OTIDFactory.createOTID(otidStr);
+        if(id == null) {
+            // lookup the id in the user object list
+            id = (OTID)userDataObjects.get(otidStr);
+        }
+        return id;
+    }
+	
 	/* (non-Javadoc)
 	 */
 	public OTObject createObject(Class objectClass)
@@ -92,13 +109,6 @@ public class OTrunkImpl implements OTrunk
 		return db.createDataObject();
 	}
 	
-	public OTResourceCollection createCollection(OTDataObject dataObject, 
-			Class collectionClass)
-		throws Exception
-	{
-		return db.createCollection(dataObject, collectionClass);
-	}
-		
 	public void setRoot(OTObject obj) throws Exception
 	{
 		// FIXME this doesn't do a good job if there
@@ -141,7 +151,11 @@ public class OTrunkImpl implements OTrunk
 		if(childID == null) {
 			throw new Exception("Null child Id");
 		}
-		// 
+		
+		if(childID instanceof OTUserDataObject) {
+		    return (OTUserDataObject)childID;
+		}
+		
 		OTDataObject childDataObject = db.getOTDataObject(dataParent, childID);
 		
 		// if the mode is authoring then just return the requested object
@@ -153,10 +167,11 @@ public class OTrunkImpl implements OTrunk
 			return childDataObject;
 		}	
 		
-		OTUserDataObject userObject;
 		OTUserStateMap user = ((OTUserDataObject)dataParent).getUser();	
+		OTUserDataObject userDataObject = user.getUserDataObject(childDataObject);
+		userDataObjects.put(userDataObject.toString(), userDataObject);
 		
-		return user.getUserDataObject(childDataObject);
+		return userDataObject;
 	}
 	
 	public void close()
@@ -298,7 +313,7 @@ public class OTrunkImpl implements OTrunk
 			Class schemaClass = params[0];
 				
 			InvocationHandler handler = 
-				new OTInvocationHandler(dataObject, this);
+				new OTResourceSchemaHandler(dataObject, this);
 
 			Class [] interfaceList = new Class[] { schemaClass };
 			
@@ -357,9 +372,8 @@ public class OTrunkImpl implements OTrunk
 		OTDataObject authoredDataObj = getOTDataObject(null, authoredId);
 		OTUserDataObject userData = 
 			new OTUserDataObject(authoredDataObj, (OTUserStateMap)user, this);
-
-		// this is a hack it should get the class from the authoring root
-		// and use that to make the portfolio object
+		userDataObjects.put(userData.toString(), userData);
+		
 		String otObjectClassStr = (String)userData.getResource("otObjectClass");
 		if(otObjectClassStr == null) {
 			return null;
