@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.4 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -10,8 +10,6 @@
 package org.concord.otrunk.xml;
 
 import java.util.Properties;
-
-import org.jdom.Element;
 
 /**
  * ResourceTypeHandler
@@ -39,7 +37,7 @@ public abstract class ResourceTypeHandler
 	 * @param elementProps
 	 * @return
 	 */
-	public abstract Object handleElement(Element element, Properties elementProps)
+	public abstract Object handleElement(OTXMLElement element, Properties elementProps)
 		throws HandleElementException;
 
 	public String getPrimitiveName()

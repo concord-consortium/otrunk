@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.4 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -12,8 +12,6 @@ package org.concord.otrunk.xml;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-
-import org.jdom.Element;
 
 /**
  * ListTypeHandler
@@ -37,13 +35,13 @@ public class ListTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	public Object handleElement(Element element, Properties elementProps)
+	public Object handleElement(OTXMLElement element, Properties elementProps)
 	{
 		XMLResourceList list = new XMLResourceList();
 		
 		List children = element.getChildren();
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			
-			Element child = (Element)childIter.next();
+		    OTXMLElement child = (OTXMLElement)childIter.next();
 			Object resValue = typeService.handleLiteralElement(child);
 			list.add(resValue);
 		}

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2005-02-09 06:15:09 $
+ * $Revision: 1.12 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.concord.otrunk.OTrunkImpl;
-import org.jdom.Attribute;
-import org.jdom.Element;
 
 /**
  * ObjectTypeHandler
@@ -65,7 +63,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	public Object handleElement(Element element, Properties elementProps)
+	public Object handleElement(OTXMLElement element, Properties elementProps)
 	{
 		String refid = element.getAttributeValue("refid");
 		if(refid != null && refid.length() > 0){
@@ -89,7 +87,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		
 		List attributes = element.getAttributes();
 		for(Iterator attIter = attributes.iterator(); attIter.hasNext(); ) {
-			Attribute attrib = (Attribute)attIter.next();
+			OTXMLAttribute attrib = (OTXMLAttribute)attIter.next();
 			String attribName = attrib.getName();
 			if(attribName.equals("id") ||
 					attribName.equals("refid") ||
@@ -101,15 +99,14 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				Object resValue = handleChildResource(attribName, attrib.getValue());
 				obj.setResource(attribName, resValue);
 			} catch (HandleElementException e) {
-				System.err.println("error in attribute: " +
+				System.err.println(e.getMessage() + " in attribute: " +
 						TypeService.attributePath(attrib));
-				e.printStackTrace();
 			}
 		}
 		
 		List children = element.getChildren();		
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {
-			Element child = (Element)childIter.next();
+		    OTXMLElement child = (OTXMLElement)childIter.next();
 
 			try {
 				Object resValue = handleChildResource(child.getName(), child);
@@ -158,11 +155,11 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 
 		String resourceType = resPrimitiveType;
 		if(resPrimitiveType.equals("object")) {
-			if(!(childObj instanceof Element)) {
+			if(!(childObj instanceof OTXMLElement)) {
 				System.err.println("child of type object must be an element");
 				return null;
 			}
-			Element child = (Element)childObj;
+			OTXMLElement child = (OTXMLElement)childObj;
 			
 			String childRefId = child.getAttributeValue("refid");
 			
@@ -181,7 +178,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 					return null;
 				}
 				childObj = children.get(0);
-				resourceType = ((Element)childObj).getName();
+				resourceType = ((OTXMLElement)childObj).getName();
 			}			
 		}
 		
@@ -201,7 +198,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				throw new HandleElementException("Can't use an attribute for a non-primitive type");
 			}
 		} else {
-			return resHandler.handleElement((Element)childObj, elementProps);
+			return resHandler.handleElement((OTXMLElement)childObj, elementProps);
 		}
 	}
 	

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.4 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -9,12 +9,7 @@
 */
 package org.concord.otrunk.xml;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Properties;
-
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 
 /**
  * StringTypeHandler
@@ -40,30 +35,10 @@ public class StringTypeHandler extends PrimitiveResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	public Object handleElement(Element element, Properties elementProps)
+	public Object handleElement(OTXMLElement element, Properties elementProps)
 	{
-		// get string from inside of this element and return it
-		XMLOutputter outputer = new XMLOutputter();
-		// need a buffer output stream to make a string out of the content
-		StringWriter stringWriter = new StringWriter();
-		try {
-			outputer.outputElementContent(element, stringWriter);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-		String contentStr = stringWriter.toString().trim();
-		
-		return new XMLParsableString(contentStr);
-		
-		/*
-		 * parse all strings because we no longer have a way to add params
-		if(elementProps != null &&
-				elementProps.getProperty("parse") != null) {
-			return new XMLParsableString(contentStr);
-		}
-		
-		return contentStr;
-		*/
+	    String contentStr = element.getContentAsXMLText();
+	    		
+		return new XMLParsableString(contentStr);		
 	}
 }

@@ -30,13 +30,6 @@
       <type>jar</type>
     </dependency>
     <dependency>
-      <groupId>xmltypes</groupId>
-      <artifactId>xmltypes</artifactId>
-      <version>1.0</version>
-      <jar>${basedir}/xmlbeans/xmltypes-1.0.jar</jar>
-      <type>jar</type>
-    </dependency>
-    <dependency>
       <groupId>domain</groupId>
       <artifactId>domain</artifactId>
       <version>1.0</version>
@@ -52,18 +45,6 @@
       <groupId>frameworkview</groupId>
       <artifactId>frameworkview</artifactId>
       <version>SNAPSHOT</version>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>xmlbeans</groupId>
-      <artifactId>xbean-apache</artifactId>
-      <version>1.0.3</version>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>ozone</groupId>
-      <artifactId>ozoneServer</artifactId>
-      <version>1.2.x-dev</version>
       <type>jar</type>
     </dependency>
   </dependencies>
