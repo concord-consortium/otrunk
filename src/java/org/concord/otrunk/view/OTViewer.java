@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-03-16 19:04:45 $
+ * $Revision: 1.8 $
+ * $Date: 2005-03-18 05:53:49 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -22,6 +23,7 @@ import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -95,7 +97,50 @@ public class OTViewer extends JFrame
 		this.showTree = showTree;
 	}
 	
-	
+	public void updateTreePane()
+	{
+		Dimension minimumSize = new Dimension(100, 50);
+	    JComponent leftComponent = null;
+        folderTreeArea = new JTree(folderTreeModel);
+        folderTreeArea.setEditable(true);
+        folderTreeArea.addTreeSelectionListener(this);
+        
+        JScrollPane folderTreeScrollPane = new JScrollPane(folderTreeArea);
+
+        if(System.getProperty("otrunk.view.debug","").equals("true")){
+	        //			ViewFactory.getComponent(root);
+	        
+	        dataTreeArea = new JTree(dataTreeModel);
+	        dataTreeArea.setEditable(true);
+	        dataTreeArea.addTreeSelectionListener(this);
+	        
+	        JScrollPane dataTreeScrollPane = new JScrollPane(dataTreeArea);
+	        
+	        JTabbedPane tabbedPane = new JTabbedPane();
+	        tabbedPane.add("Folders", folderTreeScrollPane);
+	        tabbedPane.add("Resources", dataTreeScrollPane);
+
+			//	Provide minimum sizes for the two components in the split pane
+			folderTreeScrollPane.setMinimumSize(minimumSize);
+			dataTreeScrollPane.setMinimumSize(minimumSize);
+			tabbedPane.setMinimumSize(minimumSize);			    
+
+	        leftComponent = tabbedPane;
+	    } else {
+	        leftComponent = folderTreeScrollPane;
+	    }
+	    
+		//	Create a split pane with the two scroll panes in it.
+		if(splitPane == null){
+		    splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+		            leftComponent, bodyPanel);
+		} else {
+		    splitPane.setLeftComponent(leftComponent);
+		}
+		splitPane.setOneTouchExpandable(true);
+		splitPane.setDividerLocation(200);
+		
+	}
 	
 	public void init(String url)
 	{
@@ -111,36 +156,8 @@ public class OTViewer extends JFrame
 			
 			folderTreeModel = new SimpleTreeModel();		
 			
-			folderTreeArea = new JTree(folderTreeModel);
-			folderTreeArea.setEditable(true);
-			folderTreeArea.addTreeSelectionListener(this);
-			
-			JScrollPane folderTreeScrollPane = new JScrollPane(folderTreeArea);
-			//			ViewFactory.getComponent(root);
-			
-			dataTreeArea = new JTree(dataTreeModel);
-			dataTreeArea.setEditable(true);
-			dataTreeArea.addTreeSelectionListener(this);
-			
-			JScrollPane dataTreeScrollPane = new JScrollPane(dataTreeArea);
-			
-			JTabbedPane tabbedPane = new JTabbedPane();
-			tabbedPane.add("Folders", folderTreeScrollPane);
-			tabbedPane.add("Resources", dataTreeScrollPane);
-			
-			//	Create a split pane with the two scroll panes in it.
-			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-					tabbedPane, bodyPanel);
-			splitPane.setOneTouchExpandable(true);
-			splitPane.setDividerLocation(200);
-			
-			//	Provide minimum sizes for the two components in the split pane
-			Dimension minimumSize = new Dimension(100, 50);
-			folderTreeScrollPane.setMinimumSize(minimumSize);
-			dataTreeScrollPane.setMinimumSize(minimumSize);
-			tabbedPane.setMinimumSize(minimumSize);
-			bodyPanel.setMinimumSize(minimumSize);
-			
+			updateTreePane();
+						
 			getContentPane().add(splitPane);
 		} else {
 			getContentPane().add(bodyPanel);
@@ -363,6 +380,7 @@ public class OTViewer extends JFrame
 
 			};
 			saveAction.putValue(Action.NAME, "Save");			
+			saveAction.setEnabled(false);
 			menu.add(saveAction);
 
 			saveAsAction = new AbstractAction(){
@@ -403,8 +421,25 @@ public class OTViewer extends JFrame
 				}
 			};
 			saveAsAction.putValue(Action.NAME, "Save As...");			
+			saveAsAction.setEnabled(false);
 			menu.add(saveAsAction);
 
+			JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem("Debug Mode");
+			debugItem.addActionListener(new ActionListener(){
+			   public void actionPerformed(ActionEvent e)
+			   {
+			       Object source = e.getSource();
+			       if(((JCheckBoxMenuItem)source).isSelected()){
+			           System.setProperty("otrunk.view.debug","true");
+			       } else {
+			           System.setProperty("otrunk.view.debug","false");
+			       }
+			       
+			       updateTreePane();			       
+			   }
+			});
+			menu.add(debugItem);
+			
 			JMenuItem menuItem;
 			
 			exitAction = new ExitAction();
