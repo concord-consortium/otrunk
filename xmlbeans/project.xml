@@ -1,0 +1,30 @@
+<project>
+    <pomVersion>3</pomVersion>
+
+    <!-- ===================== -->
+    <!-- Module Identification -->
+    <!-- ===================== -->
+
+    <name>otrunk:xmlbeans</name>
+    <id>xmltypes</id>
+    <shortDescription>OTrunk xml types Schema</shortDescription>
+    <description>OTrunk xml types Schema</description>
+    <url></url>
+    <siteDirectory></siteDirectory>
+    <distributionDirectory></distributionDirectory>
+
+    <package>org.concord.otrunk.xml.dod</package>
+
+    <!-- ============ -->
+    <!-- Dependencies -->
+    <!-- ============ -->
+
+    <dependencies>
+        <!-- needed for xmlbeans runtime-->
+        <dependency>
+            <groupId>xmlbeans</groupId>
+            <artifactId>xbean-apache</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+    </dependencies>
+</project>

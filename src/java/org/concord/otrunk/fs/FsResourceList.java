@@ -1,0 +1,105 @@
+/*
+ * Last modification information:
+ * $Revision: 1.1 $
+ * $Date: 2004-10-25 05:33:57 $
+ * $Author: scytacki $
+ *
+ * Licence Information
+ * Copyright 2004 The Concord Consortium 
+*/
+package org.concord.otrunk.fs;
+
+import java.io.Serializable;
+import java.util.Vector;
+
+import org.concord.otrunk.OTResourceList;
+
+
+/**
+ * FsResourceList
+ * Class name and description
+ *
+ * Date created: Aug 23, 2004
+ *
+ * @author scott<p>
+ *
+ */
+public class FsResourceList 
+	implements OTResourceList, Serializable
+{
+	Vector list = new Vector();
+	boolean readOnly;
+	private FsDataObject dataObject = null;
+		
+	FsResourceList(FsDataObject dataObject)
+	{
+		this.dataObject = dataObject;
+	}
+		
+	private void updateModifiedTime()
+	{
+		dataObject.updateModifiedTime();
+	}
+		
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceList#setReadOnly(boolean)
+	 */
+	public void setReadOnly(boolean readOnly)
+	{
+		// TODO Auto-generated method stub
+		this.readOnly = readOnly;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceList#size()
+	 */
+	public int size() {
+		return list.size();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceList#get(int)
+	 */
+	public Object get(int index) 
+	{
+		return list.get(index);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceList#add(java.lang.Object)
+	 */
+	public void add(Object object) 
+	{
+		if(readOnly) {
+			// TODO should throw an exception
+			return;
+		}
+
+		updateModifiedTime();
+		list.add(object);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceList#add(int, java.lang.Object)
+	 */
+	public void add(int index, Object object) 
+	{
+		if(readOnly) {
+			// TODO should throw an exception
+			return;
+		}
+
+		updateModifiedTime();
+		list.add(index, object);
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceList#removeAll()
+	 */
+	public void removeAll()
+	{
+		updateModifiedTime();
+		list.removeAllElements();
+	}
+}

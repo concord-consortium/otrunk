@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <artifactId>otrunk</artifactId>
+  <name>OTrunk</name>
+  <groupId>otrunk</groupId>
+  <currentVersion>1.0</currentVersion>
+  <inceptionYear>2004</inceptionYear>
+  <logo>/images/logo.gif</logo>
+  <repository />
+  <mailingLists>
+    <mailingList>
+      <name>${pom.name} Dev List</name>
+    </mailingList>
+    <mailingList>
+      <name>${pom.name} User List</name>
+    </mailingList>
+  </mailingLists>
+  <dependencies>
+    <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.0</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>jug</groupId>
+      <artifactId>jug</artifactId>
+      <version>1.1</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>xmltypes</groupId>
+      <artifactId>xmltypes</artifactId>
+      <version>1.0</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>xmlbeans</groupId>
+      <artifactId>xbean-apache</artifactId>
+      <version>1.0.3</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>ozone</groupId>
+      <artifactId>ozoneServer</artifactId>
+      <version>1.2.x-dev</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>domain</groupId>
+      <artifactId>domain</artifactId>
+      <version>1.0</version>
+      <type>jar</type>
+    </dependency>
+  </dependencies>
+  <build>
+    <sourceDirectory>src/java</sourceDirectory>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+    </unitTest>
+  </build>
+</project>
+
