@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-03-14 05:05:43 $
+ * $Revision: 1.7 $
+ * $Date: 2005-03-16 19:04:45 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -83,15 +83,6 @@ public class OTViewer extends JFrame
 	
 	boolean showTree = false;
 	
-	/**
-	 * This method initializes this
-	 * 
-	 * @return void
-	 */
-	private void initialize() {
-        this.setSize(263, 236);
-			
-	}
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
 		OTViewContainerPanel.setOTViewFactory(factory);
@@ -101,8 +92,7 @@ public class OTViewer extends JFrame
 	public OTViewer(boolean showTree)
 	{
 		super("OTrunk Viewer");
-			initialize();
-	this.showTree = showTree;
+		this.showTree = showTree;
 	}
 	
 	
@@ -156,7 +146,7 @@ public class OTViewer extends JFrame
 			getContentPane().add(bodyPanel);
 		}
 		
-        setBounds(100, 100, 800, 600);
+        setBounds(100, 100, 875, 600);
 
         setVisible(true);
         
@@ -420,6 +410,7 @@ public class OTViewer extends JFrame
 			exitAction = new ExitAction();
 			menu.add(exitAction);
 			
+			menuBar.add(menu);			
 		}
 		/////////////////////////////////////////////////
 		return menuBar;
