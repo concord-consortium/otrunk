@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-12 02:02:51 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -11,7 +11,7 @@ package org.concord.otrunk.xml;
 
 import java.util.Vector;
 
-import org.concord.otrunk.OTResourceList;
+import org.concord.otrunk.datamodel.OTResourceList;
 
 
 /**

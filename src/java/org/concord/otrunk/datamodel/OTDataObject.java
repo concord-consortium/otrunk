@@ -1,13 +1,12 @@
 /*
- * Created on Aug 17, 2004
+ * Created on Aug 16, 2004
  *
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-package org.concord.otrunk.ozone;
+package org.concord.otrunk.datamodel;
 
 import org.doomdark.uuid.UUID;
-import org.ozoneDB.OzoneRemote;
 
 /**
  * @author scott
@@ -15,11 +14,13 @@ import org.ozoneDB.OzoneRemote;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public interface OzDatabaseIndex extends OzoneRemote
+public interface OTDataObject 
 {
-	public void put(UUID id, OzDataObject dataObject); /*update*/
-	public OzDataObject get(UUID id);
+	public UUID getGlobalId();
 	
-	public void setRoot(UUID rootID);	/*update*/
-	public UUID getRoot();
+	public void setResource(String key, Object resource);
+	public Object getResource(String key);
+	public String [] getResourceKeys();
+		
+	public OTObjectRevision getCurrentRevision();
 }

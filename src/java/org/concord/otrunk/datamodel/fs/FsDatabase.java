@@ -1,13 +1,13 @@
 /*
  * Last modification information:
  * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Date: 2004-11-12 02:02:51 $
  * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
-package org.concord.otrunk.fs;
+package org.concord.otrunk.datamodel.fs;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,14 +20,13 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
-import org.concord.otrunk.OTDataObject;
-import org.concord.otrunk.OTDatabase;
-import org.concord.otrunk.OTResourceCollection;
-import org.concord.otrunk.OTResourceList;
-import org.concord.otrunk.OTResourceMap;
-import org.concord.otrunk.OTUser;
-import org.concord.otrunk.OTUserDataObject;
-import org.concord.otrunk.OTObject;
+import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.datamodel.OTResourceCollection;
+import org.concord.otrunk.datamodel.OTResourceList;
+import org.concord.otrunk.datamodel.OTResourceMap;
+import org.concord.otrunk.datamodel.OTUser;
+import org.concord.otrunk.datamodel.OTUserDataObject;
 import org.doomdark.uuid.EthernetAddress;
 import org.doomdark.uuid.NativeInterfaces;
 import org.doomdark.uuid.UUID;
@@ -43,7 +42,7 @@ import org.doomdark.uuid.UUIDGenerator;
  * @author scott<p>
  *
  */
-public class FsDatabase extends OTDatabase
+public class FsDatabase implements OTDatabase
 {
 	// This needs to be initialized from files in the db folder
 	// and on closing it should be written out again
@@ -211,28 +210,28 @@ public class FsDatabase extends OTDatabase
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.concord.otrunk.OTDatabase#setRoot(org.concord.portfolio.PortfolioObject)
-	 */
-	public void setRoot(OTObject obj)
-		throws Exception
-	{
-		rootId = obj.getGlobalId();
-
-	}
-
-	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDatabase#getRoot()
 	 */
-	public OTObject getRoot()
+	public OTDataObject getRoot()
 		throws Exception
 	{
 		if (rootId == null) {
 			return null;
 		}
-		
-		return getOTObject(null, rootId);
+			
+		return getOTDataObject(null, rootId);
 	}
 
+	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.datamodel.OTDatabase#setRoot(org.concord.otrunk.datamodel.OTDataObject)
+	 */
+	public void setRoot(UUID rootId)
+		throws Exception
+	{
+		this.rootId = rootId;
+	}
+	
 	
 	public byte [] getObjectBytes(OTDataObject dObj)
 		throws Exception 

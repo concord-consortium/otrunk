@@ -4,10 +4,11 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-package org.concord.otrunk.ozone;
+package org.concord.otrunk.datamodel.ozone;
 
 import java.util.Vector;
 
+import org.concord.otrunk.OTObject;
 import org.ozoneDB.OzoneObject;
 
 
@@ -60,5 +61,35 @@ public class OzResourceListImpl extends OzoneObject
 	public void removeAll()
 	{
 		list.removeAllElements();
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.ozone.OzResourceList#add(int, org.concord.otrunk.OTObject)
+	 */
+	public void add(int index, OTObject object)
+	{
+		// TODO Auto-generated method stub
+
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.ozone.OzResourceList#add(org.concord.otrunk.OTObject)
+	 */
+	public void add(OTObject object)
+	{
+		// TODO Auto-generated method stub
+
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.ozone.OzResourceList#getObject(int)
+	 */
+	public OTObject getObject(int index)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

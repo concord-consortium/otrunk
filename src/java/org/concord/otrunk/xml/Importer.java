@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-12 02:02:51 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.concord.otrunk.OTDataObject;
-import org.concord.otrunk.OTDatabase;
-import org.concord.otrunk.OTResourceList;
-import org.concord.otrunk.OTResourceMap;
 import org.concord.otrunk.OTObject;
+import org.concord.otrunk.OTrunk;
+import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTResourceList;
+import org.concord.otrunk.datamodel.OTResourceMap;
 import org.concord.otrunk.xml.dod.Pfobjects;
 import org.concord.otrunk.xml.dod.PfobjectsDocument;
 import org.doomdark.uuid.UUID;
@@ -45,7 +45,7 @@ import org.jdom.output.XMLOutputter;
 public class Importer
 {
 
-	public static Vector fileImport(File objectsFile, File importFile, OTDatabase db)
+	public static Vector fileImport(File objectsFile, File importFile, OTrunk db)
 		throws Exception
 	{
 		PfobjectsDocument pfObjectDoc = PfobjectsDocument.Factory.parse(objectsFile);
@@ -125,8 +125,7 @@ public class Importer
 			XMLDataObject dObj = (XMLDataObject)(rootXmlDataObjects.get(i));
 
 			OTDataObject importedDataObject = (OTDataObject)importMap.get(dObj); 
-			OTObject importedObject = db.getOTObject(null, 
-					importedDataObject.getGlobalId());
+			OTObject importedObject = db.getOTObject(importedDataObject.getGlobalId());
 			otDataObjects.add(importedObject);			
 		}
 		
@@ -141,7 +140,7 @@ public class Importer
 	
 	public static void importObjects(Vector objects,
 			Hashtable importMap, Hashtable localIdMap, 
-			OTDatabase db)
+			OTrunk db)
 		throws Exception
 	{	
 		OTDataObject otDObj = null;
@@ -218,7 +217,7 @@ public class Importer
 	}
 	
 	public static UUID getUUID(Hashtable importMap, Hashtable localIdMap,
-			OTDatabase db, XMLDataObject xmlDObj)
+			OTrunk db, XMLDataObject xmlDObj)
 	{
 		OTDataObject newChildDO = (OTDataObject)importMap.get(xmlDObj);
 		if(newChildDO == null) {

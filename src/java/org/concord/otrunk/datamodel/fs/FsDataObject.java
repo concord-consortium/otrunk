@@ -1,22 +1,22 @@
 /*
  * Last modification information:
  * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Date: 2004-11-12 02:02:51 $
  * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
-package org.concord.otrunk.fs;
+package org.concord.otrunk.datamodel.fs;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Hashtable;
 
-import org.concord.otrunk.OTDataObject;
-import org.concord.otrunk.OTObjectRevision;
-import org.concord.otrunk.OTResourceCollection;
-import org.concord.otrunk.OTResourceList;
+import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTObjectRevision;
+import org.concord.otrunk.datamodel.OTResourceCollection;
+import org.concord.otrunk.datamodel.OTResourceList;
 import org.doomdark.uuid.UUID;
 
 
@@ -117,7 +117,7 @@ public class FsDataObject
 	{
 		Object listObj = resources.get(key);
 		if(listObj instanceof OTResourceList) {
-			return (OTResourceList)listObj;
+			return (OTResourceCollection)listObj;
 		}
 		
 		if(listObj != null) {

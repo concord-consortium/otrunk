@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-12 02:02:51 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -44,8 +44,9 @@ public class TypeService
 		// define them here.  The name can be looked up when it
 		// is requested.
 		handlerMap.put("boolean", new BooleanTypeHandler(this));
-		handlerMap.put("list", new ListTypeHandler(this));
+		handlerMap.put("float", new FloatTypeHandler(this));
 		handlerMap.put("string", new StringTypeHandler(this));
+		handlerMap.put("list", new ListTypeHandler(this));
 		handlerMap.put("blob", new BlobTypeHandler(this));
 		handlerMap.put("object", new ObjectTypeHandler(this));
 	}

@@ -4,13 +4,13 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-package org.concord.otrunk.ozone;
+package org.concord.otrunk.datamodel.ozone;
 
 import java.util.Hashtable;
 
-import org.concord.otrunk.OTObjectRevision;
-import org.concord.otrunk.OTResourceCollection;
-import org.concord.otrunk.OTResourceList;
+import org.concord.otrunk.datamodel.OTObjectRevision;
+import org.concord.otrunk.datamodel.OTResourceCollection;
+import org.concord.otrunk.datamodel.OTResourceList;
 import org.doomdark.uuid.EthernetAddress;
 import org.doomdark.uuid.NativeInterfaces;
 import org.doomdark.uuid.UUID;

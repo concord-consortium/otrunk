@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2004-10-25 05:33:57 $
+ * $Revision: 1.2 $
+ * $Date: 2004-11-12 02:02:51 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.concord.otrunk.OTDatabase;
+import org.concord.otrunk.OTrunk;
 import org.concord.otrunk.xml.dod.DoDescription;
 import org.jdom.Element;
 
@@ -56,7 +56,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			obj.setLocalId(localIdStr);
 		}
 		
-		obj.setResource(OTDatabase.RES_CLASS_NAME, typeService.getClassName(type));
+		obj.setResource(OTrunk.RES_CLASS_NAME, typeService.getClassName(type));
 		List children = element.getChildren();
 		
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {
