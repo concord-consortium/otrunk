@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-02-09 06:15:09 $
+ * $Revision: 1.4 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -14,7 +14,6 @@ import org.doomdark.uuid.EthernetAddress;
 import org.doomdark.uuid.NativeInterfaces;
 import org.doomdark.uuid.UUID;
 import org.doomdark.uuid.UUIDGenerator;
-;
 
 
 /**
@@ -87,9 +86,8 @@ public class OTUUID extends UUID
 		EthernetAddress hwAddress = getHWAddress();
 				
 		UUIDGenerator generator = UUIDGenerator.getInstance();
-    	// FIXME: there has to be a better way to do this without
-    	// making a throw away object.
-    	UUID id;   	
+
+		UUID id;   	
     	if(hwAddress != null) {
     		id = generator.generateTimeBasedUUID(hwAddress);
     	} else {

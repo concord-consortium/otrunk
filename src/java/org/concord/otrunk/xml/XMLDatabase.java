@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.9 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -28,9 +28,7 @@ import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTUUID;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
+import org.concord.otrunk.xml.jdom.JDOMDocument;
 
 
 /**
@@ -76,17 +74,16 @@ public class XMLDatabase
 		ObjectTypeHandler objectTypeHandler = new ObjectTypeHandler(typeService, this);
 		typeService.registerUserType("object", objectTypeHandler);
 
-		SAXBuilder builder = new SAXBuilder();
-		Document document = builder.build(xmlStream);
+		JDOMDocument document = new JDOMDocument(xmlStream);
 		
-		Element rootElement = document.getRootElement();
-	
+		OTXMLElement rootElement = document.getRootElement();
+				
 		Vector importedOTObjectClasses = new Vector();
 		
-		Element importsElement = rootElement.getChild("imports");
+		OTXMLElement importsElement = rootElement.getChild("imports");
 		List imports = importsElement.getChildren();		
 		for(Iterator iterator=imports.iterator();iterator.hasNext();) {
-			Element currentImport=(Element)iterator.next();
+		    OTXMLElement currentImport=(OTXMLElement)iterator.next();
 			String className = currentImport.getAttributeValue("class");
 			importedOTObjectClasses.add(className);
 		}		
@@ -98,13 +95,13 @@ public class XMLDatabase
 		// Load all the xml data objects in the file
 		// This also makes a list of all these objects so we 
 		// can handle them linearly in the next pass.
-		Element objects = rootElement.getChild("objects");
+		OTXMLElement objects = rootElement.getChild("objects");
 		List xmlObjects = objects.getChildren();
 		if(xmlObjects.size() != 1) {
 			throw new Exception("Can only load files that contain a single root object");
 		}
 
-		Element rootObjectNode = (Element)xmlObjects.get(0);		
+		OTXMLElement rootObjectNode = (OTXMLElement)xmlObjects.get(0);		
 		
 		// Recusively load all the data objects
 		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode);
@@ -139,7 +136,7 @@ public class XMLDatabase
 		return (OTDataObject)dataObjects.get(rootId);
 	}
 
-	protected XMLDataObject createDataObject(Element element, String idStr)
+	protected XMLDataObject createDataObject(OTXMLElement element, String idStr)
 		throws Exception
 	{
 		OTID id = null;
@@ -149,7 +146,7 @@ public class XMLDatabase
 		return createDataObject(element, id); 
 	}
 		
-	protected XMLDataObject createDataObject(Element element, OTID id)
+	protected XMLDataObject createDataObject(OTXMLElement element, OTID id)
 		throws Exception
 	{
 		if(id == null) {

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.11 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -20,8 +20,6 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
-import org.jdom.Attribute;
-import org.jdom.Element;
 
 /**
  * DOTypeService
@@ -108,10 +106,10 @@ public class TypeService
 	}
 
 
-	public static String elementPath(Element element)
+	public static String elementPath(OTXMLElement element)
 	{
 		String path = element.getName();
-		Element parent = element.getParentElement();
+		OTXMLElement parent = element.getParentElement();
 		while(parent != null) {
 			String elementString = parent.getName();
 			
@@ -127,9 +125,9 @@ public class TypeService
 		return path;
 	}
 
-	public static String attributePath(Attribute attribute)
+	public static String attributePath(OTXMLAttribute attribute)
 	{
-		Element parent = attribute.getParent();
+	    OTXMLElement parent = attribute.getParent();
 		String parentPath = elementPath(parent);
 		return parentPath + "@" + attribute.getName();
 	}
@@ -142,7 +140,7 @@ public class TypeService
 	 * @param child
 	 * @return
 	 */
-	public Object handleLiteralElement(Element child)
+	public Object handleLiteralElement(OTXMLElement child)
 	{
 		String childName = child.getName();
 		Properties elementProps;

@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2004-11-22 23:05:40 $
+ * $Revision: 1.3 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -9,7 +9,6 @@
 */
 package org.concord.otrunk.xml;
 
-import org.jdom.Element;
 
 
 /**
@@ -40,7 +39,7 @@ public class XMLDataObjectRef extends XMLDataObject
 		this.refId = refId;
 	}
 	
-	public XMLDataObjectRef(String id, Element element)
+	public XMLDataObjectRef(String id, OTXMLElement element)
 	{
 		super(element, null);
 		

@@ -8,8 +8,6 @@ package org.concord.otrunk.xml;
 
 import java.util.Properties;
 
-import org.jdom.Element;
-
 /**
  * @author scott
  *
@@ -34,7 +32,7 @@ public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler
 	 * @param elementProps
 	 * @return
 	 */
-	public Object handleElement(Element element, Properties elementProps)
+	public Object handleElement(OTXMLElement element, Properties elementProps)
 	throws HandleElementException
 	{
 		return handleElement(element.getTextTrim(), elementProps);

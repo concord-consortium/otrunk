@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.6 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -9,16 +9,8 @@
 */
 package org.concord.otrunk.xml;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.SocketException;
 import java.net.URL;
 import java.util.Properties;
-
-import org.concord.domain.Transfer;
-import org.jdom.Element;
 
 /**
  * BlobTypeHandler

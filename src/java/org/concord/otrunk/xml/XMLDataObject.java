@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-01-25 16:19:41 $
+ * $Revision: 1.7 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -16,7 +16,6 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTObjectRevision;
-import org.jdom.Element;
 
 
 /**
@@ -32,18 +31,18 @@ public class XMLDataObject
 	implements OTDataObject
 {
 	private OTID globalId;
-	private Element element;
+	private OTXMLElement element;
 	private String localId = null;
 	
 	Hashtable resources = new Hashtable();
 
-	public XMLDataObject(Element element, OTID id)
+	public XMLDataObject(OTXMLElement element, OTID id)
 	{
 		this.element = element;
 		globalId = id;
 	}
 	
-	public Element getElement()
+	public OTXMLElement getElement()
 	{
 		return element;
 	}

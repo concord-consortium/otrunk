@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.5 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -11,7 +11,6 @@ package org.concord.otrunk.xml;
 
 import java.util.Properties;
 
-import org.jdom.Element;
 
 /**
  * BooleanTypeHandler

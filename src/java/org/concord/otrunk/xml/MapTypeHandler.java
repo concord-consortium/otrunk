@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2005-01-25 16:19:41 $
+ * $Revision: 1.2 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -12,8 +12,6 @@ package org.concord.otrunk.xml;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-
-import org.jdom.Element;
 
 
 /**
@@ -41,13 +39,13 @@ public class MapTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.xml.ResourceTypeHandler#handleElement(org.jdom.Element, java.util.Properties)
 	 */
-	public Object handleElement(Element element, Properties elementProps)
+	public Object handleElement(OTXMLElement element, Properties elementProps)
 	{
 		XMLResourceMap map = new XMLResourceMap();
 		
 		List children = element.getChildren();
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			
-			Element entry = (Element)childIter.next();
+		    OTXMLElement entry = (OTXMLElement)childIter.next();
 			if(!entry.getName().equals("entry")) {
 				throw new RuntimeException("Invalid tag inside of map element");
 			}
@@ -58,7 +56,7 @@ public class MapTypeHandler extends ResourceTypeHandler
 			if(entryChildren.size() != 1) {
 				System.err.println("Warning empty entry in map element");
 			} else {
-				Element valueElement = (Element)entryChildren.get(0);
+			    OTXMLElement valueElement = (OTXMLElement)entryChildren.get(0);
 				value = typeService.handleLiteralElement(valueElement);
 			}
 

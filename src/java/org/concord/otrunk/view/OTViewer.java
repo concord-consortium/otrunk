@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-01-27 16:45:29 $
+ * $Revision: 1.6 $
+ * $Date: 2005-03-14 05:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -75,7 +75,7 @@ public class OTViewer extends JFrame
 	AbstractAction exitAction;
 	AbstractAction saveAsAction;
 	
-	JMenuBar menuBar;
+	JMenuBar menuBar;  //  @jve:decl-index=0:visual-constraint="576,108"
 	XMLDatabase xmlDB;
 	File currentFile = null;
 	
@@ -83,6 +83,15 @@ public class OTViewer extends JFrame
 	
 	boolean showTree = false;
 	
+	/**
+	 * This method initializes this
+	 * 
+	 * @return void
+	 */
+	private void initialize() {
+        this.setSize(263, 236);
+			
+	}
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
 		OTViewContainerPanel.setOTViewFactory(factory);
@@ -92,7 +101,8 @@ public class OTViewer extends JFrame
 	public OTViewer(boolean showTree)
 	{
 		super("OTrunk Viewer");
-		this.showTree = showTree;
+			initialize();
+	this.showTree = showTree;
 	}
 	
 	
@@ -410,7 +420,6 @@ public class OTViewer extends JFrame
 			exitAction = new ExitAction();
 			menu.add(exitAction);
 			
-			menuBar.add(menu);			
 		}
 		/////////////////////////////////////////////////
 		return menuBar;
@@ -436,4 +445,4 @@ public class OTViewer extends JFrame
 	{
 		exitAction.actionPerformed(null);
 	}
-}
+}  //  @jve:decl-index=0:visual-constraint="10,10"
