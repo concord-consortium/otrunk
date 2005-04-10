@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-03-31 21:07:26 $
+ * $Revision: 1.5 $
+ * $Date: 2005-04-10 18:07:08 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -27,7 +27,7 @@ public class OTBasicObjectHandler extends OTResourceSchemaHandler
 {
 	public OTBasicObjectHandler(OTDataObject dataObject, OTrunkImpl db)
 	{
-		super(dataObject, db);
+		super(dataObject, db, null);
 	}
 	
 	/* (non-Javadoc)

@@ -25,14 +25,16 @@ import org.concord.otrunk.datamodel.OTDataObject;
  */
 public class OTResourceSchemaHandler extends OTInvocationHandler
 {
-
+    Class schemaInterface = null;
+    
     /**
      * @param dataObject
      * @param db
      */
-    public OTResourceSchemaHandler(OTDataObject dataObject, OTrunkImpl db)
+    public OTResourceSchemaHandler(OTDataObject dataObject, OTrunkImpl db, Class schemaInterface)
     {
         super(dataObject, db);
+        this.schemaInterface = schemaInterface; 
         // TODO Auto-generated constructor stub
     }
 
@@ -111,31 +113,15 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        
 	        return null;				
 	    } else if(resourceValue == null && returnType.isPrimitive()) {
-	        Field defaultField = proxyClass.getField("DEFAULT_" + resourceName);
-	        if(defaultField != null) {
-	            return defaultField.get(null);
+	        try {
+	            Field defaultField = proxyClass.getField("DEFAULT_" + resourceName);
+	            if(defaultField != null) {
+	                return defaultField.get(null);
+	            }
+	        } catch (NoSuchFieldException e) {
+	            throw new RuntimeException("No default value set for \"" + resourceName + "\" " +
+		                "in class: " + schemaInterface);
 	        }
-	        
-	        if(returnType == Boolean.TYPE) {
-	            return Boolean.TRUE;
-	        } else if(returnType == Integer.TYPE) {
-	            return new Integer(-1);
-	        } else if(returnType == Float.TYPE) {
-	            return new Float(Float.NaN);					
-	        } else if(returnType == Byte.TYPE) {
-	            return new Byte((byte)0);
-	        } else if(returnType == Character.TYPE) {
-	            return new Character('\0');
-	        } else if(returnType == Short.TYPE) {
-	            return new Short((short)-1);
-	        } else if(returnType == Long.TYPE) {
-	            return new Long(-1);
-	        } else if(returnType == Double.TYPE) {
-	            return new Double(Double.NaN);
-	        }
-	        System.err.println("Don't know what to do here yet..." + 
-	                "asked for: " + resourceName + " but it is null and its " +
-	                "type is: " + returnType);
 	    }
 	    
 	    if(resourceValue == null) return null;
@@ -161,7 +147,11 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 		throws Throwable
 	{
 		String methodName = method.getName();
-		if(methodName.startsWith("get")) {
+		if(methodName.equals("isResourceSet")) {
+		    String resourceName = (String)args[0];
+		    Object resourceValue = dataObject.getResource(resourceName);
+		    return Boolean.valueOf(resourceValue != null);
+		} else if(methodName.startsWith("get")) {
 			String resourceName = getResourceName(3, methodName); 
 			Class returnType = method.getReturnType();
 			Class proxyClass = proxy.getClass();
@@ -191,7 +181,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 			}
 			return Boolean.FALSE;
 
-		} else {
+		} else if(methodName.startsWith("set")){
 			String resourceName = getResourceName(3, methodName); 
 			Object resourceValue = args[0];
 			
@@ -201,6 +191,8 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 				resourceValue = childId;
 			} 
 			dataObject.setResource(resourceName, resourceValue);			
+		} else {
+		    System.err.println("Unknown method \"" + methodName + "\" called on " + proxy.getClass());
 		}
 		return null;
 	}
