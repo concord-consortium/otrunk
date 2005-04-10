@@ -337,7 +337,7 @@ public class OTrunkImpl implements OTrunk
 			Class schemaClass = params[0];
 				
 			InvocationHandler handler = 
-				new OTResourceSchemaHandler(dataObject, this);
+				new OTResourceSchemaHandler(dataObject, this, schemaClass);
 
 			Class [] interfaceList = new Class[] { schemaClass };
 			
