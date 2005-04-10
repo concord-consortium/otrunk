@@ -207,6 +207,7 @@ public class OTrunkImpl implements OTrunk
 		
 		loadedObjects.put(dataObject, otObject);
 		
+		/*
 		if(otObject instanceof OTWrapper){
 		    // save the wrapped object in a weak hashmap
 		    // so it can be searched out later
@@ -214,6 +215,8 @@ public class OTrunkImpl implements OTrunk
 		    Object wrappedObject = getWrappedObject.invoke(otObject, null);
 		    objectWrappers.put(wrappedObject, new WeakReference(otObject));
 		}
+		*/
+		
 		return otObject;		
 	}
 	
