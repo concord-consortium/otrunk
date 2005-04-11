@@ -209,16 +209,23 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 			String resourceName = getResourceName(3, methodName); 
 			Object resourceValue = args[0];
 			
-			if(resourceValue instanceof OTObject) {
-				OTObject child = (OTObject)resourceValue;
-				OTID childId = child.getGlobalId();
-				resourceValue = childId;
-			} 
-			dataObject.setResource(resourceName, resourceValue);			
+			setResource(resourceName, resourceValue);
 		} else {
 		    System.err.println("Unknown method \"" + methodName + "\" called on " + proxy.getClass());
 		}
 		return null;
 	}
     
+	protected boolean setResource(String name, Object value)
+	{
+		if(value instanceof OTObject) {
+			OTObject child = (OTObject)value;
+			OTID childId = child.getGlobalId();
+			value = childId;
+		} 
+		dataObject.setResource(name, value);			
+		
+		return true;
+	}
+	
 }

@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.11 $
+ * $Date: 2005-04-11 23:27:42 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -146,7 +146,8 @@ public class ReflectionTypeDefinitions
 		Method [] methods = resourceSchemaClass.getMethods();
 		for(int j=0; j<methods.length; j++) {
 			String methodName = methods[j].getName();
-			if(methodName.equals("getGlobalId")) {
+			if(methodName.equals("getGlobalId") ||
+			        methodName.equals("getOTDatabase")) {
 				continue;
 			}
 			
