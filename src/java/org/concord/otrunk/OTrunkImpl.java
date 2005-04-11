@@ -214,10 +214,10 @@ public class OTrunkImpl implements OTrunk
 		OTObject otObject = null;
 		
 		if(otObjectClass.isInterface()) {
-			InvocationHandler handler = new OTBasicObjectHandler(dataObject, this);
+			OTBasicObjectHandler handler = new OTBasicObjectHandler(dataObject, this);
 
 		    otObject = (OTObject)Proxy.newProxyInstance(otObjectClass.getClassLoader(),
-		    		new Class[] { otObjectClass }, handler);
+		    		new Class[] { otObjectClass }, handler);		    
 		} else {					
 			otObject = setResourcesFromSchema(dataObject, otObjectClass);
 			
