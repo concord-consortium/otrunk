@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-  <pomVersion>3</pomVersion>
+  <!-- Inherit main project xml file -->
+  <extend>../Builds/project.xml</extend>
+
+  <!-- Project specific parameters -->
   <artifactId>otrunk</artifactId>
   <name>OTrunk</name>
-  <groupId>otrunk</groupId>
+  <groupId>${pom.artifactId}</groupId>
   <currentVersion>1.0</currentVersion>
-  <inceptionYear>2004</inceptionYear>
-  <logo>/images/logo.gif</logo>
-  <repository />
-  <mailingLists>
-    <mailingList>
-      <name>${pom.name} Dev List</name>
-    </mailingList>
-    <mailingList>
-      <name>${pom.name} User List</name>
-    </mailingList>
-  </mailingLists>
+
   <dependencies>
     <dependency>
       <groupId>jdom</groupId>
@@ -34,18 +27,33 @@
       <artifactId>domain</artifactId>
       <version>1.0</version>
       <type>jar</type>
+      <properties>
+        <cc.proj>Domain</cc.proj>
+        <cc.path>Domain/lib</cc.path>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <groupId>framework</groupId>
       <artifactId>framework</artifactId>
       <version>SNAPSHOT</version>
       <type>jar</type>
+      <properties>
+        <cc.proj>Framework</cc.proj>
+        <cc.path>Framework/lib</cc.path>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
     <dependency>
       <groupId>frameworkview</groupId>
       <artifactId>frameworkview</artifactId>
       <version>SNAPSHOT</version>
       <type>jar</type>
+      <properties>
+        <cc.proj>FrameworkView</cc.proj>
+        <cc.path>FrameworkView/lib</cc.path>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
     </dependency>
   </dependencies>
   <build>
