@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.7 $
+ * $Date: 2005-04-12 05:26:25 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -103,6 +103,14 @@ public class XMLResourceList
 	public void remove(int index)
 	{
 		list.remove(index);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.OTResourceList#remove(java.lang.Object)
+	 */
+	public void remove(Object obj)
+	{
+		list.remove(obj);
 	}
 
 }

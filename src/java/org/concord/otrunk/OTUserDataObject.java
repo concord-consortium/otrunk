@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.9 $
+ * $Date: 2005-04-12 05:26:25 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -139,6 +139,15 @@ public class OTUserDataObject
 		 * @see org.concord.framework.otrunk.OTResourceList#remove(int)
 		 */
 		public void remove(int index)
+		{
+			// this is read only
+			return;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.concord.framework.otrunk.OTResourceList#remove(java.lang.Object)
+		 */
+		public void remove(Object obj)
 		{
 			// this is read only
 			return;
