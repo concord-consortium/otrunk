@@ -254,6 +254,18 @@ public class OTrunkImpl implements OTrunk
 	    return null;
 	}
 	
+	public OTWrapper putWrapper(Object wrappedObject, OTWrapper wrapper)
+	{
+	    WeakReference objRef = new WeakReference(wrapper);
+	    WeakReference oldRef = (WeakReference)objectWrappers.put(wrappedObject, objRef);
+	    
+	    if(oldRef != null) {
+	        return (OTWrapper)oldRef.get();
+	    }
+	    
+	    return null;
+	}
+	
 	/**
 	 * Warning: this is method should only be used when you don't know
 	 * which object is requesting the new OTObject.  The requestion object
