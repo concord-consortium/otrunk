@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.5 $
+ * $Date: 2005-04-12 05:26:25 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -133,5 +133,26 @@ public class OTObjectListImpl implements OTObjectList
 	public void removeAll()
 	{
 		list.removeAll();
+	}
+
+	/**
+	 * @see org.concord.framework.otrunk.OTObjectList#remove(org.concord.framework.otrunk.OTObject)
+	 */
+	public void remove(OTObject obj)
+	{
+		OTID id = obj.getGlobalId();
+		if(id == null) {
+			throw new RuntimeException("adding null id object list");
+		}
+
+		list.remove(id);
+	}
+
+	/**
+	 * @see org.concord.framework.otrunk.OTObjectList#remove(int)
+	 */
+	public void remove(int index)
+	{
+		list.remove(index);
 	}
 }
