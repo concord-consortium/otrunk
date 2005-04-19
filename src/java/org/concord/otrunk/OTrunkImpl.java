@@ -30,6 +30,8 @@
  */
 package org.concord.otrunk;
 
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -229,7 +231,8 @@ public class OTrunkImpl implements OTrunk
 		
 		otObject.init();
 		
-		loadedObjects.put(dataObject, otObject);
+		WeakReference objRef = new WeakReference(otObject);
+		loadedObjects.put(dataObject, objRef);
 		
 		/*
 		if(otObject instanceof OTWrapper){
@@ -326,9 +329,14 @@ public class OTrunkImpl implements OTrunk
 	{
 		OTObject otObject = null;
 		
-		otObject = (OTObject)loadedObjects.get(childDataObject);
-		if(otObject != null) {
-			return otObject;
+		Reference otObjectRef = (Reference)loadedObjects.get(childDataObject);
+		if(otObjectRef != null) {
+		    otObject = (OTObject)otObjectRef.get();
+		    if(otObject != null) {
+		        return otObject;
+		    }
+		    
+		    loadedObjects.remove(childDataObject);
 		}
 		
 		String otObjectClassStr = 

@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.5 $
+ * $Date: 2005-04-19 00:56:04 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -44,6 +44,7 @@ import javax.swing.JPanel;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrame;
+import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 
@@ -61,6 +62,7 @@ public class OTViewContainerPanel extends JPanel
 	implements OTViewContainer
 {
     OTObject currentObject = null;
+    OTObjectView currentView = null;
     
 	private static OTViewFactory otViewFactory;
 	
@@ -100,12 +102,22 @@ public class OTViewContainerPanel extends JPanel
 			return;
 		}
 		
+		if(currentView != null) {
+		    currentView.viewClosed();
+		}
+		
 		currentObject = pfObject;
 		
 		JComponent newComponent = null;
 		if(pfObject != null) {
-			newComponent = getComponent(pfObject, this, true);
-			 
+		    currentView = otViewFactory.getObjectView(pfObject, this);
+		    if(currentView == null) {
+		        newComponent = new JLabel("No view for object: " + pfObject);
+				
+
+		    } else {
+		        newComponent = currentView.getComponent(true);
+		    }
 		} else {
 			newComponent = new JLabel("Null object");
 		}
@@ -127,7 +139,7 @@ public class OTViewContainerPanel extends JPanel
 	public JComponent getComponent(OTObject pfObject,
 			OTViewContainer container, boolean editable)
 	{
-		return otViewFactory.getComponent(pfObject, container, editable);
+	    return otViewFactory.getComponent(pfObject, container, editable);
 	}
 
 	public void addViewContainerListener(OTViewContainerListener listener)

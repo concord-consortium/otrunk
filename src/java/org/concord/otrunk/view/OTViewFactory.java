@@ -33,6 +33,7 @@ package org.concord.otrunk.view;
 import javax.swing.JComponent;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 
 /**
@@ -44,4 +45,6 @@ import org.concord.framework.otrunk.view.OTViewContainer;
 public interface OTViewFactory {
 	public JComponent getComponent(OTObject pfObject, 
 			OTViewContainer container, boolean editable);
+	
+	public OTObjectView getObjectView(OTObject otObject, OTViewContainer container);
 }
