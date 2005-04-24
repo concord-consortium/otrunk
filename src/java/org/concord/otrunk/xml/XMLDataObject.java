@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.10 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -41,6 +41,7 @@ import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTObjectRevision;
 
@@ -58,15 +59,19 @@ public class XMLDataObject
 	implements OTDataObject
 {
 	private OTID globalId;
+	private XMLDatabase database = null;
 	private OTXMLElement element;
 	private String localId = null;
 	
 	Hashtable resources = new Hashtable();
 
-	public XMLDataObject(OTXMLElement element, OTID id)
+	
+	
+	XMLDataObject(OTXMLElement element, OTID id, XMLDatabase db)
 	{
 		this.element = element;
 		globalId = id;
+		database = db;
 	}
 	
 	public OTXMLElement getElement()
@@ -79,10 +84,14 @@ public class XMLDataObject
 	 */
 	public OTID getGlobalId()
 	{
-		// TODO Auto-generated method stub
 		return globalId;
 	}
 
+	public OTDatabase getDatabase()
+	{
+	    return database;
+	}
+	
 	public void setGlobalId(String id)
 	{
 		setGlobalId(OTIDFactory.createOTID(id));

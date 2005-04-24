@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.15 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -37,6 +37,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import org.concord.framework.otrunk.OTID;
+import org.concord.otrunk.OTRelativeID;
 import org.concord.otrunk.OTrunkImpl;
 
 /**
@@ -87,7 +89,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	public Object handleElement(OTXMLElement element, Properties elementProps)
+	public Object handleElement(OTXMLElement element, Properties elementProps,
+	        String relativePath)
 	{
 		String refid = element.getAttributeValue("refid");
 		if(refid != null && refid.length() > 0){
@@ -99,14 +102,31 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			idStr = null;
 		}
 
+		String localIdStr = element.getAttributeValue("local_id");
+		if(localIdStr != null && localIdStr.length() <= 0) {
+			localIdStr = null;
+		}
+		
 		XMLDataObject obj = null;
 		try {
-			obj = xmlDB.createDataObject(element, idStr);
+		    if(idStr == null && localIdStr == null && relativePath != null) {
+		        OTRelativeID pathId = new OTRelativeID(relativePath);
+		        // System.err.println(relativePath);
+		        obj = xmlDB.createDataObject(element, pathId);
+		    } else {
+		        obj = xmlDB.createDataObject(element, idStr);
+		    }
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 
+		String objRelativePath = relativePath;
+		OTID objId = obj.getGlobalId();
+		if(!(objId instanceof OTRelativeID)) {
+		    objRelativePath = objId.toString(); 
+		}
+		
 		obj.setResource(OTrunkImpl.RES_CLASS_NAME, getClassName());
 		
 		List attributes = element.getAttributes();
@@ -120,7 +140,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			}
 			
 			try {
-				Object resValue = handleChildResource(element, attribName, attrib.getValue());
+			    
+				Object resValue = handleChildResource(element, attribName, 
+				        attrib.getValue(), objRelativePath);
 				obj.setResource(attribName, resValue);
 			} catch (HandleElementException e) {
 				System.err.println(e.getMessage() + " in attribute: " +
@@ -133,7 +155,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		    OTXMLElement child = (OTXMLElement)childIter.next();
 
 			try {
-				Object resValue = handleChildResource(element, child.getName(), child);
+				Object resValue = handleChildResource(element, child.getName(), 
+				        child, objRelativePath);
 				obj.setResource(child.getName(),resValue);
 			} catch (HandleElementException e) {
 				System.err.println("error in element: " +
@@ -163,7 +186,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	 * 
 	 * @return
 	 */
-	public Object handleChildResource(OTXMLElement parentElement, String childName, Object childObj)
+	public Object handleChildResource(OTXMLElement parentElement, String childName, 
+	        Object childObj, String relativeParentPath)
 		throws HandleElementException
 	{
 		Properties elementProps;
@@ -196,7 +220,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			}
 			OTXMLElement child = (OTXMLElement)childObj;
 
-			// This is causes some stange advantage 
+			// This allows users to put refid on the attribute element:
+			// like: <OTGraph><xAxis refid="id_of_some_other_object"/></OTGraph>
 			String childRefId = child.getAttributeValue("refid");
 			
 			// If this element doesn't have a reference id then 
@@ -234,7 +259,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				throw new HandleElementException("Can't use an attribute for a non-primitive type");
 			}
 		} else {
-			return resHandler.handleElement((OTXMLElement)childObj, elementProps);
+		    String childRelativePath = relativeParentPath + "/" + childName;
+			return resHandler.handleElement((OTXMLElement)childObj, elementProps,
+			        childRelativePath);
 		}
 	}
 	

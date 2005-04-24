@@ -56,7 +56,8 @@ public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler
 	 * @param elementProps
 	 * @return
 	 */
-	public Object handleElement(OTXMLElement element, Properties elementProps)
+	public Object handleElement(OTXMLElement element, Properties elementProps, 
+	        String relativePath)
 	throws HandleElementException
 	{
 		return handleElement(element.getTextTrim(), elementProps);

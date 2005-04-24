@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.9 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -188,8 +188,8 @@ public class Exporter
 		if(objectElement == null) {
 		    objectElement = "object";
 		}
-		objectElement += " id=\"" + id + "\"";
-		indentPrint(objectIndent, "<" + objectElement + ">", output);
+		indentPrint(objectIndent, "<" + objectElement + 
+		        " id=\"" + id + "\">", output);
 		indent++;
 		String resourceKeys [] = dataObj.getResourceKeys();
 		int resourceIndent = indent;
@@ -225,7 +225,14 @@ public class Exporter
 				// recurse
 			    output.println();
 				OTDataObject childObject = otDb.getOTDataObject(dataObj, (OTID)resource);
-				exportObject(output, childObject, resourceIndent+1);
+				if(childObject == null) {
+				    // our db doesn't contain this object
+				    System.err.println("XMLExport: main db doesn't contain: " + resource);
+					indentPrint(resourceIndent+1, 
+							"<object" + " refid=\"" + resource + "\"/>", output);
+				} else {
+				    exportObject(output, childObject, resourceIndent+1);
+				}
 				printIndent(resourceIndent, output);
 			} else if(resource instanceof OTResourceList) {
 			    output.println();
@@ -277,7 +284,7 @@ public class Exporter
 			output.println("</" + resourceKeys[i] + ">");
 		}
 		
-		indentPrint(objectIndent, "</" + objectClass + ">", output);
+		indentPrint(objectIndent, "</" + objectElement + ">", output);
 	}
 	
 

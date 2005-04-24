@@ -45,6 +45,7 @@ import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTUser;
@@ -53,6 +54,9 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
+import org.concord.otrunk.user.OTReferenceMap;
+import org.concord.otrunk.user.OTTemplateDatabase;
+import org.concord.otrunk.user.OTUserObject;
 
 /**
  * @author scott
@@ -65,11 +69,15 @@ public class OTrunkImpl implements OTrunk
 	public static final String RES_CLASS_NAME = "otObjectClass";
 
 	protected Hashtable loadedObjects = new Hashtable();
+	protected Hashtable userTemplateDatabases = new Hashtable();
 	protected Hashtable userDataObjects = new Hashtable();
 	protected WeakHashMap objectWrappers = new WeakHashMap();
 	protected Vector services = null;
 	
-	protected OTDatabase db;
+	protected OTDatabase rootDb;
+	protected OTDatabase creationDb;
+	
+	Vector databases = new Vector();
 	
 	public OTrunkImpl(OTDatabase db)
 	{
@@ -78,7 +86,9 @@ public class OTrunkImpl implements OTrunk
 
 	public OTrunkImpl(OTDatabase db, Object [] services)
 	{		
-		this.db = db;
+		this.rootDb = db;
+		this.creationDb = db;
+		databases.add(db);
 		if(services != null) {
 			this.services = new Vector();
 			for(int i=0; i<services.length; i++) {
@@ -105,19 +115,50 @@ public class OTrunkImpl implements OTrunk
 		
 	}
 	
+	public void setCreationDb(OTDatabase db)
+	{
+	    creationDb = db;
+	    if(!databases.contains(db)) {
+	        databases.add(db);
+	    }
+	}
+	
 	/**
-	 *  (non-Javadoc)
+	 *
      * @see org.concord.framework.otrunk.OTrunk#getOTID(java.lang.String)
      */
     public OTID getOTID(String otidStr)
     {
-        // TODO Auto-generated method stub
-        OTID id = OTIDFactory.createOTID(otidStr);
+        // pull off the first part of the id
+        // get the data object from that
+        // ask that data object or the database of that object
+        // to give you the id of the rest.
+        int endOfId = otidStr.indexOf('/');
+        
+        String rootId = null;
+        String relativePath = null;
+        if(endOfId == -1) {
+            rootId = otidStr;
+        } else {
+            rootId = otidStr.substring(0,endOfId);
+            relativePath = otidStr.substring(endOfId+1, otidStr.length());
+        }        
+        OTID id = OTIDFactory.createOTID(rootId);
+        
+        /*
+         * FIXME
         if(id == null) {
             // lookup the id in the user object list
             id = (OTID)userDataObjects.get(otidStr);
         }
-        return id;
+        */
+        if(relativePath == null) {         
+            return id;
+        }
+        
+        OTDatabase idDb = getOTDatabase(id);
+        return idDb.getRelativeOTID(id, relativePath);
+        
     }
 	
 	/* (non-Javadoc)
@@ -137,7 +178,7 @@ public class OTrunkImpl implements OTrunk
 	public OTDataObject createDataObject()
 		throws Exception
 	{
-		return db.createDataObject();
+		return creationDb.createDataObject();
 	}
 	
 	public void setRoot(OTObject obj) throws Exception
@@ -145,7 +186,7 @@ public class OTrunkImpl implements OTrunk
 		// FIXME this doesn't do a good job if there
 		// is an OTSystem
 		OTID id = obj.getGlobalId();
-		db.setRoot(id);
+		rootDb.setRoot(id);
 	}
 		
 	protected OTObject getRealRoot() throws Exception
@@ -166,6 +207,27 @@ public class OTrunkImpl implements OTrunk
 		
 		return root;
 	}
+	
+	/**
+	 * return the database that is serving this id
+	 * currently there is only one database, so this is
+	 * easy
+	 * 
+	 * @param id
+	 * @return
+	 */
+	protected OTDatabase getOTDatabase(OTID id)
+	{
+	    // look for the database that contains this id
+	    for(int i=0; i<databases.size(); i++) {
+	        OTDatabase db = (OTDatabase)databases.get(i);
+	        if(db.contains(id)) {
+	            return db;
+	        }
+	    }
+	    return null;
+	}
+	
 	/**
 	 * The dataParent must be set so the database can correctly look up the 
 	 * child object.
@@ -182,32 +244,23 @@ public class OTrunkImpl implements OTrunk
 		if(childID == null) {
 			throw new Exception("Null child Id");
 		}
-		
-		if(childID instanceof OTUserDataObject) {
-		    return (OTUserDataObject)childID;
+
+		OTDatabase parentDb = rootDb;
+		if(dataParent == null && childID instanceof OTRelativeID) {
+		    OTID rootRelativeId = ((OTRelativeID)childID).getRootId();
+	        parentDb = getOTDatabase(rootRelativeId);		    
+		} else if (dataParent != null) {
+		    parentDb = dataParent.getDatabase();
 		}
 		
-		OTDataObject childDataObject = db.getOTDataObject(dataParent, childID);
+		OTDataObject childDataObject = parentDb.getOTDataObject(dataParent, childID);
 		
-		// if the mode is authoring then just return the requested object
-		// if the mode is student then the requested node needs to be looked up
-		// in the users object table.  Then that object is setup to reference 
-		// the authoring object.
-		if ( (dataParent == null) || 
-				!(dataParent instanceof OTUserDataObject)) {
-			return childDataObject;
-		}	
-		
-		OTUserStateMap user = ((OTUserDataObject)dataParent).getUser();	
-		OTUserDataObject userDataObject = user.getUserDataObject(childDataObject);
-		userDataObjects.put(userDataObject.toString(), userDataObject);
-		
-		return userDataObject;
+		return childDataObject;
 	}
 	
 	public void close()
 	{
-		db.close();
+		rootDb.close();
 	}
 	
 	public OTObject loadOTObject(OTDataObject dataObject, Class otObjectClass)
@@ -440,32 +493,48 @@ public class OTrunkImpl implements OTrunk
 		throws Exception
 	{
 		OTID authoredId = authoredObject.getGlobalId();
-		OTDataObject authoredDataObj = getOTDataObject(null, authoredId);
-		OTUserDataObject userData = 
-			new OTUserDataObject(authoredDataObj, (OTUserStateMap)user, this);
-		userDataObjects.put(userData.toString(), userData);
+		OTID userId = user.getUserId();
+		OTTemplateDatabase db = (OTTemplateDatabase)userTemplateDatabases.get(userId);
 		
-		String otObjectClassStr = (String)userData.getResource("otObjectClass");
-		if(otObjectClassStr == null) {
-			return null;
-		}
+		if(db == null) {
+		    OTDataObject stateRootDO = creationDb.getRoot();
+		    OTStateRoot stateRoot = (OTStateRoot)getOTObject(stateRootDO);
+		    OTObjectMap userStateMapMap = stateRoot.getUserMap();
 
-		try {
-			Class otObjectClass = Class.forName(otObjectClassStr);
-			OTObject userObject = loadOTObject(userData, otObjectClass);
-			return userObject;
-		} catch(Exception e) {
-			e.printStackTrace();
-			return null;
+		    OTReferenceMap userStateMap = (OTReferenceMap)userStateMapMap.getObject(userId.toString());
+		    if(userStateMap == null) {
+		        // this is inferring that the createObject method will
+		        // create the object in the correct database.  
+		        userStateMap = (OTReferenceMap)createObject(OTReferenceMap.class);
+		        userStateMapMap.putObject(userId.toString(), userStateMap);
+		        userStateMap.setUser((OTUserObject)user);
+		    }
+		    
+		    
+		    db = new OTTemplateDatabase(rootDb, creationDb, userStateMap);		    
+		    databases.add(db);
 		}
+				
+		OTDataObject userDataObject = db.getOTDataObject(null, authoredId);
+		
+		return getOTObject(userDataObject);		
 	}
 
+	public OTObject getRootObject(OTDatabase db)
+		throws Exception
+	{
+	    OTDataObject rootDO = db.getRoot();
+	    OTObject rootObject = getOTObject(rootDO);
+
+	    return rootObject;
+	}
+	
 	/**
 	 * @return
 	 */
 	public OTDataObject getRootDataObject()
 		throws Exception
 	{
-		return db.getRoot();
+		return rootDb.getRoot();
 	}
 }

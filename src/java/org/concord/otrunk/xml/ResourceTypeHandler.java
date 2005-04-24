@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.6 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -61,7 +61,8 @@ public abstract class ResourceTypeHandler
 	 * @param elementProps
 	 * @return
 	 */
-	public abstract Object handleElement(OTXMLElement element, Properties elementProps)
+	public abstract Object handleElement(OTXMLElement element, 
+	        Properties elementProps, String relativePath)
 		throws HandleElementException;
 
 	public String getPrimitiveName()

@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.7 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -195,7 +195,7 @@ public class FsDatabase implements OTDatabase
 	public OTDataObject createDataObject(OTID id)
 		throws Exception
 	{
-    	OTDataObject dataObject = new FsDataObject((OTUUID)id);
+    	OTDataObject dataObject = new FsDataObject((OTUUID)id, this);
     	((FsDataObject)dataObject).creationInit();
     	
     	Object oldValue = dbIndex.put(dataObject.getGlobalId(), dataObject);
@@ -283,6 +283,14 @@ public class FsDatabase implements OTDatabase
 	}
 
 	/* (non-Javadoc)
+     * @see org.concord.otrunk.datamodel.OTDatabase#contains(org.concord.framework.otrunk.OTID)
+     */
+    public boolean contains(OTID id)
+    {
+        return dbIndex.containsKey(id);
+    }
+	
+	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDatabase#close()
 	 */
 	public void close()
@@ -294,4 +302,11 @@ public class FsDatabase implements OTDatabase
 		}
 	}
 
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.datamodel.OTDatabase#getRelativeOTID(org.concord.framework.otrunk.OTID, java.lang.String)
+     */
+    public OTID getRelativeOTID(OTID parent, String relativePath)
+    {
+        throw new UnsupportedOperationException("FsDatabase does not support getRelativeOTID not supported");
+    }
 }

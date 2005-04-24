@@ -24,14 +24,14 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.1 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
-package org.concord.otrunk;
+package org.concord.otrunk.user;
 
 import org.concord.framework.otrunk.OTUser;
 import org.concord.otrunk.datamodel.OTDataObject;

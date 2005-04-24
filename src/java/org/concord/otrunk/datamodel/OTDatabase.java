@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.8 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -48,10 +48,10 @@ import org.concord.framework.otrunk.OTResourceCollection;
  */
 public interface OTDatabase
 {
-	public abstract void setRoot(OTID rootId) 
+	public void setRoot(OTID rootId) 
 		throws Exception;
 	
-	public abstract OTDataObject getRoot() 
+	public OTDataObject getRoot() 
 		throws Exception;	
 	
 	/**
@@ -59,16 +59,29 @@ public interface OTDatabase
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract OTDataObject createDataObject() 
+	public OTDataObject createDataObject() 
 		throws Exception;
 	
+	/**
+	 * There is now a concept of relative OTIDs.  These are id's
+	 * that point to objects within a containing object.  Within
+	 * the same database.  The format of the relative part of the
+	 * id is up to the database implementation.  This will probably
+	 * need to change because we will need the id to be portable.  
+	 * 
+	 * @param parent
+	 * @param relativePath
+	 * @return
+	 */
+	public OTID getRelativeOTID(OTID parent, String relativePath);
+
 	/**
 	 * Make a brand new data object and use an existing id
 	 * this is required so objects can be imported into this database
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract OTDataObject createDataObject(OTID id) 
+	public OTDataObject createDataObject(OTID id) 
 		throws Exception;
 
 	/**
@@ -84,9 +97,19 @@ public interface OTDatabase
 	 * @return
 	 * @throws Exception
 	 */
-	public abstract OTDataObject getOTDataObject(OTDataObject dataParent, OTID childID)
+	public OTDataObject getOTDataObject(OTDataObject dataParent, OTID childID)
 		throws Exception;
 	
-	public abstract void close();
+	/**
+	 * Return true if this database contains this object.  This is different
+	 * than getOTDataObject because a database might be masking or replacing
+	 * some objects with that method.  This method should not do that.
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public boolean contains(OTID id);
+	
+	public void close();
 
 }
