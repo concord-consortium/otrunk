@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.12 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -44,6 +44,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.URL;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -65,15 +66,19 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.util.SimpleTreeNode;
-import org.concord.otrunk.OTUserObject;
+import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.user.OTReferenceMap;
+import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.view.SimpleTreeModel;
@@ -112,6 +117,7 @@ public class OTViewer extends JFrame
 	
 	JMenuBar menuBar;  //  @jve:decl-index=0:visual-constraint="576,108"
 	XMLDatabase xmlDB;
+	XMLDatabase stateDB;
 	File currentFile = null;
 	
 	Hashtable otContainers = new Hashtable();
@@ -215,6 +221,34 @@ public class OTViewer extends JFrame
         } 
     }
 
+	private void loadUserDataFile(File file)
+	{
+	    try {
+	        loadUserDataURL(file.toURL());
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	private void loadUserDataURL(URL url)
+		throws Exception
+	{
+	    stateDB = new XMLDatabase(url);
+	    otrunk.setCreationDb(stateDB);
+	    
+	    // need to set the current user to the one
+	    // defined in this file
+	    OTStateRoot stateRoot = (OTStateRoot)otrunk.getRootObject(stateDB);
+
+	    OTObjectMap userMap = stateRoot.getUserMap();
+	    Vector keys = userMap.getObjectKeys();
+	    OTReferenceMap refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));
+	    
+	    currentUser = refMap.getUser();
+	    
+	    reloadWindow();
+	}
+	
 	private void loadFile(File file)
 	{
 		currentFile = file;
@@ -232,6 +266,20 @@ public class OTViewer extends JFrame
 		otrunk = new OTrunkImpl(xmlDB,
 				new Object [] {new SwingUserMessageHandler(this)});
 	
+		// create an empty user state database
+		stateDB = new XMLDatabase();
+		otrunk.setCreationDb(stateDB);
+		OTStateRoot stateRoot = (OTStateRoot)otrunk.createObject(OTStateRoot.class);
+		stateDB.setRoot(stateRoot.getGlobalId());
+
+		currentURL = url;
+
+		reloadWindow();
+	}
+	
+	private void reloadWindow()
+		throws Exception
+	{		
 		OTObject root = otrunk.getRoot();
 		if(currentUser != null) {
 		    root = otrunk.getUserRuntimeObject(root, currentUser);			    
@@ -254,8 +302,7 @@ public class OTViewer extends JFrame
 		
 		Frame frame = (Frame)SwingUtilities.getRoot(this);
 
-		currentURL = url;
-		frame.setTitle(url.toString());
+		frame.setTitle(currentURL.toString());
 	}
 		
 	public void reload()
@@ -459,6 +506,37 @@ public class OTViewer extends JFrame
 			loadAction.putValue(Action.NAME, "Open...");			
 			menu.add(loadAction);
 
+			AbstractAction loadUserDataAction = new AbstractAction(){
+				
+				/* (non-Javadoc)
+				 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+				 */
+				public void actionPerformed(ActionEvent arg0)
+				{
+					Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+
+					FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
+					if(currentFile != null) {
+						dialog.setDirectory(currentFile.getParentFile().getAbsolutePath());
+						dialog.setFile(currentFile.getName());
+					}
+					dialog.show();
+					
+					String fileName = dialog.getFile();
+					if(fileName == null) {
+						return;
+					}
+					
+					fileName = dialog.getDirectory() + fileName;
+					System.out.println("load file name: " + fileName);
+					loadUserDataFile(new File(fileName));					
+				}
+				
+			};
+			loadUserDataAction.putValue(Action.NAME, "Open User Data...");			
+			menu.add(loadUserDataAction);
+
+			
 			AbstractAction saveAction = new AbstractAction(){
 				
 				/* (non-Javadoc)
@@ -554,9 +632,7 @@ public class OTViewer extends JFrame
 					}
 					if(!currentFile.exists() || checkForReplace(currentFile)){
 						try {
-						    
-						    OTDataObject userDataObject = otrunk.getOTDataObject(null, currentUser.getGlobalId());
-							Exporter.export(currentFile, userDataObject, xmlDB);
+						    Exporter.export(currentFile, stateDB.getRoot(), stateDB);						    
 						} catch(Exception e){
 							e.printStackTrace();
 						}	                    	

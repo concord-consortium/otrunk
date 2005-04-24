@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.13 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -164,7 +164,7 @@ public class TypeService
 	 * @param child
 	 * @return
 	 */
-	public Object handleLiteralElement(OTXMLElement child)
+	public Object handleLiteralElement(OTXMLElement child, String relativePath)
 	{
 		String childName = child.getName();
 		Properties elementProps;
@@ -181,7 +181,7 @@ public class TypeService
 		}
 		
 		try {
-			return handler.handleElement(child, null);
+			return handler.handleElement(child, null, relativePath);
 		} catch (HandleElementException e) {
 			System.err.println("Error reading element: " + TypeService.elementPath(child));
 			return null;

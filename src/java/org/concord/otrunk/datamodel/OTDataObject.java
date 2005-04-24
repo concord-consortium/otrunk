@@ -58,4 +58,6 @@ public interface OTDataObject
 	public OTResourceCollection getResourceCollection(String key, Class collectionClass);
 	
 	public OTObjectRevision getCurrentRevision();
+	
+	public OTDatabase getDatabase();
 }

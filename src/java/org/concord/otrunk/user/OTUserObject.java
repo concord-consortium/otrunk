@@ -24,14 +24,14 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.1 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
-package org.concord.otrunk;
+package org.concord.otrunk.user;
 
 import java.util.Hashtable;
 
@@ -39,6 +39,8 @@ import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTResourceSchema;
+import org.concord.framework.otrunk.OTUser;
+import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 
 /**
@@ -51,7 +53,7 @@ import org.concord.otrunk.datamodel.OTDataObject;
  *
  */
 public class OTUserObject extends DefaultOTObject
-	implements OTUserStateMap
+	implements OTUser
 {
 	public static interface ResourceSchema extends OTResourceSchema {
 		public OTResourceMap getUserDataMap();
@@ -122,26 +124,5 @@ public class OTUserObject extends DefaultOTObject
 		OTResourceMap userDataMap = resources.getUserDataMap();
 		userDataMap.put(authoringId.toString(), userStateId);
 	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.concord.otrunk.PfUser#getUserDataObject(org.concord.otrunk.PfDataObject)
-	 */
-	public OTUserDataObject getUserDataObject(OTDataObject authoringObject)
-	{
 		
-		OTUserDataObject userDataObject = (OTUserDataObject)userDataObjects.get(authoringObject);
-		
-		if(userDataObject == null) {
-			userDataObject = new OTUserDataObject(authoringObject, this, (OTrunkImpl)getOTDatabase());
-			userDataObjects.put(authoringObject, userDataObject);
-		}
-		
-		// TODO should add a listener to this object so we know when a user state
-		// has been created.  Then we can remove the getUserState from the user object
-		// or we can just traverse the user data object when we are saved, and 
-		// record which ones have state objects.
-		// unfortunately there is no "when we are saved"
-		return userDataObject;
-	}
 }

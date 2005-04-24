@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.13 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -48,6 +48,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.OTRelativeID;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
@@ -74,6 +75,11 @@ public class XMLDatabase
 	
 	// a map of xml file ids to UUIDs
 	Hashtable localIdMap = new Hashtable();
+	
+	public XMLDatabase()
+	{
+	    // create an empty database with no root
+	}
 	
 	public XMLDatabase(File xmlFile)
 		throws Exception
@@ -128,7 +134,7 @@ public class XMLDatabase
 		OTXMLElement rootObjectNode = (OTXMLElement)xmlObjects.get(0);		
 		
 		// Recusively load all the data objects
-		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode);
+		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode, "anon_root");
 		
 		System.err.println("loaded all the objects");
 		
@@ -174,10 +180,12 @@ public class XMLDatabase
 		throws Exception
 	{
 		if(id == null) {
+//		    String path = TypeService.elementPath(element);
+//		    id = new OTXMLPathID(path);
 			id = OTUUID.createOTUUID();
 		}
 
-    	XMLDataObject dataObject = new XMLDataObject(element, id);
+    	XMLDataObject dataObject = new XMLDataObject(element, id, this);
 
     	Object oldValue = dataObjects.put(dataObject.getGlobalId(), dataObject);
     	if(oldValue != null) {
@@ -246,6 +254,14 @@ public class XMLDatabase
 		return (OTDataObject)dataObjects.get(childID);
 	}
 
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.datamodel.OTDatabase#contains(org.concord.framework.otrunk.OTID)
+     */
+    public boolean contains(OTID id)
+    {
+        return dataObjects.containsKey(id);
+    }
+	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.datamodel.OTDatabase#close()
 	 */
@@ -363,5 +379,11 @@ public class XMLDatabase
 		}
 		return xmlDObj.getGlobalId();		
 	}	
+	
+	public OTID getRelativeOTID(OTID parent, String relativePath)
+	{
+	    String xmlIdString = parent.toString() + "/" + relativePath;
+	    return new OTRelativeID(xmlIdString);
+	}
 	
 }

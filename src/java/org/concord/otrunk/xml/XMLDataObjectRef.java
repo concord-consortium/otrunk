@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.5 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -65,7 +65,7 @@ public class XMLDataObjectRef extends XMLDataObject
 	
 	public XMLDataObjectRef(String id, OTXMLElement element)
 	{
-		super(element, null);
+		super(element, null, null);
 		
 		setRefId(id);		
 	}

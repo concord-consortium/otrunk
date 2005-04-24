@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.6 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -42,6 +42,7 @@ import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTObjectRevision;
 import org.concord.otrunk.datamodel.OTUUID;
 
@@ -62,12 +63,14 @@ public class FsDataObject
 	Hashtable resources = new Hashtable();
 	Date creationTime = null;
 	Date modifiedTime = null;
-		
+	FsDatabase database = null;
+	
 	public final static String CURRENT_REVISION = "currentRevision";
 	
-	public FsDataObject(OTUUID id)
+	FsDataObject(OTUUID id, FsDatabase db)
 	{
 		globalId = id;
+		database = db;
 	}
 	
 	/* (non-Javadoc)
@@ -78,6 +81,14 @@ public class FsDataObject
 		return globalId;
 	}
 
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.datamodel.OTDataObject#getDatabase()
+     */
+    public OTDatabase getDatabase()
+    {
+        return database;
+    }
+	
 	void creationInit()
 	{
 		resources.put(CURRENT_REVISION, new OTObjectRevision(null));

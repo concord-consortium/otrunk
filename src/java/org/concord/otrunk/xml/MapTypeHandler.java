@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.4 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -63,7 +63,8 @@ public class MapTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.xml.ResourceTypeHandler#handleElement(org.jdom.Element, java.util.Properties)
 	 */
-	public Object handleElement(OTXMLElement element, Properties elementProps)
+	public Object handleElement(OTXMLElement element, Properties elementProps,
+	        String relativePath)
 	{
 		XMLResourceMap map = new XMLResourceMap();
 		
@@ -78,11 +79,17 @@ public class MapTypeHandler extends ResourceTypeHandler
 			List entryChildren = entry.getChildren();
 			Object value = null;
 			if(entryChildren.size() != 1) {
-				System.err.println("Warning empty entry in map element");
-			} else {
-			    OTXMLElement valueElement = (OTXMLElement)entryChildren.get(0);
-				value = typeService.handleLiteralElement(valueElement);
+				System.err.println("Warning invalid entry in map element");
+				continue;
 			}
+			
+		    String childRelativePath = null;
+		    if(relativePath != null) {
+		        childRelativePath = relativePath + "['" + key + "']";		        
+		    }
+
+		    OTXMLElement valueElement = (OTXMLElement)entryChildren.get(0);
+				value = typeService.handleLiteralElement(valueElement, childRelativePath);
 
 			map.put(key, value);
 		}

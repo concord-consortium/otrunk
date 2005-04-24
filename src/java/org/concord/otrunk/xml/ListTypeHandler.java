@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.6 $
+ * $Date: 2005-04-24 15:44:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -59,15 +59,22 @@ public class ListTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	public Object handleElement(OTXMLElement element, Properties elementProps)
+	public Object handleElement(OTXMLElement element, Properties elementProps,
+	        String relativePath)
 	{
 		XMLResourceList list = new XMLResourceList();
 		
 		List children = element.getChildren();
+		int index = 0;
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			
 		    OTXMLElement child = (OTXMLElement)childIter.next();
-			Object resValue = typeService.handleLiteralElement(child);
+		    String childRelativePath = null;
+		    if(relativePath != null) {
+		        childRelativePath = relativePath + "[" + index + "]";		        
+		    }
+			Object resValue = typeService.handleLiteralElement(child, childRelativePath);
 			list.add(resValue);
+			index++;
 		}
 
 		return list;
