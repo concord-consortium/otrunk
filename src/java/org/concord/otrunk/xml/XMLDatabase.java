@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2005-04-24 15:44:55 $
+ * $Revision: 1.14 $
+ * $Date: 2005-04-25 14:52:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -75,6 +75,8 @@ public class XMLDatabase
 	
 	// a map of xml file ids to UUIDs
 	Hashtable localIdMap = new Hashtable();
+
+    private OTID databaseId;
 	
 	public XMLDatabase()
 	{
@@ -108,6 +110,11 @@ public class XMLDatabase
 		
 		OTXMLElement rootElement = document.getRootElement();
 				
+		String dbId = rootElement.getAttributeValue("id");
+		if(dbId != null && dbId.length() > 0) {
+		    databaseId = OTIDFactory.createOTID(dbId);
+		}
+		
 		Vector importedOTObjectClasses = new Vector();
 		
 		OTXMLElement importsElement = rootElement.getChild("imports");
@@ -134,6 +141,10 @@ public class XMLDatabase
 		OTXMLElement rootObjectNode = (OTXMLElement)xmlObjects.get(0);		
 		
 		// Recusively load all the data objects
+		String relativePath = "anon_root";
+		if(databaseId != null) {
+		    relativePath = databaseId.toString();
+		}
 		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode, "anon_root");
 		
 		System.err.println("loaded all the objects");
@@ -166,6 +177,11 @@ public class XMLDatabase
 		return (OTDataObject)dataObjects.get(rootId);
 	}
 
+	public OTID getDatabaseId()
+	{
+	    return databaseId;
+	}
+	
 	protected XMLDataObject createDataObject(OTXMLElement element, String idStr)
 		throws Exception
 	{
@@ -259,7 +275,8 @@ public class XMLDatabase
      */
     public boolean contains(OTID id)
     {
-        return dataObjects.containsKey(id);
+        return id.equals(databaseId) || 
+        	dataObjects.containsKey(id);
     }
 	
 	/* (non-Javadoc)
@@ -385,5 +402,25 @@ public class XMLDatabase
 	    String xmlIdString = parent.toString() + "/" + relativePath;
 	    return new OTRelativeID(xmlIdString);
 	}
+
+    /**
+     * @param localIdStr
+     * @return
+     */
+    public OTID getOTIDFromLocalID(String localIdStr)
+    {
+        // if the db has a id use that plus
+        // the local id to create a relative ID and change
+        // the contains method to include that database id
+        OTID dbId = getDatabaseId();
+        if(dbId != null) {
+            return new OTRelativeID(dbId, "/" + localIdStr);
+        }
+        
+        // if the databse doesn't have a id then we use some 
+        // standard anon relative id (I don't know if that will
+        // work) otherwise we could hash something into an id
+        return new OTRelativeID(null, "/" + localIdStr);        
+    }
 	
 }

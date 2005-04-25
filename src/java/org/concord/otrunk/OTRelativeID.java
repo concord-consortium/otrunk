@@ -24,14 +24,16 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-04-24 15:49:47 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-04-25 14:52:40 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk;
+
+import javax.naming.OperationNotSupportedException;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTIDFactory;
@@ -48,20 +50,24 @@ import org.concord.otrunk.datamodel.OTIDFactory;
 public class OTRelativeID
     implements OTID
 {
-    String path = null;
     OTID rootId = null;
     String relativePath = null;
     
+    public OTRelativeID(OTID rootId, String relativePath)
+    {
+        this.rootId = rootId;
+        this.relativePath = relativePath;
+    }
+    
     public OTRelativeID(String path)
     {
-        this.path = path;
-
         int endOfId = path.indexOf('/');
         
         String rootIdStr = null;
         if(endOfId == -1) {
-            System.err.println("non-relative id stored in relative id");
-            rootIdStr = path;
+            rootId = null;
+            relativePath = path;
+            System.err.println("non-relative id stored in relative id: " + path);
         } else {
             rootIdStr = path.substring(0,endOfId);
             relativePath = path.substring(endOfId+1, path.length());
@@ -72,7 +78,11 @@ public class OTRelativeID
     
     public String toString()
     {
-        return path;
+        if(rootId == null) {
+            return relativePath;
+        }
+        
+        return rootId.toString() + "/" + relativePath;
     }
     
     public OTID getRootId()
@@ -90,7 +100,7 @@ public class OTRelativeID
      */
     public int hashCode()
     {
-        return path.hashCode();
+        return toString().hashCode();
     }
     
     public boolean equals(Object other)
@@ -99,7 +109,20 @@ public class OTRelativeID
             return false;
         }
         
-        return ((OTRelativeID)other).path.equals(this.path);
-            
+        OTRelativeID otherId = (OTRelativeID)other;
+        if(otherId.getRelativePath() == null && relativePath != null) {
+            return false;
+        }
+        
+        if(otherId.getRootId() == null && rootId != null) {
+            return false;
+        }
+        
+        return (otherId.getRelativePath() == null ||   
+                otherId.getRelativePath().equals(relativePath))
+                &&
+                (otherId.getRootId() == null || 
+                        otherId.getRootId().equals(rootId));
+                        
     }
 }

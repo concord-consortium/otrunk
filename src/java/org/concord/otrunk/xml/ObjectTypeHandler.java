@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2005-04-24 15:44:55 $
+ * $Revision: 1.16 $
+ * $Date: 2005-04-25 14:52:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -113,6 +113,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		        OTRelativeID pathId = new OTRelativeID(relativePath);
 		        // System.err.println(relativePath);
 		        obj = xmlDB.createDataObject(element, pathId);
+		    } else if(idStr == null && localIdStr != null) {
+		        OTID id = xmlDB.getOTIDFromLocalID(localIdStr);  
+		        obj = xmlDB.createDataObject(element, id);
 		    } else {
 		        obj = xmlDB.createDataObject(element, idStr);
 		    }
@@ -123,7 +126,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 
 		String objRelativePath = relativePath;
 		OTID objId = obj.getGlobalId();
-		if(!(objId instanceof OTRelativeID)) {
+		if(idStr != null || localIdStr != null) {
 		    objRelativePath = objId.toString(); 
 		}
 		
