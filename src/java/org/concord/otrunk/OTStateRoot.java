@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-04-24 15:49:47 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-04-26 15:41:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -49,6 +49,9 @@ public interface OTStateRoot
     extends OTObjectInterface
 {
     public OTObjectMap getUserMap();
+    
+    public String getFormatVersionString();
+    public String setFormatVersionString(String version);
     
     
 }

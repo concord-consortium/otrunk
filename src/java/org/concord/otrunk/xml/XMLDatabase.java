@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2005-04-25 14:52:40 $
+ * $Revision: 1.15 $
+ * $Date: 2005-04-26 15:41:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -215,7 +215,11 @@ public class XMLDatabase
     			dataObject.setLocalId(localIdStr);
 
     			// this is probably a temporary hack
+    			// we want to save local id so it can be shown
+    			// to the author.  It is useful for debugging
     			dataObject.setResource("localId", localIdStr);
+    			
+    			
     			Object oldId = localIdMap.put(localIdStr, dataObject.getGlobalId());
     			if(oldId != null) {
     				System.err.println("repeated local id: " + localIdStr);
@@ -374,11 +378,11 @@ public class XMLDatabase
 		}			
 	}
 
-	public OTID getGlobalId(String idStr)
+	private OTID getGlobalId(String idStr)
 	{
 		if(idStr.startsWith("${")) {
 			String localId = idStr.substring(2,idStr.length()-1);
-			OTID globalId = (OTID)localIdMap.get(localId);
+			OTID globalId =  (OTID)localIdMap.get(localId);
 			if(globalId == null) {
 				System.err.println("Can't find local id: " + localId);
 			}
@@ -388,7 +392,7 @@ public class XMLDatabase
 		}		
 	}
 	
-	public OTID getOTID(XMLDataObject xmlDObj)
+	private OTID getOTID(XMLDataObject xmlDObj)
 	{
 		if(xmlDObj instanceof XMLDataObjectRef) {
 			String refId = ((XMLDataObjectRef)xmlDObj).getRefId();
@@ -397,12 +401,6 @@ public class XMLDatabase
 		return xmlDObj.getGlobalId();		
 	}	
 	
-	public OTID getRelativeOTID(OTID parent, String relativePath)
-	{
-	    String xmlIdString = parent.toString() + "/" + relativePath;
-	    return new OTRelativeID(xmlIdString);
-	}
-
     /**
      * @param localIdStr
      * @return

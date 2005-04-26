@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-04-24 15:44:55 $
+ * $Revision: 1.9 $
+ * $Date: 2005-04-26 15:41:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -62,19 +62,6 @@ public interface OTDatabase
 	public OTDataObject createDataObject() 
 		throws Exception;
 	
-	/**
-	 * There is now a concept of relative OTIDs.  These are id's
-	 * that point to objects within a containing object.  Within
-	 * the same database.  The format of the relative part of the
-	 * id is up to the database implementation.  This will probably
-	 * need to change because we will need the id to be portable.  
-	 * 
-	 * @param parent
-	 * @param relativePath
-	 * @return
-	 */
-	public OTID getRelativeOTID(OTID parent, String relativePath);
-
 	/**
 	 * Make a brand new data object and use an existing id
 	 * this is required so objects can be imported into this database

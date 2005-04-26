@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2005-04-24 15:44:55 $
+ * $Revision: 1.10 $
+ * $Date: 2005-04-26 15:41:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -42,6 +42,7 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.OTXMLString;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -273,12 +274,23 @@ public class Exporter
 			        resource instanceof Short ||
 			        resource instanceof Boolean) {
 			    output.print(resource.toString());
+			} else if(resource instanceof OTXMLString) {
+			    output.println();
+				indentPrint(resourceIndent+1, 
+				        ((OTXMLString)resource).getContent(), output);
+				printIndent(resourceIndent, output);			    
 			} else if(resource instanceof String && 
 			        ((String)resource).length() < 30) {
-			    output.print(resource.toString());			    
+			    // escape xml characters
+			    String text = resource.toString();
+			    String escapedText = escapeElementText(text);
+			    output.print(escapedText);			    
 			} else {
 			    output.println();
-				indentPrint(resourceIndent+1, resource.toString(), output);
+			    // escape xml characters
+			    String text = resource.toString();
+			    String escapedText = escapeElementText(text);
+				indentPrint(resourceIndent+1, text, output);
 				printIndent(resourceIndent, output);
 			}
 			output.println("</" + resourceKeys[i] + ">");
@@ -287,5 +299,12 @@ public class Exporter
 		indentPrint(objectIndent, "</" + objectElement + ">", output);
 	}
 	
+	public static String escapeElementText(String text)
+	{
+	    String newText = text.replaceAll("&", "&amp;");
+	    newText = text.replaceAll("<", "&lt;");
+	    newText = newText.replaceAll(">", "&gt;");
 
+	    return newText;
+	}
 }

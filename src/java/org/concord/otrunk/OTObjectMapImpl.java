@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.4 $
+ * $Date: 2005-04-26 15:41:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -89,6 +89,10 @@ public class OTObjectMapImpl implements OTObjectMap
 		Vector names = new Vector();
 		
 		String [] keys = map.getKeys();
+		
+		if(keys == null) {
+		    return names;
+		}
 		
 		for(int i=0; i < keys.length; i++) {
 			names.add(keys[i]);

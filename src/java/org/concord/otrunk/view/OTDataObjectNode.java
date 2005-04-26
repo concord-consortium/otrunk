@@ -32,6 +32,7 @@ package org.concord.otrunk.view;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTrunkImpl;
@@ -131,6 +132,9 @@ public class OTDataObjectNode
 		} else if(child instanceof OTResourceList) {
 			// make node for list
 			return new OTResourceListNode(key, (OTResourceList) child, this);
+		} else if(child instanceof OTResourceMap) {
+			// make node for list
+			return new OTResourceMapNode(key, (OTResourceMap) child, this);		    
 		} else  {
 			// make a leaf node that displays the toString of
 			return new OTJavaObjectNode(key, child);

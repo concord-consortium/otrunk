@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-04-25 14:52:40 $
+ * $Revision: 1.4 $
+ * $Date: 2005-04-26 15:41:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -57,6 +57,10 @@ public class OTRelativeID
     {
         this.rootId = rootId;
         this.relativePath = relativePath;
+        
+        if(rootId == null && relativePath == null) {
+            throw new UnsupportedOperationException("both args null");
+        }
     }
     
     public OTRelativeID(String path)

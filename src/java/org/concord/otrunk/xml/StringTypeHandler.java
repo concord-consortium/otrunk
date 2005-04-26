@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-04-24 15:44:55 $
+ * $Revision: 1.7 $
+ * $Date: 2005-04-26 15:41:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -46,6 +46,8 @@ import java.util.Properties;
  */
 public class StringTypeHandler extends PrimitiveResourceTypeHandler
 {
+    boolean xmlString;
+    
 	public StringTypeHandler()
 	{
 		super("string");
@@ -61,9 +63,7 @@ public class StringTypeHandler extends PrimitiveResourceTypeHandler
 	 */
 	public Object handleElement(OTXMLElement element, Properties elementProps,
 	        String relativePath)
-	{
-	    String contentStr = element.getContentAsXMLText();
-	    		
-		return new XMLParsableString(contentStr);		
+	{	    
+	    return element.getTextTrim();
 	}
 }

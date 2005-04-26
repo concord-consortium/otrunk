@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.5 $
+ * $Date: 2005-04-26 15:41:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -38,6 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.otrunk.OTXMLString;
 
 /**
  * XMLParsableString
@@ -71,7 +72,7 @@ public class XMLParsableString
 		this.content = content;
 	}
 	
-	public String parse(Hashtable localIdMap)
+	public OTXMLString parse(Hashtable localIdMap)
 	{
 		Pattern p = Pattern.compile("\\$\\{([^}]*)\\}");
 		Matcher m = p.matcher(content);
@@ -85,6 +86,7 @@ public class XMLParsableString
 			}
 		}
 		m.appendTail(parsed);
-		return parsed.toString();
+		
+		return new OTXMLString(parsed.toString());
 	}
 }
