@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2005-04-24 15:44:55 $
+ * $Revision: 1.14 $
+ * $Date: 2005-04-26 15:41:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -44,6 +44,7 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.OTXMLString;
 
 /**
  * DOTypeService
@@ -60,6 +61,8 @@ public class TypeService
 	{
 		if(String.class.isAssignableFrom(klass)) {
 			return "string";
+		} else if(OTXMLString.class.isAssignableFrom(klass)) {
+		    return "xmlstring";
 		} else if(Boolean.class.isAssignableFrom(klass) ||
 				Boolean.TYPE.equals(klass)) {
 			return "boolean";
@@ -98,6 +101,7 @@ public class TypeService
 		handlerMap.put("integer", new IntegerTypeHandler());
 		handlerMap.put("float", new FloatTypeHandler());
 		handlerMap.put("string", new StringTypeHandler());
+		handlerMap.put("xmlstring", new XMLStringTypeHandler());
 		handlerMap.put("blob", new BlobTypeHandler(contextURL));
 		handlerMap.put("list", new ListTypeHandler(this));
 		handlerMap.put("map", new MapTypeHandler(this));

@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-04-24 15:49:47 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-04-26 15:41:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -53,8 +53,8 @@ final class OTUserResourceMap
      */
     public Object get(String key)
     {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO Handle user generated maps
+        return authoredMap.get(key);
     }
     
     /* (non-Javadoc)
@@ -62,8 +62,8 @@ final class OTUserResourceMap
      */
     public String[] getKeys()
     {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO Handle user generated maps
+        return authoredMap.getKeys();
     }
     
     /* (non-Javadoc)
@@ -71,7 +71,7 @@ final class OTUserResourceMap
      */
     public void put(String key, Object resource)
     {
-        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("OTUserResourceMap does not support put");
 
     }
     
@@ -80,8 +80,7 @@ final class OTUserResourceMap
      */
     public void removeAll()
     {
-        // TODO Auto-generated method stub
-
+        throw new UnsupportedOperationException("OTUserResourceMap does not support removeAll");
     }
     
     /* (non-Javadoc)
@@ -89,7 +88,7 @@ final class OTUserResourceMap
      */
     public int size()
     {
-        // TODO Auto-generated method stub
-        return 0;
+        // TODO Handle user generatored maps
+        return authoredMap.size();
     }
 }

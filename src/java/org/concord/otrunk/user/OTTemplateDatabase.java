@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-04-24 15:49:47 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-04-26 15:41:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -101,15 +101,6 @@ public class OTTemplateDatabase
     {
         // Do nothing
         return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.concord.otrunk.datamodel.OTDatabase#getRelativeOTID(org.concord.framework.otrunk.OTID, java.lang.String)
-     */
-    public OTID getRelativeOTID(OTID parent, String relativePath)
-    {
-        String idStr = parent.toString() + "/" + relativePath;
-        return new OTRelativeID(idStr);
     }
 
     /* (non-Javadoc)

@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2005-04-24 15:44:55 $
+ * $Revision: 1.2 $
+ * $Date: 2005-04-26 15:41:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -115,7 +115,7 @@ public class OTUserDataObject
 	        otherId = stateObject.getGlobalId();
 	    }
 	    
-	    return new OTRelativeID(dbId.toString() + "/" + otherId.toString());
+	    return new OTRelativeID(dbId, otherId.toString());
 	}
 	
 	

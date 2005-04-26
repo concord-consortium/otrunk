@@ -129,38 +129,42 @@ public class OTrunkImpl implements OTrunk
      */
     public OTID getOTID(String otidStr)
     {
+        return OTrunkImpl.getOTIDFromString(otidStr);        
+    }
+	
+    public static OTID getOTIDFromString(String otidStr)
+    {
         // pull off the first part of the id
         // get the data object from that
         // ask that data object or the database of that object
         // to give you the id of the rest.
         int endOfId = otidStr.indexOf('/');
         
-        String rootId = null;
+        String firstPathElement = null;
         String relativePath = null;
-        if(endOfId == -1) {
-            rootId = otidStr;
+        if(endOfId == -1 || endOfId == 0) {
+            firstPathElement = otidStr;
         } else {
-            rootId = otidStr.substring(0,endOfId);
+            firstPathElement = otidStr.substring(0,endOfId);
             relativePath = otidStr.substring(endOfId+1, otidStr.length());
-        }        
-        OTID id = OTIDFactory.createOTID(rootId);
-        
-        /*
-         * FIXME
-        if(id == null) {
-            // lookup the id in the user object list
-            id = (OTID)userDataObjects.get(otidStr);
         }
-        */
-        if(relativePath == null) {         
+        OTID id = OTIDFactory.createOTID(firstPathElement);
+                
+        if(relativePath == null && id != null) {         
             return id;
         }
         
-        OTDatabase idDb = getOTDatabase(id);
-        return idDb.getRelativeOTID(id, relativePath);
+        if(id == null) {
+            if(relativePath == null) {
+                relativePath = firstPathElement;
+            } else {
+                relativePath = firstPathElement + "/" + relativePath;
+            }
+        }
         
+        return new OTRelativeID(id, relativePath);
     }
-	
+    
 	/* (non-Javadoc)
 	 */
 	public OTObject createObject(Class objectClass)
