@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2005-04-26 15:41:41 $
+ * $Revision: 1.14 $
+ * $Date: 2005-05-02 02:59:55 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -37,6 +37,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -135,6 +136,13 @@ public class OTViewer extends JFrame
 	{
 		super("OTrunk Viewer");
 		this.showTree = showTree;
+
+		addWindowListener( new WindowAdapter() {
+		    public void windowClosing(WindowEvent e)
+		    {
+		        ((OTViewer)e.getSource()).exit();
+		    }			
+		});
 	}
 	
 	public void updateTreePane()
@@ -182,6 +190,39 @@ public class OTViewer extends JFrame
 		
 	}
 	
+	public void initArgs(String [] args)	
+	{
+		if(args.length > 0) {
+			String urlStr = null;
+			
+			if(args[0].equals("-f")) {
+				if(args.length > 1) {
+					File inFile = new File(args[1]);
+					try {
+						URL url = inFile.toURL();
+						urlStr = url.toString();
+					} catch (Exception e) {
+						e.printStackTrace();
+						urlStr = null;
+					}
+				}
+			} else if(args[0].equals("-r")) {
+			    if(args.length > 1) {
+			        ClassLoader cl = OTViewer.class.getClassLoader();
+			        URL url = cl.getResource(args[1]);
+			        urlStr = url.toString();
+			    }
+			} else {
+				urlStr = args[0];
+			}
+			
+			init(urlStr);
+		} else {
+			init(null);
+		}
+
+	}
+	
 	public void init(String url)
 	{
 		initMenuBar();
@@ -205,10 +246,21 @@ public class OTViewer extends JFrame
 			getContentPane().add(bodyPanel);
 		}
 		
-        setBounds(100, 100, 875, 600);
-
         setVisible(true);
         
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		if(screenSize.width < 1000 || screenSize.height < 700) {
+		    int state = getExtendedState();
+		    
+		    // Set the maximized bits
+		    state |= Frame.MAXIMIZED_BOTH;
+		    
+		    // Maximize the frame
+		    setExtendedState(state);
+		} else {
+		    setBounds(100, 100, 875, 600);
+		}
+
         if(url != null) {
         	try {
         		loadURL(new URL(url));
@@ -358,13 +410,6 @@ public class OTViewer extends JFrame
 			viewer.init(null);
 		}
 		
-		viewer.addWindowListener( new WindowAdapter() 
-		{
-			public void windowClosing(WindowEvent e)
-			{
-				((OTViewer)e.getSource()).exitAction.actionPerformed(null);
-			}			
-		});
 		
 		
 	}

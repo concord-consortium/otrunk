@@ -223,6 +223,10 @@ public class OTrunkImpl implements OTrunk
 	protected OTDatabase getOTDatabase(OTID id)
 	{
 	    // look for the database that contains this id
+	    if(id == null) {
+	        return null;
+	    }
+	    
 	    for(int i=0; i<databases.size(); i++) {
 	        OTDatabase db = (OTDatabase)databases.get(i);
 	        if(db.contains(id)) {
@@ -252,7 +256,9 @@ public class OTrunkImpl implements OTrunk
 		OTDatabase parentDb = rootDb;
 		if(dataParent == null && childID instanceof OTRelativeID) {
 		    OTID rootRelativeId = ((OTRelativeID)childID).getRootId();
-	        parentDb = getOTDatabase(rootRelativeId);		    
+		    if(rootRelativeId != null) {
+		        parentDb = getOTDatabase(rootRelativeId);
+		    }
 		} else if (dataParent != null) {
 		    parentDb = dataParent.getDatabase();
 		}

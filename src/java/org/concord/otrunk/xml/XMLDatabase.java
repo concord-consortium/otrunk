@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2005-04-26 15:41:41 $
+ * $Revision: 1.16 $
+ * $Date: 2005-05-02 02:59:55 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -206,7 +206,7 @@ public class XMLDatabase
     	Object oldValue = dataObjects.put(dataObject.getGlobalId(), dataObject);
     	if(oldValue != null) {
     		dataObjects.put(dataObject.getGlobalId(), oldValue);
-    		throw new Exception("repeated unique id");
+    		throw new Exception("repeated unique id: " + dataObject.getGlobalId());
     	}
 
     	if(element != null) {
