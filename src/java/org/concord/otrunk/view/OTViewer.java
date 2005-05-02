@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2005-05-02 02:59:55 $
+ * $Revision: 1.15 $
+ * $Date: 2005-05-02 03:22:07 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -393,7 +393,9 @@ public class OTViewer extends JFrame
 	    		if(showTree) {
 	    			folderTreeModel.fireTreeStructureChanged((SimpleTreeNode)folderTreeModel.getRoot());
 	    			dataTreeModel.fireTreeStructureChanged((SimpleTreeNode)dataTreeModel.getRoot());
-	    		}	    		
+	    		}
+	    		
+	    		initMenuBar();
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -526,75 +528,77 @@ public class OTViewer extends JFrame
 		    fileMenu = menuBar.getMenu(0);
 		    fileMenu.removeAll();
 		}
-				
-		AbstractAction loadUserDataAction = new AbstractAction(){
-		    
-		    /* (non-Javadoc)
-		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		     */
-		    public void actionPerformed(ActionEvent arg0)
-		    {
-		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		        
-		        FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
-		        if(currentFile != null) {
-		            dialog.setDirectory(currentFile.getParentFile().getAbsolutePath());
-		            dialog.setFile(currentFile.getName());
-		        }
-		        dialog.show();
-		        
-		        String fileName = dialog.getFile();
-		        if(fileName == null) {
-		            return;
-		        }
-		        
-		        fileName = dialog.getDirectory() + fileName;
-		        System.out.println("load file name: " + fileName);
-		        loadUserDataFile(new File(fileName));					
-		    }
-		    
-		};
-		loadUserDataAction.putValue(Action.NAME, "Open User Data...");			
-		fileMenu.add(loadUserDataAction);
 		
-		saveUserDataAsAction = new AbstractAction(){
+		if(currentUser != null) {
+		    AbstractAction loadUserDataAction = new AbstractAction(){
+		        
+		        /* (non-Javadoc)
+		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		         */
+		        public void actionPerformed(ActionEvent arg0)
+		        {
+		            Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+		            
+		            FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
+		            if(currentFile != null) {
+		                dialog.setDirectory(currentFile.getParentFile().getAbsolutePath());
+		                dialog.setFile(currentFile.getName());
+		            }
+		            dialog.show();
+		            
+		            String fileName = dialog.getFile();
+		            if(fileName == null) {
+		                return;
+		            }
+		            
+		            fileName = dialog.getDirectory() + fileName;
+		            System.out.println("load file name: " + fileName);
+		            loadUserDataFile(new File(fileName));					
+		        }
+		        
+		    };
+		    loadUserDataAction.putValue(Action.NAME, "Open User Data...");			
+		    fileMenu.add(loadUserDataAction);
 		    
-		    /* (non-Javadoc)
-		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		     */
-		    public void actionPerformed(ActionEvent arg0)
-		    {
-		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		        FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
-		        if(currentFile != null) {
-		            dialog.setDirectory(currentFile.getParentFile().getAbsolutePath());
-		            dialog.setFile(currentFile.getName());
-		        }
-		        dialog.show();
+		    saveUserDataAsAction = new AbstractAction(){
 		        
-		        String fileName = dialog.getFile();
-		        if(fileName == null) {
-		            return;
+		        /* (non-Javadoc)
+		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		         */
+		        public void actionPerformed(ActionEvent arg0)
+		        {
+		            Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+		            FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
+		            if(currentFile != null) {
+		                dialog.setDirectory(currentFile.getParentFile().getAbsolutePath());
+		                dialog.setFile(currentFile.getName());
+		            }
+		            dialog.show();
+		            
+		            String fileName = dialog.getFile();
+		            if(fileName == null) {
+		                return;
+		            }
+		            
+		            fileName = dialog.getDirectory() + fileName;
+		            currentFile = new File(fileName);
+		            
+		            if(!fileName.toLowerCase().endsWith(".otml")){
+		                currentFile = new File(currentFile.getAbsolutePath()+".otml");
+		            }
+		            if(!currentFile.exists() || checkForReplace(currentFile)){
+		                try {
+		                    Exporter.export(currentFile, stateDB.getRoot(), stateDB);						    
+		                } catch(Exception e){
+		                    e.printStackTrace();
+		                }	                    	
+		            }				
 		        }
-		        
-		        fileName = dialog.getDirectory() + fileName;
-		        currentFile = new File(fileName);
-		        
-		        if(!fileName.toLowerCase().endsWith(".otml")){
-		            currentFile = new File(currentFile.getAbsolutePath()+".otml");
-		        }
-		        if(!currentFile.exists() || checkForReplace(currentFile)){
-		            try {
-		                Exporter.export(currentFile, stateDB.getRoot(), stateDB);						    
-		            } catch(Exception e){
-		                e.printStackTrace();
-		            }	                    	
-		        }				
-		    }
-		};
-		saveUserDataAsAction.putValue(Action.NAME, "Save User Data As...");			
-		// saveAsAction.setEnabled(false);
-		fileMenu.add(saveUserDataAsAction);
+		    };
+		    saveUserDataAsAction.putValue(Action.NAME, "Save User Data As...");			
+		    // saveAsAction.setEnabled(false);
+		    fileMenu.add(saveUserDataAsAction);
+		}
 		
 		if(Boolean.getBoolean("otrunk.view.debug")) {
 		    AbstractAction loadAction = new AbstractAction(){
