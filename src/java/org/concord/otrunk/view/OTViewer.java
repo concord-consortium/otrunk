@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2005-05-02 03:22:07 $
+ * $Revision: 1.16 $
+ * $Date: 2005-05-03 19:19:46 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -248,19 +248,30 @@ public class OTViewer extends JFrame
 		
         setVisible(true);
         
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		if(screenSize.width < 1000 || screenSize.height < 700) {
-		    int state = getExtendedState();
-		    
-		    // Set the maximized bits
-		    state |= Frame.MAXIMIZED_BOTH;
-		    
-		    // Maximize the frame
-		    setExtendedState(state);
-		} else {
-		    setBounds(100, 100, 875, 600);
-		}
-
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() 
+            {
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                if(screenSize.width < 1000 || screenSize.height < 700) {
+                    int state = getExtendedState();
+                    
+                    // Set the maximized bits
+                    state |= Frame.MAXIMIZED_BOTH;
+                    
+                    // Maximize the frame
+                    setExtendedState(state);
+                } else {
+                    setBounds(100, 100, 875, 600);
+                }
+                
+                // on windows setting the bounds after setVisible
+                // seems to cause the paint methods to get screwed
+                // up.  I'm trying things to fix this.
+                bodyPanel.invalidate();
+                bodyPanel.repaint();
+            }
+        });
+        
         if(url != null) {
         	try {
         		loadURL(new URL(url));
