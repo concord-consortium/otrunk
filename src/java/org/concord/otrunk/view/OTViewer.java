@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.16 $
- * $Date: 2005-05-03 19:19:46 $
+ * $Revision: 1.17 $
+ * $Date: 2005-05-03 19:45:02 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -246,13 +246,13 @@ public class OTViewer extends JFrame
 			getContentPane().add(bodyPanel);
 		}
 		
-        setVisible(true);
-        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() 
             {
-                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+            	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                 if(screenSize.width < 1000 || screenSize.height < 700) {
+                    setVisible(true);
                     int state = getExtendedState();
                     
                     // Set the maximized bits
@@ -262,16 +262,12 @@ public class OTViewer extends JFrame
                     setExtendedState(state);
                 } else {
                     setBounds(100, 100, 875, 600);
+                    setVisible(true);
                 }
                 
-                // on windows setting the bounds after setVisible
-                // seems to cause the paint methods to get screwed
-                // up.  I'm trying things to fix this.
-                bodyPanel.invalidate();
-                bodyPanel.repaint();
-            }
+            }            
         });
-        
+
         if(url != null) {
         	try {
         		loadURL(new URL(url));
@@ -282,6 +278,7 @@ public class OTViewer extends JFrame
         		return;
         	}
         } 
+        
     }
 
 	private void loadUserDataFile(File file)
