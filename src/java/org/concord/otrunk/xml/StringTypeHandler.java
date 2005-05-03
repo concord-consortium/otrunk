@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-04-26 15:41:41 $
+ * $Revision: 1.8 $
+ * $Date: 2005-05-03 21:38:04 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -33,6 +33,7 @@
 */
 package org.concord.otrunk.xml;
 
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -63,7 +64,18 @@ public class StringTypeHandler extends PrimitiveResourceTypeHandler
 	 */
 	public Object handleElement(OTXMLElement element, Properties elementProps,
 	        String relativePath)
-	{	    
+	{
+	    // This is for backwards compatibility
+	    // if a string element has sub elements then it is treated 
+	    // as xml text.
+	    // if there is a string that shouldn't have xml tags in it
+	    // then a invalid resource value message will be printed.
+	    List children = element.getChildren();
+	    if(children != null && children.size() > 0) {
+		    String contentStr = element.getContentAsXMLText();
+		    return new XMLParsableString(contentStr);			    
+	    }
+	    
 	    return element.getTextTrim();
 	}
 }
