@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-04-19 00:56:04 $
+ * $Revision: 1.6 $
+ * $Date: 2005-05-06 21:31:31 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -126,6 +126,7 @@ public class OTViewContainerPanel extends JPanel
 		add(newComponent, BorderLayout.CENTER);
 		revalidate();
 		notifyListeners();
+		newComponent.requestFocus();
 	}
 
 	public OTObject getCurrentObject()
