@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.16 $
- * $Date: 2005-05-02 02:59:55 $
+ * $Revision: 1.17 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -48,10 +48,11 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
-import org.concord.otrunk.OTRelativeID;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
+import org.concord.otrunk.datamodel.OTPathID;
+import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
 import org.concord.otrunk.xml.jdom.JDOMDocument;
 
@@ -76,6 +77,10 @@ public class XMLDatabase
 	// a map of xml file ids to UUIDs
 	Hashtable localIdMap = new Hashtable();
 
+	// track whether any object in this database
+	// has changed
+	boolean dirty = false;
+	
     private OTID databaseId;
 	
 	public XMLDatabase()
@@ -182,6 +187,16 @@ public class XMLDatabase
 	    return databaseId;
 	}
 	
+	public boolean isDirty()
+	{
+	    return dirty;
+	}
+	
+	public void setDirty(boolean dirty)
+	{
+	    this.dirty = dirty;
+	}
+	
 	protected XMLDataObject createDataObject(OTXMLElement element, String idStr)
 		throws Exception
 	{
@@ -256,9 +271,9 @@ public class XMLDatabase
 		throws Exception
 	{
 		if(collectionClass.equals(OTResourceList.class)) {
-			return new XMLResourceList();
+			return new XMLResourceList((XMLDataObject)parent);
 		} else if(collectionClass.equals(OTResourceMap.class)) {
-			return new XMLResourceMap();
+			return new XMLResourceMap((XMLDataObject)parent);
 		}
 		
 		return null;
@@ -412,13 +427,14 @@ public class XMLDatabase
         // the contains method to include that database id
         OTID dbId = getDatabaseId();
         if(dbId != null) {
-            return new OTRelativeID(dbId, "/" + localIdStr);
+            return new OTRelativeID(dbId, new OTPathID("/" + localIdStr));
         }
         
+        // FIXME 
         // if the databse doesn't have a id then we use some 
         // standard anon relative id (I don't know if that will
         // work) otherwise we could hash something into an id
-        return new OTRelativeID(null, "/" + localIdStr);        
+        return new OTRelativeID(null, new OTPathID("/" + localIdStr));        
     }
 	
 }

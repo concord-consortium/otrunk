@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-05-03 21:38:04 $
+ * $Revision: 1.9 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -63,7 +63,7 @@ public class StringTypeHandler extends PrimitiveResourceTypeHandler
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
 	public Object handleElement(OTXMLElement element, Properties elementProps,
-	        String relativePath)
+	        String relativePath, XMLDataObject parent)
 	{
 	    // This is for backwards compatibility
 	    // if a string element has sub elements then it is treated 

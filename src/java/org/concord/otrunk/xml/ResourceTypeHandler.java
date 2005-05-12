@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-04-24 15:44:55 $
+ * $Revision: 1.7 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -62,7 +62,8 @@ public abstract class ResourceTypeHandler
 	 * @return
 	 */
 	public abstract Object handleElement(OTXMLElement element, 
-	        Properties elementProps, String relativePath)
+	        Properties elementProps, String relativePath, 
+	        XMLDataObject parent)
 		throws HandleElementException;
 
 	public String getPrimitiveName()

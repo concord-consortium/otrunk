@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2005-04-26 15:41:41 $
+ * $Revision: 1.18 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -38,8 +38,9 @@ import java.util.List;
 import java.util.Properties;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.otrunk.OTRelativeID;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.OTIDFactory;
+import org.concord.otrunk.datamodel.OTRelativeID;
 
 /**
  * ObjectTypeHandler
@@ -90,7 +91,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
 	public Object handleElement(OTXMLElement element, Properties elementProps,
-	        String relativePath)
+	        String relativePath, XMLDataObject parent)
 	{
 		String refid = element.getAttributeValue("refid");
 		if(refid != null && refid.length() > 0){
@@ -110,7 +111,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		XMLDataObject obj = null;
 		try {
 		    if(idStr == null && localIdStr == null && relativePath != null) {
-		        OTID pathId = OTrunkImpl.getOTIDFromString(relativePath);
+		        OTID pathId = OTIDFactory.createOTID(relativePath);
 		        // System.err.println(relativePath);
 		        obj = xmlDB.createDataObject(element, pathId);
 		    } else if(idStr == null && localIdStr != null) {
@@ -145,7 +146,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			try {
 			    
 				Object resValue = handleChildResource(element, attribName, 
-				        attrib.getValue(), objRelativePath);
+				        attrib.getValue(), objRelativePath, obj);
 				obj.setResource(attribName, resValue);
 			} catch (HandleElementException e) {
 				System.err.println(e.getMessage() + " in attribute: " +
@@ -159,7 +160,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 
 			try {
 				Object resValue = handleChildResource(element, child.getName(), 
-				        child, objRelativePath);
+				        child, objRelativePath, obj);
 				obj.setResource(child.getName(),resValue);
 			} catch (HandleElementException e) {
 				System.err.println("error in element: " +
@@ -190,7 +191,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	 * @return
 	 */
 	public Object handleChildResource(OTXMLElement parentElement, String childName, 
-	        Object childObj, String relativeParentPath)
+	        Object childObj, String relativeParentPath, XMLDataObject parent)
 		throws HandleElementException
 	{
 		Properties elementProps;
@@ -264,7 +265,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		} else {
 		    String childRelativePath = relativeParentPath + "/" + childName;
 			return resHandler.handleElement((OTXMLElement)childObj, elementProps,
-			        childRelativePath);
+			        childRelativePath, parent);
 		}
 	}
 	

@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.6 $
+ * $Date: 2005-05-12 15:27:19 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -50,13 +50,28 @@ import org.concord.framework.otrunk.OTResourceMap;
 public class XMLResourceMap implements OTResourceMap
 {
 	Hashtable hTable = new Hashtable();
+	XMLDataObject dataObject;
 	
+	public XMLResourceMap(XMLDataObject parent)
+	{
+	    dataObject = parent;
+	    if(dataObject == null) {
+	        throw new UnsupportedOperationException("passing null parent not allowed");
+	    }
+	}
+	
+	private void updateModifiedTime()
+	{
+		dataObject.updateModifiedTime();
+	}
+				
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceMap#put(java.lang.String, java.lang.Object)
 	 */
 	public void put(String key, Object resource)
 	{
 		hTable.put(key, resource);		
+		updateModifiedTime();
 	}
 
 	/* (non-Javadoc)
@@ -92,10 +107,12 @@ public class XMLResourceMap implements OTResourceMap
 	public void removeAll()
 	{
 		hTable.clear();		
+		updateModifiedTime();
 	}
 	
 	void remove(String key)
 	{
 		hTable.remove(key);
+		updateModifiedTime();
 	}
 }

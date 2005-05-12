@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-04-12 05:26:25 $
- * $Author: imoncada $
+ * $Revision: 1.8 $
+ * $Date: 2005-05-12 15:27:19 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -51,7 +51,21 @@ public class XMLResourceList
 	implements OTResourceList
 {
 	Vector list = new Vector();
-
+	XMLDataObject dataObject;
+	
+	public XMLResourceList(XMLDataObject parent)
+	{
+	    dataObject = parent;
+	    if(dataObject == null) {
+	        throw new UnsupportedOperationException("passing null parent not allowed");
+	    }
+	}
+		
+	private void updateModifiedTime()
+	{
+		dataObject.updateModifiedTime();
+	}
+			
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#get(int)
 	 */
@@ -66,6 +80,7 @@ public class XMLResourceList
 	public void add(Object object)
 	{
 		list.add(object);
+		updateModifiedTime();
 	}
 
 	/* (non-Javadoc)
@@ -74,11 +89,13 @@ public class XMLResourceList
 	public void add(int index, Object object)
 	{
 		list.add(index, object);
+		updateModifiedTime();
 	}
 
 	public void set(int index, Object object)
 	{
 		list.set(index, object);
+		updateModifiedTime();
 	}
 	
 	/* (non-Javadoc)
@@ -95,6 +112,7 @@ public class XMLResourceList
 	public void removeAll()
 	{
 		list.removeAllElements();
+		updateModifiedTime();
 	}
 
 	/* (non-Javadoc)
@@ -103,6 +121,7 @@ public class XMLResourceList
 	public void remove(int index)
 	{
 		list.remove(index);
+		updateModifiedTime();
 	}
 
 	/* (non-Javadoc)
@@ -111,6 +130,7 @@ public class XMLResourceList
 	public void remove(Object obj)
 	{
 		list.remove(obj);
+		updateModifiedTime();
 	}
 
 }

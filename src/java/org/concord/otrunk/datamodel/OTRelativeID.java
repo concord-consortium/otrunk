@@ -24,19 +24,18 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-04-26 15:41:41 $
+ * $Revision: 1.1 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
-package org.concord.otrunk;
+package org.concord.otrunk.datamodel;
 
 import javax.naming.OperationNotSupportedException;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.otrunk.datamodel.OTIDFactory;
 
 /**
  * OTXMLPathID
@@ -51,42 +50,25 @@ public class OTRelativeID
     implements OTID
 {
     OTID rootId = null;
-    String relativePath = null;
+    OTID relativeId = null;
     
-    public OTRelativeID(OTID rootId, String relativePath)
+    public OTRelativeID(OTID rootId, OTID relativeId)
     {
         this.rootId = rootId;
-        this.relativePath = relativePath;
+        this.relativeId = relativeId;
         
-        if(rootId == null && relativePath == null) {
+        if(rootId == null && relativeId == null) {
             throw new UnsupportedOperationException("both args null");
         }
     }
-    
-    public OTRelativeID(String path)
-    {
-        int endOfId = path.indexOf('/');
-        
-        String rootIdStr = null;
-        if(endOfId == -1) {
-            rootId = null;
-            relativePath = path;
-            System.err.println("non-relative id stored in relative id: " + path);
-        } else {
-            rootIdStr = path.substring(0,endOfId);
-            relativePath = path.substring(endOfId+1, path.length());
-        }        
 
-        rootId = OTIDFactory.createOTID(rootIdStr);
-    }
-    
     public String toString()
     {
         if(rootId == null) {
-            return relativePath;
+            return relativeId.toString();
         }
         
-        return rootId.toString() + "/" + relativePath;
+        return rootId.toString() + "!" + relativeId.toString();
     }
     
     public OTID getRootId()
@@ -94,9 +76,9 @@ public class OTRelativeID
         return rootId;        
     }
     
-    public String getRelativePath()
+    public OTID getRelativeId()
     {
-        return relativePath;
+        return relativeId;
     }
     
     /* (non-Javadoc)
@@ -114,7 +96,7 @@ public class OTRelativeID
         }
         
         OTRelativeID otherId = (OTRelativeID)other;
-        if(otherId.getRelativePath() == null && relativePath != null) {
+        if(otherId.getRelativeId() == null && relativeId != null) {
             return false;
         }
         
@@ -122,8 +104,8 @@ public class OTRelativeID
             return false;
         }
         
-        return (otherId.getRelativePath() == null ||   
-                otherId.getRelativePath().equals(relativePath))
+        return (otherId.getRelativeId() == null ||   
+                otherId.getRelativeId().equals(relativeId))
                 &&
                 (otherId.getRootId() == null || 
                         otherId.getRootId().equals(rootId));

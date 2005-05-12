@@ -24,14 +24,17 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.4 $
+ * $Date: 2005-05-12 15:27:19 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.datamodel;
+
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
 
@@ -47,12 +50,36 @@ import org.concord.framework.otrunk.OTID;
  */
 public class OTIDFactory
 {
-	public static OTID createOTID(String id)
+	public static OTID createOTID(String otidStr)
 	{
+	    int bangIndex = otidStr.indexOf("!");
+	    if(bangIndex == 0) {
+	        throw new RuntimeException("Unknown id format");
+	    }
+	    
+	    
+	    String currentIdStr = otidStr;	    	   
+	    if(bangIndex > 0) {
+	        currentIdStr = otidStr.substring(0,bangIndex);
+	    }
+	    
+        OTID currentId = null;
+        // First try to make an OTUUID out of the id
 		try {
-			return new OTUUID(id);
+			currentId = new OTUUID(currentIdStr);
 		} catch (Exception e) {
-			return null;
+			// FIXME we should only catch malformed exceptions here
+		    currentId = new OTPathID(currentIdStr);
 		}
-	}
+	    
+		if(bangIndex < 0) {
+		    // end of recursion
+		    return currentId;
+		}
+		
+		// recurse
+		String relativePath = otidStr.substring(bangIndex+1);
+		OTID relativeId = createOTID(relativePath);
+		return new OTRelativeID(currentId, relativeId);		
+    }
 }
