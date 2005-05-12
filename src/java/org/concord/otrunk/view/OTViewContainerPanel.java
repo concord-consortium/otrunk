@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-05-06 21:31:31 $
+ * $Revision: 1.7 $
+ * $Date: 2005-05-12 18:37:04 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -41,6 +41,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrame;
@@ -85,6 +86,7 @@ public class OTViewContainerPanel extends JPanel
 		super(new BorderLayout());
 		this.frameManager = frameManager;
 		myFrame = frame;
+		add(new JLabel("Loading..."));
 	}
 
 	public void showFrame()
@@ -97,6 +99,8 @@ public class OTViewContainerPanel extends JPanel
 	 */
 	public void setCurrentObject(OTObject pfObject, OTFrame otFrame)
 	{
+		System.err.println("OTViewContainerPanel.setCurrentObject");
+
 		if(otFrame != null) {
 			frameManager.setFrameObject(pfObject, otFrame);
 			return;
@@ -105,28 +109,37 @@ public class OTViewContainerPanel extends JPanel
 		if(currentView != null) {
 		    currentView.viewClosed();
 		}
-		
+			
 		currentObject = pfObject;
-		
-		JComponent newComponent = null;
-		if(pfObject != null) {
-		    currentView = otViewFactory.getObjectView(pfObject, this);
-		    if(currentView == null) {
-		        newComponent = new JLabel("No view for object: " + pfObject);
-				
-
-		    } else {
-		        newComponent = currentView.getComponent(true);
-		    }
-		} else {
-			newComponent = new JLabel("Null object");
-		}
 
 		removeAll();
-		add(newComponent, BorderLayout.CENTER);
-		revalidate();
-		notifyListeners();
-		newComponent.requestFocus();
+		add(new JLabel("Loading..."));
+		revalidate();		
+		
+		SwingUtilities.invokeLater(new Runnable(){
+		    public void run()
+		    {
+				JComponent newComponent = null;
+				if(currentObject != null) {
+				    currentView = otViewFactory.getObjectView(currentObject, OTViewContainerPanel.this);
+				    if(currentView == null) {
+				        newComponent = new JLabel("No view for object: " + currentObject);
+						
+
+				    } else {
+				        newComponent = currentView.getComponent(true);
+				    }
+				} else {
+					newComponent = new JLabel("Null object");
+				}
+
+				removeAll();
+				add(newComponent, BorderLayout.CENTER);
+				revalidate();
+				notifyListeners();
+				newComponent.requestFocus();		        
+		    }
+		});
 	}
 
 	public OTObject getCurrentObject()
