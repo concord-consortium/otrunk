@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2005-04-26 15:41:41 $
+ * $Revision: 1.15 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -185,7 +185,7 @@ public class TypeService
 		}
 		
 		try {
-			return handler.handleElement(child, null, relativePath);
+			return handler.handleElement(child, null, relativePath, null);
 		} catch (HandleElementException e) {
 			System.err.println("Error reading element: " + TypeService.elementPath(child));
 			return null;

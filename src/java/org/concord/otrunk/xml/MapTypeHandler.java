@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-04-24 15:44:55 $
+ * $Revision: 1.5 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -64,9 +64,9 @@ public class MapTypeHandler extends ResourceTypeHandler
 	 * @see org.concord.otrunk.xml.ResourceTypeHandler#handleElement(org.jdom.Element, java.util.Properties)
 	 */
 	public Object handleElement(OTXMLElement element, Properties elementProps,
-	        String relativePath)
+	        String relativePath, XMLDataObject parent)
 	{
-		XMLResourceMap map = new XMLResourceMap();
+		XMLResourceMap map = new XMLResourceMap(parent);
 		
 		List children = element.getChildren();
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			

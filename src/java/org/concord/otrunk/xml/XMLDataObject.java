@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2005-04-24 15:44:55 $
+ * $Revision: 1.11 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -102,11 +102,18 @@ public class XMLDataObject
 		globalId = id;
 	}
 	
+	public void setResource(String key, Object resource)
+	{
+	    setResource(key, resource, true);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#setResource(java.lang.String, java.lang.Object)
 	 */
-	public void setResource(String key, Object resource)
+	void setResource(String key, Object resource, boolean markDirty)
 	{
+		Object oldObject = resources.get(key);		
+
 		// Hashtables can't know the different between null and empty
 		// so if it is null we'll just remove it
 	    if(resource == null) {
@@ -114,6 +121,16 @@ public class XMLDataObject
 	    } else {
 			resources.put(key, resource);			
 		}
+
+	    if(!markDirty) return;
+	    
+		if((oldObject == null && resource == null) || 
+		         (oldObject != null && 
+		                 oldObject.equals(resource))) {		    
+		    // the object wasn't really modified
+		} else {
+			updateModifiedTime();
+		}		
 	}
 	
 	/* (non-Javadoc)
@@ -160,6 +177,14 @@ public class XMLDataObject
 		return null;
 	}
 
+	void updateModifiedTime()
+	{
+	    // update our revision 
+	    // tell the database that it is "dirty" and needs to 
+	    // be synced
+	    database.setDirty(true);
+	}
+	
 	public Collection getResourceEntries()
 	{
 		return resources.entrySet();
@@ -189,13 +214,14 @@ public class XMLDataObject
 
 	    OTResourceCollection collection = null;
 		if(collectionClass.equals(OTResourceList.class)) {
-			collection =  new XMLResourceList();
+			collection =  new XMLResourceList(this);
 		} else if(collectionClass.equals(OTResourceMap.class)) {
-			collection =  new XMLResourceMap();
+			collection =  new XMLResourceMap(this);
 		}
 		
 		if(collection != null) {
-		    setResource(key, collection);
+		    // don't mark the object as dirty until the collection has actually be modified
+		    setResource(key, collection, false);
 		}
 	    return collection;
 	}

@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-04-26 15:46:07 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-05-12 15:27:19 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -62,7 +62,7 @@ public class XMLStringTypeHandler extends PrimitiveResourceTypeHandler
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
 	public Object handleElement(OTXMLElement element, Properties elementProps,
-	        String relativePath)
+	        String relativePath, XMLDataObject parent)
 	{	    
 	    String contentStr = element.getContentAsXMLText();
 	    return new XMLParsableString(contentStr);			    

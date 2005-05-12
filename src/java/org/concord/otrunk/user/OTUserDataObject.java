@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-04-26 15:41:41 $
+ * $Revision: 1.3 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -39,10 +39,11 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
-import org.concord.otrunk.OTRelativeID;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTObjectRevision;
+import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.xml.XMLResourceList;
 import org.concord.otrunk.xml.XMLResourceMap;
 
@@ -115,7 +116,7 @@ public class OTUserDataObject
 	        otherId = stateObject.getGlobalId();
 	    }
 	    
-	    return new OTRelativeID(dbId, otherId.toString());
+	    return new OTRelativeID(dbId, otherId);
 	}
 	
 	
@@ -195,9 +196,27 @@ public class OTUserDataObject
 	        }
 	    }
 	    
+	    // get the existing user object or create a new one
 	    OTDataObject userObject = getUserObject();
 
-	    // add the resource to the user object not the author object
+	    // handle the case where a user object is being
+	    // set as a resource on a user object.  In this case
+	    // we want to save the authored object id.  
+	    // If we don't do this then we save a temporary id that came
+	    // from our TemplateDatabase	    
+	    if(resource instanceof OTRelativeID) {
+	        OTRelativeID relID = (OTRelativeID)resource;
+	        // This should probably be a special kind of relative
+	        // id, so we don't have to reprocess the string
+	        if(database.getDatabaseId().equals(relID.getRootId())) {
+	            // This is an id that came from our database
+	            // so get the relative id which is either an id in the
+	            // authored database or an id of a brand new object in
+	            // the user database
+	            resource = relID.getRelativeId();
+	        }
+	    }
+	    
 		userObject.setResource(key, resource);
 	}
 	

@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-04-11 15:01:08 $
- * $Author: maven $
+ * $Revision: 1.4 $
+ * $Date: 2005-05-12 15:27:19 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import org.concord.domain.Transfer;
 
@@ -81,12 +82,13 @@ public class XMLBlobResource
 			
 			bytes = outStream.toByteArray();
 			return bytes;
-		} catch (SocketException sockExcp)
-		{
+		} catch (SocketException sockExcp){
 			System.err.println(sockExcp.toString());
 		} catch (FileNotFoundException e){
 		    System.err.println("error loading xml resource: ");
 		    System.err.println("   " + e.toString());
+		} catch(UnknownHostException e) {
+		    System.err.println(e.toString());
 		} catch(Exception e) {
 			e.printStackTrace();
 		} finally {

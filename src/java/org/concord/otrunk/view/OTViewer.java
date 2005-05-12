@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2005-05-03 19:45:02 $
+ * $Revision: 1.18 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -56,6 +56,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
@@ -64,6 +65,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
@@ -119,12 +121,14 @@ public class OTViewer extends JFrame
 	JMenuBar menuBar;  
 	XMLDatabase xmlDB;
 	XMLDatabase stateDB;
-	File currentFile = null;
+	File currentAuthoredFile = null;
+	File currentUserFile = null;	
 	
 	Hashtable otContainers = new Hashtable();
 	
 	boolean showTree = false;
     private AbstractAction saveUserDataAsAction;
+    private AbstractAction saveUserDataAction;
 	
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
@@ -137,10 +141,13 @@ public class OTViewer extends JFrame
 		super("OTrunk Viewer");
 		this.showTree = showTree;
 
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		
 		addWindowListener( new WindowAdapter() {
 		    public void windowClosing(WindowEvent e)
 		    {
 		        ((OTViewer)e.getSource()).exit();
+		        
 		    }			
 		});
 	}
@@ -283,6 +290,7 @@ public class OTViewer extends JFrame
 
 	private void loadUserDataFile(File file)
 	{
+	    currentUserFile = file;
 	    try {
 	        loadUserDataURL(file.toURL());
 	    } catch(Exception e) {
@@ -311,9 +319,9 @@ public class OTViewer extends JFrame
 	
 	private void loadFile(File file)
 	{
-		currentFile = file;
+		currentAuthoredFile = file;
 		try {
-			loadURL(currentFile.toURL());
+			loadURL(currentAuthoredFile.toURL());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}		
@@ -325,14 +333,7 @@ public class OTViewer extends JFrame
 		xmlDB = new XMLDatabase(url);
 		otrunk = new OTrunkImpl(xmlDB,
 				new Object [] {new SwingUserMessageHandler(this)});
-	
-		// create an empty user state database
-		stateDB = new XMLDatabase();
-		otrunk.setCreationDb(stateDB);
-		OTStateRoot stateRoot = (OTStateRoot)otrunk.createObject(OTStateRoot.class);
-		stateDB.setRoot(stateRoot.getGlobalId());
-		stateRoot.setFormatVersionString("1.0");
-		
+			
 		currentURL = url;
 
 		reloadWindow();
@@ -404,6 +405,7 @@ public class OTViewer extends JFrame
 	    		}
 	    		
 	    		initMenuBar();
+	    		stateDB.setDirty(false);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -433,13 +435,11 @@ public class OTViewer extends JFrame
 		
 		public void actionPerformed(ActionEvent e) 
 		{
-			try {
-				otrunk.close();
-			} catch (Exception exp) {
-				exp.printStackTrace();
-				// exit anyhow 
-			}
-			System.exit(0);
+		    // If this suceeds then the VM will exit so
+		    // the window will get disposed
+		    
+		    
+		    exit();
 	    }
 	}
 
@@ -538,6 +538,28 @@ public class OTViewer extends JFrame
 		}
 		
 		if(currentUser != null) {
+		    AbstractAction newUserDataAction = new AbstractAction(){
+		        
+		        /* (non-Javadoc)
+		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		         */
+		        public void actionPerformed(ActionEvent arg0)
+		        {
+		            if(!checkForUnsavedUserData()) {
+		                // the user canceled the operation
+		                return;
+		            }
+
+		            // call some new method for creating a new un-saved user state
+		            // this should set the currentUserFile to null, so the save check prompts
+		            // for a file name
+		            newAnonUserData();
+		        }
+		        
+		    };
+		    newUserDataAction.putValue(Action.NAME, "New");			
+		    fileMenu.add(newUserDataAction);
+
 		    AbstractAction loadUserDataAction = new AbstractAction(){
 		        
 		        /* (non-Javadoc)
@@ -545,12 +567,17 @@ public class OTViewer extends JFrame
 		         */
 		        public void actionPerformed(ActionEvent arg0)
 		        {
+		            if(!checkForUnsavedUserData()) {
+		                // the user canceled the operation
+		                return;
+		            }
+		            
 		            Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
 		            
 		            FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
-		            if(currentFile != null) {
-		                dialog.setDirectory(currentFile.getParentFile().getAbsolutePath());
-		                dialog.setFile(currentFile.getName());
+		            if(currentUserFile != null) {
+		                dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
+		                dialog.setFile(currentUserFile.getName());
 		            }
 		            dialog.show();
 		            
@@ -565,9 +592,36 @@ public class OTViewer extends JFrame
 		        }
 		        
 		    };
-		    loadUserDataAction.putValue(Action.NAME, "Open User Data...");			
+		    loadUserDataAction.putValue(Action.NAME, "Open...");			
 		    fileMenu.add(loadUserDataAction);
 		    
+		    saveUserDataAction = new AbstractAction(){
+		        
+		        /* (non-Javadoc)
+		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		         */
+		        public void actionPerformed(ActionEvent arg0)
+		        {
+		            if(currentUserFile == null || !currentUserFile.exists()){
+		                saveUserDataAsAction.actionPerformed(arg0);
+		                return;
+		            }
+		            
+		            if(currentUserFile.exists()){
+		                try {
+		                    Exporter.export(currentUserFile, stateDB.getRoot(), stateDB);
+		                    stateDB.setDirty(false);
+		                } catch(Exception e){
+		                    e.printStackTrace();
+		                }	                    	
+		            }
+		        }
+		    };
+		    saveUserDataAction.putValue(Action.NAME, "Save");			
+		    // saveAsAction.setEnabled(false);
+		    fileMenu.add(saveUserDataAction);
+		    
+		    		    
 		    saveUserDataAsAction = new AbstractAction(){
 		        
 		        /* (non-Javadoc)
@@ -577,9 +631,9 @@ public class OTViewer extends JFrame
 		        {
 		            Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
 		            FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
-		            if(currentFile != null) {
-		                dialog.setDirectory(currentFile.getParentFile().getAbsolutePath());
-		                dialog.setFile(currentFile.getName());
+		            if(currentUserFile != null) {
+		                dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
+		                dialog.setFile(currentUserFile.getName());
 		            }
 		            dialog.show();
 		            
@@ -589,21 +643,22 @@ public class OTViewer extends JFrame
 		            }
 		            
 		            fileName = dialog.getDirectory() + fileName;
-		            currentFile = new File(fileName);
+		            currentUserFile = new File(fileName);
 		            
 		            if(!fileName.toLowerCase().endsWith(".otml")){
-		                currentFile = new File(currentFile.getAbsolutePath()+".otml");
+		                currentUserFile = new File(currentUserFile.getAbsolutePath()+".otml");
 		            }
-		            if(!currentFile.exists() || checkForReplace(currentFile)){
+		            if(!currentUserFile.exists() || checkForReplace(currentUserFile)){
 		                try {
-		                    Exporter.export(currentFile, stateDB.getRoot(), stateDB);						    
+		                    Exporter.export(currentUserFile, stateDB.getRoot(), stateDB);
+		                    stateDB.setDirty(false);
 		                } catch(Exception e){
 		                    e.printStackTrace();
 		                }	                    	
 		            }				
 		        }
 		    };
-		    saveUserDataAsAction.putValue(Action.NAME, "Save User Data As...");			
+		    saveUserDataAsAction.putValue(Action.NAME, "Save As...");			
 		    // saveAsAction.setEnabled(false);
 		    fileMenu.add(saveUserDataAsAction);
 		}
@@ -619,9 +674,9 @@ public class OTViewer extends JFrame
 		            Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
 		            
 		            FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
-		            if(currentFile != null) {
-		                dialog.setDirectory(currentFile.getParentFile().getAbsolutePath());
-		                dialog.setFile(currentFile.getName());
+		            if(currentAuthoredFile != null) {
+		                dialog.setDirectory(currentAuthoredFile.getParentFile().getAbsolutePath());
+		                dialog.setFile(currentAuthoredFile.getName());
 		            }
 		            dialog.show();
 		            
@@ -636,7 +691,7 @@ public class OTViewer extends JFrame
 		        }
 		        
 		    };
-		    loadAction.putValue(Action.NAME, "Open...");			
+		    loadAction.putValue(Action.NAME, "Open Authored Content...");			
 		    fileMenu.add(loadAction);
 		    
 		    AbstractAction saveAction = new AbstractAction(){
@@ -646,14 +701,14 @@ public class OTViewer extends JFrame
 		         */
 		        public void actionPerformed(ActionEvent arg0)
 		        {
-		            if(currentFile == null){
+		            if(currentAuthoredFile == null){
 		                saveAsAction.actionPerformed(arg0);
 		                return;
 		            }
 		            
-		            if(!currentFile.exists() || checkForReplace(currentFile)){
+		            if(!currentAuthoredFile.exists() || checkForReplace(currentAuthoredFile)){
 		                try {
-		                    Exporter.export(currentFile, xmlDB.getRoot(), xmlDB);
+		                    Exporter.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
 		                } catch(Exception e){
 		                    e.printStackTrace();
 		                }	                    	
@@ -661,8 +716,8 @@ public class OTViewer extends JFrame
 		        }
 		        
 		    };
-		    saveAction.putValue(Action.NAME, "Save");			
-		    saveAction.setEnabled(false);
+		    saveAction.putValue(Action.NAME, "Save Authored Content...");			
+		    // saveAction.setEnabled(false);
 		    fileMenu.add(saveAction);
 		    
 		    saveAsAction = new AbstractAction(){
@@ -674,9 +729,9 @@ public class OTViewer extends JFrame
 		        {
 		            Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
 		            FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
-		            if(currentFile != null) {
-		                dialog.setDirectory(currentFile.getParentFile().getAbsolutePath());
-		                dialog.setFile(currentFile.getName());
+		            if(currentAuthoredFile != null) {
+		                dialog.setDirectory(currentAuthoredFile.getParentFile().getAbsolutePath());
+		                dialog.setFile(currentAuthoredFile.getName());
 		            }
 		            dialog.show();
 		            
@@ -686,14 +741,14 @@ public class OTViewer extends JFrame
 		            }
 		            
 		            fileName = dialog.getDirectory() + fileName;
-		            currentFile = new File(fileName);
+		            currentAuthoredFile = new File(fileName);
 		            
 		            if(!fileName.toLowerCase().endsWith(".otml")){
-		                currentFile = new File(currentFile.getAbsolutePath()+".otml");
+		                currentAuthoredFile = new File(currentAuthoredFile.getAbsolutePath()+".otml");
 		            }
-		            if(!currentFile.exists() || checkForReplace(currentFile)){
+		            if(!currentAuthoredFile.exists() || checkForReplace(currentAuthoredFile)){
 		                try {
-		                    Exporter.export(currentFile, xmlDB.getRoot(), xmlDB);
+		                    Exporter.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
 		                } catch(Exception e){
 		                    e.printStackTrace();
 		                }	                    	
@@ -702,7 +757,7 @@ public class OTViewer extends JFrame
 		            frame.setTitle(fileName);
 		        }
 		    };
-		    saveAsAction.putValue(Action.NAME, "Save As...");			
+		    saveAsAction.putValue(Action.NAME, "Save Authored Content As...");			
 		    // saveAsAction.setEnabled(false);
 		    fileMenu.add(saveAsAction);
 		}
@@ -755,8 +810,88 @@ public class OTViewer extends JFrame
 
     }				
 	
-	public void exit()
+	/**
+	 * Checks if the user has unsaved work.  If they do then it prompts them to 
+	 * confirm what they are doing.  If they cancel then it returns false.
+	 *   
+	 * @return
+	 */
+	public boolean checkForUnsavedUserData()
 	{
-		exitAction.actionPerformed(null);
+	    if(currentUser != null && stateDB != null)
+	    {
+	        if(stateDB.isDirty()) {
+	            // show dialog message telling them they haven't
+	            // saved their work
+	            // FIXME
+	            String options [] = {"Don't Save", "Cancel", "Save"};
+	            int chosenOption = JOptionPane.showOptionDialog(this, "Save Changes?", "Save Changes?",
+	                    JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+	                    null, options, options[2]);
+	            switch(chosenOption) {
+	            case 0:
+	                System.err.println("Not saving work");
+	                break;
+	            case 1:
+	                System.err.println("Canceling close");
+	                return false;
+	            case 2:
+	                System.err.println("Saving work");
+	                saveUserDataAction.actionPerformed(null);
+	                break;
+	            }
+	        }			        
+	    }
+	    
+	    return true;
+	}
+
+	/**
+	 * This does not check for unsaved user data
+	 *
+	 */
+	public void newAnonUserData()
+	{
+        // call some new method for creating a new un-saved user state
+        // this should set the currentUserFile to null, so the save check prompts
+        // for a file name
+		try {
+		    // need to make a brand new stateDB
+			stateDB = new XMLDatabase();
+			otrunk.setCreationDb(stateDB);
+			OTStateRoot stateRoot = (OTStateRoot)otrunk.createObject(OTStateRoot.class);
+			stateDB.setRoot(stateRoot.getGlobalId());
+			stateRoot.setFormatVersionString("1.0");		
+			stateDB.setDirty(false);
+			
+		    
+		    
+		    OTUserObject userObject = createUser("anon_single_user");
+		    setCurrentUser(userObject);
+		    
+		    currentUserFile = null;
+		    
+			reloadWindow();
+
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
+
+	}
+	public boolean exit()
+	{
+		try {
+		    if(!checkForUnsavedUserData()) {
+		        // the user canceled the operation
+		        return false;
+		    }
+		    
+			otrunk.close();
+		} catch (Exception exp) {
+			exp.printStackTrace();
+			// exit anyhow 
+		}
+		System.exit(0);
+		return true;
 	}
 }  //  @jve:decl-index=0:visual-constraint="10,10"

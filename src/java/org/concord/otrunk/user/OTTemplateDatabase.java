@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-04-26 15:41:41 $
+ * $Revision: 1.4 $
+ * $Date: 2005-05-12 15:27:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -37,10 +37,10 @@ import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceMap;
-import org.concord.otrunk.OTRelativeID;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
+import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
 
 /**
@@ -151,9 +151,16 @@ public class OTTemplateDatabase
             return userDataObject;
         }
         
-        // this object isn't in the creationDb and we haven't 
+        // this object isn't in the creationDb and we haven't accessed
+        // it before so we need to make a new one
         OTDataObject templateObject = rootDb.getOTDataObject(null, childId);
-        userDataObject = new OTUserDataObject(templateObject, this);
+        if(templateObject == null) {
+            // we are in a bad state here.  there was a request for a child
+            // object that we can't find.  Instead of making a bogus user
+            // object lets throw a runtime exception
+            throw new RuntimeException("can't find user object: " + childId);
+        }
+         userDataObject = new OTUserDataObject(templateObject, this);
 
         mappedIdCache.put(childId, userDataObject);
         userDataObjectMap.put(userDataObject.getGlobalId(), userDataObject);

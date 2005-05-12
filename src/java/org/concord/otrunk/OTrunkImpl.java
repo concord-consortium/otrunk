@@ -54,6 +54,7 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
+import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTTemplateDatabase;
 import org.concord.otrunk.user.OTUserObject;
@@ -129,43 +130,10 @@ public class OTrunkImpl implements OTrunk
      */
     public OTID getOTID(String otidStr)
     {
-        return OTrunkImpl.getOTIDFromString(otidStr);        
+        return OTIDFactory.createOTID(otidStr);        
     }
 	
-    public static OTID getOTIDFromString(String otidStr)
-    {
-        // pull off the first part of the id
-        // get the data object from that
-        // ask that data object or the database of that object
-        // to give you the id of the rest.
-        int endOfId = otidStr.indexOf('/');
-        
-        String firstPathElement = null;
-        String relativePath = null;
-        if(endOfId == -1 || endOfId == 0) {
-            firstPathElement = otidStr;
-        } else {
-            firstPathElement = otidStr.substring(0,endOfId);
-            relativePath = otidStr.substring(endOfId+1, otidStr.length());
-        }
-        OTID id = OTIDFactory.createOTID(firstPathElement);
-                
-        if(relativePath == null && id != null) {         
-            return id;
-        }
-        
-        if(id == null) {
-            if(relativePath == null) {
-                relativePath = firstPathElement;
-            } else {
-                relativePath = firstPathElement + "/" + relativePath;
-            }
-        }
-        
-        return new OTRelativeID(id, relativePath);
-    }
-    
-	/* (non-Javadoc)
+    /* (non-Javadoc)
 	 */
 	public OTObject createObject(Class objectClass)
 		throws Exception
