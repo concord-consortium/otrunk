@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-05-12 18:37:04 $
+ * $Revision: 1.8 $
+ * $Date: 2005-05-13 19:53:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -99,7 +99,6 @@ public class OTViewContainerPanel extends JPanel
 	 */
 	public void setCurrentObject(OTObject pfObject, OTFrame otFrame)
 	{
-		System.err.println("OTViewContainerPanel.setCurrentObject");
 
 		if(otFrame != null) {
 			frameManager.setFrameObject(pfObject, otFrame);

@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.18 $
- * $Date: 2005-05-12 15:27:19 $
+ * $Revision: 1.19 $
+ * $Date: 2005-05-13 19:53:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -101,8 +101,13 @@ public class OTViewer extends JFrame
 	implements TreeSelectionListener, OTFrameManager,
 		OTViewContainerListener
 {
-	private static OTrunkImpl otrunk;
+    public final static int NO_USER_MODE = 0;
+    public final static int SINGLE_USER_MODE = 1;        
+    
+    private static OTrunkImpl otrunk;
 	private static OTViewFactory otViewFactory;
+	
+	protected int userMode = 0;
 	
 	OTUserObject currentUser = null;
 	URL currentURL = null;
@@ -120,7 +125,7 @@ public class OTViewer extends JFrame
 	
 	JMenuBar menuBar;  
 	XMLDatabase xmlDB;
-	XMLDatabase stateDB;
+	XMLDatabase userDataDB;
 	File currentAuthoredFile = null;
 	File currentUserFile = null;	
 	
@@ -129,8 +134,13 @@ public class OTViewer extends JFrame
 	boolean showTree = false;
     private AbstractAction saveUserDataAsAction;
     private AbstractAction saveUserDataAction;
+    private AbstractAction debugAction;
+    private AbstractAction newUserDataAction;
+    private AbstractAction loadUserDataAction;
+    private AbstractAction loadAction;
+    private AbstractAction saveAction;
 	
-	public static void setOTViewFactory(OTViewFactory factory)
+    public static void setOTViewFactory(OTViewFactory factory)
 	{
 		OTViewContainerPanel.setOTViewFactory(factory);
 		otViewFactory = factory;
@@ -150,6 +160,11 @@ public class OTViewer extends JFrame
 		        
 		    }			
 		});
+	}
+	
+	public void setUserMode(int mode)
+	{
+	    userMode = mode;
 	}
 	
 	public void updateTreePane()
@@ -185,7 +200,6 @@ public class OTViewer extends JFrame
 	        leftComponent = folderTreeScrollPane;
 	    }
 	    
-		//	Create a split pane with the two scroll panes in it.
 		if(splitPane == null){
 		    splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 		            leftComponent, bodyPanel);
@@ -232,7 +246,9 @@ public class OTViewer extends JFrame
 	
 	public void init(String url)
 	{
-		initMenuBar();
+	    createActions();
+	    
+		updateMenuBar();
 				
 		setJMenuBar(menuBar);
 
@@ -301,12 +317,12 @@ public class OTViewer extends JFrame
 	private void loadUserDataURL(URL url)
 		throws Exception
 	{
-	    stateDB = new XMLDatabase(url);
-	    otrunk.setCreationDb(stateDB);
+	    userDataDB = new XMLDatabase(url);
+	    otrunk.setCreationDb(userDataDB);
 	    
 	    // need to set the current user to the one
 	    // defined in this file
-	    OTStateRoot stateRoot = (OTStateRoot)otrunk.getRootObject(stateDB);
+	    OTStateRoot stateRoot = (OTStateRoot)otrunk.getRootObject(userDataDB);
 
 	    OTObjectMap userMap = stateRoot.getUserMap();
 	    Vector keys = userMap.getObjectKeys();
@@ -342,12 +358,25 @@ public class OTViewer extends JFrame
 	private void reloadWindow()
 		throws Exception
 	{		
-		OTObject root = otrunk.getRoot();
-		if(currentUser != null) {
-		    root = otrunk.getUserRuntimeObject(root, currentUser);			    
-		}
+		OTObject root = null;
+		boolean overrideShowTree = false;
 		
-		if(showTree) {
+		switch(userMode){
+		case NO_USER_MODE:
+		    root = otrunk.getRoot();
+			break;
+		case SINGLE_USER_MODE:
+		    if(userDataDB == null) {
+		        // no user file has been started yet
+		        overrideShowTree = true;
+		        root = otrunk.getFirstObjectNoUserData();
+		    } else {
+		        OTObject otRoot = otrunk.getRoot();
+			    root = otrunk.getUserRuntimeObject(otRoot, currentUser);			    		        
+		    }
+		}
+
+		if(showTree && !overrideShowTree) {
 		    OTDataObject rootDataObject = otrunk.getRootDataObject();
 			dataTreeModel.setRoot(new OTDataObjectNode("root", 
 					otrunk.getRootDataObject(), otrunk));
@@ -357,14 +386,30 @@ public class OTViewer extends JFrame
 		
 		bodyPanel.setCurrentObject(root, null);
 		
-		if(showTree) {
+		if(showTree && !overrideShowTree) {
 			folderTreeModel.fireTreeStructureChanged((SimpleTreeNode)folderTreeModel.getRoot());
 			dataTreeModel.fireTreeStructureChanged((SimpleTreeNode)dataTreeModel.getRoot());
 		}
 		
 		Frame frame = (Frame)SwingUtilities.getRoot(this);
-
-		frame.setTitle(currentURL.toString());
+		
+		switch(userMode) {
+		case NO_USER_MODE:
+		    frame.setTitle("CCPortfolio: " + currentURL.toString());
+		    break;
+		case SINGLE_USER_MODE:
+			if(currentUserFile != null) {
+			    frame.setTitle("CCPortfolio: " + currentUserFile.toString());
+			} else  if(userDataDB != null){
+			    frame.setTitle("CCPortfolio: Untitled");
+			} else {
+			    frame.setTitle("CCPortfolio");
+			}
+			break;
+		}
+		
+		saveUserDataAction.setEnabled(userDataDB != null);
+		saveUserDataAsAction.setEnabled(userDataDB != null);		
 	}
 		
 	public void reload()
@@ -404,8 +449,7 @@ public class OTViewer extends JFrame
 	    			dataTreeModel.fireTreeStructureChanged((SimpleTreeNode)dataTreeModel.getRoot());
 	    		}
 	    		
-	    		initMenuBar();
-	    		stateDB.setDirty(false);
+	    		userDataDB.setDirty(false);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -436,9 +480,7 @@ public class OTViewer extends JFrame
 		public void actionPerformed(ActionEvent e) 
 		{
 		    // If this suceeds then the VM will exit so
-		    // the window will get disposed
-		    
-		    
+		    // the window will get disposed		    
 		    exit();
 	    }
 	}
@@ -521,250 +563,218 @@ public class OTViewer extends JFrame
 		otContainer.showFrame();
 	}
 	
-	/**
-	 * @return Returns the menuBar.
-	 */
-	public JMenuBar initMenuBar()
+	public void createActions()
 	{
-		/////////////////////////////////////////////////
-	    JMenu fileMenu = null;
-		if (menuBar == null){
-			menuBar = new JMenuBar();
-			fileMenu = new JMenu("File");
-			menuBar.add(fileMenu);			
-		} else {
-		    fileMenu = menuBar.getMenu(0);
-		    fileMenu.removeAll();
-		}
-		
-		if(currentUser != null) {
-		    AbstractAction newUserDataAction = new AbstractAction(){
-		        
-		        /* (non-Javadoc)
-		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		         */
-		        public void actionPerformed(ActionEvent arg0)
-		        {
-		            if(!checkForUnsavedUserData()) {
-		                // the user canceled the operation
-		                return;
-		            }
-
-		            // call some new method for creating a new un-saved user state
-		            // this should set the currentUserFile to null, so the save check prompts
-		            // for a file name
-		            newAnonUserData();
-		        }
-		        
-		    };
-		    newUserDataAction.putValue(Action.NAME, "New");			
-		    fileMenu.add(newUserDataAction);
-
-		    AbstractAction loadUserDataAction = new AbstractAction(){
-		        
-		        /* (non-Javadoc)
-		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		         */
-		        public void actionPerformed(ActionEvent arg0)
-		        {
-		            if(!checkForUnsavedUserData()) {
-		                // the user canceled the operation
-		                return;
-		            }
-		            
-		            Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		            
-		            FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
-		            if(currentUserFile != null) {
-		                dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
-		                dialog.setFile(currentUserFile.getName());
-		            }
-		            dialog.show();
-		            
-		            String fileName = dialog.getFile();
-		            if(fileName == null) {
-		                return;
-		            }
-		            
-		            fileName = dialog.getDirectory() + fileName;
-		            System.out.println("load file name: " + fileName);
-		            loadUserDataFile(new File(fileName));					
-		        }
-		        
-		    };
-		    loadUserDataAction.putValue(Action.NAME, "Open...");			
-		    fileMenu.add(loadUserDataAction);
+		newUserDataAction = new AbstractAction(){
 		    
-		    saveUserDataAction = new AbstractAction(){
-		        
-		        /* (non-Javadoc)
-		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		         */
-		        public void actionPerformed(ActionEvent arg0)
-		        {
-		            if(currentUserFile == null || !currentUserFile.exists()){
-		                saveUserDataAsAction.actionPerformed(arg0);
-		                return;
-		            }
-		            
-		            if(currentUserFile.exists()){
-		                try {
-		                    Exporter.export(currentUserFile, stateDB.getRoot(), stateDB);
-		                    stateDB.setDirty(false);
-		                } catch(Exception e){
-		                    e.printStackTrace();
-		                }	                    	
-		            }
+		    /* (non-Javadoc)
+		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		     */
+		    public void actionPerformed(ActionEvent arg0)
+		    {
+		        if(!checkForUnsavedUserData()) {
+		            // the user canceled the operation
+		            return;
 		        }
-		    };
-		    saveUserDataAction.putValue(Action.NAME, "Save");			
-		    // saveAsAction.setEnabled(false);
-		    fileMenu.add(saveUserDataAction);
+		        
+		        // call some new method for creating a new un-saved user state
+		        // this should set the currentUserFile to null, so the save check prompts
+		        // for a file name
+		        newAnonUserData();
+		    }
 		    
+		};
+		newUserDataAction.putValue(Action.NAME, "New");			
+
+		loadUserDataAction = new AbstractAction(){
+		    /* (non-Javadoc)
+		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		     */
+		    public void actionPerformed(ActionEvent arg0)
+		    {
+		        if(!checkForUnsavedUserData()) {
+		            // the user canceled the operation
+		            return;
+		        }
+		        
+		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+		        
+		        FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
+		        if(currentUserFile != null) {
+		            dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
+		            dialog.setFile(currentUserFile.getName());
+		        }
+		        dialog.show();
+		        
+		        String fileName = dialog.getFile();
+		        if(fileName == null) {
+		            return;
+		        }
+		        
+		        fileName = dialog.getDirectory() + fileName;
+		        System.out.println("load file name: " + fileName);
+		        loadUserDataFile(new File(fileName));					
+		    }
+		    
+		};
+		loadUserDataAction.putValue(Action.NAME, "Open...");			
+		    
+		saveUserDataAction = new AbstractAction(){
+		    
+		    /* (non-Javadoc)
+		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		     */
+		    public void actionPerformed(ActionEvent arg0)
+		    {
+		        if(currentUserFile == null || !currentUserFile.exists()){
+		            saveUserDataAsAction.actionPerformed(arg0);
+		            return;
+		        }
+		        
+		        if(currentUserFile.exists()){
+		            try {
+		                Exporter.export(currentUserFile, userDataDB.getRoot(), userDataDB);
+		                userDataDB.setDirty(false);
+		            } catch(Exception e){
+		                e.printStackTrace();
+		            }	                    	
+		        }
+		    }
+		};
+		saveUserDataAction.putValue(Action.NAME, "Save");					    
 		    		    
-		    saveUserDataAsAction = new AbstractAction(){
-		        
-		        /* (non-Javadoc)
-		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		         */
-		        public void actionPerformed(ActionEvent arg0)
-		        {
-		            Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		            FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
-		            if(currentUserFile != null) {
-		                dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
-		                dialog.setFile(currentUserFile.getName());
-		            }
-		            dialog.show();
-		            
-		            String fileName = dialog.getFile();
-		            if(fileName == null) {
-		                return;
-		            }
-		            
-		            fileName = dialog.getDirectory() + fileName;
-		            currentUserFile = new File(fileName);
-		            
-		            if(!fileName.toLowerCase().endsWith(".otml")){
-		                currentUserFile = new File(currentUserFile.getAbsolutePath()+".otml");
-		            }
-		            if(!currentUserFile.exists() || checkForReplace(currentUserFile)){
-		                try {
-		                    Exporter.export(currentUserFile, stateDB.getRoot(), stateDB);
-		                    stateDB.setDirty(false);
-		                } catch(Exception e){
-		                    e.printStackTrace();
-		                }	                    	
-		            }				
-		        }
-		    };
-		    saveUserDataAsAction.putValue(Action.NAME, "Save As...");			
-		    // saveAsAction.setEnabled(false);
-		    fileMenu.add(saveUserDataAsAction);
-		}
-		
-		if(Boolean.getBoolean("otrunk.view.debug")) {
-		    AbstractAction loadAction = new AbstractAction(){
-		        
-		        /* (non-Javadoc)
-		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		         */
-		        public void actionPerformed(ActionEvent arg0)
-		        {
-		            Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		            
-		            FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
-		            if(currentAuthoredFile != null) {
-		                dialog.setDirectory(currentAuthoredFile.getParentFile().getAbsolutePath());
-		                dialog.setFile(currentAuthoredFile.getName());
-		            }
-		            dialog.show();
-		            
-		            String fileName = dialog.getFile();
-		            if(fileName == null) {
-		                return;
-		            }
-		            
-		            fileName = dialog.getDirectory() + fileName;
-		            System.out.println("load file name: " + fileName);
-		            loadFile(new File(fileName));					
-		        }
-		        
-		    };
-		    loadAction.putValue(Action.NAME, "Open Authored Content...");			
-		    fileMenu.add(loadAction);
+		saveUserDataAsAction = new AbstractAction(){
 		    
-		    AbstractAction saveAction = new AbstractAction(){
+		    /* (non-Javadoc)
+		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		     */
+		    public void actionPerformed(ActionEvent arg0)
+		    {
+		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+		        FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
+		        if(currentUserFile != null) {
+		            dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
+		            dialog.setFile(currentUserFile.getName());
+		        }
+		        dialog.show();
 		        
-		        /* (non-Javadoc)
-		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		         */
-		        public void actionPerformed(ActionEvent arg0)
-		        {
-		            if(currentAuthoredFile == null){
-		                saveAsAction.actionPerformed(arg0);
-		                return;
-		            }
-		            
-		            if(!currentAuthoredFile.exists() || checkForReplace(currentAuthoredFile)){
-		                try {
-		                    Exporter.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
-		                } catch(Exception e){
-		                    e.printStackTrace();
-		                }	                    	
-		            }
+		        String fileName = dialog.getFile();
+		        if(fileName == null) {
+		            return;
 		        }
 		        
-		    };
-		    saveAction.putValue(Action.NAME, "Save Authored Content...");			
-		    // saveAction.setEnabled(false);
-		    fileMenu.add(saveAction);
-		    
-		    saveAsAction = new AbstractAction(){
+		        fileName = dialog.getDirectory() + fileName;
+		        currentUserFile = new File(fileName);
 		        
-		        /* (non-Javadoc)
-		         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-		         */
-		        public void actionPerformed(ActionEvent arg0)
-		        {
-		            Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		            FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
-		            if(currentAuthoredFile != null) {
-		                dialog.setDirectory(currentAuthoredFile.getParentFile().getAbsolutePath());
-		                dialog.setFile(currentAuthoredFile.getName());
-		            }
-		            dialog.show();
-		            
-		            String fileName = dialog.getFile();
-		            if(fileName == null) {
-		                return;
-		            }
-		            
-		            fileName = dialog.getDirectory() + fileName;
-		            currentAuthoredFile = new File(fileName);
-		            
-		            if(!fileName.toLowerCase().endsWith(".otml")){
-		                currentAuthoredFile = new File(currentAuthoredFile.getAbsolutePath()+".otml");
-		            }
-		            if(!currentAuthoredFile.exists() || checkForReplace(currentAuthoredFile)){
-		                try {
-		                    Exporter.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
-		                } catch(Exception e){
-		                    e.printStackTrace();
-		                }	                    	
-		            }
-		            
-		            frame.setTitle(fileName);
+		        if(!fileName.toLowerCase().endsWith(".otml")){
+		            currentUserFile = new File(currentUserFile.getAbsolutePath()+".otml");
 		        }
-		    };
-		    saveAsAction.putValue(Action.NAME, "Save Authored Content As...");			
-		    // saveAsAction.setEnabled(false);
-		    fileMenu.add(saveAsAction);
-		}
+		        if(!currentUserFile.exists() || checkForReplace(currentUserFile)){
+		            try {
+		                Exporter.export(currentUserFile, userDataDB.getRoot(), userDataDB);
+		                userDataDB.setDirty(false);
+		                setTitle("CCPortfolio: " + currentUserFile.toString());
+		            } catch(Exception e){
+		                e.printStackTrace();
+		            }	                    	
+		        }				
+		    }
+		};
+		saveUserDataAsAction.putValue(Action.NAME, "Save As...");
 		
-		JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem("Debug Mode");
-		debugItem.setSelected(Boolean.getBoolean("otrunk.view.debug"));
-		debugItem.addActionListener(new ActionListener(){
+		loadAction = new AbstractAction(){
+		    
+		    /* (non-Javadoc)
+		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		     */
+		    public void actionPerformed(ActionEvent arg0)
+		    {
+		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+		        
+		        FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
+		        if(currentAuthoredFile != null) {
+		            dialog.setDirectory(currentAuthoredFile.getParentFile().getAbsolutePath());
+		            dialog.setFile(currentAuthoredFile.getName());
+		        }
+		        dialog.show();
+		        
+		        String fileName = dialog.getFile();
+		        if(fileName == null) {
+		            return;
+		        }
+		        
+		        fileName = dialog.getDirectory() + fileName;
+		        System.out.println("load file name: " + fileName);
+		        loadFile(new File(fileName));					
+		    }
+		    
+		};
+		loadAction.putValue(Action.NAME, "Open Authored Content...");			
+		    
+		saveAction = new AbstractAction(){
+		    
+		    /* (non-Javadoc)
+		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		     */
+		    public void actionPerformed(ActionEvent arg0)
+		    {
+		        if(currentAuthoredFile == null){
+		            saveAsAction.actionPerformed(arg0);
+		            return;
+		        }
+		        
+		        if(!currentAuthoredFile.exists() || checkForReplace(currentAuthoredFile)){
+		            try {
+		                Exporter.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
+		            } catch(Exception e){
+		                e.printStackTrace();
+		            }	                    	
+		        }
+		    }
+		    
+		};
+		saveAction.putValue(Action.NAME, "Save Authored Content...");			
+		    
+		saveAsAction = new AbstractAction(){
+		    
+		    /* (non-Javadoc)
+		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		     */
+		    public void actionPerformed(ActionEvent arg0)
+		    {
+		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+		        FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
+		        if(currentAuthoredFile != null) {
+		            dialog.setDirectory(currentAuthoredFile.getParentFile().getAbsolutePath());
+		            dialog.setFile(currentAuthoredFile.getName());
+		        }
+		        dialog.show();
+		        
+		        String fileName = dialog.getFile();
+		        if(fileName == null) {
+		            return;
+		        }
+		        
+		        fileName = dialog.getDirectory() + fileName;
+		        currentAuthoredFile = new File(fileName);
+		        
+		        if(!fileName.toLowerCase().endsWith(".otml")){
+		            currentAuthoredFile = new File(currentAuthoredFile.getAbsolutePath()+".otml");
+		        }
+		        if(!currentAuthoredFile.exists() || checkForReplace(currentAuthoredFile)){
+		            try {
+		                Exporter.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
+		            } catch(Exception e){
+		                e.printStackTrace();
+		            }	                    	
+		        }
+		        
+		        frame.setTitle(fileName);
+		    }
+		};
+		saveAsAction.putValue(Action.NAME, "Save Authored Content As...");			
+
+		debugAction = new AbstractAction(){
 		    public void actionPerformed(ActionEvent e)
 		    {
 		        Object source = e.getSource();
@@ -778,19 +788,57 @@ public class OTViewer extends JFrame
 		        SwingUtilities.invokeLater(new Runnable(){
 		            public void run()
 		            {
-				        initMenuBar();		                
+				        updateMenuBar();		                
 		            }
 		        });
-		    }
-		});
-		fileMenu.add(debugItem);
-		
-		JMenuItem menuItem;
+		    }		
+		};
+		debugAction.putValue(Action.NAME, "Debug Mode");
 		
 		exitAction = new ExitAction();
+    
+	}
+	
+	/**
+	 * @return Returns the menuBar.
+	 */
+	public JMenuBar updateMenuBar()
+	{
+		/////////////////////////////////////////////////
+	    JMenu fileMenu = null;
+		if (menuBar == null){
+			menuBar = new JMenuBar();
+			fileMenu = new JMenu("File");
+			menuBar.add(fileMenu);			
+		} else {
+		    fileMenu = menuBar.getMenu(0);
+		    fileMenu.removeAll();
+		}
+		
+		if(userMode == SINGLE_USER_MODE) {
+		    fileMenu.add(newUserDataAction);
+
+		    fileMenu.add(loadUserDataAction);
+		    
+		    fileMenu.add(saveUserDataAction);
+		    
+		    fileMenu.add(saveUserDataAsAction);
+		}
+		
+		if(Boolean.getBoolean("otrunk.view.debug")) {
+		    fileMenu.add(loadAction);
+		    
+		    fileMenu.add(saveAction);
+		    
+		    fileMenu.add(saveAsAction);
+		}
+		
+		JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem(debugAction);
+		debugItem.setSelected(Boolean.getBoolean("otrunk.view.debug"));
+		fileMenu.add(debugItem);
+		
 		fileMenu.add(exitAction);
 		
-
 		return menuBar;
 	}
 
@@ -818,9 +866,9 @@ public class OTViewer extends JFrame
 	 */
 	public boolean checkForUnsavedUserData()
 	{
-	    if(currentUser != null && stateDB != null)
+	    if(currentUser != null && userDataDB != null)
 	    {
-	        if(stateDB.isDirty()) {
+	        if(userDataDB.isDirty()) {
 	            // show dialog message telling them they haven't
 	            // saved their work
 	            // FIXME
@@ -857,12 +905,12 @@ public class OTViewer extends JFrame
         // for a file name
 		try {
 		    // need to make a brand new stateDB
-			stateDB = new XMLDatabase();
-			otrunk.setCreationDb(stateDB);
+			userDataDB = new XMLDatabase();
+			otrunk.setCreationDb(userDataDB);
 			OTStateRoot stateRoot = (OTStateRoot)otrunk.createObject(OTStateRoot.class);
-			stateDB.setRoot(stateRoot.getGlobalId());
+			userDataDB.setRoot(stateRoot.getGlobalId());
 			stateRoot.setFormatVersionString("1.0");		
-			stateDB.setDirty(false);
+			userDataDB.setDirty(false);
 			
 		    
 		    
