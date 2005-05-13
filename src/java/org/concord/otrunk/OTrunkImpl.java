@@ -515,4 +515,18 @@ public class OTrunkImpl implements OTrunk
 	{
 		return rootDb.getRoot();
 	}
+
+    /**
+     * @return
+     */
+    public OTObject getFirstObjectNoUserData()
+    	throws Exception
+    {
+		OTObject root = getRealRoot();
+		if(!(root instanceof OTSystem)) {
+			return null;
+		}
+		
+		return ((OTSystem)root).getFirstObjectNoUserData();
+    }
 }

@@ -44,4 +44,8 @@ public interface OTSystem extends OTObject
 	OTObject getRoot();
 	
 	OTObjectList getServices();	
+	
+	OTObject getFirstObject();
+	
+	OTObject getFirstObjectNoUserData();
 }
