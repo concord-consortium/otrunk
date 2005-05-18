@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-05-12 15:27:19 $
+ * $Revision: 1.6 $
+ * $Date: 2005-05-18 21:30:12 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -89,9 +89,11 @@ public class MapTypeHandler extends ResourceTypeHandler
 		    }
 
 		    OTXMLElement valueElement = (OTXMLElement)entryChildren.get(0);
-				value = typeService.handleLiteralElement(valueElement, childRelativePath);
+		    value = typeService.handleLiteralElement(valueElement, childRelativePath);
 
-			map.put(key, value);
+		    if(value != null) {
+		        map.put(key, value);
+		    }
 		}
 
 		return map;
