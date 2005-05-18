@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-05-12 15:27:19 $
+ * $Revision: 1.8 $
+ * $Date: 2005-05-18 21:30:12 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -73,7 +73,9 @@ public class ListTypeHandler extends ResourceTypeHandler
 		        childRelativePath = relativePath + "[" + index + "]";		        
 		    }
 			Object resValue = typeService.handleLiteralElement(child, childRelativePath);
-			list.add(resValue);
+			if(resValue != null) {
+			    list.add(resValue);
+			}
 			index++;
 		}
 

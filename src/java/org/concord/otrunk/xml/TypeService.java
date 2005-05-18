@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2005-05-12 15:27:19 $
+ * $Revision: 1.16 $
+ * $Date: 2005-05-18 21:30:12 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -175,7 +175,8 @@ public class TypeService
 
 		ResourceTypeHandler handler = getElementHandler(childName);
 		if(handler == null) {			
-			throw new RuntimeException("can't find handler for: " + elementPath(child));
+			System.err.println("can't find handler for: " + elementPath(child));
+			return null;
 		}
 		String childTypeName = handler.getPrimitiveName();
 		
