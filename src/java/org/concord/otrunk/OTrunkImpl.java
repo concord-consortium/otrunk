@@ -439,14 +439,7 @@ public class OTrunkImpl implements OTrunk
 				return null;
 			}
 			
-			constructorParams[i] = null;
-			for(int j=0; j<services.size(); j++) {
-				Object service = services.get(j);
-				if(params[i].isInstance(service)) {
-					constructorParams[i] = service;
-					break;
-				}
-			}
+			constructorParams[i] = getService(params[i]);
 			
 			if(constructorParams[i] == null) {
 				System.err.println("No service could be found to handle the\n" +
@@ -467,6 +460,18 @@ public class OTrunkImpl implements OTrunk
 	    return otObject;
 	}
 
+	public Object getService(Class serviceInterface)
+	{
+		for(int j=0; j<services.size(); j++) {
+			Object service = services.get(j);
+			if(serviceInterface.isInstance(service)) {
+				return service;
+			}
+		}
+		
+		return null;
+	}
+	
 	public OTObject getUserRuntimeObject(OTObject authoredObject, OTUser user)
 		throws Exception
 	{

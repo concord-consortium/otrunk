@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.19 $
- * $Date: 2005-05-13 19:53:40 $
+ * $Revision: 1.20 $
+ * $Date: 2005-05-19 17:09:49 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -131,6 +131,8 @@ public class OTViewer extends JFrame
 	
 	Hashtable otContainers = new Hashtable();
 	
+	String startupMessage = "";
+	
 	boolean showTree = false;
     private AbstractAction saveUserDataAsAction;
     private AbstractAction saveUserDataAction;
@@ -142,7 +144,6 @@ public class OTViewer extends JFrame
 	
     public static void setOTViewFactory(OTViewFactory factory)
 	{
-		OTViewContainerPanel.setOTViewFactory(factory);
 		otViewFactory = factory;
 	}
 		
@@ -159,7 +160,7 @@ public class OTViewer extends JFrame
 		        ((OTViewer)e.getSource()).exit();
 		        
 		    }			
-		});
+		});				
 	}
 	
 	public void setUserMode(int mode)
@@ -345,11 +346,20 @@ public class OTViewer extends JFrame
 	
 	private void loadURL(URL url)
 		throws Exception
-	{
-		xmlDB = new XMLDatabase(url);
+	{	    	    
+		xmlDB = new XMLDatabase(url, System.err);
+
 		otrunk = new OTrunkImpl(xmlDB,
 				new Object [] {new SwingUserMessageHandler(this)});
 			
+		OTViewFactory myViewFactory = 
+		    (OTViewFactory)otrunk.getService(OTViewFactory.class);
+		if(myViewFactory != null) {
+		    otViewFactory = myViewFactory;
+		}
+		
+		bodyPanel.setOTViewFactory(otViewFactory);
+		
 		currentURL = url;
 
 		reloadWindow();
@@ -460,14 +470,12 @@ public class OTViewer extends JFrame
 	public static void main(String [] args)
 	{
 		OTViewer viewer = new OTViewer(true);
-		if(args.length > 0) {
-			viewer.init(args[0]);
-		} else {
-			viewer.init(null);
-		}
-		
-		
-		
+
+		if(Boolean.getBoolean("otrunk.view.single_user")) {
+			viewer.setUserMode(OTViewer.SINGLE_USER_MODE);
+		}		
+
+		viewer.initArgs(args);				
 	}
 	
 	class ExitAction extends AbstractAction
@@ -544,11 +552,12 @@ public class OTViewer extends JFrame
 		OTViewContainerPanel otContainer = (OTViewContainerPanel)otContainers.get(otFrame.getGlobalId());
 		
 		if(otContainer == null) {
-
 			JFrame jFrame = new JFrame(otFrame.getTitle());
 
 			otContainer = new OTViewContainerPanel(this, jFrame);
 
+			otContainer.setOTViewFactory(otViewFactory);
+			
 			jFrame.getContentPane().setLayout(new BorderLayout());
 
 			jFrame.getContentPane().add(otContainer, BorderLayout.CENTER);
