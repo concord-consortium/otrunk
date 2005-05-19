@@ -40,17 +40,17 @@
     </file>
     <file>
         <name>file_catalog.xml</name>
-        <rev>1.4</rev>
-        <modtime>1116452019000</modtime>
-        <size>18571</size>
-        <md5sum>9f29cf9f40d26876504d68ac41170b24</md5sum>
+        <rev>1.5</rev>
+        <modtime>1116525262000</modtime>
+        <size>19057</size>
+        <md5sum>8d96caac451993bf4d7ddc05ef68db0f</md5sum>
     </file>
     <file>
         <name>project.xml</name>
-        <rev>1.1</rev>
-        <modtime>1116525257000</modtime>
-        <size>2159</size>
-        <md5sum>bffa9855ca08bf3ddf4da103eb56c2c2</md5sum>
+        <rev>1.13</rev>
+        <modtime>1116537162000</modtime>
+        <size>2179</size>
+        <md5sum>2006184aa3f1590e48c088e76e78da4e</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/OTBasicObjectHandler.java</name>
