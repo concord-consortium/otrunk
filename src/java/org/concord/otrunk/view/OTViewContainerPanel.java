@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-05-13 19:53:40 $
+ * $Revision: 1.9 $
+ * $Date: 2005-05-19 17:09:49 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -65,7 +65,7 @@ public class OTViewContainerPanel extends JPanel
     OTObject currentObject = null;
     OTObjectView currentView = null;
     
-	private static OTViewFactory otViewFactory;
+	private OTViewFactory otViewFactory;
 	
 	protected OTFrameManager frameManager;
 
@@ -73,11 +73,6 @@ public class OTViewContainerPanel extends JPanel
 
 	Vector containerListeners = new Vector();
 	
-	public static void setOTViewFactory(OTViewFactory factory)
-	{
-		otViewFactory = factory;
-	}
-		
 	/**
 	 * 
 	 */
@@ -89,6 +84,17 @@ public class OTViewContainerPanel extends JPanel
 		add(new JLabel("Loading..."));
 	}
 
+	public void setOTViewFactory(OTViewFactory factory)
+	{
+		otViewFactory = factory;
+	}
+		
+	public void setMessage(String message)
+	{
+	    removeAll();
+	    add(new JLabel(message));
+	}
+	
 	public void showFrame()
 	{
 		myFrame.setVisible(true);

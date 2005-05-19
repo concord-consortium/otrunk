@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2005-05-12 15:27:19 $
+ * $Revision: 1.18 $
+ * $Date: 2005-05-19 17:09:49 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -36,6 +36,7 @@ package org.concord.otrunk.xml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -43,6 +44,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceCollection;
@@ -83,6 +87,8 @@ public class XMLDatabase
 	
     private OTID databaseId;
 	
+    PrintStream statusStream = null;
+    
 	public XMLDatabase()
 	{
 	    // create an empty database with no root
@@ -91,28 +97,40 @@ public class XMLDatabase
 	public XMLDatabase(File xmlFile)
 		throws Exception
 	{
-		this(new FileInputStream(xmlFile), xmlFile.toURL());
+		this(new FileInputStream(xmlFile), xmlFile.toURL(), null);
 	}
 	
 	public XMLDatabase(URL xmlURL)
 		throws Exception
 	{
-		this(xmlURL.openStream(), xmlURL);
+		this(xmlURL.openStream(), xmlURL, null);
+	}
+
+	public XMLDatabase(URL xmlURL, PrintStream statusStream)
+	throws Exception
+	{
+	    this(xmlURL.openStream(), xmlURL, statusStream);
 	}
 
 	/**
 	 * 
 	 */
-	public XMLDatabase(InputStream xmlStream, URL contextURL)
+	public XMLDatabase(InputStream xmlStream, URL contextURL, PrintStream statusStream)
 		throws Exception
 	{
+	    this.statusStream = statusStream;
+	 
 		// parse the xml file...
 		TypeService typeService = new TypeService(contextURL);
 		ObjectTypeHandler objectTypeHandler = new ObjectTypeHandler(typeService, this);
 		typeService.registerUserType("object", objectTypeHandler);
 
+		printStatus("Started Loading File...");
+		
 		JDOMDocument document = new JDOMDocument(xmlStream);
 		
+		printStatus("Finished Loading File...");
+
 		OTXMLElement rootElement = document.getRootElement();
 				
 		String dbId = rootElement.getAttributeValue("id");
@@ -164,6 +182,13 @@ public class XMLDatabase
 		
 	}
 
+	protected void printStatus(String message)
+	{
+	    if(statusStream != null) {
+	        statusStream.println(message);
+	    }
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.datamodel.OTDatabase#setRoot(org.doomdark.uuid.UUID)
 	 */
