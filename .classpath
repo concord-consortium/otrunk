@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="MAVEN_REPO/jug/jars/jug-1.1.jar"/>
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="src" path="/Framework"/>
 	<classpathentry kind="src" path="/FrameworkView"/>
-	<classpathentry kind="var" path="MAVEN_REPO/domain/jars/domain-1.0.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/jdom/jars/jdom-1.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Domain"/>
+	<classpathentry kind="lib" path="/thirdparty/jdom-1.0.jar"/>
+	<classpathentry kind="lib" path="/thirdparty/jug-1.1.2.jar"/>
 	<classpathentry kind="output" path="lib"/>
 </classpath>
