@@ -472,6 +472,38 @@ public class OTrunkImpl implements OTrunk
 		return null;
 	}
 	
+    /**
+     * This is a temporary method.  It works for files that
+     * represent a single user.  This method finds that user and registers
+     * them.  It could be modified to register all the users referenced in
+     * the passed in database and in which case it should check if the user
+     * is already registered with another database.  
+     * 
+     * @param userDataDb
+     * @throws Exception
+     */
+    public void registerUserDataDatabase(OTDatabase userDataDb)
+        throws Exception
+    {
+        OTStateRoot stateRoot = (OTStateRoot)getRootObject(userDataDb);
+
+        OTObjectMap userMap = stateRoot.getUserMap();
+        
+        // find the user from this database.
+        // this currently is the first user in the userMap
+        Vector keys = userMap.getObjectKeys();
+        OTReferenceMap refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));        
+        OTUser currentUser = refMap.getUser();
+
+        // create a template database that links this userDataDb with the rootDb
+        // and uses the refMap to store the links between the two
+        OTTemplateDatabase db = new OTTemplateDatabase(rootDb, userDataDb, refMap);          
+
+        // save this data base so getUserRuntimeObject can track down
+        // objects related to this user
+        userTemplateDatabases.put(currentUser.getUserId(), db);        
+    }
+    
 	public OTObject getUserRuntimeObject(OTObject authoredObject, OTUser user)
 		throws Exception
 	{
