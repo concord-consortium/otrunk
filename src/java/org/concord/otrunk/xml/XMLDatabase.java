@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.18 $
- * $Date: 2005-05-19 17:09:49 $
+ * $Revision: 1.19 $
+ * $Date: 2005-07-05 20:42:44 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -99,7 +100,7 @@ public class XMLDatabase
 	{
 		this(new FileInputStream(xmlFile), xmlFile.toURL(), null);
 	}
-	
+
 	public XMLDatabase(URL xmlURL)
 		throws Exception
 	{
@@ -121,10 +122,6 @@ public class XMLDatabase
 	    this.statusStream = statusStream;
 	 
 		// parse the xml file...
-		TypeService typeService = new TypeService(contextURL);
-		ObjectTypeHandler objectTypeHandler = new ObjectTypeHandler(typeService, this);
-		typeService.registerUserType("object", objectTypeHandler);
-
 		printStatus("Started Loading File...");
 		
 		JDOMDocument document = new JDOMDocument(xmlStream);
@@ -132,7 +129,32 @@ public class XMLDatabase
 		printStatus("Finished Loading File...");
 
 		OTXMLElement rootElement = document.getRootElement();
-				
+
+		String dbBase = rootElement.getAttributeValue("base");
+		if(dbBase != null && dbBase.length() > 0) {
+		    // this document has a specific base address
+		    
+		    // make sure the address ends with a slash
+		    if(!dbBase.endsWith("/")) {
+		        dbBase += "/";
+		    }
+		    
+		    // add a pseudo file to the end so the URL class treats
+		    // this as a correct contextURL: it strips off the last part
+		    // of the context url.
+		    dbBase += "pseudo.txt";
+		    try {
+		        contextURL = new URL(dbBase);
+		    } catch (MalformedURLException e) {
+		        // the base url was not formed right
+		        e.printStackTrace();
+		    }
+		}
+		
+		TypeService typeService = new TypeService(contextURL);
+		ObjectTypeHandler objectTypeHandler = new ObjectTypeHandler(typeService, this);
+		typeService.registerUserType("object", objectTypeHandler);
+
 		String dbId = rootElement.getAttributeValue("id");
 		if(dbId != null && dbId.length() > 0) {
 		    databaseId = OTIDFactory.createOTID(dbId);
