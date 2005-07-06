@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.20 $
- * $Date: 2005-05-19 17:09:49 $
+ * $Revision: 1.21 $
+ * $Date: 2005-07-06 12:38:46 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,6 +34,7 @@
 package org.concord.otrunk.view;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Frame;
@@ -84,6 +85,7 @@ import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
+import org.concord.swing.util.Util;
 import org.concord.view.SimpleTreeModel;
 import org.concord.view.SwingUserMessageHandler;
 
@@ -141,6 +143,8 @@ public class OTViewer extends JFrame
     private AbstractAction loadUserDataAction;
     private AbstractAction loadAction;
     private AbstractAction saveAction;
+    private AbstractAction exportImageAction;
+    private AbstractAction exportHiResImageAction;
 	
     public static void setOTViewFactory(OTViewFactory factory)
 	{
@@ -469,6 +473,8 @@ public class OTViewer extends JFrame
 	
 	public static void main(String [] args)
 	{
+        System.setProperty("apple.laf.useScreenMenuBar","true");
+
 		OTViewer viewer = new OTViewer(true);
 
 		if(Boolean.getBoolean("otrunk.view.single_user")) {
@@ -783,6 +789,33 @@ public class OTViewer extends JFrame
 		};
 		saveAsAction.putValue(Action.NAME, "Save Authored Content As...");			
 
+        exportImageAction = new AbstractAction(){
+            public void actionPerformed(ActionEvent e)
+            {
+                // this introduces a dependency on concord Swing project
+                // instead there needs to be a way to added these actions through
+                // the xml 
+                Component currentComp = bodyPanel.getCurrentComponent();
+                if(currentComp instanceof JScrollPane) {
+                    currentComp = ((JScrollPane)currentComp).getViewport().getView();
+                }
+                Util.makeScreenShot(currentComp);
+            }            
+        };
+        exportImageAction.putValue(Action.NAME, "Export Image...");          
+        
+        exportHiResImageAction = new AbstractAction(){
+            public void actionPerformed(ActionEvent e)
+            {
+                Component currentComp = bodyPanel.getCurrentComponent();
+                if(currentComp instanceof JScrollPane) {
+                    currentComp = ((JScrollPane)currentComp).getViewport().getView();
+                }
+                Util.makeScreenShot(currentComp, 2, 2);
+            }                        
+        };
+        exportHiResImageAction.putValue(Action.NAME, "Export Hi Res Image...");          
+        
 		debugAction = new AbstractAction(){
 		    public void actionPerformed(ActionEvent e)
 		    {
@@ -841,7 +874,13 @@ public class OTViewer extends JFrame
 		    
 		    fileMenu.add(saveAsAction);
 		}
-		
+	
+        if(Boolean.getBoolean("otrunk.view.export_image")) {
+            fileMenu.add(exportImageAction);
+            
+            fileMenu.add(exportHiResImageAction);
+        }
+        
 		JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem(debugAction);
 		debugItem.setSelected(Boolean.getBoolean("otrunk.view.debug"));
 		fileMenu.add(debugItem);
