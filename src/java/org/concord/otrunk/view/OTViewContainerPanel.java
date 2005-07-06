@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2005-05-19 17:09:49 $
+ * $Revision: 1.10 $
+ * $Date: 2005-07-06 12:38:46 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,6 +34,7 @@
 package org.concord.otrunk.view;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.LayoutManager;
 import java.util.Vector;
 
@@ -147,6 +148,11 @@ public class OTViewContainerPanel extends JPanel
 		});
 	}
 
+    public Component getCurrentComponent()
+    {
+        return getComponent(0);
+    }
+    
 	public OTObject getCurrentObject()
 	{
 	    return currentObject;
