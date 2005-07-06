@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Domain"/>
 	<classpathentry kind="lib" path="/thirdparty/jdom-1.0.jar"/>
 	<classpathentry kind="lib" path="/thirdparty/jug-1.1.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Swing"/>
 	<classpathentry kind="output" path="lib"/>
 </classpath>
