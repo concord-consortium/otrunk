@@ -45,6 +45,17 @@
       </properties>
     </dependency>
     <dependency>
+      <groupId>swing</groupId>
+      <artifactId>swing</artifactId>
+      <version>SNAPSHOT</version>
+      <type>jar</type>
+      <properties>
+        <cc.proj>Swing</cc.proj>
+        <cc.path>Swing/lib</cc.path>
+        <eclipse.dependency>true</eclipse.dependency>
+      </properties>
+    </dependency>
+    <dependency>
       <groupId>frameworkview</groupId>
       <artifactId>frameworkview</artifactId>
       <version>SNAPSHOT</version>
