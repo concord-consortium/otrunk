@@ -79,6 +79,7 @@ public class OTrunkImpl implements OTrunk
 	protected OTDatabase creationDb;
 	
 	Vector databases = new Vector();
+	Vector users = new Vector();
 	
 	public OTrunkImpl(OTDatabase db)
 	{
@@ -494,6 +495,7 @@ public class OTrunkImpl implements OTrunk
         Vector keys = userMap.getObjectKeys();
         OTReferenceMap refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));        
         OTUser currentUser = refMap.getUser();
+        users.add(currentUser);
 
         // create a template database that links this userDataDb with the rootDb
         // and uses the refMap to store the links between the two
@@ -502,6 +504,14 @@ public class OTrunkImpl implements OTrunk
         // save this data base so getUserRuntimeObject can track down
         // objects related to this user
         userTemplateDatabases.put(currentUser.getUserId(), db);        
+    }
+    
+    public Hashtable getUserTemplateDatabases() {
+    	return userTemplateDatabases;
+    }
+    
+    public Vector getUsers() {
+    	return users;
     }
     
 	public OTObject getUserRuntimeObject(OTObject authoredObject, OTUser user)
