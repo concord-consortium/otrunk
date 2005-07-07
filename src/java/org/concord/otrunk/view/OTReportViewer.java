@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2005-07-07 16:19:00 $
- * $Author: swang $
+ * $Revision: 1.2 $
+ * $Date: 2005-07-07 16:52:08 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -83,7 +83,6 @@ import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.VFTreeModel;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTTemplateDatabase;

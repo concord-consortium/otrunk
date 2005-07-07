@@ -486,6 +486,11 @@ public class OTrunkImpl implements OTrunk
     public void registerUserDataDatabase(OTDatabase userDataDb)
         throws Exception
     {
+        // add this database as one of our databases
+        if(!databases.contains(userDataDb)) {
+            databases.add(userDataDb);
+        }
+        
         OTStateRoot stateRoot = (OTStateRoot)getRootObject(userDataDb);
 
         OTObjectMap userMap = stateRoot.getUserMap();
@@ -501,6 +506,8 @@ public class OTrunkImpl implements OTrunk
         // and uses the refMap to store the links between the two
         OTTemplateDatabase db = new OTTemplateDatabase(rootDb, userDataDb, refMap);          
 
+        databases.add(db);
+        
         // save this data base so getUserRuntimeObject can track down
         // objects related to this user
         userTemplateDatabases.put(currentUser.getUserId(), db);        
