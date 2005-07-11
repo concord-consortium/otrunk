@@ -234,6 +234,26 @@ public class OTrunkImpl implements OTrunk
 		
 		OTDataObject childDataObject = parentDb.getOTDataObject(dataParent, childID);
 		
+        /*
+         * FIXME: this is a bit a of a hack
+         * it is to solve the problem caused by reports.  The report creates a 
+         * compound document with links to objects in each users database.  When
+         * the compound document resolves these links it uses itself as the
+         * dataParent.   But the compound documents database is the authored
+         * database, so it won't find the user objects. 
+         * In this case the childID will be relative.  And the rootId will 
+         * the id of the users template database.
+         */ 
+		if(childDataObject == null && childID instanceof OTRelativeID) {
+            OTID rootRelativeId = ((OTRelativeID)childID).getRootId();
+            if(rootRelativeId != null) {
+                parentDb = getOTDatabase(rootRelativeId);
+            }
+
+            childDataObject = parentDb.getOTDataObject(dataParent, childID);
+        }
+        
+        
 		return childDataObject;
 	}
 	
@@ -342,7 +362,9 @@ public class OTrunkImpl implements OTrunk
 			//hmmm we have a null data object that means the child doesn't 
 			//exist in the database.  
 			// I suppose we could throw a special "not found" exception here
-			return null;
+            // FIXME: this might break existing code that expect this to return null
+            // if it can't find the object.
+            throw new Exception("Data object is not found for: " + childID);
 		}
 
 		return getOTObject(childDataObject);
