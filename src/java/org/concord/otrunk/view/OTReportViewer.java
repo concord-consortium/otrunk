@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-07-07 16:52:08 $
- * $Author: scytacki $
+ * $Revision: 1.3 $
+ * $Date: 2005-07-11 16:21:16 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -38,13 +38,12 @@ import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -53,13 +52,9 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -69,23 +64,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTUser;
-import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTStateRoot;
+import org.concord.otrunk.OTUserListService;
 import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.datamodel.OTDataObject;
-import org.concord.otrunk.user.OTReferenceMap;
-import org.concord.otrunk.user.OTTemplateDatabase;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -109,9 +98,12 @@ public class OTReportViewer extends JFrame
     public final static int NO_USER_MODE = 0;
     public final static int SINGLE_USER_MODE = 1;        
     public final static int MULTIPLE_USER_MODE = 2;
+    public final static String VIEW_REPORT_PROPERTY = "otrunk.view.multiple_user_report";
     
     private static OTrunkImpl otrunk;
 	private static OTViewFactory otViewFactory;
+	
+	Properties p;
 	
 	protected int userMode = 2;
 	
@@ -121,9 +113,11 @@ public class OTReportViewer extends JFrame
 	 * users in the otml file
 	 */
 	private Vector users = new Vector();
-	private URL usersURL = null;
+	private OTUserListService userList = new OTUserListService();
 	private File usersDirectory;
 	private int numberOfUsers;
+	private String reportNodeString = "Reports";
+	private String rootNodeName;
 	
 	JTree rootTree = new JTree();
 	
@@ -179,6 +173,8 @@ public class OTReportViewer extends JFrame
 		        
 		    }			
 		});				
+		
+		p = new Properties(System.getProperties());
 	}
 	
 	public void setUserMode(int mode)
@@ -189,79 +185,53 @@ public class OTReportViewer extends JFrame
 	public void updateTreePane()
 	{
 		if(userMode == MULTIPLE_USER_MODE) {
+			OTObject root = null;
 			VirtualFolder vFolder = new VirtualFolder();
+			vFolder.setName(rootNodeName);
+			
+			VirtualFolder userReports = new VirtualFolder();
 			
 			VirtualFolder userRoots = new VirtualFolder();
-			userRoots.setName("User Roots");
-			//System.out.println("start update tree pane: " + numberOfUsers);
+			
+			userRoots.setName("Users");
+			
 			if(numberOfUsers > 0) {
-				Vector users = otrunk.getUsers();
+				users = otrunk.getUsers();
+				try {
+					root = otrunk.getRoot();
+				} catch (Exception exp) {
+					exp.printStackTrace();
+				}
 				for(int i = 0; i < numberOfUsers; i++) {
 					try {
-						OTObject root = otrunk.getRoot();
+						//root = otrunk.getRoot();
 						OTUser userObject = (OTUser) users.elementAt(i);
-						System.out.println("user " + i + ": " + userObject.getName());
+						//System.out.println("user " + i + ": " + userObject.getName());
 						
 					    OTObject userPfObject = 
 					    	otrunk.getUserRuntimeObject(root, userObject);
+					    
 						userRoots.addVirtualChild(userPfObject);
+						
 					} catch(Exception exp) {
 						exp.printStackTrace();
 					}
 
 				}
-				//System.out.println("userroots: " + userRoots.getChildCount());
+				userReports.addVirtualChild(root);
+				userReports.setName(reportNodeString);
+				vFolder.addVirtualChild(userReports);
+
 				vFolder.addVirtualChild(userRoots);
-				//System.out.println("vFolder: " + vFolder.getChildCount());
-				vFolder.setName("System");
 				OTFolderNode folderNode = new OTFolderNode(vFolder);
-				//System.out.println("OTFolderNode: " + folderNode.getChildCount());
+				//OTFolderNode folderNode = new OTFolderNode(userRoots);
 				folderTreeModel.setRoot(folderNode);
-				//System.out.println("folder tree model root: " + folderTreeModel.getRoot());
 				folderTreeArea = new JTree(folderTreeModel);
 		        folderTreeArea.setEditable(true);
 		        folderTreeArea.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		        folderTreeArea.addTreeSelectionListener(this);
-				//System.out.println("folder tree area: " + folderTreeArea.getRowCount());
-
-				/*Hashtable usersHT = otrunk.getUserTemplateDatabases();
-				Enumeration userNames = usersHT.keys();
-				//folderTreeArea.removeAll();
-				try {
-					while(userNames.hasMoreElements()) {
-						OTObject root = otrunk.getRoot();
-						OTTemplateDatabase tempDB = 
-							(OTTemplateDatabase) usersHT.get(userNames.nextElement());
-						System.out.println(tempDB.toString());
-						
-						OTStateRoot stateRoot = 
-							(OTStateRoot)otrunk.getRootObject(tempDB);
-						System.out.println(stateRoot.toString());
-						
-					    OTObjectMap userMap = stateRoot.getUserMap();
-					    Vector keys = userMap.getObjectKeys();
-					    OTReferenceMap refMap = 
-					    	(OTReferenceMap)userMap.getObject((String)keys.get(0));
-					    
-					    OTUserObject userObject = refMap.getUser();
-					    OTObject userPfObject = 
-					    	otrunk.getUserRuntimeObject(root, userObject);
-					    tempDB.close();
-
-						userRoots.addVirtualChild(userPfObject);
-						System.out.println("             " + userObject.getName());
-					}
-					vFolder.addVirtualChild(userRoots);
-					vFolder.setName("System");
-					OTFolderNode folderNode = new OTFolderNode(vFolder);
-					folderTreeModel.setRoot(folderNode);
-					folderTreeArea = new JTree(folderTreeModel);
-				} catch (Exception exp) {
-					exp.printStackTrace();
-				}
-				*/
-
-			}	
+			}
+			
 			JScrollPane folderTreeScrollPane = new JScrollPane(folderTreeArea);
 			
 			if(splitPane == null){
@@ -442,10 +412,11 @@ public class OTReportViewer extends JFrame
 	private void loadURL(URL url)
 		throws Exception
 	{
+		
 		xmlDB = new XMLDatabase(url, System.err);
 
 		otrunk = new OTrunkImpl(xmlDB,
-				new Object [] {new SwingUserMessageHandler(this)});
+				new Object [] {new SwingUserMessageHandler(this), userList});
 			
 		OTViewFactory myViewFactory = 
 		    (OTViewFactory)otrunk.getService(OTViewFactory.class);
@@ -481,6 +452,8 @@ public class OTReportViewer extends JFrame
 			break;
 		case MULTIPLE_USER_MODE:
 			root = otrunk.getRoot();
+			userList.setUserList(otrunk.getUsers());
+
 		    /*if(userDataDB == null) {
 		        // no user file has been started yet
 		        overrideShowTree = true;
@@ -636,20 +609,28 @@ public class OTReportViewer extends JFrame
 	/* (non-Javadoc)
 	 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
 	 */
-	public void valueChanged(TreeSelectionEvent event) 
-	{	
-		//System.out.print("selection changed to ");
+	public void valueChanged(TreeSelectionEvent event) {	
 		if (event.getSource() == folderTreeArea) {
-			if(folderTreeArea.getSelectionRows()[0] < 2) return;
-			OTFolderNode node = (OTFolderNode)
-			folderTreeArea.getLastSelectedPathComponent();
-			//System.out.println(node.getChildCount());
+			if(folderTreeArea.getSelectionPath() == null) return;
+			//if(folderTreeArea.getSelectionRows()[0] < 3) return;
+			OTFolderNode node = 
+				(OTFolderNode)folderTreeArea.getLastSelectedPathComponent();
 
 			if (node == null) return;
 
 			OTObject pfObject = node.getPfObject();
-			System.out.println("pfObject " + pfObject.getName());
+			if(!(pfObject instanceof OTObject)) return;
 
+			//System.out.println("pfObject " + pfObject.getName());
+			if(folderTreeArea.getSelectionPath().getParentPath().toString().indexOf(reportNodeString) != -1) {
+				p.setProperty(VIEW_REPORT_PROPERTY, "true");
+				System.setProperties(p);
+				//bodyPanel.setCurrentObject(users, null);
+				//bodyPanel.setCurrentObject(pfObject, null);
+			} else {
+				p.setProperty(VIEW_REPORT_PROPERTY, "false");
+				System.setProperties(p);
+			}
 			bodyPanel.setCurrentObject(pfObject, null);
 			
 			if(splitPane.getRightComponent() != bodyPanel){
@@ -744,6 +725,7 @@ public class OTReportViewer extends JFrame
 			            if(usersDirectory == null) return;
 			            
 			            File[] files = usersDirectory.listFiles();
+			            rootNodeName = usersDirectory.getPath();
 		            	//System.out.println("files in the directory:");
 		            	numberOfUsers = 0;
 			            for(int i = 0; i < files.length; i++) {
