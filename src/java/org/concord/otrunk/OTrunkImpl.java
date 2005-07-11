@@ -57,6 +57,7 @@ import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTTemplateDatabase;
+import org.concord.otrunk.user.OTUserDataObject;
 import org.concord.otrunk.user.OTUserObject;
 
 /**
@@ -541,6 +542,26 @@ public class OTrunkImpl implements OTrunk
     
     public Vector getUsers() {
     	return users;
+    }
+    
+    public boolean hasUserModified(OTObject authoredObject, OTUser user) throws Exception
+    {
+        OTID authoredId = authoredObject.getGlobalId();
+        OTID userId = user.getUserId();
+        OTTemplateDatabase db = (OTTemplateDatabase)userTemplateDatabases.get(userId);
+        
+        if(db == null) {
+            // FIXME this should throw an exception
+            return false;
+        } 
+
+        OTDataObject userDataObject = db.getOTDataObject(null, authoredId);
+
+        if(userDataObject instanceof OTUserDataObject) {
+            OTDataObject userModifications = ((OTUserDataObject)userDataObject).getExistingUserObject();
+            return  userModifications != null;
+        }
+        return false;
     }
     
 	public OTObject getUserRuntimeObject(OTObject authoredObject, OTUser user)
