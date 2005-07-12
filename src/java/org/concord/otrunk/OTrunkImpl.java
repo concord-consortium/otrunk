@@ -75,7 +75,7 @@ public class OTrunkImpl implements OTrunk
 	protected Hashtable userDataObjects = new Hashtable();
 	protected WeakHashMap objectWrappers = new WeakHashMap();
 	protected Vector services = null;
-	
+
 	protected OTDatabase rootDb;
 	protected OTDatabase creationDb;
 	
@@ -506,7 +506,7 @@ public class OTrunkImpl implements OTrunk
      * @param userDataDb
      * @throws Exception
      */
-    public void registerUserDataDatabase(OTDatabase userDataDb)
+    public void registerUserDataDatabase(OTDatabase userDataDb, String name)
         throws Exception
     {
         // add this database as one of our databases
@@ -523,7 +523,9 @@ public class OTrunkImpl implements OTrunk
         Vector keys = userMap.getObjectKeys();
         OTReferenceMap refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));        
         OTUser currentUser = refMap.getUser();
-        users.add(currentUser);
+        OTUserObject aUser = (OTUserObject)currentUser;
+        aUser.setName(name);
+        users.add(aUser);
 
         // create a template database that links this userDataDb with the rootDb
         // and uses the refMap to store the links between the two
