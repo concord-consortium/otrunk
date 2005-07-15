@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-05-12 15:27:19 $
+ * $Revision: 1.4 $
+ * $Date: 2005-07-15 20:26:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -199,27 +199,44 @@ public class OTUserDataObject
 	    // get the existing user object or create a new one
 	    OTDataObject userObject = getUserObject();
 
-	    // handle the case where a user object is being
-	    // set as a resource on a user object.  In this case
-	    // we want to save the authored object id.  
-	    // If we don't do this then we save a temporary id that came
-	    // from our TemplateDatabase	    
-	    if(resource instanceof OTRelativeID) {
-	        OTRelativeID relID = (OTRelativeID)resource;
-	        // This should probably be a special kind of relative
-	        // id, so we don't have to reprocess the string
-	        if(database.getDatabaseId().equals(relID.getRootId())) {
-	            // This is an id that came from our database
-	            // so get the relative id which is either an id in the
-	            // authored database or an id of a brand new object in
-	            // the user database
-	            resource = relID.getRelativeId();
-	        }
-	    }
-	    
+        resource = resolveIDResource(resource);
+        	    
 		userObject.setResource(key, resource);
 	}
 	
+    /**
+     * This method is to handle the case where a resource is an
+     * id.  Some of the passed in ids will be from our template
+     * database.  So they are really just temporary ids.  These ids are
+     * relative ids, where the root is the id of the template db and
+     * the relative part is the id of the original object
+     * 
+     * We want to store the id of the original object.  So this method
+     * should be called on any resource that could be an id.
+     * 
+     * If this isn't working properly then an id will be stored that 
+     * doesn't exist. 
+     * 
+     * @param resource
+     * @return
+     */
+    public Object resolveIDResource(Object resource)
+    {
+        if(resource instanceof OTRelativeID) {
+            OTRelativeID relID = (OTRelativeID)resource;
+            if(database.getDatabaseId().equals(relID.getRootId())) {
+                // This is an id that came from our database
+                // so get the relative part of the id which is 
+                // either an id in the
+                // authored database or an id of a brand new object in
+                // the user database
+                return relID.getRelativeId();
+            }
+        }
+        
+        return resource;
+    }
+    
 	public OTResourceCollection getResourceCollection(String key, Class collectionClass)
 	{
 	    OTResourceCollection collection = 

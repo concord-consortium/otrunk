@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-04-24 15:49:47 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-07-15 20:26:19 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -84,6 +84,7 @@ final class OTUserResourceList
 	
 	public void set(int index, Object object)
 	{
+        object = parent.resolveIDResource(object);
 	    getUserList().set(index, object);
 	}
 
@@ -92,6 +93,7 @@ final class OTUserResourceList
 	 */
 	public void add(int index, Object object)
 	{
+        object = parent.resolveIDResource(object);
 	    getUserList().add(index, object);
 	}
 
@@ -100,6 +102,7 @@ final class OTUserResourceList
 	 */
 	public void add(Object object)
 	{
+        object = parent.resolveIDResource(object);
 	    getUserList().add(object);
 	}
 
@@ -163,6 +166,7 @@ final class OTUserResourceList
 	 */
 	public void remove(Object obj)
 	{
+        obj = parent.resolveIDResource(obj);
 	    getUserList().remove(obj);
 	}				
 }

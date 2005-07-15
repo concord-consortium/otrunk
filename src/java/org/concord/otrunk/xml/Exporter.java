@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2005-04-26 15:41:41 $
+ * $Revision: 1.11 $
+ * $Date: 2005-07-15 20:26:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -130,8 +130,7 @@ public class Exporter
 		if(item instanceof OTID) {
 			// this is an object reference
 			// recurse
-			OTDataObject childObject = otDb.getOTDataObject(parentDataObj, (OTID)item);
-			exportObject(output, childObject, indent);
+            exportID(output, parentDataObj, (OTID)item, indent);
 		} else if(item instanceof OTResourceList  ||
 				item instanceof OTResourceMap) {
 			System.err.println("nested collections are illegal");
@@ -165,6 +164,25 @@ public class Exporter
 		}
 	}
 
+    public static void exportID(PrintStream output, OTDataObject parent, 
+            OTID id, int indent)
+    throws Exception
+    {
+        OTDataObject childObject = otDb.getOTDataObject(parent, id);
+        if(childObject == null) {
+            // our db doesn't contain this object
+            // so write out a reference to it and hope that we can find 
+            // it when we are loaded in.  
+            // FIXME: This should be a little more careful.  The list of
+            // databases we require should be saved.  So then we can check
+            // if this external object will be resolvable on loading.
+            indentPrint(indent, 
+                    "<object" + " refid=\"" + id + "\"/>", output);
+        } else {
+            exportObject(output, childObject, indent);
+        }
+    }
+    
 	public static void exportObject(PrintStream output, OTDataObject dataObj, int indent)
 	throws Exception
 	{
@@ -225,15 +243,7 @@ public class Exporter
 				// this is an object reference
 				// recurse
 			    output.println();
-				OTDataObject childObject = otDb.getOTDataObject(dataObj, (OTID)resource);
-				if(childObject == null) {
-				    // our db doesn't contain this object
-				    System.err.println("XMLExport: main db doesn't contain: " + resource);
-					indentPrint(resourceIndent+1, 
-							"<object" + " refid=\"" + resource + "\"/>", output);
-				} else {
-				    exportObject(output, childObject, resourceIndent+1);
-				}
+                exportID(output, dataObj, (OTID)resource, resourceIndent+1);
 				printIndent(resourceIndent, output);
 			} else if(resource instanceof OTResourceList) {
 			    output.println();

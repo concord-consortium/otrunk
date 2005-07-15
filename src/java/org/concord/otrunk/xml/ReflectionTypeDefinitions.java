@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2005-04-11 23:27:42 $
+ * $Revision: 1.12 $
+ * $Date: 2005-07-15 20:26:19 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -75,7 +75,7 @@ public class ReflectionTypeDefinitions
 		        typeClasses.add(typeClass);
 		    } catch (Exception e) {
 		        System.err.println("Error importing class: " + className);
-		        e.printStackTrace();
+                System.err.println("  this class was listed as an import in the otml file");
 		    }
 		}		
 		
