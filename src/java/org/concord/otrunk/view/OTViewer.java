@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2005-07-06 12:38:46 $
- * $Author: scytacki $
+ * $Revision: 1.22 $
+ * $Date: 2005-07-15 18:24:04 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -45,6 +45,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -79,6 +80,7 @@ import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTStateRoot;
+import org.concord.otrunk.OTUserListService;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.user.OTReferenceMap;
@@ -105,11 +107,18 @@ public class OTViewer extends JFrame
 {
     public final static int NO_USER_MODE = 0;
     public final static int SINGLE_USER_MODE = 1;        
+    public final static int MULTIPLE_USER_MODE = 2;
     
     private static OTrunkImpl otrunk;
 	private static OTViewFactory otViewFactory;
 	
 	protected int userMode = 0;
+	
+	/**
+	 * users in the otml file
+	 */
+	private HashMap users = new HashMap();
+	private URL usersURL = null;
 	
 	OTUserObject currentUser = null;
 	URL currentURL = null;
@@ -354,7 +363,7 @@ public class OTViewer extends JFrame
 		xmlDB = new XMLDatabase(url, System.err);
 
 		otrunk = new OTrunkImpl(xmlDB,
-				new Object [] {new SwingUserMessageHandler(this)});
+				new Object [] {new SwingUserMessageHandler(this), new OTUserListService()});
 			
 		OTViewFactory myViewFactory = 
 		    (OTViewFactory)otrunk.getService(OTViewFactory.class);
