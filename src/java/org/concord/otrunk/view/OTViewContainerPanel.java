@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2005-07-06 12:38:46 $
- * $Author: scytacki $
+ * $Revision: 1.11 $
+ * $Date: 2005-07-18 22:24:04 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -35,7 +35,13 @@ package org.concord.otrunk.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.LayoutManager;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Enumeration;
+import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.JComponent;
@@ -49,6 +55,7 @@ import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
+import org.concord.swing.util.ComponentScreenshot;
 
 
 /**
@@ -148,6 +155,49 @@ public class OTViewContainerPanel extends JPanel
 		});
 	}
 
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.view.OTViewContainer#setCurrentObject(org.concord.framework.otrunk.OTObject, org.concord.otrunk.view.OTFrame)
+	 */
+	/*public void setCurrentObject(Vector users, OTFrame otFrame)
+	{
+		if(users == null || users.size() == 0) return;
+		
+		if(currentView != null) {
+		    currentView.viewClosed();
+		}
+
+		currentObject = pfObject;
+
+		removeAll();
+		add(new JLabel("Loading..."));
+		revalidate();		
+		
+		SwingUtilities.invokeLater(new Runnable(){
+		    public void run()
+		    {
+				JComponent newComponent = null;
+				if(currentObject != null) {
+				    currentView = otViewFactory.getObjectView(currentObject, OTViewContainerPanel.this);
+				    if(currentView == null) {
+				        newComponent = new JLabel("No view for object: " + currentObject);
+						
+
+				    } else {
+				        newComponent = currentView.getComponent(true);
+				    }
+				} else {
+					newComponent = new JLabel("Null object");
+				}
+
+				removeAll();
+				add(newComponent, BorderLayout.CENTER);
+				revalidate();
+				notifyListeners();
+				newComponent.requestFocus();		        
+		    }
+		});
+	}*/
+
     public Component getCurrentComponent()
     {
         return getComponent(0);
@@ -184,5 +234,32 @@ public class OTViewContainerPanel extends JPanel
 	        	currentObjectChanged(this);
 	        	
 	    }
+	}
+
+	public String saveImage(JComponent comp, float scaleX, float scaleY, File folder, OTObject otObject) {
+		// TODO Auto-generated method stub
+        try{
+        	String seperator = System.getProperty("file.separator");
+        	        	
+        	String id = otObject.getGlobalId().toString();
+        	id = id.replaceAll("/", "_");
+        	id = id.replaceAll("!", "") + ".png";
+        	
+        	if(!folder.isDirectory()) return null;
+        	
+        	File newFile = new File(folder.getAbsoluteFile().toString() + seperator + id);
+
+        	BufferedImage bim = 
+        		ComponentScreenshot.makeComponentImageAlpha(comp, scaleX, scaleY);
+        	ComponentScreenshot.saveImageAsFile(bim, newFile, "png");
+        	
+            String relativePath = folder + "/" + newFile.getName();
+            
+            return relativePath;
+            
+        }catch(Throwable t){
+        	t.printStackTrace();
+        }
+		return null;
 	}
 }
