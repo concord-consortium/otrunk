@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-05-12 15:27:19 $
- * $Author: scytacki $
+ * $Revision: 1.5 $
+ * $Date: 2005-07-19 14:48:48 $
+ * $Author: eburke $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -42,7 +42,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
-import org.concord.domain.Transfer;
+import org.concord.loader.util.Transfer;
 
 
 /**
