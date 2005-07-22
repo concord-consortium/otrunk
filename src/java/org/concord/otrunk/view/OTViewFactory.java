@@ -30,10 +30,15 @@
  */
 package org.concord.otrunk.view;
 
+import java.util.Vector;
+
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTObjectView;
+import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 
 /**
@@ -42,9 +47,113 @@ import org.concord.framework.otrunk.view.OTViewContainer;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public interface OTViewFactory {
-	public JComponent getComponent(OTObject pfObject, 
-			OTViewContainer container, boolean editable);
-	
-	public OTObjectView getObjectView(OTObject otObject, OTViewContainer container);
+public class OTViewFactory 
+{
+    OTrunk otrunk;
+    OTViewFactory parent;
+    Vector viewMap = new Vector();
+    Vector userList = new Vector();
+        
+    public OTViewFactory(OTrunk otrunk)
+    {
+        this.otrunk = otrunk;
+    }
+    
+    public OTViewFactory(OTViewFactory parent)
+    {
+        this.parent = parent;
+        this.otrunk = parent.otrunk;
+    }
+    
+    class ViewEntry {
+        Class objectClass;
+        Class viewClass;
+    }
+        
+    /* (non-Javadoc)
+     * @see org.concord.otrunk.view.OTViewFactory#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, boolean)
+     */
+    public JComponent getComponent(OTObject pfObject,
+            OTViewContainer container, boolean editable)
+    {
+        OTObjectView view = 
+            getObjectView(pfObject, container);
+        
+        if(view == null) {
+            return new JLabel("No view for object: " + pfObject);
+        }
+        
+        return view.getComponent(editable);
+    }
+
+    public OTView getView(OTObject otObject, Class viewInterface)
+    {
+        OTView view = getViewInteral(otObject, viewInterface);
+                
+        if(view != null) { 
+            if(view instanceof OTMultiUserView && 
+                    userList != null) {
+                ((OTMultiUserView)view).setUserList(otrunk, userList);                
+            }
+            
+            if(view instanceof OTViewFactoryAware) {
+                ((OTViewFactoryAware)view).setViewFactory(this);
+            }
+        }
+        
+        return view;
+    }
+    
+    private OTView getViewInteral(OTObject otObject, Class viewInterface)
+    {
+        OTView view = null;
+        for(int i=0; i<viewMap.size(); i++) {
+            ViewEntry entry = (ViewEntry)viewMap.get(i);
+            if(entry.objectClass.isInstance(otObject) &&
+                    viewInterface.isAssignableFrom(entry.viewClass)) {
+                try {
+                    view = (OTView)entry.viewClass.newInstance();
+                    break;
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // can't find the view in our own list
+        // check parent
+        if(view == null && parent != null) {
+            view = parent.getViewInteral(otObject, viewInterface);
+        }
+        
+        return view;        
+    }
+    
+    /* (non-Javadoc)
+     * @see org.concord.otrunk.view.OTViewFactory#getObjectView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer)
+     */
+    public OTObjectView getObjectView(OTObject otObject,
+            OTViewContainer container)
+    {
+        OTObjectView view = (OTObjectView)getView(otObject, OTObjectView.class);
+        
+        if(view == null) {
+            return null;
+        }
+        
+        view.initialize(otObject, container);
+        
+        return view;
+    }
+    
+    public void addViewEntry(Class objectClass, Class viewClass)
+    {
+        ViewEntry internalEntry = new ViewEntry();
+        internalEntry.objectClass = objectClass;
+        internalEntry.viewClass = viewClass;
+        viewMap.add(internalEntry);
+    }
+    
 }
