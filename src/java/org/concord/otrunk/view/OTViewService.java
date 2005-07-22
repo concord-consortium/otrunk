@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-05-19 17:18:40 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-07-22 16:20:38 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -41,10 +41,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.concord.framework.otrunk.DefaultOTObject;
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.view.OTObjectView;
+import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 
 /**
@@ -57,7 +59,6 @@ import org.concord.framework.otrunk.view.OTViewContainer;
  *
  */
 public class OTViewService extends DefaultOTObject
-    implements OTViewFactory
 {
     public static interface ResourceSchema extends OTResourceSchema {
         public OTObjectList getViewEntries();
@@ -65,63 +66,16 @@ public class OTViewService extends DefaultOTObject
     
     ResourceSchema resources;
     
-    Vector viewMap = new Vector();
-    
     public OTViewService(ResourceSchema resources)
     {
         super(resources);
         this.resources = resources;
     }
-    
-    /* (non-Javadoc)
-     * @see org.concord.otrunk.view.OTViewFactory#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, boolean)
-     */
-    public JComponent getComponent(OTObject pfObject,
-            OTViewContainer container, boolean editable)
-    {
-		OTObjectView view = 
-		    getObjectView(pfObject, container);
-		
-		if(view == null) {
-			return new JLabel("No view for object: " + pfObject);
-		}
-		
-		return view.getComponent(editable);
-    }
 
-    /* (non-Javadoc)
-     * @see org.concord.otrunk.view.OTViewFactory#getObjectView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer)
-     */
-    public OTObjectView getObjectView(OTObject otObject,
-            OTViewContainer container)
+    public OTViewFactory getViewFactory()
     {
-        for(int i=0; i<viewMap.size(); i++) {
-            ViewEntry entry = (ViewEntry)viewMap.get(i);
-            if(entry.objectClass.isInstance(otObject)) {
-                try {
-                    OTObjectView view = (OTObjectView)entry.viewClass.newInstance();
-
-                    view.initialize(otObject, container);
-                    
-                    return view;
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return null;
-    }
-    
-    class ViewEntry {
-        Class objectClass;
-        Class viewClass;
-    }
-    
-    public void init()
-    {
+        OTViewFactory factory = new OTViewFactory(getOTDatabase());
+        
         // read in all the viewEntries and create a vector 
         // of class entries.
         OTObjectList viewEntries = resources.getViewEntries();
@@ -133,10 +87,10 @@ public class OTViewService extends DefaultOTObject
             String viewClassStr = entry.getViewClass();
             
             try {
-                ViewEntry internalEntry = new ViewEntry();
-                internalEntry.objectClass = loader.loadClass(objClassStr);
-                internalEntry.viewClass = loader.loadClass(viewClassStr);
-                viewMap.add(internalEntry);
+                Class objectClass = loader.loadClass(objClassStr);
+                Class viewClass = loader.loadClass(viewClassStr);
+                factory.addViewEntry(objectClass, viewClass);
+                
             } catch (ClassNotFoundException e) {
                 System.err.println("Can't find view: " + viewClassStr + 
                         " for object: " + objClassStr);
@@ -144,6 +98,7 @@ public class OTViewService extends DefaultOTObject
             }
         }
         
+        return factory;
     }
 
 }

@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.22 $
- * $Date: 2005-07-15 18:24:04 $
- * $Author: swang $
+ * $Revision: 1.23 $
+ * $Date: 2005-07-22 16:20:35 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -365,8 +365,14 @@ public class OTViewer extends JFrame
 		otrunk = new OTrunkImpl(xmlDB,
 				new Object [] {new SwingUserMessageHandler(this), new OTUserListService()});
 			
-		OTViewFactory myViewFactory = 
-		    (OTViewFactory)otrunk.getService(OTViewFactory.class);
+		OTViewService viewService = 
+		    (OTViewService)otrunk.getService(OTViewService.class);
+        
+        OTViewFactory myViewFactory = null;
+        if(viewService != null) {
+            myViewFactory = viewService.getViewFactory();
+        }
+
 		if(myViewFactory != null) {
 		    otViewFactory = myViewFactory;
 		}
