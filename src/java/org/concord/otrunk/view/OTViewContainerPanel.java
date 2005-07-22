@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2005-07-20 16:30:32 $
+ * $Revision: 1.13 $
+ * $Date: 2005-07-22 16:50:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -212,10 +212,9 @@ public class OTViewContainerPanel extends JPanel
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.view.OTViewContainer#getComponent(org.concord.framework.otrunk.OTObject, org.concord.otrunk.view.OTViewContainer, boolean)
 	 */
-	public JComponent getComponent(OTObject pfObject,
-			OTViewContainer container, boolean editable)
+	public JComponent getComponent(OTObject pfObject, boolean editable)
 	{
-	    return otViewFactory.getComponent(pfObject, container, editable);
+	    return otViewFactory.getComponent(pfObject, this, editable);
 	}
 
 	public void addViewContainerListener(OTViewContainerListener listener)
