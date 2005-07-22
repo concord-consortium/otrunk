@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-05-12 15:27:19 $
- * $Author: scytacki $
+ * $Revision: 1.5 $
+ * $Date: 2005-07-22 14:00:40 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -72,7 +72,7 @@ public class OTTemplateDatabase
 	    databaseId = OTUUID.createOTUUID();
 	}
 	
-	OTID getDatabaseId()
+	public OTID getDatabaseId()
 	{
 	    return databaseId;
 	}
@@ -129,13 +129,20 @@ public class OTTemplateDatabase
     public OTDataObject getOTDataObject(OTDataObject dataParent, OTID childId)
             throws Exception
     {
+    	if(childId instanceof OTRelativeID) {
+    		OTID childRootId = ((OTRelativeID)childId).getRootId();
+    		if(childRootId.equals(getDatabaseId()))
+    			childId = ((OTRelativeID)childId).getRelativeId();
+    	}
         OTUserDataObject userDataObject = (OTUserDataObject)userDataObjectMap.get(childId);
         if(userDataObject != null) {
+        	//System.out.println("v1. " + userDataObject.getGlobalId());
             return userDataObject;
         }
         
         userDataObject = (OTUserDataObject)mappedIdCache.get(childId);
         if(userDataObject != null) {
+        	//System.out.println("v2. " + userDataObject.getGlobalId());
             return userDataObject;
         }
         
@@ -148,6 +155,7 @@ public class OTTemplateDatabase
             userDataObject = new OTUserDataObject(null, this);
             OTDataObject childObject = stateDb.getOTDataObject(null, childId);
             userDataObject.setStateObject(childObject);
+        	//System.out.println("v3. " + userDataObject.getGlobalId());
             return userDataObject;
         }
         
@@ -158,7 +166,9 @@ public class OTTemplateDatabase
             // we are in a bad state here.  there was a request for a child
             // object that we can't find.  Instead of making a bogus user
             // object lets throw a runtime exception
-            throw new RuntimeException("can't find user object: " + childId);
+        	System.err.println("can't find user object: " + childId);
+        	return null;
+            //throw new RuntimeException("can't find user object: " + childId);
         }
          userDataObject = new OTUserDataObject(templateObject, this);
 
@@ -168,6 +178,7 @@ public class OTTemplateDatabase
         // System.err.println("created userDataObject template-id: " + childId + 
         //         " userDataObject-id: " + userDataObject.getGlobalId());
         
+    	//System.out.println("v5. " + userDataObject.getGlobalId());
         return userDataObject;
     }
     
