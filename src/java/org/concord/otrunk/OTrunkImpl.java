@@ -365,7 +365,9 @@ public class OTrunkImpl implements OTrunk
 			// I suppose we could throw a special "not found" exception here
             // FIXME: this might break existing code that expect this to return null
             // if it can't find the object.
-            throw new Exception("Data object is not found for: " + childID);
+			System.err.println("Data object is not found for: " + childID);
+			return null;
+            //throw new Exception("Data object is not found for: " + childID);
 		}
 
 		return getOTObject(childDataObject);
@@ -569,6 +571,8 @@ public class OTrunkImpl implements OTrunk
 	public OTObject getUserRuntimeObject(OTObject authoredObject, OTUser user)
 		throws Exception
 	{
+		authoredObject = getRuntimeAuthoredObject(authoredObject, user);
+		
 		OTID authoredId = authoredObject.getGlobalId();
 		OTID userId = user.getUserId();
 		OTTemplateDatabase db = (OTTemplateDatabase)userTemplateDatabases.get(userId);
@@ -595,6 +599,27 @@ public class OTrunkImpl implements OTrunk
 		OTDataObject userDataObject = db.getOTDataObject(null, authoredId);
 		
 		return getOTObject(userDataObject);		
+	}
+	
+	public OTObject getRuntimeAuthoredObject(OTObject userObject, OTUser user)
+	throws Exception {
+		OTID objectId = userObject.getGlobalId();
+		OTID userId = user.getUserId();
+		OTTemplateDatabase db = (OTTemplateDatabase)userTemplateDatabases.get(userId);
+				
+	    if(objectId instanceof OTRelativeID) {
+	    	//System.out.println("is relative");
+    		OTID childRootId = ((OTRelativeID)objectId).getRootId();
+    		if(childRootId.equals(db.getDatabaseId())) {
+    			//System.out.print("   equals to databaseid");
+    			objectId = ((OTRelativeID)objectId).getRelativeId();
+    			//System.out.println(": " + objectId.toString());
+
+    			return getOTObject(objectId);		    			
+    		}
+    	}
+
+	    return userObject;
 	}
 
 	public OTObject getRootObject(OTDatabase db)
