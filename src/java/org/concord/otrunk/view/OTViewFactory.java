@@ -53,7 +53,7 @@ public class OTViewFactory
     OTrunk otrunk;
     OTViewFactory parent;
     Vector viewMap = new Vector();
-    Vector userList = new Vector();
+    Vector userList = null;
         
     public OTViewFactory(OTrunk otrunk)
     {
@@ -71,6 +71,10 @@ public class OTViewFactory
         Class viewClass;
     }
         
+    public void setUserList(Vector userList) {
+    	this.userList = userList;
+    }
+    
     /* (non-Javadoc)
      * @see org.concord.otrunk.view.OTViewFactory#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, boolean)
      */
@@ -89,7 +93,7 @@ public class OTViewFactory
 
     public OTView getView(OTObject otObject, Class viewInterface)
     {
-        OTView view = getViewInteral(otObject, viewInterface);
+        OTView view = getViewInternal(otObject, viewInterface);
                 
         if(view != null) { 
             if(view instanceof OTMultiUserView && 
@@ -105,7 +109,7 @@ public class OTViewFactory
         return view;
     }
     
-    private OTView getViewInteral(OTObject otObject, Class viewInterface)
+    private OTView getViewInternal(OTObject otObject, Class viewInterface)
     {
         OTView view = null;
         for(int i=0; i<viewMap.size(); i++) {
@@ -126,7 +130,7 @@ public class OTViewFactory
         // can't find the view in our own list
         // check parent
         if(view == null && parent != null) {
-            view = parent.getViewInteral(otObject, viewInterface);
+            view = parent.getViewInternal(otObject, viewInterface);
         }
         
         return view;        
