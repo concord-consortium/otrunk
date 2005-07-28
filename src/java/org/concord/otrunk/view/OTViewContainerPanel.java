@@ -24,8 +24,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2005-07-22 16:50:43 $
+ * $Revision: 1.14 $
+ * $Date: 2005-07-28 17:15:24 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -235,99 +235,4 @@ public class OTViewContainerPanel extends JPanel
 	        	
 	    }
 	}
-
-
-    /**
-     * This code attempts to save an image of the component.  
-     * It does 3 things that are a bit odd but seem to make things work.
-     * 1. It calls addNotify on the component.  This tricks it into thinking
-     *    it has a parent, so it can be laid out.
-     * 2. It calls validate on the component that makes it get laid out.
-     * 
-     * 3. The image saving code is placed into a invoke and wait call.
-     *    Both setSize and validate cause events to be queued so we use
-     *    Invoke and wait so these events get processed before we save the
-     *    image by calling paint on it.
-     * 
-     */
-	public String saveImage(JComponent comp, float scaleX, float scaleY, File folder, OTObject otObject) 
-    {
-	    Dimension compSize = comp.getSize();
-        
-        if(compSize.height <= 0 || compSize.width <= 0) {
-            throw new RuntimeException("Component size width: " + compSize.width +
-                    " height: " + compSize.height + " cannot be <=0");
-        }
-        
-        comp.addNotify();
-        comp.validate();
-
-        ImageSaver saver = new ImageSaver(comp, folder, otObject, scaleX, scaleY);
-        
-        try{
-            SwingUtilities.invokeAndWait(saver);
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        } catch (InvocationTargetException e){
-            e.printStackTrace();
-        }
-                       
-        return saver.getText();
-    }
-
-    class ImageSaver implements Runnable
-    {
-        JComponent comp;
-        File folder;
-        OTObject otObject;
-        String text = null;
-        float scaleX = 1;
-        float scaleY = 1;
-        
-        ImageSaver(JComponent comp, File folder, OTObject otObject,
-            float scaleX, float scaleY)
-        {
-            this.comp = comp;
-            this.folder = folder;
-            this.otObject = otObject;
-            this.scaleX = scaleX;
-            this.scaleY = scaleY;
-        }
-        
-        public void run()
-        {
-            // TODO Auto-generated method stub
-            try{
-                String seperator = System.getProperty("file.separator");
-                            
-                String id = otObject.getGlobalId().toString();
-                id = id.replaceAll("/", "_");
-                id = id.replaceAll("!", "") + ".png";
-                
-                if(!folder.isDirectory()) {
-                    text = null;
-                    return;
-                }
-                
-                File newFile = new File(folder, id);
-
-                BufferedImage bim = 
-                    ComponentScreenshot.makeComponentImageAlpha(comp, scaleX, scaleY);
-                ComponentScreenshot.saveImageAsFile(bim, newFile, "png");
-                
-                text = folder + "/" + id;
-                return;
-                            
-            }catch(Throwable t){
-                t.printStackTrace();
-            }
-            text = null;
-        }
-                    
-        String getText()
-        {
-            return text;
-        }
-    }
-
 }
