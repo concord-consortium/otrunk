@@ -23,13 +23,13 @@
       <type>jar</type>
     </dependency>
     <dependency>
-      <groupId>domain</groupId>
-      <artifactId>domain</artifactId>
-      <version>1.0</version>
+      <groupId>loader</groupId>
+      <artifactId>loader</artifactId>
+      <version>SNAPSHOT</version>
       <type>jar</type>
       <properties>
-        <cc.proj>Domain</cc.proj>
-        <cc.path>Domain/lib</cc.path>
+        <cc.proj>Loader</cc.proj>
+        <cc.path>Loader/lib</cc.path>
         <eclipse.dependency>true</eclipse.dependency>
       </properties>
     </dependency>
