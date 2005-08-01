@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2005-07-28 17:15:24 $
- * $Author: scytacki $
+ * $Revision: 1.15 $
+ * $Date: 2005-08-01 14:24:45 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -56,6 +56,7 @@ import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
+import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.swing.util.ComponentScreenshot;
 
 
@@ -140,9 +141,9 @@ public class OTViewContainerPanel extends JPanel
 				        newComponent = new JLabel("No view for object: " + currentObject);
 						
 
-				    } else {
-				        newComponent = currentView.getComponent(true);
-				    }
+			    } else {
+	                    newComponent = currentView.getComponent(true);
+					}
 				} else {
 					newComponent = new JLabel("Null object");
 				}
