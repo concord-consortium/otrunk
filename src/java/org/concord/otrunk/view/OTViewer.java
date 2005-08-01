@@ -24,9 +24,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.23 $
- * $Date: 2005-07-22 16:20:35 $
- * $Author: scytacki $
+ * $Revision: 1.24 $
+ * $Date: 2005-08-01 14:27:33 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -53,6 +53,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -79,6 +80,7 @@ import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.util.SimpleTreeNode;
+import org.concord.otrunk.OTMLToXHTMLConverter;
 import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTUserListService;
 import org.concord.otrunk.OTrunkImpl;
@@ -87,6 +89,7 @@ import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
+import org.concord.swing.CCJFileChooser;
 import org.concord.swing.util.Util;
 import org.concord.view.SimpleTreeModel;
 import org.concord.view.SwingUserMessageHandler;
@@ -154,6 +157,7 @@ public class OTViewer extends JFrame
     private AbstractAction saveAction;
     private AbstractAction exportImageAction;
     private AbstractAction exportHiResImageAction;
+    private AbstractAction exportToHtmlAction;
 	
     public static void setOTViewFactory(OTViewFactory factory)
 	{
@@ -611,6 +615,7 @@ public class OTViewer extends JFrame
 		        // this should set the currentUserFile to null, so the save check prompts
 		        // for a file name
 		        newAnonUserData();
+				exportToHtmlAction.setEnabled(true);
 		    }
 		    
 		};
@@ -644,10 +649,26 @@ public class OTViewer extends JFrame
 		        fileName = dialog.getDirectory() + fileName;
 		        System.out.println("load file name: " + fileName);
 		        loadUserDataFile(new File(fileName));					
+				exportToHtmlAction.setEnabled(true);
 		    }
 		    
 		};
-		loadUserDataAction.putValue(Action.NAME, "Open...");			
+		loadUserDataAction.putValue(Action.NAME, "Open...");		
+		
+		exportToHtmlAction = new AbstractAction() {
+			public void actionPerformed(ActionEvent arg0) {
+				File fileToSave = getReportFile();
+                OTMLToXHTMLConverter otxc = 
+                	new OTMLToXHTMLConverter(otViewFactory, bodyPanel);
+                otxc.setXHTMLParams(fileToSave, 800, 600);
+                
+                (new Thread(otxc)).start();
+			}
+		};
+		exportToHtmlAction.putValue(Action.NAME, "Export to html...");
+		exportToHtmlAction.setEnabled(false);
+		
+
 		    
 		saveUserDataAction = new AbstractAction(){
 		    
@@ -736,6 +757,7 @@ public class OTViewer extends JFrame
 		        fileName = dialog.getDirectory() + fileName;
 		        System.out.println("load file name: " + fileName);
 		        loadFile(new File(fileName));					
+				exportToHtmlAction.setEnabled(true);
 		    }
 		    
 		};
@@ -848,6 +870,7 @@ public class OTViewer extends JFrame
 				        updateMenuBar();		                
 		            }
 		        });
+				exportToHtmlAction.setEnabled(true);
 		    }		
 		};
 		debugAction.putValue(Action.NAME, "Debug Mode");
@@ -896,6 +919,8 @@ public class OTViewer extends JFrame
             fileMenu.add(exportHiResImageAction);
         }
         
+	    fileMenu.add(exportToHtmlAction);
+
 		JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem(debugAction);
 		debugItem.setSelected(Boolean.getBoolean("otrunk.view.debug"));
 		fileMenu.add(debugItem);
@@ -1005,4 +1030,38 @@ public class OTViewer extends JFrame
 		System.exit(0);
 		return true;
 	}
+	
+	public File getReportFile(){
+		File fileToSave;
+        //javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
+        org.concord.swing.CCJFileChooser chooser = new CCJFileChooser();
+        chooser.setMultiSelectionEnabled(false);
+        chooser.setFileFilter(new HtmlFileFilter());
+        int retValue = 0;
+        retValue = chooser.showSaveDialog(javax.swing.SwingUtilities.getRoot(bodyPanel));        	
+        if(retValue == JFileChooser.APPROVE_OPTION){
+            fileToSave = chooser.getSelectedFile();
+            if(!fileToSave.getName().toLowerCase().endsWith(".html")){
+                        fileToSave = new File(fileToSave.getAbsolutePath()+".html");
+            }
+            if(!fileToSave.exists() || checkForReplace(fileToSave)){
+            	return fileToSave;
+            }
+        }
+        return null;
+	}
 }  //  @jve:decl-index=0:visual-constraint="10,10"
+
+class HtmlFileFilter extends javax.swing.filechooser.FileFilter{
+    public boolean accept(File f){
+        if(f == null) return false;
+        if (f.isDirectory())  return true;
+
+        return (f.getName().toLowerCase().endsWith(".html"));
+    }
+    public String getDescription(){
+        return "HTML files";
+    }
+    
+}  //  @jve:decl-index=0:visual-constraint="10,10"
+
