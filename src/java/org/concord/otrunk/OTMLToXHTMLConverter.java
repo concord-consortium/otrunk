@@ -66,9 +66,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 		setViewContainer(viewContainer);			
 		setViewFactory(viewFactory);
 	}
-	
-    
-    
+	  
 	public void setViewContainer(OTViewContainer viewContainer) {
 		this.viewContainer = viewContainer;
 		if(viewContainer.getCurrentObject() != null) {
