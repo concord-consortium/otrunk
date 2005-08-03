@@ -73,7 +73,8 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 	public void setViewContainer(OTViewContainer viewContainer) {
 		this.viewContainer = viewContainer;
 		if(viewContainer.getCurrentObject() != null) {
-            this.pfDocument = (DefaultOTObject)viewContainer.getCurrentObject();
+			if(viewContainer.getCurrentObject() instanceof DefaultOTObject)
+				this.pfDocument = (DefaultOTObject)viewContainer.getCurrentObject();
         }
 	}
 	
