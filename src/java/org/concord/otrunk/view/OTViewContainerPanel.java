@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.16 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.17 $
+ * $Date: 2005-08-04 17:45:50 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -48,6 +48,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.concord.framework.otrunk.OTObject;
@@ -79,6 +80,7 @@ public class OTViewContainerPanel extends JPanel
 	protected OTFrameManager frameManager;
 
 	private JFrame myFrame;
+	private JScrollPane scrollPane = null;
 
 	Vector containerListeners = new Vector();
 	
@@ -86,13 +88,16 @@ public class OTViewContainerPanel extends JPanel
 	 * 
 	 */
 	public OTViewContainerPanel(OTFrameManager frameManager, JFrame frame)
-	{	
+	{
 		super(new BorderLayout());
+		
 		this.frameManager = frameManager;
 		myFrame = frame;
-		add(new JLabel("Loading..."));
+		scrollPane = new JScrollPane(new JLabel("Loading..."));
+		//scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		add(scrollPane);
 	}
-
+	
 	public void setOTViewFactory(OTViewFactory factory)
 	{
 		otViewFactory = factory;
@@ -137,18 +142,20 @@ public class OTViewContainerPanel extends JPanel
 				if(currentObject != null) {
 				    currentView = otViewFactory.getObjectView(currentObject, OTViewContainerPanel.this);
 				    if(currentView == null) {
-				        newComponent = new JLabel("No view for object: " + currentObject);
-						
-
-			    } else {
-	                    newComponent = currentView.getComponent(true);
+				    	newComponent = new JLabel("No view for object: " + currentObject);
+				    } else {
+				    	newComponent = currentView.getComponent(true);
 					}
 				} else {
 					newComponent = new JLabel("Null object");
 				}
+				
+		    	scrollPane = new JScrollPane(newComponent);
+		    	scrollPane.getViewport().setViewPosition(new Point(0,0));
 
 				removeAll();
-				add(newComponent, BorderLayout.CENTER);
+				add(scrollPane, BorderLayout.CENTER);
+				
 				revalidate();
 				notifyListeners();
 				newComponent.requestFocus();		        
