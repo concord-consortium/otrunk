@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2005-08-04 17:45:50 $
+ * $Revision: 1.18 $
+ * $Date: 2005-08-05 18:31:04 $
  * $Author: swang $
  *
  * Licence Information
@@ -94,7 +94,7 @@ public class OTViewContainerPanel extends JPanel
 		this.frameManager = frameManager;
 		myFrame = frame;
 		scrollPane = new JScrollPane(new JLabel("Loading..."));
-		//scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		add(scrollPane);
 	}
 	
@@ -152,6 +152,7 @@ public class OTViewContainerPanel extends JPanel
 				
 		    	scrollPane = new JScrollPane(newComponent);
 		    	scrollPane.getViewport().setViewPosition(new Point(0,0));
+				scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 				removeAll();
 				add(scrollPane, BorderLayout.CENTER);
