@@ -30,6 +30,7 @@
 package org.concord.otrunk.view;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTrunk;
@@ -85,32 +86,51 @@ public class OTDataObjectNode
 		
 		return nodeName;
 	}		
-	
+
+    static boolean isChildNode(Object object)
+    {
+        return object instanceof OTResourceCollection ||
+            object instanceof OTID;
+    }
+    
 	public int getChildCount()
-	{
-		if(object != null) {
-			String [] keys = object.getResourceKeys();
-			return keys.length + 1;
+    {
+        if(object == null) {
+            return 0;
+        }
+        
+        String [] keys = object.getResourceKeys();
+        int count = 0;
+        for(int i=0; i<keys.length; i++) {
+            Object child = object.getResource(keys[i]);
+            if(isChildNode(child)) {
+                count++;
+            }
 		}
 
-		return 0;
+		return count;
 	}
 	
 	public SimpleTreeNode getChild(int index)
-	{
-		OTDataObject pfParent = getPfDataObject();
-		
-		if(index == 0) {
-			// make a leaf node that displays the toString of
-			return new OTJavaObjectNode("id", "" + pfParent.getGlobalId());
-		}
-		
-		String [] keys = pfParent.getResourceKeys();
-		String key = keys[index - 1];
-		Object child = pfParent.getResource(key);
+	{		
+		String [] keys = object.getResourceKeys();
+        int count = 0;
+        String childKey = null;
+        for(int i=0; i<keys.length; i++) {
+            Object child = object.getResource(keys[i]);
+            if(isChildNode(child)) {
+                if(count == index) {
+                    childKey = keys[i];
+                    break;
+                }
+                count++;
+            }
+        }
+        
+		Object child = object.getResource(childKey);
 			
 		try {		
-			return getNodeFromObject(key, child);
+			return getNodeFromObject(childKey, child);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -144,17 +164,15 @@ public class OTDataObjectNode
 	{
 		OTDataObject dataObject = getPfDataObject();
 		
-		if(child.getObject().equals(dataObject.getGlobalId().toString())) {
-			return 0;
-		}
-		
 		String [] keys = dataObject.getResourceKeys();
 		
 		for(int i=0; i<keys.length; i++) {
 			Object testChild = dataObject.getResource(keys[i]);
-			if(child.getObject().equals(testChild)) {
-				return i+1;
-			}			 
+            if(isChildNode(testChild)) {
+                if(child.getObject().equals(testChild)) {
+                    return i;
+                }
+            }
 		}
 		
 		return -1;
