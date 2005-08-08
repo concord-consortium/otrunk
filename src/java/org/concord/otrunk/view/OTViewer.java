@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.25 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.26 $
+ * $Date: 2005-08-08 18:58:14 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -189,7 +189,11 @@ public class OTViewer extends JFrame
 		Dimension minimumSize = new Dimension(100, 50);
 	    JComponent leftComponent = null;
         folderTreeArea = new JTree(folderTreeModel);
-        folderTreeArea.setEditable(true);
+
+        // we are just disabling this however if we want to 
+        // use this tree for authoring, or for managing student
+        // created objects this will need to be some form of option
+        folderTreeArea.setEditable(false);
         folderTreeArea.addTreeSelectionListener(this);
         
         JScrollPane folderTreeScrollPane = new JScrollPane(folderTreeArea);
@@ -198,7 +202,7 @@ public class OTViewer extends JFrame
 	        //			ViewFactory.getComponent(root);
 	        
 	        dataTreeArea = new JTree(dataTreeModel);
-	        dataTreeArea.setEditable(true);
+	        dataTreeArea.setEditable(false);
 	        dataTreeArea.addTreeSelectionListener(this);
 	        
 	        JScrollPane dataTreeScrollPane = new JScrollPane(dataTreeArea);
@@ -564,9 +568,15 @@ public class OTViewer extends JFrame
 				resourceValue = "no selected data object";
 			}
 			
-			JTextArea textArea = new JTextArea(resourceValue.toString());
-			
-			splitPane.setRightComponent(textArea);
+            JComponent nodeView = null;
+            if(resourceValue instanceof OTDataObject) {
+                nodeView = new OTDataObjectView((OTDataObject)resourceValue);
+            } else {
+                nodeView = new JTextArea(resourceValue.toString());
+            }
+			JScrollPane scrollPane = new JScrollPane(nodeView);
+            
+			splitPane.setRightComponent(scrollPane);
 		}
 	}
 	
