@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.26 $
- * $Date: 2005-08-08 18:58:14 $
- * $Author: scytacki $
+ * $Revision: 1.27 $
+ * $Date: 2005-08-10 20:47:03 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -35,14 +35,13 @@ package org.concord.otrunk.view;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -88,6 +87,8 @@ import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
+import org.concord.swing.CCFileDialog;
+import org.concord.swing.CCFilenameFilter;
 import org.concord.swing.CCJFileChooser;
 import org.concord.swing.util.Util;
 import org.concord.view.SimpleTreeModel;
@@ -643,7 +644,9 @@ public class OTViewer extends JFrame
 		        
 		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
 		        
-		        FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
+		        CCFileDialog dialog = new CCFileDialog(frame, "Open", CCFileDialog.LOAD);
+		        CCFilenameFilter filenameFilter = new CCFilenameFilter("otml");
+		        dialog.setFilenameFilter(filenameFilter);
 		        if(currentUserFile != null) {
 		            dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
 		            dialog.setFile(currentUserFile.getName());
@@ -711,7 +714,9 @@ public class OTViewer extends JFrame
 		    public void actionPerformed(ActionEvent arg0)
 		    {
 		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		        FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
+		        CCFileDialog dialog = new CCFileDialog(frame, "Save As", CCFileDialog.SAVE);
+		        CCFilenameFilter filenameFilter = new CCFilenameFilter("otml");
+		        dialog.setFilenameFilter(filenameFilter);
 		        if(currentUserFile != null) {
 		            dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
 		            dialog.setFile(currentUserFile.getName());
@@ -751,7 +756,9 @@ public class OTViewer extends JFrame
 		    {
 		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
 		        
-		        FileDialog dialog = new FileDialog(frame, "Open", FileDialog.LOAD);
+		        CCFileDialog dialog = new CCFileDialog(frame, "Open", CCFileDialog.LOAD);
+		        CCFilenameFilter filenameFilter = new CCFilenameFilter("otml");
+		        dialog.setFilenameFilter(filenameFilter);
 		        if(currentAuthoredFile != null) {
 		            dialog.setDirectory(currentAuthoredFile.getParentFile().getAbsolutePath());
 		            dialog.setFile(currentAuthoredFile.getName());
@@ -804,7 +811,9 @@ public class OTViewer extends JFrame
 		    public void actionPerformed(ActionEvent arg0)
 		    {
 		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		        FileDialog dialog = new FileDialog(frame, "Save As", FileDialog.SAVE);
+		        CCFileDialog dialog = new CCFileDialog(frame, "Save As", CCFileDialog.SAVE);
+		        CCFilenameFilter filenameFilter = new CCFilenameFilter("otml");
+		        dialog.setFilenameFilter(filenameFilter);
 		        if(currentAuthoredFile != null) {
 		            dialog.setDirectory(currentAuthoredFile.getParentFile().getAbsolutePath());
 		            dialog.setFile(currentAuthoredFile.getName());
@@ -1042,21 +1051,29 @@ public class OTViewer extends JFrame
 	
 	public File getReportFile(){
 		File fileToSave;
-        //javax.swing.JFileChooser chooser = new javax.swing.JFileChooser();
-        org.concord.swing.CCJFileChooser chooser = new CCJFileChooser();
-        chooser.setMultiSelectionEnabled(false);
-        chooser.setFileFilter(new HtmlFileFilter());
-        int retValue = 0;
-        retValue = chooser.showSaveDialog(javax.swing.SwingUtilities.getRoot(bodyPanel));        	
-        if(retValue == JFileChooser.APPROVE_OPTION){
-            fileToSave = chooser.getSelectedFile();
-            if(!fileToSave.getName().toLowerCase().endsWith(".html")){
-                        fileToSave = new File(fileToSave.getAbsolutePath()+".html");
+		CCFileDialog dialog = new CCFileDialog(new Frame(), "Save As html", CCFileDialog.SAVE);
+		CCFilenameFilter filenameFilter = new CCFilenameFilter("html");
+		dialog.setFilenameFilter(filenameFilter);
+		dialog.setMode(CCFileDialog.SAVE);
+		dialog.show();
+
+		String filestr = dialog.getDirectory() + dialog.getFile();
+
+		if(filestr == null) {
+			return null;
+		}
+		else {
+			fileToSave = new File(filestr);
+            
+			if(!fileToSave.getName().toLowerCase().endsWith(".html")){
+				fileToSave = new File(fileToSave.getAbsolutePath()+".html");
             }
+
             if(!fileToSave.exists() || checkForReplace(fileToSave)){
             	return fileToSave;
             }
-        }
+		}
+
         return null;
 	}
 }  //  @jve:decl-index=0:visual-constraint="10,10"
@@ -1073,4 +1090,3 @@ class HtmlFileFilter extends javax.swing.filechooser.FileFilter{
     }
     
 }  //  @jve:decl-index=0:visual-constraint="10,10"
-
