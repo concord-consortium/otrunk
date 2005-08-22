@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -83,45 +83,4 @@ public class OTUserObject extends DefaultOTObject
 	{
 		return getGlobalId();
 	}
-	
-
-	/* (non-Javadoc)
-	 * @see org.concord.portfolio.PfUser#getUserStateObject(org.concord.portfolio.PfDataObject)
-	 */
-	public OTDataObject getUserStateObject(OTDataObject authoringObject)
-	{
-		OTID authoringId = authoringObject.getGlobalId();
-		OTResourceMap userDataMap = resources.getUserDataMap();
-		OTID userStateId = (OTID)userDataMap.get(authoringId.toString());
-
-		if(userStateId == null) {
-			return null;
-		}
-		
-		OTrunkImpl db = (OTrunkImpl)getOTDatabase();
-		
-		try{
-			return db.getOTDataObject(authoringObject, userStateId);			
-		}
-		catch (Exception e){
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.concord.portfolio.PfUser#setUserStateObject(org.concord.portfolio.PfDataObject, org.concord.portfolio.PfDataObject)
-	 */
-	public void setUserStateObject(OTDataObject authoringObject,
-			OTDataObject userStateObject)
-	{
-		OTID authoringId = authoringObject.getGlobalId();
-		OTID userStateId = userStateObject.getGlobalId();
-
-		OTResourceMap userDataMap = resources.getUserDataMap();
-		userDataMap.put(authoringId.toString(), userStateId);
-	}
-		
 }

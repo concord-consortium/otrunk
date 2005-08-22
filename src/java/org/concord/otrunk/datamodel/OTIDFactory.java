@@ -23,17 +23,14 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.6 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.datamodel;
-
-import java.util.StringTokenizer;
-import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
 

@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.18 $
- * $Date: 2005-08-05 18:31:04 $
- * $Author: swang $
+ * $Revision: 1.19 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -34,14 +34,7 @@ package org.concord.otrunk.view;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.LayoutManager;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Enumeration;
-import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.JComponent;
@@ -56,8 +49,6 @@ import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
-import org.concord.framework.otrunk.view.OTXHTMLView;
-import org.concord.swing.util.ComponentScreenshot;
 
 
 /**
@@ -72,6 +63,11 @@ import org.concord.swing.util.ComponentScreenshot;
 public class OTViewContainerPanel extends JPanel
 	implements OTViewContainer
 {
+    /**
+     * First version of this class
+     */    
+    private static final long serialVersionUID = 1L;
+    
     OTObject currentObject = null;
     OTObjectView currentView = null;
     

@@ -23,30 +23,32 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-08-08 19:01:10 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.view;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.concord.otrunk.OTXMLString;
 import org.concord.otrunk.datamodel.OTDataObject;
 
 public class OTDataObjectView extends JComponent
 {
+    /**
+     * First version of this class.
+     */
+    private static final long serialVersionUID = 1L;
+    
     OTDataObject dataObject = null;
     GridBagLayout gridBag = null;
     GridBagConstraints constraints = null;

@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.7 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -51,7 +51,12 @@ import org.doomdark.uuid.UUIDGenerator;
 public class OTUUID extends UUID
 	implements OTID 
 {
-	private static boolean noEthernetInterfaces;
+	/**
+     * first version of this class
+     */
+    private static final long serialVersionUID = 1L;
+    
+    private static boolean noEthernetInterfaces;
 	private static EthernetAddress hwAddress = null;
 	
 	static {

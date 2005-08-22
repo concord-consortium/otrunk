@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.27 $
- * $Date: 2005-08-10 20:47:03 $
- * $Author: swang $
+ * $Revision: 1.28 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -41,25 +41,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -70,26 +62,23 @@ import javax.swing.WindowConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
-import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectMap;
-import org.concord.framework.otrunk.OTrunk;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTMLToXHTMLConverter;
+import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTUserListService;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
-import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.swing.CCFileDialog;
 import org.concord.swing.CCFilenameFilter;
-import org.concord.swing.CCJFileChooser;
 import org.concord.swing.util.Util;
 import org.concord.view.SimpleTreeModel;
 import org.concord.view.SwingUserMessageHandler;
@@ -108,6 +97,11 @@ public class OTViewer extends JFrame
 	implements TreeSelectionListener, OTFrameManager,
 		OTViewContainerListener
 {
+    /**
+     * first version of this class
+     */
+    private static final long serialVersionUID = 1L;
+    
     public final static int NO_USER_MODE = 0;
     public final static int SINGLE_USER_MODE = 1;        
     public final static int MULTIPLE_USER_MODE = 2;
@@ -116,13 +110,7 @@ public class OTViewer extends JFrame
 	private static OTViewFactory otViewFactory;
 	
 	protected int userMode = 0;
-	
-	/**
-	 * users in the otml file
-	 */
-	private HashMap users = new HashMap();
-	private URL usersURL = null;
-	
+		
 	OTUserObject currentUser = null;
 	URL currentURL = null;
 	
@@ -330,28 +318,19 @@ public class OTViewer extends JFrame
 	{
 	    currentUserFile = file;
 	    try {
-	        loadUserDataURL(file.toURL());
+	        loadUserDataURL(file.toURL(), file.getName());
 	    } catch(Exception e) {
 	        e.printStackTrace();
 	    }
 	}
 
-	private void loadUserDataURL(URL url)
+	private void loadUserDataURL(URL url, String name)
 		throws Exception
 	{
 	    userDataDB = new XMLDatabase(url);
-	    otrunk.setCreationDb(userDataDB);
-	    
-	    // need to set the current user to the one
-	    // defined in this file
-	    OTStateRoot stateRoot = (OTStateRoot)otrunk.getRootObject(userDataDB);
-
-	    OTObjectMap userMap = stateRoot.getUserMap();
-	    Vector keys = userMap.getObjectKeys();
-	    OTReferenceMap refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));
-	    
-	    currentUser = refMap.getUser();
-	    
+        otrunk.setCreationDb(userDataDB);
+        currentUser = otrunk.registerUserDataDatabase(userDataDB, name);
+        
 	    reloadWindow();
 	}
 	
@@ -378,7 +357,7 @@ public class OTViewer extends JFrame
         
         OTViewFactory myViewFactory = null;
         if(viewService != null) {
-            myViewFactory = viewService.getViewFactory();
+            myViewFactory = viewService.getViewFactory(otrunk);
         }
 
 		if(myViewFactory != null) {
@@ -416,7 +395,7 @@ public class OTViewer extends JFrame
 		if(showTree && !overrideShowTree) {
 		    OTDataObject rootDataObject = otrunk.getRootDataObject();
 			dataTreeModel.setRoot(new OTDataObjectNode("root", 
-					otrunk.getRootDataObject(), otrunk));
+					rootDataObject, otrunk));
 			
 			folderTreeModel.setRoot(new OTFolderNode(root));
 		}
@@ -455,10 +434,10 @@ public class OTViewer extends JFrame
 	    loadURL(currentURL);
 	}
 	
-	public OTUserObject createUser(String name)
+	public OTUserObject createUser(String name, OTObjectService objService)
 		throws Exception
 	{
-	    OTUserObject user = (OTUserObject)otrunk.createObject(OTUserObject.class); 
+	    OTUserObject user = (OTUserObject)objService.createObject(OTUserObject.class); 
 	    user.setName(name);
 	    return user;
 	}
@@ -509,7 +488,12 @@ public class OTViewer extends JFrame
 	
 	class ExitAction extends AbstractAction
 	{
-		public ExitAction()
+		/**
+         * nothing to serialize here.
+         */
+        private static final long serialVersionUID = 1L;
+
+        public ExitAction()
 		{
 			super("Exit");			
 		}
@@ -611,7 +595,12 @@ public class OTViewer extends JFrame
 	{
 		newUserDataAction = new AbstractAction(){
 		    
-		    /* (non-Javadoc)
+		    /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            /* (non-Javadoc)
 		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		     */
 		    public void actionPerformed(ActionEvent arg0)
@@ -632,7 +621,12 @@ public class OTViewer extends JFrame
 		newUserDataAction.putValue(Action.NAME, "New");			
 
 		loadUserDataAction = new AbstractAction(){
-		    /* (non-Javadoc)
+		    /**
+             * nothing to serialize here.  Just the parent class.
+             */
+            private static final long serialVersionUID = 1L;
+
+            /* (non-Javadoc)
 		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		     */
 		    public void actionPerformed(ActionEvent arg0)
@@ -668,7 +662,12 @@ public class OTViewer extends JFrame
 		loadUserDataAction.putValue(Action.NAME, "Open...");		
 		
 		exportToHtmlAction = new AbstractAction() {
-			public void actionPerformed(ActionEvent arg0) {
+			/**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(ActionEvent arg0) {
 				File fileToSave = getReportFile();
                 OTMLToXHTMLConverter otxc = 
                 	new OTMLToXHTMLConverter(otViewFactory, bodyPanel);
@@ -684,7 +683,12 @@ public class OTViewer extends JFrame
 		    
 		saveUserDataAction = new AbstractAction(){
 		    
-		    /* (non-Javadoc)
+		    /**
+             * Nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            /* (non-Javadoc)
 		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		     */
 		    public void actionPerformed(ActionEvent arg0)
@@ -708,7 +712,12 @@ public class OTViewer extends JFrame
 		    		    
 		saveUserDataAsAction = new AbstractAction(){
 		    
-		    /* (non-Javadoc)
+		    /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+            /* (non-Javadoc)
 		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		     */
 		    public void actionPerformed(ActionEvent arg0)
@@ -749,6 +758,12 @@ public class OTViewer extends JFrame
 		
 		loadAction = new AbstractAction(){
 		    
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+
 		    /* (non-Javadoc)
 		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		     */
@@ -781,6 +796,11 @@ public class OTViewer extends JFrame
 		    
 		saveAction = new AbstractAction(){
 		    
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
 		    /* (non-Javadoc)
 		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		     */
@@ -805,6 +825,12 @@ public class OTViewer extends JFrame
 		    
 		saveAsAction = new AbstractAction(){
 		    
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+
 		    /* (non-Javadoc)
 		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		     */
@@ -845,6 +871,13 @@ public class OTViewer extends JFrame
 		saveAsAction.putValue(Action.NAME, "Save Authored Content As...");			
 
         exportImageAction = new AbstractAction(){
+            
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+
             public void actionPerformed(ActionEvent e)
             {
                 // this introduces a dependency on concord Swing project
@@ -860,6 +893,12 @@ public class OTViewer extends JFrame
         exportImageAction.putValue(Action.NAME, "Export Image...");          
         
         exportHiResImageAction = new AbstractAction(){
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+
             public void actionPerformed(ActionEvent e)
             {
                 Component currentComp = bodyPanel.getCurrentComponent();
@@ -872,6 +911,13 @@ public class OTViewer extends JFrame
         exportHiResImageAction.putValue(Action.NAME, "Export Hi Res Image...");          
         
 		debugAction = new AbstractAction(){
+            
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+
 		    public void actionPerformed(ActionEvent e)
 		    {
 		        Object source = e.getSource();
@@ -1012,15 +1058,17 @@ public class OTViewer extends JFrame
 		try {
 		    // need to make a brand new stateDB
 			userDataDB = new XMLDatabase();
-			otrunk.setCreationDb(userDataDB);
-			OTStateRoot stateRoot = (OTStateRoot)otrunk.createObject(OTStateRoot.class);
+			OTObjectService objService = otrunk.createObjectService(userDataDB);
+
+			OTStateRoot stateRoot = (OTStateRoot)objService.createObject(OTStateRoot.class);
 			userDataDB.setRoot(stateRoot.getGlobalId());
 			stateRoot.setFormatVersionString("1.0");		
 			userDataDB.setDirty(false);
-			
-		    
-		    
-		    OTUserObject userObject = createUser("anon_single_user");
+					    		    
+		    OTUserObject userObject = createUser("anon_single_user", objService);
+            
+            otrunk.initUserObjectService((OTObjectServiceImpl)objService, userObject, stateRoot);
+            
 		    setCurrentUser(userObject);
 		    
 		    currentUserFile = null;

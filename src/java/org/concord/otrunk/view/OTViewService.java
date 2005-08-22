@@ -23,30 +23,19 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.5 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.view;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Vector;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-
 import org.concord.framework.otrunk.DefaultOTObject;
-import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
-import org.concord.framework.otrunk.view.OTObjectView;
-import org.concord.framework.otrunk.view.OTView;
-import org.concord.framework.otrunk.view.OTViewContainer;
+import org.concord.framework.otrunk.OTrunk;
 
 /**
  * OTViewService
@@ -71,9 +60,9 @@ public class OTViewService extends DefaultOTObject
         this.resources = resources;
     }
 
-    public OTViewFactory getViewFactory()
+    public OTViewFactory getViewFactory(OTrunk otrunk)
     {
-        OTViewFactory factory = new OTViewFactory(getOTDatabase());
+        OTViewFactory factory = new OTViewFactory(otrunk);
         
         // read in all the viewEntries and create a vector 
         // of class entries.

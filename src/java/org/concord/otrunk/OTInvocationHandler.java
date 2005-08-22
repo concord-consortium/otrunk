@@ -23,25 +23,18 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.14 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectList;
-import org.concord.framework.otrunk.OTObjectMap;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 
 
@@ -58,12 +51,10 @@ public class OTInvocationHandler
 	implements InvocationHandler
 {
 	OTDataObject dataObject;
-	OTrunkImpl db;
 	
-	public OTInvocationHandler(OTDataObject dataObject, OTrunkImpl db)
+	public OTInvocationHandler(OTDataObject dataObject)
 	{
 		this.dataObject = dataObject;
-		this.db = db;
 	}
 	
 	public static String getResourceName(int prefixLen, String methodName)

@@ -43,9 +43,9 @@ import org.concord.otrunk.datamodel.OTDataObject;
 public class OTWrappedObjectHandler extends OTInvocationHandler
 {
         
-	public OTWrappedObjectHandler(OTDataObject dataObject, OTrunkImpl db)
+	public OTWrappedObjectHandler(OTDataObject dataObject)
 	{
-	    super(dataObject, db);
+	    super(dataObject);
 	}
 	
 	public Object invoke(Object proxy, Method method, Object[] args)

@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.6 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -37,8 +37,8 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectMap;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceMap;
-import org.concord.otrunk.datamodel.OTDataObject;
 
 /**
  * PfObjectTable
@@ -51,15 +51,13 @@ import org.concord.otrunk.datamodel.OTDataObject;
  */
 public class OTObjectMapImpl implements OTObjectMap
 {
-	OTrunkImpl oTrunk;
-	OTResourceMap map;
-	OTDataObject owner;
+    OTObjectService objService;
+    OTResourceMap map;
 
-	public OTObjectMapImpl(OTResourceMap map, OTDataObject dataObject, OTrunkImpl db)
+	public OTObjectMapImpl(OTResourceMap map, OTObjectService objectService)
 	{
-		this.oTrunk = db;
+        this.objService = objectService;
 		this.map = map;
-		this.owner = dataObject;
 	}
 
 	public int getNumberOfObjects()
@@ -75,7 +73,7 @@ public class OTObjectMapImpl implements OTObjectMap
 		}
 		
 		try {
-			OTObject pfObj = oTrunk.getOTObject(owner, objId);
+			OTObject pfObj = objService.getOTObject(objId);
 			return pfObj;
 		} catch (Exception e) {
 			e.printStackTrace();

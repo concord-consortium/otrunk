@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.7 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -37,8 +37,8 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceList;
-import org.concord.otrunk.datamodel.OTDataObject;
 
 /**
  * OTObjectList
@@ -51,16 +51,13 @@ import org.concord.otrunk.datamodel.OTDataObject;
  */
 public class OTObjectListImpl implements OTObjectList
 {
-	OTrunkImpl oTrunk;
+	OTObjectService objService;
 	OTResourceList list;
-	OTDataObject owner;
 	
-	public OTObjectListImpl(OTResourceList resList, OTDataObject owner, 
-		OTrunkImpl oTrunk)
+	public OTObjectListImpl(OTResourceList resList, OTObjectService objectService)
 	{
-		this.oTrunk = oTrunk;
+		this.objService = objectService;
 		this.list = resList;
-		this.owner = owner;
 	}
 	
 	public OTObject get(int index)
@@ -71,7 +68,7 @@ public class OTObjectListImpl implements OTObjectList
 				System.err.println("Null item in object list index: " + index);
 				return null;
 			}
-			return oTrunk.getOTObject(owner, id);
+			return objService.getOTObject(id);
 		} catch (Exception e) {
 			e.printStackTrace();			
 		}
@@ -85,7 +82,7 @@ public class OTObjectListImpl implements OTObjectList
 		for(int i=0; i<list.size(); i++) {
 			try {	
 				OTID childID = (OTID)list.get(i);
-				childVector.add(oTrunk.getOTObject(owner, childID));
+				childVector.add(objService.getOTObject(childID));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
