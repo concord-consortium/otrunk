@@ -36,6 +36,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
@@ -49,15 +50,20 @@ import org.concord.otrunk.datamodel.OTDataObject;
 public class OTResourceSchemaHandler extends OTInvocationHandler
 {
     Class schemaInterface = null;
+    OTrunkImpl db;
+    OTObjectService objectService;
     
     /**
      * @param dataObject
      * @param db
      */
-    public OTResourceSchemaHandler(OTDataObject dataObject, OTrunkImpl db, Class schemaInterface)
+    public OTResourceSchemaHandler(OTDataObject dataObject, OTrunkImpl db, 
+            OTObjectService objectService, Class schemaInterface)
     {
-        super(dataObject, db);
+        super(dataObject);
         this.schemaInterface = schemaInterface; 
+        this.db = db;
+        this.objectService = objectService;
         // TODO Auto-generated constructor stub
     }
 
@@ -69,10 +75,10 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        return dataObject.getGlobalId();
 	    }
 	    
-	    if(resourceName.equals("oTDatabase")) {
-	        return db;
-	    }
-	    
+        if(resourceName.equals("oTObjectService")) {
+            return objectService;
+        }
+        
 	    Object resourceValue = dataObject.getResource(resourceName);
 	    
 	    // we can't rely on the returnType here because it could be an
@@ -85,7 +91,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	            }
 	            OTID objId = (OTID)resourceValue;
 	            
-	            object = (OTObject)db.getOTObject(dataObject, objId);
+	            object = (OTObject)objectService.getOTObject(objId);
 	            
 	            return object;
 	        } catch (Exception e)
@@ -109,7 +115,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        try {					
 	            OTResourceMap map = (OTResourceMap)dataObject.getResourceCollection(
 	                    resourceName, OTResourceMap.class);
-	            return new OTObjectMapImpl(map, dataObject, db);
+	            return new OTObjectMapImpl(map, objectService);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -129,7 +135,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        try {					
 	            OTResourceList list = (OTResourceList)dataObject.getResourceCollection(
 	                    resourceName, OTResourceList.class);
-	            return new OTObjectListImpl(list, dataObject, db);
+	            return new OTObjectListImpl(list, objectService);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -180,7 +186,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 			Class proxyClass = proxy.getClass();
 			return handleGet(resourceName, returnType, proxyClass);
 		} else if(methodName.startsWith("add")) {
-			String resourceName = getResourceName(3, methodName); 
+			// String resourceName = getResourceName(3, methodName); 
 			System.err.println("Don't handle add yet");
 			return null;
 		} else if(methodName.startsWith("removeAll")) {

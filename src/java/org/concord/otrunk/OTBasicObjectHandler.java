@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.9 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -39,6 +39,7 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.otrunk.datamodel.OTDataObject;
 
 
@@ -58,9 +59,10 @@ public class OTBasicObjectHandler extends OTResourceSchemaHandler
     OTObject otObject;
     private OTChangeEvent changeEvent;
     
-	public OTBasicObjectHandler(OTDataObject dataObject, OTrunkImpl db)
+	public OTBasicObjectHandler(OTDataObject dataObject, OTrunkImpl db, 
+            OTObjectService objectService)
 	{
-		super(dataObject, db, null);
+		super(dataObject, db, objectService, null);
 	}
 	
 	/* (non-Javadoc)

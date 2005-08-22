@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.5 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -50,7 +50,12 @@ import org.concord.framework.otrunk.OTID;
 public class OTObjectRevision
 	implements Serializable
 {
-	OTID revisionId = null;
+	/**
+     * First version of this class.
+     */
+    private static final long serialVersionUID = 1L;
+    
+    OTID revisionId = null;
 	OTObjectRevision ancestor;
 	Date modifiedTime;
 	boolean synced;

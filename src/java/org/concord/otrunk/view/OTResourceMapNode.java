@@ -29,7 +29,6 @@
  */
 package org.concord.otrunk.view;
 
-import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.util.SimpleTreeNode;
 

@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.6 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -93,7 +93,10 @@ public class OTUserDataObject
 	    if(stateObject != null) {
 	        return stateObject;
 	    } else {
-	        return database.getStateObject(authoringObject);
+            // I don't know if I should do this but it should speed things
+            // up
+            stateObject = database.getStateObject(authoringObject);
+	        return stateObject;
 	    }
 	}
 			

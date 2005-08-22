@@ -33,7 +33,6 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
-import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
@@ -146,7 +145,7 @@ public class OTDataObjectNode
 
 		if(child instanceof OTID) {
 			// get the dataobject for this id
-			OTDataObject pfChild = pfDatabase.getOTDataObject(pfParent, (OTID)child);
+			OTDataObject pfChild = pfParent.getDatabase().getOTDataObject(pfParent, (OTID)child); 
 			return new OTDataObjectNode(key, pfChild, pfDatabase);
 		} else if(child instanceof OTResourceList) {
 			// make node for list

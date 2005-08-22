@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.7 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -97,9 +97,13 @@ public class OTTemplateDatabase
      * @see org.concord.otrunk.datamodel.OTDatabase#createDataObject()
      */
     public OTDataObject createDataObject() throws Exception
-    {
-        // Do nothing
-        return null;
+    {        
+        // in this case we need to create a new state object and wrap it
+        OTUserDataObject userDataObject = new OTUserDataObject(null, this);
+        OTDataObject childObject = stateDb.createDataObject();
+        userDataObject.setStateObject(childObject);
+        //System.out.println("v3. " + userDataObject.getGlobalId());
+        return userDataObject;
     }
 
     /* (non-Javadoc)
@@ -107,8 +111,12 @@ public class OTTemplateDatabase
      */
     public OTDataObject createDataObject(OTID id) throws Exception
     {
-        // Do nothing
-        return null;
+        // in this case we need to create a new state object and wrap it
+        OTUserDataObject userDataObject = new OTUserDataObject(null, this);
+        OTDataObject childObject = stateDb.createDataObject(id);
+        userDataObject.setStateObject(childObject);
+        //System.out.println("v3. " + userDataObject.getGlobalId());
+        return userDataObject;
     }
 
     public OTDataObject getStateObject(OTDataObject template)
@@ -122,7 +130,17 @@ public class OTTemplateDatabase
         return map.createStateObject(template, stateDb);        
     }
     
-    /* (non-Javadoc)
+    /**
+     * FIXME:  This method uses the state database to determine whether
+     * an object can be directly changed or it needs to be wrapped by 
+     * a template (user object) and just that object is changed. 
+     * This should not be dependent on the state database because in some
+     * cases there will not be a separate database just for the state 
+     * objects.  So in this case there should be another way to know if
+     * an object should be directly changed when it is access through
+     * this database.  The reference map should probably be used for 
+     * this.
+     * 
      * @see org.concord.otrunk.datamodel.OTDatabase#getOTDataObject(org.concord.otrunk.datamodel.OTDataObject, org.concord.framework.otrunk.OTID)
      */
     public OTDataObject getOTDataObject(OTDataObject dataParent, OTID childId)

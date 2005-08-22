@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.11 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -33,7 +33,6 @@
 package org.concord.otrunk.datamodel;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTResourceCollection;
 
 
 /**

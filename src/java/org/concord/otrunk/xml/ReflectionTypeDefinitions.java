@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.14 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -146,7 +146,8 @@ public class ReflectionTypeDefinitions
 		for(int j=0; j<methods.length; j++) {
 			String methodName = methods[j].getName();
 			if(methodName.equals("getGlobalId") ||
-			        methodName.equals("getOTDatabase")) {
+			        methodName.equals("getOTDatabase") ||
+                    methodName.equals("getOTObjectService")) {
 				continue;
 			}
 			

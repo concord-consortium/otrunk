@@ -23,16 +23,14 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-08-22 21:09:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.datamodel;
-
-import javax.naming.OperationNotSupportedException;
 
 import org.concord.framework.otrunk.OTID;
 
