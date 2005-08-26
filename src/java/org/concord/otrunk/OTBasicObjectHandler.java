@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.10 $
+ * $Date: 2005-08-26 13:59:53 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -60,9 +60,9 @@ public class OTBasicObjectHandler extends OTResourceSchemaHandler
     private OTChangeEvent changeEvent;
     
 	public OTBasicObjectHandler(OTDataObject dataObject, OTrunkImpl db, 
-            OTObjectService objectService)
+            OTObjectService objectService, Class objectInterface)
 	{
-		super(dataObject, db, objectService, null);
+		super(dataObject, db, objectService, objectInterface);
 	}
 	
 	/* (non-Javadoc)

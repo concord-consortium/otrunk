@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2005-08-22 21:11:09 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2005-08-26 13:59:53 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -129,7 +129,7 @@ public class OTObjectServiceImpl
         OTObject otObject = null;
         
         if(otObjectClass.isInterface()) {
-            OTBasicObjectHandler handler = new OTBasicObjectHandler(dataObject, otrunk, this);
+            OTBasicObjectHandler handler = new OTBasicObjectHandler(dataObject, otrunk, this, otObjectClass);
 
             otObject = (OTObject)Proxy.newProxyInstance(otObjectClass.getClassLoader(),
                     new Class[] { otObjectClass }, handler);            
