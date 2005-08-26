@@ -180,18 +180,23 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 		    String resourceName = (String)args[0];
 		    Object resourceValue = dataObject.getResource(resourceName);
 		    return Boolean.valueOf(resourceValue != null);
+        } else if(methodName.startsWith("is")) {
+            String resourceName = getResourceName(2, methodName); 
+            Class returnType = method.getReturnType();
+            Class proxyClass = proxy.getClass();
+            return handleGet(resourceName, returnType, proxyClass);            
 		} else if(methodName.startsWith("get")) {
 			String resourceName = getResourceName(3, methodName); 
 			Class returnType = method.getReturnType();
 			Class proxyClass = proxy.getClass();
 			return handleGet(resourceName, returnType, proxyClass);
 		} else if(methodName.startsWith("add")) {
-			// String resourceName = getResourceName(3, methodName); 
-			System.err.println("Don't handle add yet");
-			return null;
+			// String resourceName = getResourceName(3, methodName);
+            (new Exception("Don't handle add yet")).printStackTrace();
+            return null;
 		} else if(methodName.startsWith("removeAll")) {
-			System.err.println("Dont' handle remove All yet");
-			return null;
+            (new Exception("Don't handle removeAll yet")).printStackTrace();
+            return null;
 		} else if(methodName.equals("toString")) {
 			return dataObject.getResource(OTrunkImpl.RES_CLASS_NAME) + "@" +  dataObject.getGlobalId();
 		} else if(methodName.equals("equals")) {
