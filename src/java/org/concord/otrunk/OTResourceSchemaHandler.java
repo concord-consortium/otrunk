@@ -199,6 +199,10 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
             return null;
 		} else if(methodName.equals("toString")) {
 			return dataObject.getResource(OTrunkImpl.RES_CLASS_NAME) + "@" +  dataObject.getGlobalId();
+		} else if(methodName.equals("hashCode")) {
+			String str = (String)dataObject.getResource(OTrunkImpl.RES_CLASS_NAME) + "@" +  dataObject.getGlobalId();
+			Integer integer = new Integer(str.hashCode()); 
+			return integer;
 		} else if(methodName.equals("equals")) {
 			Object other = args[0];
 			if(!(other instanceof OTObject)){
