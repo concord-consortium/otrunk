@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.8 $
+ * $Date: 2005-09-14 16:22:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -54,7 +54,16 @@ import org.concord.otrunk.datamodel.OTUUID;
 public class OTTemplateDatabase
     implements OTDatabase
 {
+    /**
+     * This is a map from the global id of an object returned
+     * by this database to that object itself.
+     */
 	protected Hashtable userDataObjectMap = new Hashtable();
+    
+    /**
+     * This is a map from the original id of the object to 
+     * the userdataobject that this database returns for that id.
+     */
 	protected Hashtable mappedIdCache = new Hashtable();
 	OTDatabase rootDb;
 	OTDatabase stateDb;
@@ -173,6 +182,10 @@ public class OTTemplateDatabase
             OTDataObject childObject = stateDb.getOTDataObject(null, childId);
             userDataObject.setStateObject(childObject);
         	//System.out.println("v3. " + userDataObject.getGlobalId());
+            
+            // save this object so if it is referenced again the same
+            // dataobject is returned.
+            mappedIdCache.put(childId, userDataObject);
             return userDataObject;
         }
         
