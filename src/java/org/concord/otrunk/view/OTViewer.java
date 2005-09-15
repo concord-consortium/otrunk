@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.28 $
- * $Date: 2005-08-22 21:09:52 $
- * $Author: scytacki $
+ * $Revision: 1.29 $
+ * $Date: 2005-09-15 18:18:21 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -33,11 +33,13 @@
 package org.concord.otrunk.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -46,12 +48,15 @@ import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -147,6 +152,11 @@ public class OTViewer extends JFrame
     private AbstractAction exportHiResImageAction;
     private AbstractAction exportToHtmlAction;
 	
+    //check if the program is just started or not.
+    private boolean justStarted = true;
+    
+    private JComponent leftComponent = null;
+    
     public static void setOTViewFactory(OTViewFactory factory)
 	{
 		otViewFactory = factory;
@@ -176,7 +186,6 @@ public class OTViewer extends JFrame
 	public void updateTreePane()
 	{
 		Dimension minimumSize = new Dimension(100, 50);
-	    JComponent leftComponent = null;
         folderTreeArea = new JTree(folderTreeModel);
 
         // we are just disabling this however if we want to 
@@ -210,15 +219,20 @@ public class OTViewer extends JFrame
 	        leftComponent = folderTreeScrollPane;
 	    }
 	    
-		if(splitPane == null){
-		    splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-		            leftComponent, bodyPanel);
-		} else {
-		    splitPane.setLeftComponent(leftComponent);
+		if(justStarted) {
+			instructionPanel();
+			splitPane.setOneTouchExpandable(true);
+			splitPane.setDividerLocation(200);
+			return;
 		}
-		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(200);
 		
+		splitPane.removeAll();
+	    splitPane.setLeftComponent(leftComponent);
+	    if(splitPane.getRightComponent() != bodyPanel)
+	    	splitPane.setRightComponent(bodyPanel);
+
+	    splitPane.setOneTouchExpandable(true);
+		splitPane.setDividerLocation(200);
 	}
 	
 	public void initArgs(String [] args)	
@@ -605,16 +619,7 @@ public class OTViewer extends JFrame
 		     */
 		    public void actionPerformed(ActionEvent arg0)
 		    {
-		        if(!checkForUnsavedUserData()) {
-		            // the user canceled the operation
-		            return;
-		        }
-		        
-		        // call some new method for creating a new un-saved user state
-		        // this should set the currentUserFile to null, so the save check prompts
-		        // for a file name
-		        newAnonUserData();
-				exportToHtmlAction.setEnabled(true);
+		    	createNewUser();
 		    }
 		    
 		};
@@ -631,31 +636,7 @@ public class OTViewer extends JFrame
 		     */
 		    public void actionPerformed(ActionEvent arg0)
 		    {
-		        if(!checkForUnsavedUserData()) {
-		            // the user canceled the operation
-		            return;
-		        }
-		        
-		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		        
-		        CCFileDialog dialog = new CCFileDialog(frame, "Open", CCFileDialog.LOAD);
-		        CCFilenameFilter filenameFilter = new CCFilenameFilter("otml");
-		        dialog.setFilenameFilter(filenameFilter);
-		        if(currentUserFile != null) {
-		            dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
-		            dialog.setFile(currentUserFile.getName());
-		        }
-		        dialog.show();
-		        
-		        String fileName = dialog.getFile();
-		        if(fileName == null) {
-		            return;
-		        }
-		        
-		        fileName = dialog.getDirectory() + fileName;
-		        System.out.println("load file name: " + fileName);
-		        loadUserDataFile(new File(fileName));					
-				exportToHtmlAction.setEnabled(true);
+		    	openUserData();
 		    }
 		    
 		};
@@ -1124,6 +1105,96 @@ public class OTViewer extends JFrame
 
         return null;
 	}
+	
+	public void createNewUser() {
+        if(!checkForUnsavedUserData()) {
+            // the user canceled the operation
+            return;
+        }
+        
+        // call some new method for creating a new un-saved user state
+        // this should set the currentUserFile to null, so the save check prompts
+        // for a file name
+        newAnonUserData();
+		exportToHtmlAction.setEnabled(true);
+	}
+	
+	public void openUserData() {
+        if(!checkForUnsavedUserData()) {
+            // the user canceled the operation
+            return;
+        }
+        
+        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+        
+        CCFileDialog dialog = new CCFileDialog(frame, "Open", CCFileDialog.LOAD);
+        CCFilenameFilter filenameFilter = new CCFilenameFilter("otml");
+        dialog.setFilenameFilter(filenameFilter);
+        if(currentUserFile != null) {
+            dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
+            dialog.setFile(currentUserFile.getName());
+        }
+        dialog.show();
+        
+        String fileName = dialog.getFile();
+        if(fileName == null) {
+            return;
+        }
+        
+        fileName = dialog.getDirectory() + fileName;
+        System.out.println("load file name: " + fileName);
+        loadUserDataFile(new File(fileName));					
+		exportToHtmlAction.setEnabled(true);		
+	}
+	
+	public void instructionPanel() {
+		JPanel panel = new JPanel();
+		panel.setBackground(Color.WHITE);
+		panel.setLayout(null);
+		
+		JLabel lNew = new JLabel("Click the \"New\" button to create a portfolio:");
+		JLabel lOpen = new JLabel("Click the \"Open\" button to open a saved portfolio:");
+		JButton bNew = new JButton("New");
+		JButton bOpen = new JButton("Open");
+		
+		panel.add(lNew);
+		panel.add(lOpen);
+		panel.add(bNew);
+		panel.add(bOpen);
+		
+		lNew.setLocation(100, 100);
+		lOpen.setLocation(100, 150);
+		bNew.setLocation(450, 100);
+		bOpen.setLocation(450, 150);
+		
+		lNew.setSize(340, 30);
+		lOpen.setSize(340, 30);
+		bNew.setSize(70, 25);
+		bOpen.setSize(70, 25);
+		
+		bNew.setOpaque(false);
+		bOpen.setOpaque(false);
+
+		bNew.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				createNewUser();
+				updateTreePane();
+			}
+		});
+		
+		bOpen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				openUserData();
+				updateTreePane();
+			}			
+		});
+		
+	    splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+	            leftComponent, panel);
+
+	    justStarted = false;
+	}
+	
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
 class HtmlFileFilter extends javax.swing.filechooser.FileFilter{
