@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.29 $
- * $Date: 2005-09-15 18:18:21 $
+ * $Revision: 1.30 $
+ * $Date: 2005-09-15 20:05:20 $
  * $Author: swang $
  *
  * Licence Information
@@ -51,6 +51,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -155,7 +156,7 @@ public class OTViewer extends JFrame
     //check if the program is just started or not.
     private boolean justStarted = true;
     
-    private JComponent leftComponent = null;
+	private JDialog commDialog;
     
     public static void setOTViewFactory(OTViewFactory factory)
 	{
@@ -176,6 +177,8 @@ public class OTViewer extends JFrame
 		        
 		    }			
 		});				
+		
+		commDialog = new JDialog(this, true);
 	}
 	
 	public void setUserMode(int mode)
@@ -194,6 +197,8 @@ public class OTViewer extends JFrame
         folderTreeArea.setEditable(false);
         folderTreeArea.addTreeSelectionListener(this);
         
+        JComponent leftComponent = null;
+
         JScrollPane folderTreeScrollPane = new JScrollPane(folderTreeArea);
 
         if(System.getProperty("otrunk.view.debug","").equals("true")){
@@ -219,20 +224,24 @@ public class OTViewer extends JFrame
 	        leftComponent = folderTreeScrollPane;
 	    }
 	    
-		if(justStarted) {
-			instructionPanel();
-			splitPane.setOneTouchExpandable(true);
-			splitPane.setDividerLocation(200);
-			return;
+		if(splitPane == null) {
+		    splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+		            leftComponent, bodyPanel);
+		} else {
+		    splitPane.setLeftComponent(leftComponent);
 		}
-		
-		splitPane.removeAll();
-	    splitPane.setLeftComponent(leftComponent);
-	    if(splitPane.getRightComponent() != bodyPanel)
-	    	splitPane.setRightComponent(bodyPanel);
 
 	    splitPane.setOneTouchExpandable(true);
 		splitPane.setDividerLocation(200);
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if(justStarted) {
+					instructionPanel();
+					justStarted = false;
+				}		
+			}
+		});
 	}
 	
 	public void initArgs(String [] args)	
@@ -1138,6 +1147,7 @@ public class OTViewer extends JFrame
         
         String fileName = dialog.getFile();
         if(fileName == null) {
+        	commDialog.setVisible(true);
             return;
         }
         
@@ -1148,11 +1158,13 @@ public class OTViewer extends JFrame
 	}
 	
 	public void instructionPanel() {
+		commDialog.setResizable(false);
+		
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.WHITE);
 		panel.setLayout(null);
 		
-		JLabel lNew = new JLabel("Click the \"New\" button to create a portfolio:");
+		JLabel lNew = new JLabel("Click the \"New\" button to create a new portfolio:");
 		JLabel lOpen = new JLabel("Click the \"Open\" button to open a saved portfolio:");
 		JButton bNew = new JButton("New");
 		JButton bOpen = new JButton("Open");
@@ -1162,10 +1174,10 @@ public class OTViewer extends JFrame
 		panel.add(bNew);
 		panel.add(bOpen);
 		
-		lNew.setLocation(100, 100);
-		lOpen.setLocation(100, 150);
-		bNew.setLocation(450, 100);
-		bOpen.setLocation(450, 150);
+		lNew.setLocation(50, 100);
+		lOpen.setLocation(50, 150);
+		bNew.setLocation(400, 100);
+		bOpen.setLocation(400, 150);
 		
 		lNew.setSize(340, 30);
 		lOpen.setSize(340, 30);
@@ -1177,24 +1189,26 @@ public class OTViewer extends JFrame
 
 		bNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				commDialog.setVisible(false);
 				createNewUser();
-				updateTreePane();
 			}
 		});
 		
 		bOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				commDialog.setVisible(false);
 				openUserData();
-				updateTreePane();
 			}			
 		});
 		
-	    splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-	            leftComponent, panel);
-
-	    justStarted = false;
+		commDialog.getContentPane().add(panel);
+		commDialog.setBounds(200, 200, 500, 300);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    commDialog.show();				
+			}
+		});
 	}
-	
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
 class HtmlFileFilter extends javax.swing.filechooser.FileFilter{
