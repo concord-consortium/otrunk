@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.30 $
- * $Date: 2005-09-15 20:05:20 $
+ * $Revision: 1.31 $
+ * $Date: 2005-09-23 20:54:45 $
  * $Author: swang $
  *
  * Licence Information
@@ -157,6 +157,8 @@ public class OTViewer extends JFrame
     private boolean justStarted = true;
     
 	private JDialog commDialog;
+	
+	private boolean firstOpen = true;
     
     public static void setOTViewFactory(OTViewFactory factory)
 	{
@@ -504,7 +506,9 @@ public class OTViewer extends JFrame
 
 		if(Boolean.getBoolean("otrunk.view.single_user")) {
 			viewer.setUserMode(OTViewer.SINGLE_USER_MODE);
-		}		
+		} else if(Boolean.getBoolean("otrunk.view.no_user")) {
+			viewer.setUserMode(OTViewer.NO_USER_MODE);
+		}
 
 		viewer.initArgs(args);				
 	}
@@ -1126,6 +1130,7 @@ public class OTViewer extends JFrame
         // for a file name
         newAnonUserData();
 		exportToHtmlAction.setEnabled(true);
+		firstOpen = false;
 	}
 	
 	public void openUserData() {
@@ -1147,14 +1152,18 @@ public class OTViewer extends JFrame
         
         String fileName = dialog.getFile();
         if(fileName == null) {
-        	commDialog.setVisible(true);
+        	if(firstOpen)
+        		commDialog.setVisible(true);
+        	else
+        		return;
             return;
         }
         
         fileName = dialog.getDirectory() + fileName;
         System.out.println("load file name: " + fileName);
         loadUserDataFile(new File(fileName));					
-		exportToHtmlAction.setEnabled(true);		
+		exportToHtmlAction.setEnabled(true);
+		firstOpen = false;
 	}
 	
 	public void instructionPanel() {
