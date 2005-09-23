@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.19 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.20 $
+ * $Date: 2005-09-23 20:54:23 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -160,6 +160,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			try {
 				Object resValue = handleChildResource(element, child.getName(), 
 				        child, objRelativePath, obj);
+				if(resValue == null) {
+					System.out.println("null: " + TypeService.elementPath(child));
+				}
 				obj.setResource(child.getName(),resValue);
 			} catch (HandleElementException e) {
 				System.err.println("error in element: " +
@@ -231,7 +234,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			// then the first child of this element is object 
 			if(childRefId == null) {
 				List children = child.getChildren();
-				if(children.size() != 1) {
+				if(children.size() < 1) {
 					// empty object tag
 					// this happens a lot in the current xml so
 					// I'm taking this out for now
@@ -242,6 +245,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 					return null;
 				}
 				childObj = children.get(0);
+				System.err.println("Warning: Only the first element is returned from " +this.getClassName());
 				resourceType = ((OTXMLElement)childObj).getName();
 			}			
 		}
