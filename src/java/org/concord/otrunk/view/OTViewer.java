@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.31 $
- * $Date: 2005-09-23 20:54:45 $
- * $Author: swang $
+ * $Revision: 1.32 $
+ * $Date: 2005-10-06 18:00:13 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -153,9 +153,6 @@ public class OTViewer extends JFrame
     private AbstractAction exportHiResImageAction;
     private AbstractAction exportToHtmlAction;
 	
-    //check if the program is just started or not.
-    private boolean justStarted = true;
-    
 	private JDialog commDialog;
 	
 	private boolean firstOpen = true;
@@ -236,14 +233,6 @@ public class OTViewer extends JFrame
 	    splitPane.setOneTouchExpandable(true);
 		splitPane.setDividerLocation(200);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if(justStarted) {
-					instructionPanel();
-					justStarted = false;
-				}		
-			}
-		});
 	}
 	
 	public void initArgs(String [] args)	
@@ -337,6 +326,13 @@ public class OTViewer extends JFrame
         	}
         } 
         
+        if(userMode == SINGLE_USER_MODE) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    instructionPanel();                           
+                }
+            });
+        }
     }
 
 	private void loadUserDataFile(File file)
