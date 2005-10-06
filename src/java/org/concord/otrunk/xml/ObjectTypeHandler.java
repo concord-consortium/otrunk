@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.20 $
- * $Date: 2005-09-23 20:54:23 $
- * $Author: swang $
+ * $Revision: 1.21 $
+ * $Date: 2005-10-06 18:00:13 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -39,7 +39,6 @@ import java.util.Properties;
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTIDFactory;
-import org.concord.otrunk.datamodel.OTRelativeID;
 
 /**
  * ObjectTypeHandler
@@ -161,7 +160,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				Object resValue = handleChildResource(element, child.getName(), 
 				        child, objRelativePath, obj);
 				if(resValue == null) {
-					System.out.println("null: " + TypeService.elementPath(child));
+                    // this should be an option debug or log message
+					// System.out.println("null resource: " + TypeService.elementPath(child));
 				}
 				obj.setResource(child.getName(),resValue);
 			} catch (HandleElementException e) {
@@ -245,7 +245,10 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 					return null;
 				}
 				childObj = children.get(0);
-				System.err.println("Warning: Only the first element is returned from " +this.getClassName());
+                if(children.size() > 1) {
+                    System.err.println("Warning: Only the first element is returned from " +
+                            TypeService.elementPath(child));
+                }
 				resourceType = ((OTXMLElement)childObj).getName();
 			}			
 		}
