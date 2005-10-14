@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.32 $
- * $Date: 2005-10-06 18:00:13 $
+ * $Revision: 1.33 $
+ * $Date: 2005-10-14 19:11:38 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -43,6 +43,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.Hashtable;
 
@@ -85,6 +86,8 @@ import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.swing.CCFileDialog;
 import org.concord.swing.CCFilenameFilter;
+import org.concord.swing.StreamRecord;
+import org.concord.swing.StreamRecordView;
 import org.concord.swing.util.Util;
 import org.concord.view.SimpleTreeModel;
 import org.concord.view.SwingUserMessageHandler;
@@ -108,6 +111,11 @@ public class OTViewer extends JFrame
      */
     private static final long serialVersionUID = 1L;
     
+    public final static String DEBUG_PROP = "otrunk.view.debug";
+    public final static String TITLE_PROP = "otrunk.view.frame_title";
+    public final static String SINGLE_USER_PROP = "otrunk.view.single_user";
+    public final static String NO_USER_PROP = "otrunk.view.no_user";
+        
     public final static int NO_USER_MODE = 0;
     public final static int SINGLE_USER_MODE = 1;        
     public final static int MULTIPLE_USER_MODE = 2;
@@ -120,6 +128,8 @@ public class OTViewer extends JFrame
 	OTUserObject currentUser = null;
 	URL currentURL = null;
 	
+    String baseFrameTitle = "OTrunk Viewer";
+    
 	OTViewContainerPanel bodyPanel;
 	JTree folderTreeArea;
 	SimpleTreeModel folderTreeModel;
@@ -127,6 +137,8 @@ public class OTViewer extends JFrame
 	SimpleTreeModel dataTreeModel;
 	JSplitPane splitPane;
 	
+    JFrame consoleFrame;
+    
 	//Temp, to close the window
 	AbstractAction exitAction;
 	AbstractAction saveAsAction;
@@ -145,6 +157,7 @@ public class OTViewer extends JFrame
     private AbstractAction saveUserDataAsAction;
     private AbstractAction saveUserDataAction;
     private AbstractAction debugAction;
+    private AbstractAction showConsoleAction;
     private AbstractAction newUserDataAction;
     private AbstractAction loadUserDataAction;
     private AbstractAction loadAction;
@@ -164,9 +177,22 @@ public class OTViewer extends JFrame
 		
 	public OTViewer(boolean showTree)
 	{
-		super("OTrunk Viewer");
+        super();
+        
 		this.showTree = showTree;
+        
+        try {
+            // this overrides the default base frame title
+            String title = System.getProperty(TITLE_PROP,null);
+            if(title != null) {
+                baseFrameTitle = title;
+            }
+        } catch (Throwable t) {
+            // do nothing, just use the default title
+        }
 
+        setTitle(baseFrameTitle);
+        
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		
 		addWindowListener( new WindowAdapter() {
@@ -176,7 +202,17 @@ public class OTViewer extends JFrame
 		        
 		    }			
 		});				
-		
+	
+        consoleFrame = new JFrame("Console");
+        StreamRecord record = new StreamRecord(10000);
+        StreamRecordView view = new StreamRecordView(record);
+        consoleFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        System.setOut((PrintStream) view.addOutputStream(System.out, "Console"));
+        System.setErr((PrintStream) view.addOutputStream(System.err, System.out));
+
+        consoleFrame.getContentPane().add(view);
+        consoleFrame.setSize(800, 600);
+        
 		commDialog = new JDialog(this, true);
 	}
 	
@@ -200,7 +236,7 @@ public class OTViewer extends JFrame
 
         JScrollPane folderTreeScrollPane = new JScrollPane(folderTreeArea);
 
-        if(System.getProperty("otrunk.view.debug","").equals("true")){
+        if(System.getProperty(DEBUG_PROP,"").equals("true")){
 	        //			ViewFactory.getComponent(root);
 	        
 	        dataTreeArea = new JTree(dataTreeModel);
@@ -432,15 +468,15 @@ public class OTViewer extends JFrame
 		
 		switch(userMode) {
 		case NO_USER_MODE:
-		    frame.setTitle("CCPortfolio: " + currentURL.toString());
+		    frame.setTitle(baseFrameTitle + ": " + currentURL.toString());
 		    break;
 		case SINGLE_USER_MODE:
 			if(currentUserFile != null) {
-			    frame.setTitle("CCPortfolio: " + currentUserFile.toString());
+			    frame.setTitle(baseFrameTitle + ": " + currentUserFile.toString());
 			} else  if(userDataDB != null){
-			    frame.setTitle("CCPortfolio: Untitled");
+			    frame.setTitle(baseFrameTitle + ": Untitled");
 			} else {
-			    frame.setTitle("CCPortfolio");
+			    frame.setTitle(baseFrameTitle);
 			}
 			break;
 		}
@@ -500,9 +536,9 @@ public class OTViewer extends JFrame
 
 		OTViewer viewer = new OTViewer(true);
 
-		if(Boolean.getBoolean("otrunk.view.single_user")) {
+		if(Boolean.getBoolean(SINGLE_USER_PROP)) {
 			viewer.setUserMode(OTViewer.SINGLE_USER_MODE);
-		} else if(Boolean.getBoolean("otrunk.view.no_user")) {
+		} else if(Boolean.getBoolean(NO_USER_PROP)) {
 			viewer.setUserMode(OTViewer.NO_USER_MODE);
 		}
 
@@ -737,7 +773,7 @@ public class OTViewer extends JFrame
 		            try {
 		                Exporter.export(currentUserFile, userDataDB.getRoot(), userDataDB);
 		                userDataDB.setDirty(false);
-		                setTitle("CCPortfolio: " + currentUserFile.toString());
+		                setTitle(baseFrameTitle + ": " + currentUserFile.toString());
 		            } catch(Exception e){
 		                e.printStackTrace();
 		            }	                    	
@@ -912,9 +948,9 @@ public class OTViewer extends JFrame
 		    {
 		        Object source = e.getSource();
 		        if(((JCheckBoxMenuItem)source).isSelected()){
-		            System.setProperty("otrunk.view.debug","true");
+		            System.setProperty(DEBUG_PROP,"true");
 		        } else {
-		            System.setProperty("otrunk.view.debug","false");
+		            System.setProperty(DEBUG_PROP,"false");
 		        }
 		        
 		        updateTreePane();
@@ -929,7 +965,24 @@ public class OTViewer extends JFrame
 		};
 		debugAction.putValue(Action.NAME, "Debug Mode");
 		
-		exitAction = new ExitAction();
+        showConsoleAction = new AbstractAction(){
+            
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+
+            public void actionPerformed(ActionEvent e)
+            {
+                if(consoleFrame != null) {
+                    consoleFrame.setVisible(true);
+                }
+            }       
+        };
+        showConsoleAction.putValue(Action.NAME, "Show Console");
+
+        exitAction = new ExitAction();
     
 	}
 	
@@ -959,7 +1012,7 @@ public class OTViewer extends JFrame
 		    fileMenu.add(saveUserDataAsAction);
 		}
 		
-		if(Boolean.getBoolean("otrunk.view.debug")) {
+		if(Boolean.getBoolean(DEBUG_PROP)) {
 		    fileMenu.add(loadAction);
 		    
 		    fileMenu.add(saveAction);
@@ -975,8 +1028,10 @@ public class OTViewer extends JFrame
         
 	    fileMenu.add(exportToHtmlAction);
 
+        fileMenu.add(showConsoleAction);
+        
 		JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem(debugAction);
-		debugItem.setSelected(Boolean.getBoolean("otrunk.view.debug"));
+		debugItem.setSelected(Boolean.getBoolean(DEBUG_PROP));
 		fileMenu.add(debugItem);
 		
 		fileMenu.add(exitAction);
