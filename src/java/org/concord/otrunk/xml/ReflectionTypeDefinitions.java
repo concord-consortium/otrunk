@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.15 $
+ * $Date: 2005-10-17 20:55:48 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -160,7 +160,7 @@ public class ReflectionTypeDefinitions
 			String resourceType = TypeService.getPrimitiveType(resourceClass);
 
 			if(resourceType == null){
-			    // This resource type might be an interface that on of the other
+			    // This resource type might be an interface that one of the other
 			    // typeClasses implements.  
 			    for(int k=0; k<typeClasses.size(); k++){
 			        Class typeClass = (Class)typeClasses.get(k);
@@ -171,7 +171,12 @@ public class ReflectionTypeDefinitions
 			}			
 
 			if(resourceType == null){
-				System.err.println("Unknown resourceType: " + resourceClass);
+				System.err.println("Warning: the field: " + resourceName + " on class: " + resourceSchemaClass + "\n" + 
+                        "    has an unknown type: " + resourceClass + "\n"  +
+                        "  There are no imported classes that implement this type");
+                // in a strict assertion mode we might want to stop
+                // here, but setting the type to object seems pretty safe
+                resourceType = "object";
 			}
 			
 			ResourceDefinition resourceDef = new ResourceDefinition(resourceName,
