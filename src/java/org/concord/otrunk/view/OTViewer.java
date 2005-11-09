@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.33 $
- * $Date: 2005-10-14 19:11:38 $
- * $Author: scytacki $
+ * $Revision: 1.34 $
+ * $Date: 2005-11-09 19:09:28 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -86,6 +86,7 @@ import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.swing.CCFileDialog;
 import org.concord.swing.CCFilenameFilter;
+import org.concord.swing.MostRecentFileDialog;
 import org.concord.swing.StreamRecord;
 import org.concord.swing.StreamRecordView;
 import org.concord.swing.util.Util;
@@ -152,6 +153,8 @@ public class OTViewer extends JFrame
 	Hashtable otContainers = new Hashtable();
 	
 	String startupMessage = "";
+	
+	boolean justStarted = true;
 	
 	boolean showTree = false;
     private AbstractAction saveUserDataAsAction;
@@ -365,7 +368,7 @@ public class OTViewer extends JFrame
         if(userMode == SINGLE_USER_MODE) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    instructionPanel();                           
+                    instructionPanel();              
                 }
             });
         }
@@ -405,7 +408,7 @@ public class OTViewer extends JFrame
 		throws Exception
 	{	    	    
 		xmlDB = new XMLDatabase(url, System.err);
-
+		
 		otrunk = new OTrunkImpl(xmlDB,
 				new Object [] {new SwingUserMessageHandler(this), new OTUserListService()});
 			
@@ -1002,6 +1005,8 @@ public class OTViewer extends JFrame
 		    fileMenu.removeAll();
 		}
 		
+		fileMenu.setEnabled(!justStarted);
+		
 		if(userMode == SINGLE_USER_MODE) {
 		    fileMenu.add(newUserDataAction);
 
@@ -1103,6 +1108,7 @@ public class OTViewer extends JFrame
 		try {
 		    // need to make a brand new stateDB
 			userDataDB = new XMLDatabase();
+			//System.out.println("otrunk: " + otrunk + " userDatabase: " + userDataDB);
 			OTObjectService objService = otrunk.createObjectService(userDataDB);
 
 			OTStateRoot stateRoot = (OTStateRoot)objService.createObject(OTStateRoot.class);
@@ -1133,7 +1139,7 @@ public class OTViewer extends JFrame
 		        return false;
 		    }
 		    
-			otrunk.close();
+			if(otrunk != null) otrunk.close();
 		} catch (Exception exp) {
 			exp.printStackTrace();
 			// exit anyhow 
@@ -1192,29 +1198,21 @@ public class OTViewer extends JFrame
         
         Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
         
-        CCFileDialog dialog = new CCFileDialog(frame, "Open", CCFileDialog.LOAD);
-        CCFilenameFilter filenameFilter = new CCFilenameFilter("otml");
-        dialog.setFilenameFilter(filenameFilter);
-        if(currentUserFile != null) {
-            dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
-            dialog.setFile(currentUserFile.getName());
-        }
-        dialog.show();
+        MostRecentFileDialog mrfd = new MostRecentFileDialog("org.concord.otviewer.openotml");
+        mrfd.setFilenameFilter("otml");
         
-        String fileName = dialog.getFile();
-        if(fileName == null) {
-        	if(firstOpen)
-        		commDialog.setVisible(true);
-        	else
-        		return;
-            return;
+        int retval = mrfd.showOpenDialog(frame);
+        
+        File file = null;
+        if(retval == MostRecentFileDialog.APPROVE_OPTION) {
+        	file = mrfd.getSelectedFile();
         }
         
-        fileName = dialog.getDirectory() + fileName;
-        System.out.println("load file name: " + fileName);
-        loadUserDataFile(new File(fileName));					
-		exportToHtmlAction.setEnabled(true);
-		firstOpen = false;
+        if(file != null && file.exists()) {
+        	loadUserDataFile(file);
+        	exportToHtmlAction.setEnabled(true);
+        	firstOpen = false;
+        } 
 	}
 	
 	public void instructionPanel() {
@@ -1265,7 +1263,9 @@ public class OTViewer extends JFrame
 		commDialog.setBounds(200, 200, 500, 300);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-			    commDialog.show();				
+			    commDialog.show();
+			    justStarted = false;
+			    updateMenuBar();
 			}
 		});
 	}
