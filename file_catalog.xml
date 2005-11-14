@@ -3,7 +3,7 @@
     <server>cvs.concord.org</server>
     <repo>/home/buildspace/CodeBank</repo>
     <module>Projects/OTrunk</module>
-    <tagname>rel_1_5</tagname>
+    <tagname>rel_1_6</tagname>
     <file>
         <name>.classpath</name>
         <rev>1.10</rev>
@@ -41,17 +41,17 @@
     </file>
     <file>
         <name>file_catalog.xml</name>
-        <rev>1.10</rev>
-        <modtime>1128626811000</modtime>
-        <size>20567</size>
-        <md5sum>5dc75984a02fe66d21a752d198c2457e</md5sum>
+        <rev>1.11</rev>
+        <modtime>1129317406000</modtime>
+        <size>20568</size>
+        <md5sum>5aa47eaec01a538b8327d38f4b0f37d8</md5sum>
     </file>
     <file>
         <name>project.xml</name>
-        <rev>1.25</rev>
-        <modtime>1129317402000</modtime>
+        <rev>1.27</rev>
+        <modtime>1132001462000</modtime>
         <size>2545</size>
-        <md5sum>35afe4cda4b50383ab16a0264a0508fb</md5sum>
+        <md5sum>e4b6e2bb6ee8b264dae40290c862e8c0</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/OTBasicObjectHandler.java</name>
@@ -377,10 +377,10 @@
     </file>
     <file>
         <name>src/java/org/concord/otrunk/view/OTViewer.java</name>
-        <rev>1.33</rev>
-        <modtime>1129317098000</modtime>
-        <size>38014</size>
-        <md5sum>f84b61c77620d9a7f7473ca8b4f9b64d</md5sum>
+        <rev>1.34</rev>
+        <modtime>1131563368000</modtime>
+        <size>37919</size>
+        <md5sum>c49a3af471efe1119201423f3a6097cc</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/xml/BlobTypeHandler.java</name>
@@ -475,10 +475,10 @@
     </file>
     <file>
         <name>src/java/org/concord/otrunk/xml/ReflectionTypeDefinitions.java</name>
-        <rev>1.14</rev>
-        <modtime>1124744992000</modtime>
-        <size>7076</size>
-        <md5sum>2987ddd108b356e2a6e03e5cf9a001d5</md5sum>
+        <rev>1.15</rev>
+        <modtime>1129582548000</modtime>
+        <size>7466</size>
+        <md5sum>5789b4a8e1c417fc908b811d0a1941d1</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/xml/ResourceDefinition.java</name>
