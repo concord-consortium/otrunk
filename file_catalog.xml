@@ -3,7 +3,7 @@
     <server>cvs.concord.org</server>
     <repo>/home/buildspace/CodeBank</repo>
     <module>Projects/OTrunk</module>
-    <tagname>rel_1_6</tagname>
+    <tagname>rel_1_7</tagname>
     <file>
         <name>.classpath</name>
         <rev>1.10</rev>
@@ -41,17 +41,17 @@
     </file>
     <file>
         <name>file_catalog.xml</name>
-        <rev>1.11</rev>
-        <modtime>1129317406000</modtime>
+        <rev>1.2</rev>
+        <modtime>1132001467000</modtime>
         <size>20568</size>
-        <md5sum>5aa47eaec01a538b8327d38f4b0f37d8</md5sum>
+        <md5sum>c47f3a22e4130be2646ca30e95d80137</md5sum>
     </file>
     <file>
         <name>project.xml</name>
-        <rev>1.27</rev>
-        <modtime>1132001462000</modtime>
+        <rev>1.29</rev>
+        <modtime>1133798406000</modtime>
         <size>2545</size>
-        <md5sum>e4b6e2bb6ee8b264dae40290c862e8c0</md5sum>
+        <md5sum>abebaf06867b7c7504eb00ab0ea751ec</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/OTBasicObjectHandler.java</name>
@@ -538,10 +538,10 @@
     </file>
     <file>
         <name>src/java/org/concord/otrunk/xml/XMLDatabase.java</name>
-        <rev>1.20</rev>
-        <modtime>1123102343000</modtime>
-        <size>14351</size>
-        <md5sum>0eb5cf51d66f60c6080d8da28ebdcee7</md5sum>
+        <rev>1.21</rev>
+        <modtime>1133797433000</modtime>
+        <size>14420</size>
+        <md5sum>9c7035f429b3405a0b0376ebf3991298</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/xml/XMLParsableString.java</name>
