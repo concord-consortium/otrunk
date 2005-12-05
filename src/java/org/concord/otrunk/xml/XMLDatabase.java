@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.20 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.21 $
+ * $Date: 2005-12-05 15:43:53 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -158,7 +158,7 @@ public class XMLDatabase
 		if(dbId != null && dbId.length() > 0) {
 		    databaseId = OTIDFactory.createOTID(dbId);
 		}
-		
+       
 		Vector importedOTObjectClasses = new Vector();
 		
 		OTXMLElement importsElement = rootElement.getChild("imports");
@@ -231,6 +231,10 @@ public class XMLDatabase
 	public OTID getDatabaseId()
 	{
 	    return databaseId;
+	}
+	
+	public Hashtable getDataObjects() {
+		return dataObjects;
 	}
 	
 	public boolean isDirty()
