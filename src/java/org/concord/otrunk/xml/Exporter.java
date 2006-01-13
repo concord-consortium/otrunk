@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.13 $
+ * $Date: 2006-01-13 21:04:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -311,7 +311,7 @@ public class Exporter
 	public static String escapeElementText(String text)
 	{
 	    String newText = text.replaceAll("&", "&amp;");
-	    newText = text.replaceAll("<", "&lt;");
+	    newText = newText.replaceAll("<", "&lt;");
 	    newText = newText.replaceAll(">", "&gt;");
 
 	    return newText;
