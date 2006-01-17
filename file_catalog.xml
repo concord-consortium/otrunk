@@ -3,7 +3,7 @@
     <server>cvs.concord.org</server>
     <repo>/home/buildspace/CodeBank</repo>
     <module>Projects/OTrunk</module>
-    <tagname>rel_1_7</tagname>
+    <tagname>rel_1_8</tagname>
     <file>
         <name>.classpath</name>
         <rev>1.10</rev>
@@ -41,17 +41,17 @@
     </file>
     <file>
         <name>file_catalog.xml</name>
-        <rev>1.2</rev>
-        <modtime>1132001467000</modtime>
-        <size>20568</size>
-        <md5sum>c47f3a22e4130be2646ca30e95d80137</md5sum>
+        <rev>1.13</rev>
+        <modtime>1133798412000</modtime>
+        <size>20567</size>
+        <md5sum>e96d7f23787bc04cfd2823867af31c3a</md5sum>
     </file>
     <file>
         <name>project.xml</name>
-        <rev>1.29</rev>
-        <modtime>1133798406000</modtime>
+        <rev>1.31</rev>
+        <modtime>1137517417000</modtime>
         <size>2545</size>
-        <md5sum>abebaf06867b7c7504eb00ab0ea751ec</md5sum>
+        <md5sum>f705cacaf71f997b29fb4ad1cd226f41</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/OTBasicObjectHandler.java</name>
@@ -398,10 +398,10 @@
     </file>
     <file>
         <name>src/java/org/concord/otrunk/xml/Exporter.java</name>
-        <rev>1.12</rev>
-        <modtime>1123102343000</modtime>
-        <size>10405</size>
-        <md5sum>69c7f6f3b3da505643321fca2f9423e6</md5sum>
+        <rev>1.13</rev>
+        <modtime>1137186281000</modtime>
+        <size>10411</size>
+        <md5sum>4079bd1fa23a929c0149693ce886afc0</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/xml/FloatTypeHandler.java</name>
