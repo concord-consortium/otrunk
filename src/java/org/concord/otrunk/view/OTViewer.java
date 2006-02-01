@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.34 $
- * $Date: 2005-11-09 19:09:28 $
- * $Author: swang $
+ * $Revision: 1.35 $
+ * $Date: 2006-02-01 21:39:18 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -1004,11 +1004,11 @@ public class OTViewer extends JFrame
 		    fileMenu = menuBar.getMenu(0);
 		    fileMenu.removeAll();
 		}
-		
-		fileMenu.setEnabled(!justStarted);
-		
+				
 		if(userMode == SINGLE_USER_MODE) {
-		    fileMenu.add(newUserDataAction);
+            fileMenu.setEnabled(!justStarted);
+
+            fileMenu.add(newUserDataAction);
 
 		    fileMenu.add(loadUserDataAction);
 		    
