@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.8 $
+ * $Date: 2006-02-06 18:18:38 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -84,7 +84,7 @@ public class OTUUID extends UUID
 			hwAddress = NativeInterfaces.getPrimaryInterface();
 		} catch (Throwable t) {
 			// can't get the hardware address for some reason
-			System.err.println("Unable to find hardware address for unique ids because: \r\t" + t.getMessage());
+			System.err.println("OTrunk: Not using native library for uuids");
 			noEthernetInterfaces = true;
 			return null;
 		}
