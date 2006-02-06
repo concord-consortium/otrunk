@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.35 $
- * $Date: 2006-02-01 21:39:18 $
+ * $Revision: 1.36 $
+ * $Date: 2006-02-06 18:18:38 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -114,6 +114,7 @@ public class OTViewer extends JFrame
     
     public final static String DEBUG_PROP = "otrunk.view.debug";
     public final static String TITLE_PROP = "otrunk.view.frame_title";
+    public final static String HIDE_TREE_PROP = "otrunk.view.hide_tree";
     public final static String SINGLE_USER_PROP = "otrunk.view.single_user";
     public final static String NO_USER_PROP = "otrunk.view.no_user";
         
@@ -537,7 +538,7 @@ public class OTViewer extends JFrame
 	{
         System.setProperty("apple.laf.useScreenMenuBar","true");
 
-		OTViewer viewer = new OTViewer(true);
+		OTViewer viewer = new OTViewer(!Boolean.getBoolean(HIDE_TREE_PROP));
 
 		if(Boolean.getBoolean(SINGLE_USER_PROP)) {
 			viewer.setUserMode(OTViewer.SINGLE_USER_MODE);
