@@ -3,7 +3,7 @@
     <server>cvs.concord.org</server>
     <repo>/home/buildspace/CodeBank</repo>
     <module>Projects/OTrunk</module>
-    <tagname>rel_1_9</tagname>
+    <tagname>rel_1_10</tagname>
     <file>
         <name>.classpath</name>
         <rev>1.10</rev>
@@ -41,17 +41,17 @@
     </file>
     <file>
         <name>file_catalog.xml</name>
-        <rev>1.14</rev>
-        <modtime>1137517423000</modtime>
+        <rev>1.15</rev>
+        <modtime>1139265169000</modtime>
         <size>20568</size>
-        <md5sum>882f3a1d1712194204503f475eefe160</md5sum>
+        <md5sum>c5a69d1a76e3a3fd3958672a17f6bcda</md5sum>
     </file>
     <file>
         <name>project.xml</name>
-        <rev>1.33</rev>
-        <modtime>1139265161000</modtime>
-        <size>2545</size>
-        <md5sum>e23dcb64af489eeda4fcb82dc15f71eb</md5sum>
+        <rev>1.35</rev>
+        <modtime>1139346704000</modtime>
+        <size>2546</size>
+        <md5sum>72492ab58aa813a23ee69eda931fe772</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/OTBasicObjectHandler.java</name>
@@ -377,10 +377,10 @@
     </file>
     <file>
         <name>src/java/org/concord/otrunk/view/OTViewer.java</name>
-        <rev>1.36</rev>
-        <modtime>1139249918000</modtime>
-        <size>38042</size>
-        <md5sum>4dc5d2321fd401a47925b405e5fbfb7f</md5sum>
+        <rev>1.37</rev>
+        <modtime>1139274438000</modtime>
+        <size>38556</size>
+        <md5sum>cc5a8c6da199b552d99d6a5441d0b0db</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/xml/BlobTypeHandler.java</name>
