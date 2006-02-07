@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.36 $
- * $Date: 2006-02-06 18:18:38 $
+ * $Revision: 1.37 $
+ * $Date: 2006-02-07 01:07:18 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -165,6 +165,7 @@ public class OTViewer extends JFrame
     private AbstractAction newUserDataAction;
     private AbstractAction loadUserDataAction;
     private AbstractAction loadAction;
+    private AbstractAction reloadAction;
     private AbstractAction saveAction;
     private AbstractAction exportImageAction;
     private AbstractAction exportHiResImageAction;
@@ -801,29 +802,48 @@ public class OTViewer extends JFrame
 		    {
 		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
 		        
-		        CCFileDialog dialog = new CCFileDialog(frame, "Open", CCFileDialog.LOAD);
-		        CCFilenameFilter filenameFilter = new CCFilenameFilter("otml");
-		        dialog.setFilenameFilter(filenameFilter);
-		        if(currentAuthoredFile != null) {
-		            dialog.setDirectory(currentAuthoredFile.getParentFile().getAbsolutePath());
-		            dialog.setFile(currentAuthoredFile.getName());
-		        }
-		        dialog.show();
+		        MostRecentFileDialog mrfd = new MostRecentFileDialog("org.concord.otviewer.openotml");
+		        mrfd.setFilenameFilter("otml");
 		        
-		        String fileName = dialog.getFile();
-		        if(fileName == null) {
-		            return;
+		        int retval = mrfd.showOpenDialog(frame);
+		        
+		        File file = null;
+		        if(retval == MostRecentFileDialog.APPROVE_OPTION) {
+		        	file = mrfd.getSelectedFile();
 		        }
 		        
-		        fileName = dialog.getDirectory() + fileName;
-		        System.out.println("load file name: " + fileName);
-		        loadFile(new File(fileName));					
-				exportToHtmlAction.setEnabled(true);
+		        if(file != null && file.exists()) {
+			        System.out.println("load file name: " + file);
+		        	loadFile(file);
+					exportToHtmlAction.setEnabled(true);
+			    } 
 		    }
 		    
 		};
 		loadAction.putValue(Action.NAME, "Open Authored Content...");			
 		    
+		reloadAction = new AbstractAction(){
+		    
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+
+		    /* (non-Javadoc)
+		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		     */
+		    public void actionPerformed(ActionEvent arg0)
+		    {
+		    	try {
+		    		reload();
+		    	} catch (Exception exp) {
+		    		exp.printStackTrace();
+		    	}
+		    }
+		};
+		reloadAction.putValue(Action.NAME, "Reload Authored Content...");			
+		
 		saveAction = new AbstractAction(){
 		    
             /**
@@ -957,7 +977,12 @@ public class OTViewer extends JFrame
 		            System.setProperty(DEBUG_PROP,"false");
 		        }
 		        
-		        updateTreePane();
+		        try {
+		        	reloadWindow();
+		        } catch (Exception exp) {
+		        	exp.printStackTrace();
+		        }
+		        
 		        SwingUtilities.invokeLater(new Runnable(){
 		            public void run()
 		            {
@@ -1020,6 +1045,8 @@ public class OTViewer extends JFrame
 		
 		if(Boolean.getBoolean(DEBUG_PROP)) {
 		    fileMenu.add(loadAction);
+		    
+		    fileMenu.add(reloadAction);
 		    
 		    fileMenu.add(saveAction);
 		    
