@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.18 $
+ * $Date: 2006-02-24 20:59:16 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -56,33 +56,43 @@ import org.concord.otrunk.OTXMLString;
  */
 public class TypeService
 {
+    public final static String STRING = "string";
+    public final static String XML_STRING = "xmlstring";
+    public final static String BOOLEAN = "boolean";
+    public final static String INTEGER = "integer";
+    public final static String FLOAT = "float";
+    public final static String BLOB = "blob";
+    public final static String LIST = "list";
+    public final static String MAP = "map";
+    public final static String OBJECT = "object";
+    
 	public static String getPrimitiveType(Class klass)
 	{
 		if(String.class.isAssignableFrom(klass)) {
-			return "string";
+			return STRING;
 		} else if(OTXMLString.class.isAssignableFrom(klass)) {
-		    return "xmlstring";
+		    return XML_STRING;
 		} else if(Boolean.class.isAssignableFrom(klass) ||
 				Boolean.TYPE.equals(klass)) {
-			return "boolean";
+			return BOOLEAN;
 		} else if(Integer.class.isAssignableFrom(klass) ||
 				Integer.TYPE.equals(klass)) {
-			return "integer";
+			return INTEGER;
 		} else if(Float.class.isAssignableFrom(klass) ||
 				Float.TYPE.equals(klass)) {
-			return "float";
+			return FLOAT;
 		} else if(klass.isArray() && 
 				klass.getComponentType().equals(Byte.TYPE)) {
-			return "blob";
+			return BLOB;
 		} else if(OTResourceList.class.isAssignableFrom(klass) ||
 				OTObjectList.class.isAssignableFrom(klass)) {
-			return "list";
+			return LIST;
 		} else if(OTResourceMap.class.isAssignableFrom(klass) ||
 				OTObjectMap.class.isAssignableFrom(klass)) {
-			return "map";
+			return MAP;
 		} else if(OTID.class.isAssignableFrom(klass) ||
 				OTObject.class.isAssignableFrom(klass) ) {
-			return "object";
+			return OBJECT;
 		}
 	
 		return null;

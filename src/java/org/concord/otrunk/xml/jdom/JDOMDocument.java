@@ -34,7 +34,6 @@ import java.io.InputStream;
 import org.concord.otrunk.xml.OTXMLElement;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 /**
