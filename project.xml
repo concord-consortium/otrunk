@@ -6,7 +6,7 @@
     <artifactId>otrunk</artifactId>
     <name>OTrunk</name>
     <groupId>${pom.artifactId}</groupId>
-    <currentVersion>1.10</currentVersion>
+    <currentVersion>1.11</currentVersion>
     <dependencies>
         <dependency>
             <groupId>jdom</groupId>
