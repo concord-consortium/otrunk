@@ -77,14 +77,14 @@ public class OTViewFactory
     /* (non-Javadoc)
      * @see org.concord.otrunk.view.OTViewFactory#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, boolean)
      */
-    public JComponent getComponent(OTObject pfObject,
+    public JComponent getComponent(OTObject otObject,
             OTViewContainer container, boolean editable)
     {
         OTObjectView view = 
-            getObjectView(pfObject, container);
+            getObjectView(otObject, container);
         
         if(view == null) {
-            return new JLabel("No view for object: " + pfObject);
+            return new JLabel("No view for object: " + otObject);
         }
         
         return view.getComponent(editable);
