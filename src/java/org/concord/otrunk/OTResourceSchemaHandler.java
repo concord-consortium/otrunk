@@ -30,15 +30,19 @@
 package org.concord.otrunk;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectInterface;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.otrunk.datamodel.OTDataObject;
 
 /**
@@ -180,7 +184,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 		    String resourceName = (String)args[0];
 		    Object resourceValue = dataObject.getResource(resourceName);
 		    return Boolean.valueOf(resourceValue != null);
-        } else if(methodName.startsWith("is")) {
+        }  else if(methodName.startsWith("is")) {
             String resourceName = getResourceName(2, methodName); 
             Class returnType = method.getReturnType();
             Class proxyClass = proxy.getClass();
@@ -224,7 +228,9 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 			Object resourceValue = args[0];
 			
 			setResource(resourceName, resourceValue);
-		} else {
+		} else if(methodName.equals("copyInto")) {
+            return copyInto(args[0]);
+        } else {
 		    System.err.println("Unknown method \"" + methodName + "\" called on " + proxy.getClass());
 		}
 		return null;

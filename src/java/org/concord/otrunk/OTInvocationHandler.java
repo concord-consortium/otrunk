@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.15 $
+ * $Date: 2006-05-05 16:00:32 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,7 +34,14 @@ package org.concord.otrunk;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
+import org.concord.framework.otrunk.OTObjectInterface;
+import org.concord.framework.otrunk.OTResourceCollection;
+import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.framework.otrunk.OTResourceSchema;
+import org.concord.otrunk.datamodel.DataObjectUtil;
 import org.concord.otrunk.datamodel.OTDataObject;
 
 
@@ -76,8 +83,34 @@ public class OTInvocationHandler
 	    // Handle the globalId specially
 	    if(methodName.equals("getGlobalId")) {
 	        return dataObject.getGlobalId();
-	    }
+	    } else if(methodName.equals("copyInto")) {
+            return copyInto(args[0]);
+        }
 	    
 	    return null;
 	}
+    
+    public Object copyInto(Object target)
+    {
+        // copy the dataObject
+        if(!(target instanceof Proxy)){
+            // error - should throw an exception here                
+            return null;
+        }
+        
+        // copy the dataObject
+        InvocationHandler handler = 
+            Proxy.getInvocationHandler(target);
+        if(!(handler instanceof OTInvocationHandler)){
+            // error - should throw an exception here                
+            return null;                
+        } 
+     
+        OTDataObject copyDataObject = 
+            ((OTInvocationHandler)handler).dataObject;
+        
+        DataObjectUtil.copyInto(dataObject, copyDataObject);
+        
+        return null;        
+    }
 }
