@@ -6,7 +6,7 @@
     <artifactId>otrunk</artifactId>
     <name>OTrunk</name>
     <groupId>${pom.artifactId}</groupId>
-    <currentVersion>1.10</currentVersion>
+    <currentVersion>1.12</currentVersion>
     <dependencies>
         <dependency>
             <groupId>jdom</groupId>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>framework</groupId>
             <artifactId>framework</artifactId>
-            <version>1.6</version>
+            <version>1.7</version>
             <type>jar</type>
             <properties>
                 <cc.proj>Framework</cc.proj>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>swing</groupId>
             <artifactId>swing</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
             <type>jar</type>
             <properties>
                 <cc.proj>Swing</cc.proj>
@@ -56,7 +56,7 @@
         <dependency>
             <groupId>frameworkview</groupId>
             <artifactId>frameworkview</artifactId>
-            <version>1.3</version>
+            <version>1.4</version>
             <type>jar</type>
             <properties>
                 <cc.proj>FrameworkView</cc.proj>
