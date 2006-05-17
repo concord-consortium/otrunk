@@ -3,7 +3,7 @@
     <server>cvs.concord.org</server>
     <repo>/home/buildspace/CodeBank</repo>
     <module>Projects/OTrunk</module>
-    <tagname>rel_1_11</tagname>
+    <tagname>rel_1_12</tagname>
     <file>
         <name>.classpath</name>
         <rev>1.10</rev>
@@ -41,17 +41,17 @@
     </file>
     <file>
         <name>file_catalog.xml</name>
-        <rev>1.16</rev>
-        <modtime>1139346712000</modtime>
-        <size>20569</size>
-        <md5sum>d6050e37e57b1b5069cec9551422c6be</md5sum>
+        <rev>1.17</rev>
+        <modtime>1144042984000</modtime>
+        <size>21701</size>
+        <md5sum>1fbcf5de862e92be41b190bdf4417c97</md5sum>
     </file>
     <file>
         <name>project.xml</name>
-        <rev>1.36</rev>
-        <modtime>1144060958000</modtime>
+        <rev>1.38</rev>
+        <modtime>1147899224000</modtime>
         <size>2546</size>
-        <md5sum>3e535ba5a98a9865a81d33ab024b72cd</md5sum>
+        <md5sum>1ce620c14ec14f16ed5c5d1bc7438d41</md5sum>
     </file>
     <file>
         <name>schema/otrunk_all_lax.rng</name>
@@ -90,10 +90,10 @@
     </file>
     <file>
         <name>src/java/org/concord/otrunk/OTInvocationHandler.java</name>
-        <rev>1.14</rev>
-        <modtime>1124744992000</modtime>
-        <size>2312</size>
-        <md5sum>22e43041aefe487361e031a265687f2e</md5sum>
+        <rev>1.15</rev>
+        <modtime>1146844832000</modtime>
+        <size>3500</size>
+        <md5sum>c3a8971abd352b32daad05a64586bce4</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/OTMLToXHTMLConverter.java</name>
@@ -125,10 +125,10 @@
     </file>
     <file>
         <name>src/java/org/concord/otrunk/OTResourceSchemaHandler.java</name>
-        <rev>1.9</rev>
-        <modtime>1125065847000</modtime>
-        <size>8607</size>
-        <md5sum>45cb9a69e4fc9825f0fa6fd4b57c63b7</md5sum>
+        <rev>1.10</rev>
+        <modtime>1146844832000</modtime>
+        <size>8882</size>
+        <md5sum>4d28713b907b3b3cc38f5ed7aa45a2c6</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/OTStateRoot.java</name>
@@ -178,6 +178,27 @@
         <modtime>1123102343000</modtime>
         <size>2913</size>
         <md5sum>e90b0973dac71ec44cd01afa5a9a72bd</md5sum>
+    </file>
+    <file>
+        <name>src/java/org/concord/otrunk/control/OTButton.java</name>
+        <rev>1.2</rev>
+        <modtime>1146846379000</modtime>
+        <size>1391</size>
+        <md5sum>92a709f95d0b7ebeceb7e304ee144245</md5sum>
+    </file>
+    <file>
+        <name>src/java/org/concord/otrunk/control/OTButtonView.java</name>
+        <rev>1.2</rev>
+        <modtime>1146846379000</modtime>
+        <size>2669</size>
+        <md5sum>eb43385ddb5c9d954231b5d9d670ca11</md5sum>
+    </file>
+    <file>
+        <name>src/java/org/concord/otrunk/datamodel/DataObjectUtil.java</name>
+        <rev>1.2</rev>
+        <modtime>1146846379000</modtime>
+        <size>2808</size>
+        <md5sum>f92b490fbe7cd17013110ea733a357fc</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/datamodel/OTDataObject.java</name>
@@ -384,10 +405,10 @@
     </file>
     <file>
         <name>src/java/org/concord/otrunk/view/OTViewFactory.java</name>
-        <rev>1.8</rev>
-        <modtime>1123102343000</modtime>
+        <rev>1.9</rev>
+        <modtime>1146844832000</modtime>
         <size>5098</size>
-        <md5sum>13f7a446312fd533d5dff9c4393eec6d</md5sum>
+        <md5sum>f4e68dfa8a792222fdba3793e6564563</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/view/OTViewFactoryAware.java</name>
