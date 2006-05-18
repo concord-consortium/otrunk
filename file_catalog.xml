@@ -3,7 +3,7 @@
     <server>cvs.concord.org</server>
     <repo>/home/buildspace/CodeBank</repo>
     <module>Projects/OTrunk</module>
-    <tagname>rel_1_12</tagname>
+    <tagname>rel_1_13</tagname>
     <file>
         <name>.classpath</name>
         <rev>1.10</rev>
@@ -41,17 +41,17 @@
     </file>
     <file>
         <name>file_catalog.xml</name>
-        <rev>1.17</rev>
-        <modtime>1144042984000</modtime>
-        <size>21701</size>
-        <md5sum>1fbcf5de862e92be41b190bdf4417c97</md5sum>
+        <rev>1.18</rev>
+        <modtime>1147899235000</modtime>
+        <size>22440</size>
+        <md5sum>c3887ac6e179c2e0fb6b551adc8ed8be</md5sum>
     </file>
     <file>
         <name>project.xml</name>
-        <rev>1.38</rev>
-        <modtime>1147899224000</modtime>
+        <rev>1.40</rev>
+        <modtime>1147982829000</modtime>
         <size>2546</size>
-        <md5sum>1ce620c14ec14f16ed5c5d1bc7438d41</md5sum>
+        <md5sum>6bc4fd43b7d57fff7a4851ba1cbc30f1</md5sum>
     </file>
     <file>
         <name>schema/otrunk_all_lax.rng</name>
@@ -181,10 +181,10 @@
     </file>
     <file>
         <name>src/java/org/concord/otrunk/control/OTButton.java</name>
-        <rev>1.2</rev>
-        <modtime>1146846379000</modtime>
-        <size>1391</size>
-        <md5sum>92a709f95d0b7ebeceb7e304ee144245</md5sum>
+        <rev>1.3</rev>
+        <modtime>1147981706000</modtime>
+        <size>1507</size>
+        <md5sum>8b3350f48f902b2c0d720629f79c9d22</md5sum>
     </file>
     <file>
         <name>src/java/org/concord/otrunk/control/OTButtonView.java</name>
