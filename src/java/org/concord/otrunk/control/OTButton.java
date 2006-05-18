@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2006-05-05 16:26:19 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2006-05-18 19:48:26 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -34,11 +34,13 @@ package org.concord.otrunk.control;
 
 import org.concord.framework.otrunk.OTObjectInterface;
 import org.concord.framework.otrunk.view.OTAction;
+import org.concord.framework.otrunk.view.OTActionView;
 
 public interface OTButton
-    extends OTObjectInterface
+    extends OTObjectInterface, OTActionView
 {
     public String getText();
     
     public OTAction getAction();
+    public void setAction(OTAction action);
 }
