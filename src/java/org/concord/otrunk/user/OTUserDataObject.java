@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.7 $
+ * $Date: 2006-05-18 22:24:21 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -161,8 +161,37 @@ public class OTUserDataObject
 	{
 		// if this is called then it isn't clear what to do, I guess
 		// some combination of the two objects.
-		(new Exception("user data object get resource keys not implemented")).printStackTrace();
-		return null;
+        // it is needed to implement generic object copying
+        // if we had access to the objects data description we could use
+        // that in this case, but assuming we don't have that
+        // we need to go through all the keys of the userobject and 
+        // all the keys of the author object and combine them, an easy
+        // way is to use a hashtable
+        Hashtable keyTable = new Hashtable();
+        OTDataObject userObject = getExistingUserObject();
+        if (userObject != null) {
+            String [] userKeys = userObject.getResourceKeys();
+            for(int i=0; i<userKeys.length; i++){
+                // we can put any object, but lets use the userObject
+                // so we might take advantage of that later
+                keyTable.put(userKeys[i], userObject);
+            }
+        }
+        
+        if(authoringObject != null) {
+            String [] authorKeys = authoringObject.getResourceKeys();
+            for(int i=0; i<authorKeys.length; i++){
+                Object oldValue = keyTable.get(authorKeys[i]);
+                if(oldValue == null){
+                    keyTable.put(authorKeys[i], authoringObject);
+                }
+            }
+        }
+
+        Object [] keys = keyTable.keySet().toArray();
+        String [] strKeys = new String [keys.length];
+        System.arraycopy(keys, 0, strKeys, 0, keys.length);
+        return strKeys;
 	}
 
 	public OTDataObject getUserObject()
