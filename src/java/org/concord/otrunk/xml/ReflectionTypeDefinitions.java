@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2005-10-17 20:55:48 $
+ * $Revision: 1.16 $
+ * $Date: 2006-09-15 12:15:18 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -97,10 +97,13 @@ public class ReflectionTypeDefinitions
 				Constructor [] memberConstructors = otObjectClass.getConstructors();
 				Constructor resourceConstructor = memberConstructors[0]; 
 				Class [] params = resourceConstructor.getParameterTypes();
-								
-				if(memberConstructors.length > 1 || params == null ||
+						
+				// Check all the conditions for incorrect imports.
+				if(memberConstructors.length > 1 || params == null || 
+						params.length == 0 ||
 						!OTResourceSchema.class.isAssignableFrom(params[0])) {
-					System.err.println("Invlaid constructor for OTrunk Object: " + className);
+					System.err.println("Invlaid constructor for OTrunk Object: " + className +
+							"\n   If you are using an otml file check the import statements");
 					throw new RuntimeException("OTObjects should only have 1 constructor" + "\n" +
 							" whose first argument is the resource schema");
 				}
