@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.37 $
- * $Date: 2006-02-07 01:07:18 $
+ * $Revision: 1.38 $
+ * $Date: 2006-09-27 18:46:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -173,8 +173,6 @@ public class OTViewer extends JFrame
 	
 	private JDialog commDialog;
 	
-	private boolean firstOpen = true;
-    
     public static void setOTViewFactory(OTViewFactory factory)
 	{
 		otViewFactory = factory;
@@ -708,7 +706,7 @@ public class OTViewer extends JFrame
 			}
 		};
 		exportToHtmlAction.putValue(Action.NAME, "Export to html...");
-		exportToHtmlAction.setEnabled(false);
+		exportToHtmlAction.setEnabled(true);
 		
 
 		    
@@ -1215,7 +1213,6 @@ public class OTViewer extends JFrame
         // for a file name
         newAnonUserData();
 		exportToHtmlAction.setEnabled(true);
-		firstOpen = false;
 	}
 	
 	public void openUserData() {
@@ -1239,7 +1236,6 @@ public class OTViewer extends JFrame
         if(file != null && file.exists()) {
         	loadUserDataFile(file);
         	exportToHtmlAction.setEnabled(true);
-        	firstOpen = false;
         } 
 	}
 	

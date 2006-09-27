@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-08-26 13:59:53 $
+ * $Revision: 1.4 $
+ * $Date: 2006-09-27 18:46:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -41,6 +41,7 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTWrapper;
+import org.concord.framework.otrunk.OTWrapperService;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTRelativeID;
@@ -113,6 +114,10 @@ public class OTObjectServiceImpl
         return otrunk.getOTID(otidStr);
     }
 
+    public OTWrapperService createWrapperService() {
+    	return new OTWrapperServiceImpl(this);
+    }
+    
     public OTWrapper getWrapper(Object wrappedObject)
     {
         return otrunk.getWrapper(wrappedObject);
