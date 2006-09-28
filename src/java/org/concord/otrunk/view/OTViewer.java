@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.38 $
- * $Date: 2006-09-27 18:46:33 $
+ * $Revision: 1.39 $
+ * $Date: 2006-09-28 04:07:48 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -573,15 +573,21 @@ public class OTViewer extends JFrame
      */
     public void currentObjectChanged(OTViewContainer container)
     {
+    	final OTViewContainer myContainer = container; 
+    	
         // TODO Auto-generated method stub
-        OTObject currentObject = container.getCurrentObject();
-        if(folderTreeArea != null) {
-			OTFolderNode node = (OTFolderNode)folderTreeArea.getLastSelectedPathComponent();
-			if(node == null) return;
-            if(node.getPfObject() != currentObject) {
-                folderTreeArea.setSelectionPath(null);
-            }
-        }
+    	SwingUtilities.invokeLater(new Runnable(){
+    		public void run(){
+    			OTObject currentObject =myContainer.getCurrentObject();
+    			if(folderTreeArea != null) {
+    				OTFolderNode node = (OTFolderNode)folderTreeArea.getLastSelectedPathComponent();
+    				if(node == null) return;
+    				if(node.getPfObject() != currentObject) {
+    					folderTreeArea.setSelectionPath(null);
+    				}
+    			}
+    		}    		
+    	});
     }
 	
 	/* (non-Javadoc)
