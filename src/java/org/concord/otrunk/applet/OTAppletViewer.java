@@ -51,14 +51,19 @@ public class OTAppletViewer extends JApplet {
 	XMLDatabase xmlDB;
 	boolean masterLoaded = false;
 	private OTAppletViewer master;
+
+	public String getAppletName() {
+		return getParameter("name");
+	}
 	
 	public void init() {
 		super.init();
 
 		String urlString = getParameter("url");
+		System.out.println("" + getAppletName() + " started init");
 
-		System.out.println("I " + getParameter("name") + " started init");
-
+		
+		getName();
 		if(urlString == null) {
 			return;			
 		}
@@ -81,7 +86,7 @@ public class OTAppletViewer extends JApplet {
 			}
 
 			masterLoaded = true;
-			
+			master = this;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -94,7 +99,7 @@ public class OTAppletViewer extends JApplet {
 		// TODO Auto-generated method stub
 		super.start();
 
-		System.out.println("I " + getParameter("name") + " started start");
+		System.out.println("" + getAppletName() + " started start");
 
 		if(isMasterLoaded()){
 			setupView();
@@ -106,6 +111,7 @@ public class OTAppletViewer extends JApplet {
 				Applet a = (Applet)applets.nextElement();
 				if(a instanceof OTAppletViewer &&
 						!((OTAppletViewer)a).isMaster()){
+					System.out.println("" + getAppletName() + " calling finishedLoading on " + a.getParameter("name"));
 					((OTAppletViewer)a).masterFinishedLoading(this);
 				}
 			}
@@ -117,8 +123,10 @@ public class OTAppletViewer extends JApplet {
 		super.stop();
 	}
 
-	protected void setupView()
+	public void setupView()
 	{
+		System.out.println("" + getAppletName() + " start setupView");
+
 		// get the otml url
 		try {
 			// look up view container with the frame.
@@ -135,6 +143,8 @@ public class OTAppletViewer extends JApplet {
 
 			getContentPane().setLayout(new BorderLayout());
 
+			getContentPane().removeAll();
+			
 			getContentPane().add(otContainer, BorderLayout.CENTER);
 
 			// call setCurrentObject on that view container with a null
@@ -142,23 +152,42 @@ public class OTAppletViewer extends JApplet {
 			OTObject root;
 			root = getOTrunk().getRoot();
 
-			OTID id = getID(getParameter("refid"));
-			
-			OTObject appletObject = 
-				((DefaultOTObject)root).getReferencedObject(id);
+			String refid = getParameter("refid");
+			OTObject appletObject = root;
+			if(refid != null && refid.length() > 0){
+				OTID id = getID(refid);
+
+				appletObject = ((DefaultOTObject)root).getReferencedObject(id);
+			}
 			
 			otContainer.setCurrentObject(appletObject, null);
 			
-			System.out.println("I " + getParameter("name") + " finished setupView");
+			System.out.println("" + getAppletName() + " finished setupView");
 			//repaint();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
 	}
+
+	public OTObject getOTObject() throws Exception {
+		// call setCurrentObject on that view container with a null
+		// frame
+		OTObject root = getOTrunk().getRoot();
+
+		String refid = getParameter("refid");
+		OTObject appletObject = root;
+		if(refid != null && refid.length() > 0){
+			OTID id = getID(refid);
+
+			appletObject = ((DefaultOTObject)root).getReferencedObject(id);
+		}
+
+		return appletObject;
+	}
 	
 	public boolean isMaster(){
-		return "master".equals(getParameter("name"));		
+		return this == master;
 	}
 	
 	public OTAppletViewer getMaster(){
@@ -173,8 +202,8 @@ public class OTAppletViewer extends JApplet {
 		Enumeration applets = getAppletContext().getApplets();
 		while(applets.hasMoreElements()){
 			Applet a = (Applet)applets.nextElement();
-			System.out.println("I " + a.getParameter("name") + " found applet: " + a);
-			System.out.println("  name: " + a.getParameter("name"));
+			System.out.println("" + a.getParameter("name") + " found: " +
+					a.getParameter("name") + " applet.toString: " + a);
 			if(a instanceof OTAppletViewer &&
 					((OTAppletViewer)a).isMaster()){
 				master = (OTAppletViewer)a;
