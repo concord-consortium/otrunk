@@ -25,10 +25,18 @@ package org.concord.otrunk.applet;
 
 import java.applet.Applet;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Enumeration;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JApplet;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.concord.framework.otrunk.DefaultOTObject;
@@ -42,6 +50,7 @@ import org.concord.otrunk.view.OTFrameManager;
 import org.concord.otrunk.view.OTViewContainerPanel;
 import org.concord.otrunk.view.OTViewFactory;
 import org.concord.otrunk.view.OTViewService;
+import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.view.SwingUserMessageHandler;
 
@@ -51,6 +60,9 @@ public class OTAppletViewer extends JApplet {
 	XMLDatabase xmlDB;
 	boolean masterLoaded = false;
 	private OTAppletViewer master;
+	
+	Action stateAction;
+	private JButton authorSaveButton;
 
 	public String getAppletName() {
 		return getParameter("name");
@@ -162,6 +174,20 @@ public class OTAppletViewer extends JApplet {
 			
 			otContainer.setCurrentObject(appletObject, null);
 			
+			///////////////////////////////
+			stateAction = new StateHandlerAction();
+			
+			//Save author content button
+			authorSaveButton = new JButton("Save");
+			authorSaveButton.setActionCommand("save_author");
+			authorSaveButton.addActionListener(stateAction);
+			
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.add(authorSaveButton);
+			
+			getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+			///////////////////////////////
+			
 			System.out.println("" + getAppletName() + " finished setupView");
 			//repaint();
 		} catch (Exception e) {
@@ -262,5 +288,42 @@ public class OTAppletViewer extends JApplet {
 		
 		// try to get the viewfactory from the master applet
 		return getMaster().getID(id);
+	}
+	
+	public void saveAuthorState()
+	{
+		String saveUrlString = getParameter("author_state_save_url");
+		if (saveUrlString == null){
+			//Don't save
+			System.err.println("No author url specified for saving");
+			return;
+		}
+				
+		try{
+			System.out.println("opening "+saveUrlString);
+			URL saveUrl = new URL(getDocumentBase(), saveUrlString);
+			System.out.println(saveUrl);
+			URLConnection urlConn = saveUrl.openConnection();
+			System.out.println(urlConn);
+			urlConn.setDoOutput(true);
+			OutputStream outStream = urlConn.getOutputStream();
+			
+			Exporter.export(outStream, xmlDB.getRoot(), xmlDB);
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	class StateHandlerAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			if (e.getActionCommand().equals("save_author")){
+				saveAuthorState();
+			}
+			
+		}
+		
 	}
 }
