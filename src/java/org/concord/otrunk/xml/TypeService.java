@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.18 $
- * $Date: 2006-02-24 20:59:16 $
+ * $Revision: 1.19 $
+ * $Date: 2006-10-02 02:17:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -60,7 +60,9 @@ public class TypeService
     public final static String XML_STRING = "xmlstring";
     public final static String BOOLEAN = "boolean";
     public final static String INTEGER = "integer";
+    public final static String LONG = "long";
     public final static String FLOAT = "float";
+    public final static String DOUBLE = "double";
     public final static String BLOB = "blob";
     public final static String LIST = "list";
     public final static String MAP = "map";
@@ -78,9 +80,15 @@ public class TypeService
 		} else if(Integer.class.isAssignableFrom(klass) ||
 				Integer.TYPE.equals(klass)) {
 			return INTEGER;
+		} else if(Long.class.isAssignableFrom(klass) ||
+				Long.TYPE.equals(klass)) {
+			return LONG;
 		} else if(Float.class.isAssignableFrom(klass) ||
 				Float.TYPE.equals(klass)) {
 			return FLOAT;
+		} else if(Double.class.isAssignableFrom(klass) ||
+				Double.TYPE.equals(klass)) {
+			return DOUBLE;
 		} else if(klass.isArray() && 
 				klass.getComponentType().equals(Byte.TYPE)) {
 			return BLOB;

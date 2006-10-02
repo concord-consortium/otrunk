@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2006-02-24 21:01:13 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2006-10-02 02:17:43 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -247,7 +247,13 @@ public class RNGSchemaGenerator
                 resourceDefElement = createSimpleResourceDef(resName, "boolean");                
             } else if(type.equals(TypeService.FLOAT)){
                 resourceDefElement = createSimpleResourceDef(resName, "float");                                
+            } else if(type.equals(TypeService.DOUBLE)){
+                resourceDefElement = createSimpleResourceDef(resName, "double");                                
             } else if(type.equals(TypeService.INTEGER)){                
+                // we want to allow hex values like 0xFFFFF make this
+                // basic text seems to be the only way to do that
+                resourceDefElement = createSimpleResourceDef(resName, "text");                                                
+            } else if(type.equals(TypeService.LONG)){                
                 // we want to allow hex values like 0xFFFFF make this
                 // basic text seems to be the only way to do that
                 resourceDefElement = createSimpleResourceDef(resName, "text");                                                
