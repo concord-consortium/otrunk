@@ -23,101 +23,32 @@
 
 package org.concord.otrunk.applet;
 
-import java.applet.Applet;
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.Enumeration;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JApplet;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import org.concord.framework.otrunk.DefaultOTObject;
-import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTrunk;
-import org.concord.framework.otrunk.view.OTFrame;
-import org.concord.otrunk.OTUserListService;
-import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.view.OTFrameManager;
-import org.concord.otrunk.view.OTViewContainerPanel;
-import org.concord.otrunk.view.OTViewFactory;
-import org.concord.otrunk.view.OTViewService;
-import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
-import org.concord.view.SwingUserMessageHandler;
 
-public class OTAppletViewer extends JApplet {
-	OTViewFactory viewFactory;
-	OTrunk otrunk;
-	XMLDatabase xmlDB;
-	boolean masterLoaded = false;
-	private OTAppletViewer master;
-	
-	Action stateAction;
-	private JButton authorSaveButton;
-
-	public String getAppletName() {
-		return getParameter("name");
-	}
-	
-	public void init() {
+public class OTAppletViewer extends OTAbstractAppletViewer 
+{
+	public void init() 
+	{
 		super.init();
 
-		String urlString = getParameter("url");
 		System.out.println("" + getAppletName() + " started init");
-
 		
-		getName();
-		if(urlString == null) {
-			return;			
-		}
-		
-		try {			
-			URL url = new URL(getDocumentBase(), urlString);
-
-			xmlDB = new XMLDatabase(url, System.err);
-
-			otrunk = new OTrunkImpl(xmlDB,
-					new Object[] { new SwingUserMessageHandler(this),
-							new OTUserListService() });
-
-			OTViewService viewService = (OTViewService) otrunk
-					.getService(OTViewService.class);
-
-			viewFactory = null;
-			if (viewService != null) {
-				viewFactory = viewService.getViewFactory(otrunk);
-			}
-
-			masterLoaded = true;
-			master = this;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	
+		loadState();		
 	}
 	
-	public void start() {
-		// TODO Auto-generated method stub
+	public void start() 
+	{
 		super.start();
 
 		System.out.println("" + getAppletName() + " started start");
 
-		if(isMasterLoaded()){
+//		if(isMasterLoaded()){
 			setupView();
-		}
+//		}
 		
-		if(isMaster()){
+/*		if(isMaster()){
 			Enumeration applets = getAppletContext().getApplets();
 			while(applets.hasMoreElements()){
 				Applet a = (Applet)applets.nextElement();
@@ -128,202 +59,27 @@ public class OTAppletViewer extends JApplet {
 				}
 			}
 		}
+*/
 	}
 	
-	public void stop() {
-		// TODO Auto-generated method stub
-		super.stop();
-	}
-
-	public void setupView()
+	protected void openOTDatabase()
+		throws Exception
 	{
-		System.out.println("" + getAppletName() + " start setupView");
+		String urlString = getParameter("url");
 
-		// get the otml url
+		if (urlString == null || urlString.equals("")){
+			System.err.println("No url load state specified");
+			throw new Exception("No url load state specified");
+		}
+		
 		try {
-			// look up view container with the frame.
-			OTViewContainerPanel otContainer = new OTViewContainerPanel(
-					new OTFrameManager() {
-						public void setFrameObject(OTObject otObject,
-								OTFrame otFrame) {
-							// TODO Auto-generated method stub
-
-						}
-					}, null);
-
-			otContainer.setOTViewFactory(getViewFactory());
-
-			getContentPane().setLayout(new BorderLayout());
-
-			getContentPane().removeAll();
+			URL url = new URL(getDocumentBase(), urlString);
 			
-			getContentPane().add(otContainer, BorderLayout.CENTER);
-
-			// call setCurrentObject on that view container with a null
-			// frame
-			OTObject root;
-			root = getOTrunk().getRoot();
-
-			String refid = getParameter("refid");
-			OTObject appletObject = root;
-			if(refid != null && refid.length() > 0){
-				OTID id = getID(refid);
-
-				appletObject = ((DefaultOTObject)root).getReferencedObject(id);
-			}
+			xmlDB = new XMLDatabase(url, System.err);
 			
-			otContainer.setCurrentObject(appletObject, null);
-			
-			///////////////////////////////
-			stateAction = new StateHandlerAction();
-			
-			//Save author content button
-			authorSaveButton = new JButton("Save");
-			authorSaveButton.setActionCommand("save_author");
-			authorSaveButton.addActionListener(stateAction);
-			
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.add(authorSaveButton);
-			
-			getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-			///////////////////////////////
-			
-			System.out.println("" + getAppletName() + " finished setupView");
-			//repaint();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-	}
-
-	public OTObject getOTObject() throws Exception {
-		// call setCurrentObject on that view container with a null
-		// frame
-		OTObject root = getOTrunk().getRoot();
-
-		String refid = getParameter("refid");
-		OTObject appletObject = root;
-		if(refid != null && refid.length() > 0){
-			OTID id = getID(refid);
-
-			appletObject = ((DefaultOTObject)root).getReferencedObject(id);
-		}
-
-		return appletObject;
-	}
-	
-	public boolean isMaster(){
-		return this == master;
-	}
-	
-	public OTAppletViewer getMaster(){
-		if(isMaster()){
-			return this;
-		}
-		
-		if(master != null) {
-			return master;
-		}
-		
-		Enumeration applets = getAppletContext().getApplets();
-		while(applets.hasMoreElements()){
-			Applet a = (Applet)applets.nextElement();
-			System.out.println("" + a.getParameter("name") + " found: " +
-					a.getParameter("name") + " applet.toString: " + a);
-			if(a instanceof OTAppletViewer &&
-					((OTAppletViewer)a).isMaster()){
-				master = (OTAppletViewer)a;
-				return master;
-			}
-		}
-
-		return null;
-//		return (OTAppletViewer)getAppletContext().getApplet("master");		
-	}
-	
-	public boolean isMasterLoaded(){
-		if(isMaster()) {
-			return masterLoaded;
-		}
-
-		if(getMaster() != null){
-			return getMaster().isMasterLoaded();
-		}
-		
-		return false;
-	}
-	
-	public void masterFinishedLoading(OTAppletViewer master){
-		this.master = master;
-		//we might not be in the correct thread
-		SwingUtilities.invokeLater(new Runnable(){
-			public void run() {
-				setupView();
-			}
-		});
-	}
-	
-	public OTViewFactory getViewFactory(){
-		if(isMaster()) {
-			return viewFactory;
-		}
-		
-		// try to get the viewfactory from the master applet
-		return getMaster().getViewFactory();
-	}
-	
-	public OTrunk getOTrunk(){
-		if(isMaster()) {
-			return otrunk;
-		}
-
-		// try to get the viewfactory from the master applet
-		return getMaster().getOTrunk();
-	}
-	
-	public OTID getID(String id){
-		if(isMaster()){
-			return xmlDB.getOTIDFromLocalID(id);
-		}
-		
-		// try to get the viewfactory from the master applet
-		return getMaster().getID(id);
-	}
-	
-	public void saveAuthorState()
-	{
-		String saveUrlString = getParameter("author_state_save_url");
-		if (saveUrlString == null){
-			//Don't save
-			System.err.println("No author url specified for saving");
-			return;
-		}
-				
-		try{
-			System.out.println("opening "+saveUrlString);
-			URL saveUrl = new URL(getDocumentBase(), saveUrlString);
-			System.out.println(saveUrl);
-			URLConnection urlConn = saveUrl.openConnection();
-			System.out.println(urlConn);
-			urlConn.setDoOutput(true);
-			OutputStream outStream = urlConn.getOutputStream();
-			
-			Exporter.export(outStream, xmlDB.getRoot(), xmlDB);
-		}
-		catch (Exception ex) {
+		}catch (Exception ex) {
 			ex.printStackTrace();
-		}
-	}
-	
-	class StateHandlerAction extends AbstractAction
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			if (e.getActionCommand().equals("save_author")){
-				saveAuthorState();
-			}
-			
-		}
-		
+			throw ex;
+		}				
 	}
 }
