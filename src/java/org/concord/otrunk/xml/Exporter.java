@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2006-01-13 21:04:41 $
- * $Author: scytacki $
+ * $Revision: 1.14 $
+ * $Date: 2006-10-02 02:14:21 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -35,6 +35,7 @@ package org.concord.otrunk.xml;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Vector;
 
@@ -65,9 +66,16 @@ public class Exporter
 	public static void export(File outputFile, OTDataObject rootObject, OTDatabase db)
 	throws Exception
 	{
+		FileOutputStream outputStream = new FileOutputStream(outputFile);
+		
+		export(outputStream, rootObject, db);
+	}
+	
+	public static void export(OutputStream outputStream, OTDataObject rootObject, OTDatabase db)
+	throws Exception
+	{
 		writtenIds = new Vector();
 		writtenClasses = new Vector();
-		FileOutputStream outputStream = new FileOutputStream(outputFile);
 		PrintStream printStream = new PrintStream(outputStream);
 	
 		otDb = db;
