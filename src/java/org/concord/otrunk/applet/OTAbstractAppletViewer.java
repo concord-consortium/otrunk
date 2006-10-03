@@ -26,7 +26,9 @@ package org.concord.otrunk.applet;
 import java.applet.Applet;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
@@ -199,8 +201,7 @@ public abstract class OTAbstractAppletViewer extends JApplet
 
 	public boolean isMaster()
 	{
-		return true;
-		//return this == master;
+		return this == master;
 	}
 
 	public OTAbstractAppletViewer getMaster()
@@ -299,15 +300,43 @@ public abstract class OTAbstractAppletViewer extends JApplet
 			URLConnection urlConn = saveUrl.openConnection();
 			System.out.println(urlConn);
 			urlConn.setDoOutput(true);
+			urlConn.setRequestProperty("Content-Type", "application/xml");
+			if(urlConn instanceof HttpURLConnection){
+				String method = getParameter("author_state_save_method");
+				if(method == null || method.length() == 0) {
+					method = "PUT";
+				}
+				((HttpURLConnection)urlConn).setRequestMethod(method);
+			}			
+			// url
 			OutputStream outStream = urlConn.getOutputStream();
 			
 			Exporter.export(outStream, xmlDB.getRoot(), xmlDB);
+			
+			outStream.flush();
+			outStream.close();
+			
+			InputStream postIn = urlConn.getInputStream();
+
+			// It seems like I have to read the response other wise the post isn't
+			// accepted.
+			
+			byte [] inBytes = new byte [1000];
+			postIn.read(inBytes);
+
+			String inTest = new String(inBytes);
+					
+			postIn.close();
+
+			if(urlConn instanceof HttpURLConnection) {
+				((HttpURLConnection)urlConn).disconnect();
+			}
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-
+	
 	class StateHandlerAction extends AbstractAction
 	{
 		public void actionPerformed(ActionEvent e)
