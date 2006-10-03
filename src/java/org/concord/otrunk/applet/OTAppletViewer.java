@@ -23,7 +23,11 @@
 
 package org.concord.otrunk.applet;
 
+import java.applet.Applet;
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.Enumeration;
 
 import org.concord.otrunk.xml.XMLDatabase;
 
@@ -34,8 +38,16 @@ public class OTAppletViewer extends OTAbstractAppletViewer
 		super.init();
 
 		System.out.println("" + getAppletName() + " started init");
-		
-		loadState();		
+
+		String urlString = getParameter("url");		
+		// If the url is not set then
+		// this is not the master applet on the page
+		// so the state does not need to be loaded
+		if(urlString == null) {
+			return;			
+		}
+
+		loadState();
 	}
 	
 	public void start() 
@@ -44,11 +56,11 @@ public class OTAppletViewer extends OTAbstractAppletViewer
 
 		System.out.println("" + getAppletName() + " started start");
 
-//		if(isMasterLoaded()){
+		if(isMasterLoaded()){
 			setupView();
-//		}
+		}
 		
-/*		if(isMaster()){
+		if(isMaster()){
 			Enumeration applets = getAppletContext().getApplets();
 			while(applets.hasMoreElements()){
 				Applet a = (Applet)applets.nextElement();
@@ -59,7 +71,6 @@ public class OTAppletViewer extends OTAbstractAppletViewer
 				}
 			}
 		}
-*/
 	}
 	
 	protected void openOTDatabase()
@@ -74,12 +85,17 @@ public class OTAppletViewer extends OTAbstractAppletViewer
 		
 		try {
 			URL url = new URL(getDocumentBase(), urlString);
+
+			URLConnection urlConn = url.openConnection();
+			urlConn.setRequestProperty("Content-Type", "application/xml");
+				
+			InputStream input = urlConn.getInputStream();
 			
-			xmlDB = new XMLDatabase(url, System.err);
-			
+			xmlDB = new XMLDatabase(input, url, System.err);
+
 		}catch (Exception ex) {
 			ex.printStackTrace();
 			throw ex;
 		}				
-	}
+	}		
 }
