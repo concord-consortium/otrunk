@@ -38,7 +38,8 @@ public class OTAppletViewer extends OTAbstractAppletViewer
 		super.init();
 
 		System.out.println("" + getAppletName() + " started init");
-
+		System.out.println("" + getAppletName() + " codebase: " + getCodeBase());
+		
 		String urlString = getParameter("url");		
 		// If the url is not set then
 		// this is not the master applet on the page
