@@ -23,20 +23,22 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2006-10-02 02:14:21 $
- * $Author: imoncada $
+ * $Revision: 1.15 $
+ * $Date: 2006-10-11 17:26:00 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.xml;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
@@ -70,21 +72,28 @@ public class Exporter
 		
 		export(outputStream, rootObject, db);
 	}
-	
+
 	public static void export(OutputStream outputStream, OTDataObject rootObject, OTDatabase db)
 	throws Exception
 	{
+		OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+		export(writer, rootObject, db);
+	}
+	
+	public static void export(Writer writer, OTDataObject rootObject, OTDatabase db)
+	throws Exception
+	{	
 		writtenIds = new Vector();
 		writtenClasses = new Vector();
-		PrintStream printStream = new PrintStream(outputStream);
+		PrintWriter printStream = new PrintWriter(writer);
 	
 		otDb = db;
 		
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		PrintStream objectPrintStream = new PrintStream(byteStream);
-		exportObject(objectPrintStream, rootObject, 2);
+		StringWriter objectWriter = new StringWriter();
+		PrintWriter objectPrintWriter = new PrintWriter(objectWriter);
+		exportObject(objectPrintWriter, rootObject, 2);
 
-		String objectString = byteStream.toString();
+		String objectString = objectWriter.toString();
 		
 		printStream.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		printStream.println("<otrunk>");
@@ -114,7 +123,7 @@ public class Exporter
 		
 	}
 	
-	public static void printIndent(int indent, PrintStream output)
+	public static void printIndent(int indent, PrintWriter output)
 	{
 		String start = "";
 		for(int i=0; i<indent; i++) {
@@ -123,7 +132,7 @@ public class Exporter
 		output.print(start);
 	}
 	
-	public static void indentPrint(int indent, String str, PrintStream output)
+	public static void indentPrint(int indent, String str, PrintWriter output)
 	{
 	    printIndent(indent, output);
 	    
@@ -131,7 +140,7 @@ public class Exporter
 	}
 	
 	public static void exportCollectionItem(OTDataObject parentDataObj, 
-			PrintStream output, Object item, int indent)
+			PrintWriter output, Object item, int indent)
 	throws Exception
 	{
 		if(item instanceof OTID) {
@@ -171,7 +180,7 @@ public class Exporter
 		}
 	}
 
-    public static void exportID(PrintStream output, OTDataObject parent, 
+    public static void exportID(PrintWriter output, OTDataObject parent, 
             OTID id, int indent)
     throws Exception
     {
@@ -190,7 +199,7 @@ public class Exporter
         }
     }
     
-	public static void exportObject(PrintStream output, OTDataObject dataObj, int indent)
+	public static void exportObject(PrintWriter output, OTDataObject dataObj, int indent)
 	throws Exception
 	{
 		OTID id = dataObj.getGlobalId();
@@ -307,7 +316,7 @@ public class Exporter
 			    // escape xml characters
 			    String text = resource.toString();
 			    String escapedText = escapeElementText(text);
-				indentPrint(resourceIndent+1, text, output);
+				indentPrint(resourceIndent+1, escapedText, output);
 				printIndent(resourceIndent, output);
 			}
 			output.println("</" + resourceKeys[i] + ">");

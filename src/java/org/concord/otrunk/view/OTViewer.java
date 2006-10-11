@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.39 $
- * $Date: 2006-09-28 04:07:48 $
+ * $Revision: 1.40 $
+ * $Date: 2006-10-11 17:26:00 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -112,16 +112,9 @@ public class OTViewer extends JFrame
      */
     private static final long serialVersionUID = 1L;
     
-    public final static String DEBUG_PROP = "otrunk.view.debug";
     public final static String TITLE_PROP = "otrunk.view.frame_title";
     public final static String HIDE_TREE_PROP = "otrunk.view.hide_tree";
-    public final static String SINGLE_USER_PROP = "otrunk.view.single_user";
-    public final static String NO_USER_PROP = "otrunk.view.no_user";
-        
-    public final static int NO_USER_MODE = 0;
-    public final static int SINGLE_USER_MODE = 1;        
-    public final static int MULTIPLE_USER_MODE = 2;
-    
+
     private static OTrunkImpl otrunk;
 	private static OTViewFactory otViewFactory;
 	
@@ -239,7 +232,7 @@ public class OTViewer extends JFrame
 
         JScrollPane folderTreeScrollPane = new JScrollPane(folderTreeArea);
 
-        if(System.getProperty(DEBUG_PROP,"").equals("true")){
+        if(System.getProperty(OTViewerHelper.DEBUG_PROP,"").equals("true")){
 	        //			ViewFactory.getComponent(root);
 	        
 	        dataTreeArea = new JTree(dataTreeModel);
@@ -365,7 +358,7 @@ public class OTViewer extends JFrame
         	}
         } 
         
-        if(userMode == SINGLE_USER_MODE) {
+        if(userMode == OTViewerHelper.SINGLE_USER_MODE) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     instructionPanel();              
@@ -388,7 +381,6 @@ public class OTViewer extends JFrame
 		throws Exception
 	{
 	    userDataDB = new XMLDatabase(url);
-        otrunk.setCreationDb(userDataDB);
         currentUser = otrunk.registerUserDataDatabase(userDataDB, name);
         
 	    reloadWindow();
@@ -438,14 +430,18 @@ public class OTViewer extends JFrame
 		boolean overrideShowTree = false;
 		
 		switch(userMode){
-		case NO_USER_MODE:
+		case OTViewerHelper.NO_USER_MODE:
 		    root = otrunk.getRoot();
 			break;
-		case SINGLE_USER_MODE:
+		case OTViewerHelper.SINGLE_USER_MODE:
 		    if(userDataDB == null) {
+		        // FIXME This is an error 
+		    	// the newAnonUserData should have been called before this method is
+		    	// called 
 		        // no user file has been started yet
 		        overrideShowTree = true;
-		        root = otrunk.getFirstObjectNoUserData();
+		        
+		        root = null;
 		    } else {
 		        OTObject otRoot = otrunk.getRoot();
 			    root = otrunk.getUserRuntimeObject(otRoot, currentUser);			    		        
@@ -453,7 +449,7 @@ public class OTViewer extends JFrame
 		}
 
 		if(showTree && !overrideShowTree) {
-		    OTDataObject rootDataObject = otrunk.getRootDataObject();
+			OTDataObject rootDataObject = xmlDB.getRoot();
 			dataTreeModel.setRoot(new OTDataObjectNode("root", 
 					rootDataObject, otrunk));
 			
@@ -470,10 +466,10 @@ public class OTViewer extends JFrame
 		Frame frame = (Frame)SwingUtilities.getRoot(this);
 		
 		switch(userMode) {
-		case NO_USER_MODE:
+		case OTViewerHelper.NO_USER_MODE:
 		    frame.setTitle(baseFrameTitle + ": " + currentURL.toString());
 		    break;
-		case SINGLE_USER_MODE:
+		case OTViewerHelper.SINGLE_USER_MODE:
 			if(currentUserFile != null) {
 			    frame.setTitle(baseFrameTitle + ": " + currentUserFile.toString());
 			} else  if(userDataDB != null){
@@ -493,16 +489,7 @@ public class OTViewer extends JFrame
 	{
 	    loadURL(currentURL);
 	}
-	
-	public OTUserObject createUser(String name, OTObjectService objService)
-		throws Exception
-	{
-	    OTUserObject user = (OTUserObject)objService.createObject(OTUserObject.class); 
-	    user.setName(name);
-	    return user;
-	}
-
-	
+		
 	public void setCurrentUser(OTUserObject userObject)
 	{
 	    OTUserObject oldUser = currentUser;
@@ -539,10 +526,10 @@ public class OTViewer extends JFrame
 
 		OTViewer viewer = new OTViewer(!Boolean.getBoolean(HIDE_TREE_PROP));
 
-		if(Boolean.getBoolean(SINGLE_USER_PROP)) {
-			viewer.setUserMode(OTViewer.SINGLE_USER_MODE);
-		} else if(Boolean.getBoolean(NO_USER_PROP)) {
-			viewer.setUserMode(OTViewer.NO_USER_MODE);
+		if(Boolean.getBoolean(OTViewerHelper.SINGLE_USER_PROP)) {
+			viewer.setUserMode(OTViewerHelper.SINGLE_USER_MODE);
+		} else if(Boolean.getBoolean(OTViewerHelper.NO_USER_PROP)) {
+			viewer.setUserMode(OTViewerHelper.NO_USER_MODE);
 		}
 
 		viewer.initArgs(args);				
@@ -976,9 +963,9 @@ public class OTViewer extends JFrame
 		    {
 		        Object source = e.getSource();
 		        if(((JCheckBoxMenuItem)source).isSelected()){
-		            System.setProperty(DEBUG_PROP,"true");
+		            System.setProperty(OTViewerHelper.DEBUG_PROP,"true");
 		        } else {
-		            System.setProperty(DEBUG_PROP,"false");
+		            System.setProperty(OTViewerHelper.DEBUG_PROP,"false");
 		        }
 		        
 		        try {
@@ -1035,7 +1022,7 @@ public class OTViewer extends JFrame
 		    fileMenu.removeAll();
 		}
 				
-		if(userMode == SINGLE_USER_MODE) {
+		if(userMode == OTViewerHelper.SINGLE_USER_MODE) {
             fileMenu.setEnabled(!justStarted);
 
             fileMenu.add(newUserDataAction);
@@ -1047,7 +1034,7 @@ public class OTViewer extends JFrame
 		    fileMenu.add(saveUserDataAsAction);
 		}
 		
-		if(Boolean.getBoolean(DEBUG_PROP)) {
+		if(Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
 		    fileMenu.add(loadAction);
 		    
 		    fileMenu.add(reloadAction);
@@ -1068,7 +1055,7 @@ public class OTViewer extends JFrame
         fileMenu.add(showConsoleAction);
         
 		JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem(debugAction);
-		debugItem.setSelected(Boolean.getBoolean(DEBUG_PROP));
+		debugItem.setSelected(Boolean.getBoolean(OTViewerHelper.DEBUG_PROP));
 		fileMenu.add(debugItem);
 		
 		fileMenu.add(exitAction);
@@ -1148,7 +1135,7 @@ public class OTViewer extends JFrame
 			stateRoot.setFormatVersionString("1.0");		
 			userDataDB.setDirty(false);
 					    		    
-		    OTUserObject userObject = createUser("anon_single_user", objService);
+		    OTUserObject userObject = OTViewerHelper.createUser("anon_single_user", objService);
             
             otrunk.initUserObjectService((OTObjectServiceImpl)objService, userObject, stateRoot);
             

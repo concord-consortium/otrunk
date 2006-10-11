@@ -26,11 +26,7 @@ package org.concord.otrunk.applet;
 import java.applet.Applet;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Enumeration;
 
 import javax.swing.AbstractAction;
@@ -44,23 +40,15 @@ import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTrunk;
-import org.concord.framework.otrunk.view.OTFrame;
-import org.concord.otrunk.OTUserListService;
-import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.view.OTFrameManager;
+import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.view.OTViewContainerPanel;
-import org.concord.otrunk.view.OTViewFactory;
-import org.concord.otrunk.view.OTViewService;
-import org.concord.otrunk.xml.Exporter;
+import org.concord.otrunk.view.OTViewerHelper;
 import org.concord.otrunk.xml.XMLDatabase;
-import org.concord.view.SwingUserMessageHandler;
 
 public abstract class OTAbstractAppletViewer extends JApplet
 {
-	protected OTViewFactory viewFactory;
-	protected OTrunk otrunk;
+	protected OTViewerHelper viewerHelper;
 
-	protected XMLDatabase xmlDB;
 	protected boolean masterLoaded = false;
 	protected OTAbstractAppletViewer master;
 	protected Action stateAction;
@@ -69,6 +57,7 @@ public abstract class OTAbstractAppletViewer extends JApplet
 	public OTAbstractAppletViewer()
 	{
 		super();
+		viewerHelper = new OTViewerHelper();
 	}
 
 	public String getAppletName()
@@ -86,25 +75,16 @@ public abstract class OTAbstractAppletViewer extends JApplet
 		super.stop();
 	}
 	
-	protected abstract void openOTDatabase() throws Exception;
+	protected abstract OTDatabase openOTDatabase() throws Exception;
 	
 	protected void loadState()
 	{
 		try {
 
 			//Open xmlDB
-			openOTDatabase();
+			OTDatabase otDB = openOTDatabase();
 			
-			otrunk = new OTrunkImpl(xmlDB,
-					new Object[] { new SwingUserMessageHandler(this),
-					new OTUserListService() });
-
-			OTViewService viewService = (OTViewService)otrunk.getService(OTViewService.class);
-
-			viewFactory = null;
-			if (viewService != null) {
-				viewFactory = viewService.getViewFactory(otrunk);
-			}
+			viewerHelper.loadOTrunk(otDB, this);
 
 			masterLoaded = true;
 			master = this;
@@ -121,16 +101,8 @@ public abstract class OTAbstractAppletViewer extends JApplet
 		// get the otml url
 		try {
 			// look up view container with the frame.
-			OTViewContainerPanel otContainer = new OTViewContainerPanel(
-					new OTFrameManager() {
-						public void setFrameObject(OTObject otObject,
-								OTFrame otFrame) {
-							// TODO Auto-generated method stub
-	
-						}
-					}, null);
-	
-			otContainer.setOTViewFactory(getViewFactory());
+			OTViewContainerPanel otContainer = 
+				getViewerHelper().createViewContainerPanel(); 
 	
 			getContentPane().setLayout(new BorderLayout());
 	
@@ -140,17 +112,8 @@ public abstract class OTAbstractAppletViewer extends JApplet
 	
 			// call setCurrentObject on that view container with a null
 			// frame
-			OTObject root;
-			root = getOTrunk().getRoot();
-	
-			String refid = getParameter("refid");
-			OTObject appletObject = root;
-			if(refid != null && refid.length() > 0){
-				OTID id = getID(refid);
-	
-				appletObject = ((DefaultOTObject)root).getReferencedObject(id);
-			}
-			
+			OTObject appletObject = getOTObject();
+
 			otContainer.setCurrentObject(appletObject, null);
 			
 			///////////////////////////////
@@ -186,7 +149,7 @@ public abstract class OTAbstractAppletViewer extends JApplet
 	{
 		// call setCurrentObject on that view container with a null
 		// frame
-		OTObject root = getOTrunk().getRoot();
+		OTObject root = getViewerHelper().getRootObject();
 	
 		String refid = getParameter("refid");
 		OTObject appletObject = root;
@@ -254,20 +217,21 @@ public abstract class OTAbstractAppletViewer extends JApplet
 		});
 	}
 
-	public OTViewFactory getViewFactory()
+	public OTViewerHelper getViewerHelper()
 	{
 		if(isMaster()) {
-			return viewFactory;
+			return viewerHelper;
 		}
 		
-		// try to get the viewfactory from the master applet
-		return getMaster().getViewFactory();
+		// try to get the viewerHelper from the master applet
+		return getMaster().getViewerHelper();
+		
 	}
-
+	
 	public OTrunk getOTrunk()
 	{
 		if(isMaster()) {
-			return otrunk;
+			return viewerHelper.getOtrunk();
 		}
 	
 		// try to get the viewfactory from the master applet
@@ -277,7 +241,7 @@ public abstract class OTAbstractAppletViewer extends JApplet
 	public OTID getID(String id)
 	{
 		if(isMaster()){
-			return xmlDB.getOTIDFromLocalID(id);
+			return ((XMLDatabase)viewerHelper.getOtDB()).getOTIDFromLocalID(id);
 		}
 		
 		// try to get the viewfactory from the master applet
@@ -296,41 +260,14 @@ public abstract class OTAbstractAppletViewer extends JApplet
 		try{
 			System.out.println("opening "+saveUrlString);
 			URL saveUrl = new URL(getDocumentBase(), saveUrlString);
-			System.out.println(saveUrl);
-			URLConnection urlConn = saveUrl.openConnection();
-			System.out.println(urlConn);
-			urlConn.setDoOutput(true);
-			urlConn.setRequestProperty("Content-Type", "application/xml");
-			if(urlConn instanceof HttpURLConnection){
-				String method = getParameter("author_state_save_method");
-				if(method == null || method.length() == 0) {
-					method = "PUT";
-				}
-				((HttpURLConnection)urlConn).setRequestMethod(method);
-			}			
-			// url
-			OutputStream outStream = urlConn.getOutputStream();
-			
-			Exporter.export(outStream, xmlDB.getRoot(), xmlDB);
-			
-			outStream.flush();
-			outStream.close();
-			
-			InputStream postIn = urlConn.getInputStream();
+			OTDatabase otDB = viewerHelper.getOtDB();
 
-			// It seems like I have to read the response other wise the post isn't
-			// accepted.
-			
-			byte [] inBytes = new byte [1000];
-			postIn.read(inBytes);
-
-			String inTest = new String(inBytes);
-					
-			postIn.close();
-
-			if(urlConn instanceof HttpURLConnection) {
-				((HttpURLConnection)urlConn).disconnect();
+			String method = getParameter("author_state_save_method");
+			if(method == null || method.length() == 0) {
+				method = "PUT";
 			}
+
+			viewerHelper.saveOTDatabaseXML(otDB, saveUrl, method);			
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();
@@ -339,6 +276,11 @@ public abstract class OTAbstractAppletViewer extends JApplet
 	
 	class StateHandlerAction extends AbstractAction
 	{
+		/**
+		 * This is not intended to be serialized, but this removes the warnings
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			if (e.getActionCommand().equals("save_author")){

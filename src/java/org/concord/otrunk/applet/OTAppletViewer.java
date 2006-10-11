@@ -24,15 +24,18 @@
 package org.concord.otrunk.applet;
 
 import java.applet.Applet;
-import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Enumeration;
 
-import org.concord.otrunk.xml.XMLDatabase;
+import org.concord.otrunk.datamodel.OTDatabase;
 
 public class OTAppletViewer extends OTAbstractAppletViewer 
 {
+	/**
+	 * First version of this class, it is not intended to be serialized
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public void init() 
 	{
 		super.init();
@@ -74,7 +77,7 @@ public class OTAppletViewer extends OTAbstractAppletViewer
 		}
 	}
 	
-	protected void openOTDatabase()
+	protected OTDatabase openOTDatabase()
 		throws Exception
 	{
 		String urlString = getParameter("url");
@@ -87,13 +90,7 @@ public class OTAppletViewer extends OTAbstractAppletViewer
 		try {
 			URL url = new URL(getDocumentBase(), urlString);
 
-			URLConnection urlConn = url.openConnection();
-			urlConn.setRequestProperty("Content-Type", "application/xml");
-				
-			InputStream input = urlConn.getInputStream();
-			
-			xmlDB = new XMLDatabase(input, url, System.err);
-
+			return viewerHelper.loadOTDatabaseXML(url);
 		}catch (Exception ex) {
 			ex.printStackTrace();
 			throw ex;

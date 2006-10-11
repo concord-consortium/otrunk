@@ -30,6 +30,7 @@
 package org.concord.otrunk.xml.jdom;
 
 import java.io.InputStream;
+import java.io.Reader;
 
 import org.concord.otrunk.xml.OTXMLElement;
 import org.jdom.Document;
@@ -45,6 +46,7 @@ import org.jdom.input.SAXBuilder;
 public class JDOMDocument
 {
     Document doc;
+
     public JDOMDocument(InputStream xmlStream)
     	throws Exception
     {
@@ -52,6 +54,15 @@ public class JDOMDocument
         Document documentJDOM = builder.build(xmlStream);
                 
         this.doc = documentJDOM;
+    }
+    
+    public JDOMDocument(Reader xmlStream)
+    throws Exception
+    {
+    	SAXBuilder builder = new SAXBuilder();
+    	Document documentJDOM = builder.build(xmlStream);
+
+    	this.doc = documentJDOM;
     }
     
     public OTXMLElement getRootElement()
