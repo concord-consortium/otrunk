@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2005-12-05 15:43:53 $
- * $Author: swang $
+ * $Revision: 1.22 $
+ * $Date: 2006-10-11 17:26:00 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -44,9 +45,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceCollection;
@@ -112,14 +110,11 @@ public class XMLDatabase
 	    this(xmlURL.openStream(), xmlURL, statusStream);
 	}
 
-	/**
-	 * 
-	 */
 	public XMLDatabase(InputStream xmlStream, URL contextURL, PrintStream statusStream)
-		throws Exception
+	throws Exception
 	{
-	    this.statusStream = statusStream;
-	 
+		this.statusStream = statusStream;
+
 		// parse the xml file...
 		printStatus("Started Loading File...");
 		
@@ -127,6 +122,30 @@ public class XMLDatabase
 		
 		printStatus("Finished Loading File...");
 
+		loadDatabase(document, contextURL);
+	}	
+	
+	public XMLDatabase(Reader xmlReader, URL contextURL, PrintStream statusStream)
+	throws Exception
+	{
+		this.statusStream = statusStream;
+
+		// parse the xml file...
+		printStatus("Started Loading File...");
+		
+		JDOMDocument document = new JDOMDocument(xmlReader);
+		
+		printStatus("Finished Loading File...");
+
+		loadDatabase(document, contextURL);
+	}	
+	
+	/**
+	 * 
+	 */
+	protected void loadDatabase(JDOMDocument document, URL contextURL)
+		throws Exception
+	{
 		OTXMLElement rootElement = document.getRootElement();
 
 		String dbBase = rootElement.getAttributeValue("base");
@@ -185,11 +204,16 @@ public class XMLDatabase
 		OTXMLElement rootObjectNode = (OTXMLElement)xmlObjects.get(0);		
 		
 		// Recusively load all the data objects
+		
+		// If the database does not have an id then use a path of anon_root
+		// Due to an error before, anon_root was being used even when the database had an
+		// id.  However all of our legacy data came from files that used local_ids everywhere.
+		// so in that case the correct database id is used.
 		String relativePath = "anon_root";
 		if(databaseId != null) {
 		    relativePath = databaseId.toString();
 		}
-		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode, "anon_root");
+		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode, relativePath);
 		
 		System.err.println("loaded all the objects");
 		
@@ -362,8 +386,6 @@ public class XMLDatabase
 		throws Exception
 	{	
 		Collection objects = dataObjects.values();
-		
-		OTDataObject otDObj = null;
 		
 		for(Iterator iter = objects.iterator(); iter.hasNext();){
 			XMLDataObject xmlDObj = (XMLDataObject)iter.next();

@@ -70,7 +70,6 @@ public class OTrunkImpl implements OTrunk
 	protected Vector services = null;
 
 	protected OTDatabase rootDb;
-	protected OTDatabase creationDb;
 	
     protected OTObjectServiceImpl rootObjectService;
     
@@ -87,7 +86,6 @@ public class OTrunkImpl implements OTrunk
 	public OTrunkImpl(OTDatabase db, Object [] services)
 	{		
 		this.rootDb = db;
-		this.creationDb = db;
 		databases.add(db);
 		if(services != null) {
 			this.services = new Vector();
@@ -117,20 +115,6 @@ public class OTrunkImpl implements OTrunk
 			e.printStackTrace();
 		}
 		
-	}
-	
-    /**
-     * We need to fix this soon.  It should be removed from here because
-     * the creation stuff should be handled by the OTObjectService now.
-     * 
-     * @param db
-     */
-	public void setCreationDb(OTDatabase db)
-	{
-	    creationDb = db;
-	    if(!databases.contains(db)) {
-	        databases.add(db);
-	    }
 	}
 	
 	/**
@@ -315,7 +299,9 @@ public class OTrunkImpl implements OTrunk
         OTReferenceMap refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));        
         OTUser user = refMap.getUser();
         OTUserObject aUser = (OTUserObject)user;
-        aUser.setName(name);
+        if(name != null){
+        	aUser.setName(name);
+        }
         users.add(aUser);
 
         // create a template database that links this userDataDb with the rootDb
@@ -328,8 +314,7 @@ public class OTrunkImpl implements OTrunk
         // objects related to this user
         userTemplateDatabases.put(user.getUserId(), db);        
         
-        OTObjectService userObjService = 
-            createObjectService(db);
+        OTObjectService userObjService = createObjectService(db);
         userObjectServices.put(user.getUserId(), userObjService);
         
         return aUser;

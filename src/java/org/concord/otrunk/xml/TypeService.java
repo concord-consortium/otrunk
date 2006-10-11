@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.19 $
- * $Date: 2006-10-02 02:17:43 $
+ * $Revision: 1.20 $
+ * $Date: 2006-10-11 17:26:00 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,7 +34,6 @@ package org.concord.otrunk.xml;
 
 import java.net.URL;
 import java.util.Hashtable;
-import java.util.Properties;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
@@ -188,7 +187,6 @@ public class TypeService
 	public Object handleLiteralElement(OTXMLElement child, String relativePath)
 	{
 		String childName = child.getName();
-		Properties elementProps;
 
 		ResourceTypeHandler handler = getElementHandler(childName);
 		if(handler == null) {			
