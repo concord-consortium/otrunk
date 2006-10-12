@@ -121,17 +121,23 @@ public class OTWrapperServiceImpl implements OTWrapperService {
 		return null;
 	}
 
-	public OTWrapper getWrapper(Object realObject) {
+	public OTWrapper getWrapper(Object realObject) 
+	{
+		// lookup the class of this object in the wrapperClass map
+		// TODO this should look for matches up the inheritance tree.
+		Class wrapperClass = (Class)wrapperClasses.get(realObject.getClass());
+		
+		return getWrapper(realObject, wrapperClass);
+	}
+	
+	public OTWrapper getWrapper(Object realObject, Class wrapperClass)
+	{
 		OTWrapper wrapper = (OTWrapper)wrapperMap.get(realObject); 
 		
 		if(wrapper != null) {
 			return wrapper;
 		}
 		
-		// lookup the class of this object in the wrapperClass map
-		// TODO this should look for matches up the inheritance tree.
-		Class wrapperClass = (Class)wrapperClasses.get(realObject.getClass());
-
 		if(wrapperClass == null) {
 			System.err.println("can't find wrapper class for realObject: " 
 					+ realObject.getClass());
