@@ -40,11 +40,12 @@ import org.concord.framework.otrunk.OTObjectList;
  */
 public interface OTSystem extends OTObject 
 {
-	OTObject getRoot();
+	public OTObject getRoot();
+	public void setRoot(OTObject root);
 	
-	OTObjectList getServices();	
+	public OTObjectList getServices();	
 	
-	OTObject getFirstObject();
+	public OTObject getFirstObject();
 	
-	OTObject getFirstObjectNoUserData();
+	public OTObject getFirstObjectNoUserData();
 }

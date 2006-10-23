@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2006-10-23 04:59:20 $
+ * $Revision: 1.7 $
+ * $Date: 2006-10-23 19:30:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -90,4 +90,8 @@ public class OTViewService extends DefaultOTObject
         return factory;
     }
 
+    public OTObjectList getViewEntries()
+    {
+    	return resources.getViewEntries();
+    }
 }

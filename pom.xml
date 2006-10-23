@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.concord</groupId>
     <artifactId>maven2-parent</artifactId>
-    <version>4</version>
+    <version>5</version>
     <relativePath>../Builds/maven2-parent</relativePath>
   </parent>
   
