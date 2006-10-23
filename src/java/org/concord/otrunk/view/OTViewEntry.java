@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.4 $
+ * $Date: 2006-10-23 19:30:14 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -47,6 +47,8 @@ public interface OTViewEntry
     extends OTObjectInterface
 {
     public String getObjectClass();
+    public void setObjectClass(String objectClass);
     
     public String getViewClass();
+    public void setViewClass(String viewClass);
 }
