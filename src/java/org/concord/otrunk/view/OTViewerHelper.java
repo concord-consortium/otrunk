@@ -41,6 +41,7 @@ import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTFrame;
+import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTUserListService;

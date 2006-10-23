@@ -23,18 +23,43 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.1 $
+ * $Date: 2006-10-23 04:59:20 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
-package org.concord.otrunk.view;
+package org.concord.otrunk.view.document;
 
-import org.concord.framework.otrunk.view.OTView;
+import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTObject;
 
-public interface OTViewFactoryAware extends OTView
+
+/**
+ * OTDocument
+ * Class name and description
+ *
+ * Date created: Dec 17, 2004
+ *
+ * @author scott<p>
+ *
+ */
+public interface OTDocument
+	extends OTObject
 {
-    public void setViewFactory(OTViewFactory factory);
+	public static final String MARKUP_PLAIN = "plain";
+	public static final String MARKUP_PFXHTML = "xhtml";
+	public static final String MARKUP_PFHTML = "html";
+
+	public String getDocumentText();
+	public void setDocumentText(String text);
+	
+	public boolean getInput();
+	
+	public String getMarkupLanguage();
+	
+	public OTObject getReferencedObject(OTID id);	
+	
+	public OTObject getReferencedObject(String id);
 }

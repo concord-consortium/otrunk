@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.19 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.20 $
+ * $Date: 2006-10-23 04:59:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -49,6 +49,7 @@ import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
+import org.concord.framework.otrunk.view.OTViewFactory;
 
 
 /**

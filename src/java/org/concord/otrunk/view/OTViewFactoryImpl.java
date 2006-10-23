@@ -40,6 +40,8 @@ import org.concord.framework.otrunk.view.OTMultiUserView;
 import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
+import org.concord.framework.otrunk.view.OTViewFactory;
+import org.concord.framework.otrunk.view.OTViewFactoryAware;
 
 /**
  * @author Informaiton Services
@@ -47,19 +49,19 @@ import org.concord.framework.otrunk.view.OTViewContainer;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class OTViewFactory 
+public class OTViewFactoryImpl implements OTViewFactory 
 {
     OTrunk otrunk;
-    OTViewFactory parent;
+    OTViewFactoryImpl parent;
     Vector viewMap = new Vector();
     Vector userList = null;
         
-    public OTViewFactory(OTrunk otrunk)
+    public OTViewFactoryImpl(OTrunk otrunk)
     {
         this.otrunk = otrunk;
     }
     
-    public OTViewFactory(OTViewFactory parent)
+    protected OTViewFactoryImpl(OTViewFactoryImpl parent)
     {
         this.parent = parent;
         this.otrunk = parent.otrunk;
@@ -69,14 +71,25 @@ public class OTViewFactory
         Class objectClass;
         Class viewClass;
     }
-        
+
+    public OTViewFactory createChildViewFactory()
+    {
+    	return new OTViewFactoryImpl(this);
+    }
+    
+    /* (non-Javadoc)
+	 * @see org.concord.otrunk.view.OTViewFactory#setUserList(java.util.Vector)
+	 */
     public void setUserList(Vector userList) {
     	this.userList = userList;
     }
     
     /* (non-Javadoc)
-     * @see org.concord.otrunk.view.OTViewFactory#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, boolean)
+     * @see org.concord.otrunk.view.OTViewFactoryImpl#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, boolean)
      */
+    /* (non-Javadoc)
+	 * @see org.concord.otrunk.view.OTViewFactory#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, boolean)
+	 */
     public JComponent getComponent(OTObject otObject,
             OTViewContainer container, boolean editable)
     {
@@ -90,6 +103,9 @@ public class OTViewFactory
         return view.getComponent(editable);
     }
 
+    /* (non-Javadoc)
+	 * @see org.concord.otrunk.view.OTViewFactory#getView(org.concord.framework.otrunk.OTObject, java.lang.Class)
+	 */
     public OTView getView(OTObject otObject, Class viewInterface)
     {
         OTView view = getViewInternal(otObject, viewInterface);
@@ -136,8 +152,11 @@ public class OTViewFactory
     }
     
     /* (non-Javadoc)
-     * @see org.concord.otrunk.view.OTViewFactory#getObjectView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer)
+     * @see org.concord.otrunk.view.OTViewFactoryImpl#getObjectView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer)
      */
+    /* (non-Javadoc)
+	 * @see org.concord.otrunk.view.OTViewFactory#getObjectView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer)
+	 */
     public OTObjectView getObjectView(OTObject otObject,
             OTViewContainer container)
     {
@@ -152,6 +171,9 @@ public class OTViewFactory
         return view;
     }
     
+    /* (non-Javadoc)
+	 * @see org.concord.otrunk.view.OTViewFactory#addViewEntry(java.lang.Class, java.lang.Class)
+	 */
     public void addViewEntry(Class objectClass, Class viewClass)
     {
         ViewEntry internalEntry = new ViewEntry();
