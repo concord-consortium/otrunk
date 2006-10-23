@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.6 $
+ * $Date: 2006-10-23 04:59:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -36,6 +36,7 @@ import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTrunk;
+import org.concord.framework.otrunk.view.OTViewFactory;
 
 /**
  * OTViewService
@@ -62,7 +63,7 @@ public class OTViewService extends DefaultOTObject
 
     public OTViewFactory getViewFactory(OTrunk otrunk)
     {
-        OTViewFactory factory = new OTViewFactory(otrunk);
+        OTViewFactoryImpl factory = new OTViewFactoryImpl(otrunk);
         
         // read in all the viewEntries and create a vector 
         // of class entries.

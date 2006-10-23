@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.40 $
- * $Date: 2006-10-11 17:26:00 $
+ * $Revision: 1.41 $
+ * $Date: 2006-10-23 04:59:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -74,6 +74,7 @@ import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
+import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTMLToXHTMLConverter;
 import org.concord.otrunk.OTObjectServiceImpl;

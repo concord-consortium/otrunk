@@ -42,9 +42,9 @@ import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTPrintDimension;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
+import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTXHTMLHelper;
 import org.concord.framework.otrunk.view.OTXHTMLView;
-import org.concord.otrunk.view.OTViewFactory;
 import org.concord.swing.util.ComponentScreenshot;
 
 public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
