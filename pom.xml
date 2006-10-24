@@ -56,6 +56,7 @@
     </dependency>
   </dependencies>
 
+  <!--  if we have resources we will need to fix the resource directory too -->
   <build>
     <sourceDirectory>src/java</sourceDirectory>
   </build>
