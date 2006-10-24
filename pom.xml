@@ -56,6 +56,10 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <sourceDirectory>src/java</sourceDirectory>
+  </build>
+
   <properties>
     <concordDir>${project.name}</concordDir>
   </properties>
