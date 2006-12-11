@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk>
+  <imports>
+    <import class="org.concord.otrunk.OTStateRoot"/>
+    <import class="org.concord.otrunk.user.OTReferenceMap"/>
+    <import class="org.concord.otrunk.user.OTUserObject"/>
+    <import class="org.concord.otrunk.view.document.OTTextObject"/>
+  </imports>
+  <objects>
+    <org.concord.otrunk.OTStateRoot id="d7542225-8947-11db-adf6-f1f6b39df2bd">
+      <userMap>
+        <entry key="d755cfd6-8947-11db-adf6-f1f6b39df2bd">
+          <org.concord.otrunk.user.OTReferenceMap id="d7572f67-8947-11db-adf6-f1f6b39df2bd">
+            <user>
+              <org.concord.otrunk.user.OTUserObject id="d755cfd6-8947-11db-adf6-f1f6b39df2bd">
+                <name>document-with-data.otml</name>
+              </org.concord.otrunk.user.OTUserObject>
+            </user>
+            <map>
+              <entry key="33754150-b594-11d9-9669-0800200c9a66!/text_object">
+                <org.concord.otrunk.view.document.OTTextObject id="d8525849-8947-11db-adf6-f1f6b39df2bd">
+                  <bodyText>hi</bodyText>
+                </org.concord.otrunk.view.document.OTTextObject>
+              </entry>
+            </map>
+          </org.concord.otrunk.user.OTReferenceMap>
+        </entry>
+      </userMap>
+      <formatVersionString>1.0</formatVersionString>
+    </org.concord.otrunk.OTStateRoot>
+
+  </objects>
+</otrunk>
