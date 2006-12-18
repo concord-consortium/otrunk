@@ -29,9 +29,16 @@
  */
 package org.concord.otrunk;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 import java.util.WeakHashMap;
 
@@ -40,6 +47,8 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTWrapper;
 import org.concord.framework.otrunk.OTrunk;
@@ -51,6 +60,9 @@ import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTTemplateDatabase;
 import org.concord.otrunk.user.OTUserDataObject;
 import org.concord.otrunk.user.OTUserObject;
+import org.concord.otrunk.view.document.OTCompoundDoc;
+import org.concord.otrunk.xml.XMLDataObject;
+import org.concord.otrunk.xml.XMLDatabase;
 
 /**
  * @author scott
@@ -78,6 +90,12 @@ public class OTrunkImpl implements OTrunk
 	
     Vector objectServices = new Vector();
     
+    Hashtable investigationSections;
+    
+	Hashtable reverseMap = new Hashtable();
+
+	//private transient PrintWriter pw;
+	
 	public OTrunkImpl(OTDatabase db)
 	{
 		this(db, null);
@@ -115,6 +133,10 @@ public class OTrunkImpl implements OTrunk
 			e.printStackTrace();
 		}
 		
+		if(rootDb instanceof XMLDatabase) {
+			investigationSections = new Hashtable();
+			investigationSections = ((XMLDatabase)rootDb).getPages();
+		}
 	}
 	
 	/**
@@ -340,12 +362,16 @@ public class OTrunkImpl implements OTrunk
         } 
 
         OTDataObject userDataObject = db.getOTDataObject(null, authoredId);
-
+        
+        boolean modified = false;
         if(userDataObject instanceof OTUserDataObject) {
             OTDataObject userModifications = ((OTUserDataObject)userDataObject).getExistingUserObject();
-            return  userModifications != null;
+            modified = (userModifications != null);
+            //return  userModifications != null;
         }
-        return false;
+        //if(modified) System.out.println(userDataObject.getGlobalId().toString() + " is modified: " + modified);
+        //return false;
+        return modified;
     }
 
     public OTObjectService initUserObjectService(OTObjectServiceImpl objService, OTUser user, OTStateRoot stateRoot)
@@ -529,5 +555,196 @@ public class OTrunkImpl implements OTrunk
         
         System.err.println("Data object is not found for: " + childID);
         return null;
+    }
+    
+    /**
+     * Return a vector that contains modified objects.
+     * 
+     * @return Vector - modified ojbects
+     */
+    public Vector getModifiedObjects() {
+    	Vector modifiedObjs = new Vector();
+    	if(rootDb != null) {
+    		if(rootDb instanceof XMLDatabase) {
+    			XMLDatabase db = (XMLDatabase)rootDb;
+    			Hashtable dbObjs = db.getDataObjects();
+    			Set set = dbObjs.keySet();
+    			Iterator it = set.iterator();
+    			while (it.hasNext()) {
+    				Object key = it.next();
+    				OTDataObject obj = (OTDataObject)dbObjs.get(key);
+					try {
+						OTObject otObj = rootObjectService.getOTObject(obj.getGlobalId());
+						for(int i = 0; i < users.size(); i++) {
+							OTUser user = (OTUser)users.elementAt(i);
+							//otObj = getUserRuntimeObject(otObj, user);
+							if(hasUserModified((OTObject)otObj, user)) {
+								modifiedObjs.addElement(obj);
+								break;
+							}							
+						}
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+    			}
+    		}
+    	}
+    	return modifiedObjs;
+    }
+    
+    private boolean isInvestigationSection(OTDataObject object) {
+    	if(object != null) 
+    		return ((XMLDatabase)rootDb).getPages().containsKey(object);
+    	return false;
+    }
+    
+    public Vector getAllReferencedObjects(OTDataObject object) {
+    	//pw.println("\t\tGetting all referenced objects for " + object.getGlobalId());
+    	Vector refedObjs = new Vector();
+    	
+    	if(isInvestigationSection(object)) {
+    		try {
+				OTCompoundDoc oto = 
+					(OTCompoundDoc)rootObjectService.getOTObject(object.getGlobalId());
+				Vector embedded = oto.getEmbedded();
+				//for(int k = 0; k < embedded.size(); k++)
+					//pw.println("\t\t\t"+((OTObject)embedded.elementAt(k)).getGlobalId());
+				return embedded;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+    	} else {
+        	String[] keys = object.getResourceKeys();
+        	for(int i = 0; i < keys.length; i++) {
+                Object resource = object.getResource(keys[i]);
+        		//System.out.println("\t" + i + ": " + keys[i] + " " + resource + " " +resource.getClass());
+                if(resource instanceof OTID) {
+                	try {
+                		OTObject oto = rootObjectService.getOTObject((OTID)resource);
+                		//pw.println("\t\t\t" + oto.getGlobalId());
+						refedObjs.addElement(oto);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		//System.out.println("\t" + i + ": " + keys[i] + " " + resource + " " +resource.getClass());
+                } else if(resource instanceof OTResourceList) {
+                	OTResourceList list = (OTResourceList)resource;
+                    for(int j=0; j<list.size(); j++){
+                    	Object o = list.get(j);
+                    	if(o instanceof OTID) {
+                    		try {
+                    			//pw.println("\t\t\t"+o.toString());
+								OTObject oto = rootObjectService.getOTObject((OTID)o);
+		                    	refedObjs.add(oto);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+                    	}
+                		//System.out.println("\t" + i + ": " + keys[i] + " " + list.get(j) + " " +list.get(j).getClass());
+                    }
+                } else if(resource instanceof OTResourceMap) {
+                	OTResourceMap map = (OTResourceMap)resource;
+                    String [] mapKeys = map.getKeys();
+                    for(int j=0; j<mapKeys.length; j++){
+	                	Object o = map.get(mapKeys[j]);
+	                	if(o instanceof OTID) {
+	                		try {
+	                			//pw.println("\t\t\t"+o.toString());
+								OTObject oto = rootObjectService.getOTObject((OTID)o);
+		                    	refedObjs.add(oto);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+	                	}
+                    }
+                }
+        	}
+        	//pw.println("\t\t\tTotal refedObjs: "+refedObjs.size());
+        	return refedObjs;
+    	}
+    }
+    
+    private void initReverseMap() {
+    	//pw.println("\tInitializing reverseMap...");
+    	reverseMap = new Hashtable();
+    	if(rootDb != null) {
+    		if(rootDb instanceof XMLDatabase) {
+    			XMLDatabase db = (XMLDatabase)rootDb;
+    			Hashtable dbObjs = db.getDataObjects();
+    			Set set = dbObjs.keySet();
+    			Iterator it = set.iterator();
+    			int j = 0;
+    			while (it.hasNext()) {
+    				Object key = it.next();
+    				XMLDataObject obj = (XMLDataObject)dbObjs.get(key);
+    				Vector refedObjs = getAllReferencedObjects(obj);
+    				
+    				for(int i = 0; i < refedObjs.size(); i++) {
+    					OTObject ref = (OTObject)refedObjs.elementAt(i);
+    					Vector reverseRefs = (Vector)reverseMap.get(ref.getGlobalId());
+    					if(reverseRefs == null) {
+    						reverseRefs = new Vector();
+    						reverseMap.put(ref.getGlobalId(), reverseRefs);
+    					}
+    					reverseRefs.addElement(obj);
+    				}
+    			}
+    		}
+    	}
+    }
+    
+    public Hashtable getModifiedPages() {
+    	
+		/*pw = null;
+		
+		try {
+			pw = new PrintWriter(new BufferedWriter(new FileWriter("objRefs.txt")));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}*/
+		
+    	//pw.println("Getting modified pages...");
+    	
+    	this.initReverseMap();
+    	
+    	Hashtable modifiedPages = new Hashtable();
+    	
+    	Vector userMods = this.getModifiedObjects();
+    	for(int k = 0; k < userMods.size(); k++) {
+    		OTDataObject userMod = (OTDataObject)userMods.elementAt(k);
+    		//System.out.println("Modified object " + userMod.getGlobalId());
+        	Vector objectList = new Vector();
+        	objectList.add(userMod);
+        	 
+        	for(int i=0; i<objectList.size(); i++){
+        		OTDataObject current = (OTDataObject)objectList.get(i);
+        		if(isInvestigationSection(current)){
+        			if(!modifiedPages.containsKey(current)) {
+            			//pw.println(current.getGlobalId()+" is modified!!!");
+            			modifiedPages.put(current, ((XMLDatabase)rootDb).getPages().get(current));
+        			}
+        			break;
+        		}
+        		//System.out.println("Trying to get reverse map for "+current.getGlobalId().toString());
+        		Vector reverseRefs = (Vector)reverseMap.get(current.getGlobalId());
+        		if(reverseRefs != null) {
+            		for(int j = 0; j < reverseRefs.size(); j++){
+            			Object reverseRef = reverseRefs.elementAt(j);
+            			if(!objectList.contains(reverseRef)){
+            				objectList.add(reverseRef);
+            			}
+            		}
+        		}
+        	}    	
+    	}
+    	//pw.flush();
+    	//pw.close();
+    	return modifiedPages;
     }
 }
