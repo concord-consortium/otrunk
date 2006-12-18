@@ -29,6 +29,7 @@
  */
 package org.concord.otrunk.view.document;
 
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +64,7 @@ public class OTCompoundDoc extends OTFolderObject
 	}
 
 	private ResourceSchema resources;
+
 	public OTCompoundDoc(ResourceSchema resources) 
 	{
 		super(resources);
@@ -101,8 +103,39 @@ public class OTCompoundDoc extends OTFolderObject
 
 	public void addDocumentReference(OTID embeddedId)
 	{
-		OTObjectList embedded = (OTObjectList)resources.getDocumentRefs();
+		OTObjectList embedded = resources.getDocumentRefs();
 		embedded.add(embeddedId);
+	}
+	
+	public Vector getEmbedded() {
+		String bodyText = getBodyText();
+
+		Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
+		Matcher m = p.matcher(bodyText);
+		while (m.find()) {
+			String idStr = m.group(1);
+			OTID id = getReferencedId(idStr);
+			//System.out.print(" " + id.toString());
+			OTObject obj = getReferencedObject(id);
+			if(obj != null) addDocumentReference(obj);
+		}
+
+		p = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>");
+		m = p.matcher(bodyText);
+		while (m.find()) {
+			String idStr = m.group(1);
+			if(!(idStr.startsWith("http:") || idStr.startsWith("file:")
+					|| idStr.startsWith("https:"))) {
+				OTID id = getReferencedId(idStr);
+				//System.out.print(" " + id.toString());
+				OTObject obj = getReferencedObject(id);
+				if(obj != null) addDocumentReference(obj);
+			}
+		}
+		
+		//System.out.println();
+
+		return resources.getDocumentRefs().getVector();
 	}
 	
 	public void removeAllDocumentReference()
