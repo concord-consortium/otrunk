@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.23 $
- * $Date: 2006-12-18 16:41:36 $
+ * $Revision: 1.24 $
+ * $Date: 2006-12-21 17:54:56 $
  * $Author: swang $
  *
  * Licence Information
@@ -87,19 +87,6 @@ public class XMLDatabase
 	
     PrintStream statusStream = null;
     
-    private Hashtable pages = new Hashtable();
-
-	private static final String[] pageID = {/*"investigation_toc_invid_" 
-										  ,*/"investigation_intro_invid_"
-										  ,"thinking_invid_"
-										  ,"materials_invid_"
-										  ,"safety_invid_"
-										  ,"trial_id_"
-										  ,"investigation_technical_hint_toc_invid_"
-										  ,"analysis_invid_"
-										  ,"further_investigations_invid_"
-										  ,"assessment_invid_"};
-	
 	public XMLDatabase()
 	{
 	    // create an empty database with no root
@@ -247,22 +234,6 @@ public class XMLDatabase
 	    }
 	}
 	
-	/**
-	 * Test whether a local id refers to a page: OTCompoundDoc
-	 * @param str - Local ID of an object
-	 * @return boolean - true: is a page false: not a page
-	 */
-	private boolean isPage(String str) {
-		for(int i = 0; i < pageID.length; i++) {
-			if(str.indexOf(pageID[i]) != -1) return true;
-		}
-		return false;
-	}
-	
-	public Hashtable getPages() {
-		return pages;
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.datamodel.OTDatabase#setRoot(org.doomdark.uuid.UUID)
 	 */
@@ -341,23 +312,8 @@ public class XMLDatabase
     			if(oldId != null) {
     				System.err.println("repeated local id: " + localIdStr);
     			}
-
-    			// Add "page" to pages so that it can be used later on.
-    			if(isPage(localIdStr)) {
-    				StringBuffer sb = new StringBuffer();
-    				sb.append(element.getParentElement().getParentElement()
-    						.getParentElement().getParentElement().
-    						getChild("name").getTextTrim());
-    				sb.append(" - ");
-    				sb.append(element.getParentElement().getParentElement()
-    						.getChild("name").getTextTrim());
-    				sb.append(" - ");
-    				sb.append(element.getChild("name").getTextTrim());
-    				pages.put(dataObjects.get(dataObject.getGlobalId()),sb.toString());
-    			}
     		}
     	}
-    		
     	return dataObject;
 	}
 	
