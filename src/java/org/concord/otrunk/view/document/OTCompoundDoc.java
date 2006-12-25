@@ -107,15 +107,14 @@ public class OTCompoundDoc extends OTFolderObject
 		embedded.add(embeddedId);
 	}
 	
-	public Vector getEmbedded() {
+	public Vector getDocumentRefs() {
 		String bodyText = getBodyText();
-
+		
 		Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
 		Matcher m = p.matcher(bodyText);
 		while (m.find()) {
 			String idStr = m.group(1);
 			OTID id = getReferencedId(idStr);
-			//System.out.print(" " + id.toString());
 			OTObject obj = getReferencedObject(id);
 			if(obj != null) addDocumentReference(obj);
 		}
@@ -127,14 +126,11 @@ public class OTCompoundDoc extends OTFolderObject
 			if(!(idStr.startsWith("http:") || idStr.startsWith("file:")
 					|| idStr.startsWith("https:"))) {
 				OTID id = getReferencedId(idStr);
-				//System.out.print(" " + id.toString());
 				OTObject obj = getReferencedObject(id);
 				if(obj != null) addDocumentReference(obj);
 			}
 		}
 		
-		//System.out.println();
-
 		return resources.getDocumentRefs().getVector();
 	}
 	
