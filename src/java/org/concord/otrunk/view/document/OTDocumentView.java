@@ -263,11 +263,20 @@ public class OTDocumentView extends OTTextObjectView
 			return null;
 		}
 		
+		
+		Pattern editablePattern = Pattern.compile("editable=\"([^\"]*)\"");
+		
 		Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
 		Matcher m = p.matcher(inText);
 		StringBuffer parsed = new StringBuffer();
 		while(m.find()) {
 			String id = m.group(1);
+			
+			// FIXME
+			// check if it has editable attribute
+			String tag = m.group(0);
+			
+			
 			String replacement = getIncludableReplacement(id);
 						
 			try {

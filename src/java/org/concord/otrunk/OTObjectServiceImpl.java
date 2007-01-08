@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2006-09-27 18:46:33 $
+ * $Revision: 1.5 $
+ * $Date: 2007-01-08 20:06:16 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -40,8 +40,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceSchema;
-import org.concord.framework.otrunk.OTWrapper;
-import org.concord.framework.otrunk.OTWrapperService;
+import org.concord.framework.otrunk.OTControllerService;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTRelativeID;
@@ -114,20 +113,10 @@ public class OTObjectServiceImpl
         return otrunk.getOTID(otidStr);
     }
 
-    public OTWrapperService createWrapperService() {
-    	return new OTWrapperServiceImpl(this);
+    public OTControllerService createControllerService() {
+    	return new OTControllerServiceImpl(this);
     }
     
-    public OTWrapper getWrapper(Object wrappedObject)
-    {
-        return otrunk.getWrapper(wrappedObject);
-    }
-
-    public OTWrapper putWrapper(Object wrappedObject, OTWrapper wrapper)
-    {
-        return otrunk.putWrapper(wrappedObject, wrapper);
-    }
-
     public OTObject loadOTObject(OTDataObject dataObject, Class otObjectClass)
     throws  Exception
     {
@@ -145,20 +134,7 @@ public class OTObjectServiceImpl
         otObject.init();
         
         otrunk.putLoadedObject(otObject, dataObject);
- 
-        /*
-         * This was to support OTWrapper object automatically
-         * this didn't work out right at the time but this is 
-         * saved in case I can get working again
-        if(otObject instanceof OTWrapper){
-            // save the wrapped object in a weak hashmap
-            // so it can be searched out later
-            Method getWrappedObject = otObjectClass.getMethod("getWrappedObject", null);
-            Object wrappedObject = getWrappedObject.invoke(otObject, null);
-            objectWrappers.put(wrappedObject, new WeakReference(otObject));
-        }
-        */
-        
+         
         return otObject;        
     }
     

@@ -50,7 +50,6 @@ import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTUser;
-import org.concord.framework.otrunk.OTWrapper;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -201,28 +200,6 @@ public class OTrunkImpl implements OTrunk
 	public void close()
 	{
 		rootDb.close();
-	}
-	
-	public OTWrapper getWrapper(Object wrappedObject)
-	{
-	    WeakReference objRef = (WeakReference)objectWrappers.get(wrappedObject);
-	    if(objRef != null){
-	        return (OTWrapper)objRef.get();
-	    }
-	    
-	    return null;
-	}
-	
-	public OTWrapper putWrapper(Object wrappedObject, OTWrapper wrapper)
-	{
-	    WeakReference objRef = new WeakReference(wrapper);
-	    WeakReference oldRef = (WeakReference)objectWrappers.put(wrappedObject, objRef);
-	    
-	    if(oldRef != null) {
-	        return (OTWrapper)oldRef.get();
-	    }
-	    
-	    return null;
 	}
 	
 	/**

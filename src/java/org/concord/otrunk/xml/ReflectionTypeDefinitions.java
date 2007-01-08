@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.16 $
- * $Date: 2006-09-15 12:15:18 $
+ * $Revision: 1.17 $
+ * $Date: 2007-01-08 20:06:16 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -36,9 +36,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Vector;
 
-import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTResourceSchema;
-import org.concord.framework.otrunk.OTWrapper;
 import org.concord.otrunk.OTInvocationHandler;
 
 
@@ -87,12 +85,7 @@ public class ReflectionTypeDefinitions
 			// get that object, otherwise use the class itself
 			Class resourceSchemaClass = null;
 			if(otObjectClass.isInterface()){
-			    if(OTWrapper.class.isAssignableFrom(otObjectClass)) {
-			    		// don't do anything special yet
-						resourceSchemaClass = otObjectClass;			        
-			    } else if (OTObject.class.isAssignableFrom(otObjectClass)){
-						resourceSchemaClass = otObjectClass;
-			    }
+				resourceSchemaClass = otObjectClass;
 			} else {
 				Constructor [] memberConstructors = otObjectClass.getConstructors();
 				Constructor resourceConstructor = memberConstructors[0]; 
