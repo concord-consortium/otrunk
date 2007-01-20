@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.41 $
- * $Date: 2006-10-23 04:59:20 $
+ * $Revision: 1.42 $
+ * $Date: 2007-01-20 13:26:45 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -82,6 +82,7 @@ import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTUserListService;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -149,7 +150,7 @@ public class OTViewer extends JFrame
 	
 	String startupMessage = "";
 	
-	boolean justStarted = true;
+	boolean justStarted = false;
 	
 	boolean showTree = false;
     private AbstractAction saveUserDataAsAction;
@@ -195,8 +196,7 @@ public class OTViewer extends JFrame
 		addWindowListener( new WindowAdapter() {
 		    public void windowClosing(WindowEvent e)
 		    {
-		        ((OTViewer)e.getSource()).exit();
-		        
+		    	exitAction.actionPerformed(null);		        
 		    }			
 		});				
 	
@@ -294,13 +294,13 @@ public class OTViewer extends JFrame
 				urlStr = args[0];
 			}
 			
-			init(urlStr);
+			initWithWizard(urlStr);
 		} else {
-			init(null);
+			initWithWizard(null);
 		}
 
 	}
-	
+
 	public void init(String url)
 	{
 	    createActions();
@@ -358,7 +358,14 @@ public class OTViewer extends JFrame
         		return;
         	}
         } 
-        
+	}
+	
+	public void initWithWizard(String url)
+	{
+		justStarted = true;
+		
+		init(url);
+		
         if(userMode == OTViewerHelper.SINGLE_USER_MODE) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -368,7 +375,7 @@ public class OTViewer extends JFrame
         }
     }
 
-	private void loadUserDataFile(File file)
+	public void loadUserDataFile(File file)
 	{
 	    currentUserFile = file;
 	    try {
@@ -378,13 +385,20 @@ public class OTViewer extends JFrame
 	    }
 	}
 
-	private void loadUserDataURL(URL url, String name)
+	public void loadUserDataURL(URL url, String name)
+		throws Exception
+	{		
+	    XMLDatabase db = new XMLDatabase(url);
+	    loadUserDataDb(db, name);
+	}
+	
+	public void loadUserDataDb(XMLDatabase db, String name)
 		throws Exception
 	{
-	    userDataDB = new XMLDatabase(url);
+		userDataDB = db;
         currentUser = otrunk.registerUserDataDatabase(userDataDB, name);
         
-	    reloadWindow();
+	    reloadWindow();		
 	}
 	
 	private void loadFile(File file)
@@ -490,7 +504,12 @@ public class OTViewer extends JFrame
 	{
 	    loadURL(currentURL);
 	}
-		
+
+	public OTDatabase getUserDataDb() 
+	{
+		return userDataDB;
+	}
+	
 	public void setCurrentUser(OTUserObject userObject)
 	{
 	    OTUserObject oldUser = currentUser;
@@ -536,7 +555,7 @@ public class OTViewer extends JFrame
 		viewer.initArgs(args);				
 	}
 	
-	class ExitAction extends AbstractAction
+		class ExitAction extends AbstractAction
 	{
 		/**
          * nothing to serialize here.
@@ -1286,6 +1305,10 @@ public class OTViewer extends JFrame
 			    updateMenuBar();
 			}
 		});
+	}
+
+	public void setExitAction(AbstractAction exitAction) {
+		this.exitAction = exitAction;
 	}
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
