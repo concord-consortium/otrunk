@@ -44,6 +44,9 @@ import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTViewContainer;
+import org.concord.framework.otrunk.view.OTViewContainerAware;
+import org.concord.framework.otrunk.view.OTViewFactory;
+import org.concord.framework.otrunk.view.OTViewFactoryAware;
 import org.concord.otrunk.view.document.OTDocument;
 
 /**
@@ -53,18 +56,20 @@ import org.concord.otrunk.view.document.OTDocument;
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class OTTextObjectView 
-	implements OTObjectView, DocumentListener, OTChangeListener
+	implements OTObjectView, OTViewContainerAware, OTViewFactoryAware,
+		DocumentListener, OTChangeListener
 {
 	OTDocument pfObject;
 	protected PlainDocument textAreaModel = null;
 	protected OTViewContainer viewContainer;
-	JLabel labelView = null;
+    protected OTViewFactory viewFactory = null;
+
+    JLabel labelView = null;
     private boolean changingText = false;
 	
-	public void initialize(OTObject pfTextObject, OTViewContainer vContainer)
+	protected void setup(OTObject pfTextObject)
 	{
 		this.pfObject = (OTDocument)pfTextObject;
-		viewContainer = vContainer;
 		if(pfTextObject instanceof OTChangeNotifying){
 		    ((OTChangeNotifying)pfTextObject).addOTChangeListener(this);
 		}
@@ -87,8 +92,10 @@ public class OTTextObjectView
 		}		
 	}
 	
-	public JComponent getComponent(boolean editable)
+	public JComponent getComponent(OTObject otObject, boolean editable)
 	{
+		setup(otObject);
+		
 		if(pfObject.getInput() && editable) {
 		
 			initTextAreaModel();
@@ -176,4 +183,14 @@ public class OTTextObjectView
 		}
 
     }
+
+	public void setViewContainer(OTViewContainer container) 
+	{
+		viewContainer = container;
+	}
+
+	public void setViewFactory(OTViewFactory factory) 
+	{
+		viewFactory = factory;
+	}
 }

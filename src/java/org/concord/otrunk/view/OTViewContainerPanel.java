@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.20 $
- * $Date: 2006-10-23 04:59:20 $
+ * $Revision: 1.21 $
+ * $Date: 2007-01-24 22:11:24 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -62,7 +62,6 @@ import org.concord.framework.otrunk.view.OTViewFactory;
  *
  */
 public class OTViewContainerPanel extends JPanel
-	implements OTViewContainer
 {
     /**
      * First version of this class
@@ -81,18 +80,22 @@ public class OTViewContainerPanel extends JPanel
 
 	Vector containerListeners = new Vector();
 	
+	MyViewContainer viewContainer;
+	
 	/**
 	 * 
 	 */
 	public OTViewContainerPanel(OTFrameManager frameManager, JFrame frame)
 	{
 		super(new BorderLayout());
+
+		viewContainer = new MyViewContainer();
 		
 		this.frameManager = frameManager;
 		myFrame = frame;
 		scrollPane = new JScrollPane(new JLabel("Loading..."));
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		add(scrollPane);
+		add(scrollPane);		
 	}
 	
 	public void setOTViewFactory(OTViewFactory factory)
@@ -111,14 +114,16 @@ public class OTViewContainerPanel extends JPanel
 		myFrame.setVisible(true);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.concord.otrunk.view.OTViewContainer#setCurrentObject(org.concord.framework.otrunk.OTObject, org.concord.otrunk.view.OTFrame)
-	 */
-	public void setCurrentObject(OTObject pfObject, OTFrame otFrame)
+	public OTObject getCurrentObject()
+	{
+	    return currentObject;
+	}
+	
+	public void setCurrentObject(OTObject otObject, OTFrame otFrame)
 	{
 
 		if(otFrame != null) {
-			frameManager.setFrameObject(pfObject, otFrame);
+			frameManager.setFrameObject(otObject, otFrame);
 			return;
 		}
 		
@@ -126,7 +131,7 @@ public class OTViewContainerPanel extends JPanel
 		    currentView.viewClosed();
 		}
 			
-		currentObject = pfObject;
+		currentObject = otObject;
 
 		removeAll();
 		add(new JLabel("Loading..."));
@@ -137,11 +142,11 @@ public class OTViewContainerPanel extends JPanel
 		    {
 				JComponent newComponent = null;
 				if(currentObject != null) {
-				    currentView = otViewFactory.getObjectView(currentObject, OTViewContainerPanel.this);
+				    currentView = otViewFactory.getObjectView(currentObject, viewContainer);
 				    if(currentView == null) {
 				    	newComponent = new JLabel("No view for object: " + currentObject);
 				    } else {
-				    	newComponent = currentView.getComponent(true);
+				    	newComponent = currentView.getComponent(currentObject, true);
 					}
 				} else {
 					newComponent = new JLabel("Null object");
@@ -209,19 +214,6 @@ public class OTViewContainerPanel extends JPanel
         return getComponent(0);
     }
     
-	public OTObject getCurrentObject()
-	{
-	    return currentObject;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.concord.otrunk.view.OTViewContainer#getComponent(org.concord.framework.otrunk.OTObject, org.concord.otrunk.view.OTViewContainer, boolean)
-	 */
-	public JComponent getComponent(OTObject pfObject, boolean editable)
-	{
-	    return otViewFactory.getComponent(pfObject, this, editable);
-	}
-
 	public void addViewContainerListener(OTViewContainerListener listener)
 	{
 	    containerListeners.add(listener);
@@ -236,8 +228,30 @@ public class OTViewContainerPanel extends JPanel
 	{
 	    for(int i=0; i<containerListeners.size(); i++) {
 	        ((OTViewContainerListener)containerListeners.get(i)).
-	        	currentObjectChanged(this);
+	        	currentObjectChanged(viewContainer);
 	        	
 	    }
+	}
+	
+	/**
+	 * Internal class so views which get passed a view container do not
+	 * have direct access to the viewcontainer panel.  This also makes it
+	 * easier to see who is using view containers and who is using 
+	 * the viewcontainerpanel directly
+	 * 
+	 * @author scott
+	 *
+	 */
+	class MyViewContainer implements OTViewContainer {
+		public OTObject getCurrentObject() {
+		    return OTViewContainerPanel.this.getCurrentObject();
+		}
+		public void setCurrentObject(OTObject pfObject, OTFrame otFrame) {
+			OTViewContainerPanel.this.setCurrentObject(pfObject, otFrame);
+		}
+	}
+
+	public MyViewContainer getViewContainer() {
+		return viewContainer;
 	}
 }

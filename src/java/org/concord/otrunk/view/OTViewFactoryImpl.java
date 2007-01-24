@@ -40,6 +40,7 @@ import org.concord.framework.otrunk.view.OTMultiUserView;
 import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
+import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTViewFactoryAware;
 
@@ -93,14 +94,13 @@ public class OTViewFactoryImpl implements OTViewFactory
     public JComponent getComponent(OTObject otObject,
             OTViewContainer container, boolean editable)
     {
-        OTObjectView view = 
-            getObjectView(otObject, container);
+        OTObjectView view = getObjectView(otObject, container);
         
         if(view == null) {
             return new JLabel("No view for object: " + otObject);
         }
         
-        return view.getComponent(editable);
+        return view.getComponent(otObject, editable);
     }
 
     /* (non-Javadoc)
@@ -166,7 +166,9 @@ public class OTViewFactoryImpl implements OTViewFactory
             return null;
         }
         
-        view.initialize(otObject, container);
+        if(view instanceof OTViewContainerAware){
+        	((OTViewContainerAware)view).setViewContainer(container);
+        }
         
         return view;
     }

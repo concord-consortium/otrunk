@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2006-10-23 04:59:20 $
+ * $Revision: 1.2 $
+ * $Date: 2007-01-24 22:11:24 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -51,7 +51,6 @@ import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewFactory;
 
 public class OTDocumentObjectView extends ComponentView
-	implements OTViewContainer
 {
 	OTDocument compoundDoc;
 	OTViewContainer viewContainer;
@@ -59,6 +58,25 @@ public class OTDocumentObjectView extends ComponentView
 	JPanel componentPanel;
     private OTObject currentObject;
 	
+    /**
+     * A anonymous class to clarify the role of this object.  
+     * The object uses the view factory to create views and 
+     * then provides a view container to those views.
+     */
+    OTViewContainer myViewContainer = new OTViewContainer(){
+
+		public OTObject getCurrentObject() 
+		{
+			return OTDocumentObjectView.this.getCurrentObject();
+		}
+
+		public void setCurrentObject(OTObject otObject, OTFrame otFrame) 
+		{
+			OTDocumentObjectView.this.setCurrentObject(otObject, otFrame, false);
+		}
+    	
+    };
+    
     public OTDocumentObjectView(Element elem, OTDocument doc, 
     		OTViewContainer vContainer, OTViewFactory factory) 
     {
@@ -127,11 +145,6 @@ public class OTDocumentObjectView extends ComponentView
     	return getEndOffset();
     }
         
-	public void setCurrentObject(OTObject otObject, OTFrame otFrame)
-	{
-		setCurrentObject(otObject, otFrame, false);
-	}
-
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.browser.PfViewContainer#setCurrentObject(org.concord.portfolio.PortfolioObject)
 	 */
@@ -154,7 +167,9 @@ public class OTDocumentObjectView extends ComponentView
 			componentPanel.removeAll();
 		}
 		
-    	JComponent childComponent = getComponent(otObject, editable);
+    	JComponent childComponent = 
+    		viewFactory.getComponent(otObject, myViewContainer, editable);		
+
     	if(childComponent == null) {
     		
     	}
@@ -174,7 +189,12 @@ public class OTDocumentObjectView extends ComponentView
 	 */
 	public JComponent getComponent(OTObject pfObject, boolean editable)
 	{
-		return viewFactory.getComponent(pfObject, this, editable);		
+		return viewFactory.getComponent(pfObject, myViewContainer, editable);		
+	}
+
+	public void setViewContainer(OTViewContainer container) 
+	{
+		viewContainer = container;
 	}
 
 }
