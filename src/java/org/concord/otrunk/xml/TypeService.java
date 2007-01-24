@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.20 $
- * $Date: 2006-10-11 17:26:00 $
+ * $Revision: 1.21 $
+ * $Date: 2007-01-24 22:11:24 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -58,7 +58,7 @@ public class TypeService
     public final static String STRING = "string";
     public final static String XML_STRING = "xmlstring";
     public final static String BOOLEAN = "boolean";
-    public final static String INTEGER = "integer";
+    public final static String INTEGER = "int";
     public final static String LONG = "long";
     public final static String FLOAT = "float";
     public final static String DOUBLE = "double";
@@ -114,8 +114,10 @@ public class TypeService
 		// define them here.  The name can be looked up when it
 		// is requested.
 		handlerMap.put("boolean", new BooleanTypeHandler());
-		handlerMap.put("integer", new IntegerTypeHandler());
+		handlerMap.put("int", new IntegerTypeHandler());
+		handlerMap.put("long", new LongTypeHandler());
 		handlerMap.put("float", new FloatTypeHandler());
+		handlerMap.put("double", new DoubleTypeHandler());
 		handlerMap.put("string", new StringTypeHandler());
 		handlerMap.put("xmlstring", new XMLStringTypeHandler());
 		handlerMap.put("blob", new BlobTypeHandler(contextURL));

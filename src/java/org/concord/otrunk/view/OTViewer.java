@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.42 $
- * $Date: 2007-01-20 13:26:45 $
+ * $Revision: 1.43 $
+ * $Date: 2007-01-24 22:11:24 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -712,7 +712,7 @@ public class OTViewer extends JFrame
             public void actionPerformed(ActionEvent arg0) {
 				File fileToSave = getReportFile();
                 OTMLToXHTMLConverter otxc = 
-                	new OTMLToXHTMLConverter(otViewFactory, bodyPanel);
+                	new OTMLToXHTMLConverter(otViewFactory, bodyPanel.getViewContainer());
                 otxc.setXHTMLParams(fileToSave, 800, 600);
                 
                 (new Thread(otxc)).start();

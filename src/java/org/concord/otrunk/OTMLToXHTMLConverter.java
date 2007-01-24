@@ -205,7 +205,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
         
         OTObjectView objView = (OTObjectView)viewFactory.getObjectView(obj, viewContainer);
         
-        JComponent comp = objView.getComponent(false);
+        JComponent comp = objView.getComponent(obj, false);
         if(dim != null) comp.setSize(dim);
         else {
             Dimension dim2 = comp.getPreferredSize();

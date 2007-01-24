@@ -52,10 +52,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrame;
-import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewFactory;
-import org.concord.framework.otrunk.view.OTViewFactoryAware;
 import org.concord.framework.otrunk.view.OTXHTMLHelper;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.w3c.dom.Document;
@@ -69,13 +67,11 @@ import org.xml.sax.helpers.DefaultHandler;
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class OTDocumentView extends OTTextObjectView
-	implements OTObjectView, ChangeListener, HyperlinkListener, 
-        OTViewFactoryAware, OTXHTMLView
+	implements ChangeListener, HyperlinkListener, OTXHTMLView
 {
 	public static boolean addedCustomLayout = false;
 	
 	OTDocument pfDocument;		
-    OTViewFactory viewFactory = null;
     
 	JTabbedPane tabbedPane = null;
 	JComponent previewComponent = null;
@@ -100,9 +96,9 @@ public class OTDocumentView extends OTTextObjectView
 		"</html>";
 
     
-	public void initialize(OTObject doc, OTViewContainer vContainer)
+	protected void setup(OTObject doc)
 	{
-		super.initialize(doc, vContainer);
+		super.setup(doc);
 		pfDocument = (OTDocument)doc;
 	}
 
@@ -111,8 +107,10 @@ public class OTDocumentView extends OTTextObjectView
         viewFactory = factory;	    
 	}
     
-	public JComponent getComponent(boolean editable)
+	public JComponent getComponent(OTObject otObject, boolean editable)
 	{
+		setup(otObject);
+		
 		initTextAreaModel();
 		
 		if (tabbedPane != null) {
