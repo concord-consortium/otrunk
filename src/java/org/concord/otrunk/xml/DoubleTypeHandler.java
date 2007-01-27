@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-01-24 22:11:24 $
+ * $Revision: 1.2 $
+ * $Date: 2007-01-27 23:46:22 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -49,7 +49,7 @@ public class DoubleTypeHandler extends PrimitiveResourceTypeHandler
 {
 	public DoubleTypeHandler()
 	{
-		super("double");
+		super("double", Double.class);
 	}
 	
 	/* (non-Javadoc)

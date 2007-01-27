@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.8 $
+ * $Date: 2007-01-27 23:46:22 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -55,7 +55,7 @@ public class MapTypeHandler extends ResourceTypeHandler
 	 */
 	public MapTypeHandler(TypeService dots)
 	{
-		super("list");
+		super("map");
 		typeService = dots;
 	}
 
@@ -71,7 +71,7 @@ public class MapTypeHandler extends ResourceTypeHandler
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			
 		    OTXMLElement entry = (OTXMLElement)childIter.next();
 			if(!entry.getName().equals("entry")) {
-				throw new RuntimeException("Invalid tag inside of map element");
+				throw new RuntimeException("Invalid tag: " + entry.getName() + " inside of map element.");
 			}
 			
 			String key = entry.getAttributeValue("key");

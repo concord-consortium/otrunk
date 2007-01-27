@@ -39,9 +39,12 @@ import java.util.Properties;
  */
 public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler 
 {
-	public PrimitiveResourceTypeHandler(String primitiveName)
+	Class primitiveClass;
+	
+	public PrimitiveResourceTypeHandler(String primitiveName, Class primitiveClass)
 	{
 		super(primitiveName);
+		this.primitiveClass = primitiveClass;
 	}
 	
 	abstract public Object handleElement(String value, Properties elementProps)
@@ -60,5 +63,10 @@ public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler
 	throws HandleElementException
 	{
 		return handleElement(element.getTextTrim(), elementProps);
+	}
+	
+	public Class getPrimitiveClass()
+	{
+		return primitiveClass;
 	}
 }

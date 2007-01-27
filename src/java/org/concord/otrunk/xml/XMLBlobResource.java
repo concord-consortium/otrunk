@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.7 $
+ * $Date: 2007-01-27 23:46:22 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -57,51 +57,62 @@ public class XMLBlobResource
 {
 	URL blobURL;
 	byte [] bytes;
+	String gzb64;
 	
 	public XMLBlobResource(URL url)
 	{
 		blobURL = url;
 	}
 	
+	public XMLBlobResource(String gzippedBase64Str)
+	{
+		gzb64 = gzippedBase64Str;
+	}
+	
 	public byte [] getBytes()
 	{
 	    if(bytes != null) return bytes;
-	    
-		InputStream urlStream = null;
-		try {
-			urlStream = blobURL.openStream();
-			BufferedInputStream inStream = new BufferedInputStream(urlStream);
-			Transfer trans = new Transfer();
-			
-			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-			
-			trans.transfer(inStream, outStream, true);
 
-			urlStream = null;
-			
-			bytes = outStream.toByteArray();
-			return bytes;
-		} catch (SocketException sockExcp){
-			System.err.println(sockExcp.toString());
-		} catch (FileNotFoundException e){
-		    System.err.println("error loading xml resource: ");
-		    System.err.println("   " + e.toString());
-		} catch(UnknownHostException e) {
-		    System.err.println(e.toString());
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			
-			if(urlStream != null) try{
-				urlStream.close();
-			}
-			catch (IOException e1){
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-		}
-		
+	    if(blobURL != null) {
+	    	InputStream urlStream = null;
+	    	try {
+	    		urlStream = blobURL.openStream();
+	    		BufferedInputStream inStream = new BufferedInputStream(urlStream);
+	    		Transfer trans = new Transfer();
+
+	    		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+
+	    		trans.transfer(inStream, outStream, true);
+
+	    		urlStream = null;
+
+	    		bytes = outStream.toByteArray();
+	    		return bytes;
+	    	} catch (SocketException sockExcp){
+	    		System.err.println(sockExcp.toString());
+	    	} catch (FileNotFoundException e){
+	    		System.err.println("error loading xml resource: ");
+	    		System.err.println("   " + e.toString());
+	    	} catch(UnknownHostException e) {
+	    		System.err.println(e.toString());
+	    	} catch(Exception e) {
+	    		e.printStackTrace();
+	    	} finally {
+
+	    		if(urlStream != null) try{
+	    			urlStream.close();
+	    		}
+	    		catch (IOException e1){
+	    			// TODO Auto-generated catch block
+	    			e1.printStackTrace();
+	    		}
+
+	    	}
+	    } else if(gzb64 != null) {
+	    	// just decode on the fly instead of saving the bytes, 
+	    	// this should save memory
+	    	return Base64.decode(gzb64);
+	    }
 
 		return null;
 	}

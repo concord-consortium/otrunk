@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.5 $
+ * $Date: 2007-01-27 23:46:22 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -49,7 +49,7 @@ public class XMLStringTypeHandler extends PrimitiveResourceTypeHandler
 {
     public XMLStringTypeHandler()
     {
-        super("xmlstring");
+        super("xmlstring", XMLParsableString.class);
     }
     
 	public Object handleElement(String value, Properties elementProps)
