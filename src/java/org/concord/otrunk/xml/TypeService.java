@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2007-01-24 22:11:24 $
+ * $Revision: 1.22 $
+ * $Date: 2007-01-27 23:46:22 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -110,19 +110,22 @@ public class TypeService
 
 	public TypeService(URL contextURL)
 	{	
-		// This should be done automatically so we don't need to 
-		// define them here.  The name can be looked up when it
-		// is requested.
-		handlerMap.put("boolean", new BooleanTypeHandler());
-		handlerMap.put("int", new IntegerTypeHandler());
-		handlerMap.put("long", new LongTypeHandler());
-		handlerMap.put("float", new FloatTypeHandler());
-		handlerMap.put("double", new DoubleTypeHandler());
-		handlerMap.put("string", new StringTypeHandler());
-		handlerMap.put("xmlstring", new XMLStringTypeHandler());
-		handlerMap.put("blob", new BlobTypeHandler(contextURL));
-		handlerMap.put("list", new ListTypeHandler(this));
-		handlerMap.put("map", new MapTypeHandler(this));
+		ResourceTypeHandler [] handlers = {
+				new BooleanTypeHandler(),
+				new IntegerTypeHandler(),
+				new LongTypeHandler(),
+				new FloatTypeHandler(),
+				new DoubleTypeHandler(),
+				new StringTypeHandler(),
+				new XMLStringTypeHandler(),
+				new BlobTypeHandler(contextURL),
+				new ListTypeHandler(this),
+				new MapTypeHandler(this),	
+		};
+		
+		for(int i=0; i<handlers.length; i++){
+			handlerMap.put(handlers[i].getPrimitiveName(), handlers[i]);
+		}
 	}
 	
 	public void registerUserType(String name, ResourceTypeHandler handler)
@@ -139,14 +142,6 @@ public class TypeService
 	public ResourceTypeHandler getElementHandler(String nodeName)
 	{
 		ResourceTypeHandler handler = (ResourceTypeHandler) handlerMap.get(nodeName);
-		
-		// temporary hack
-		String packageName = "org.concord.portfolio.objects.";
-		
-		if(handler == null && nodeName.startsWith(packageName)) {
-			nodeName = nodeName.substring(packageName.length(), nodeName.length());
-			handler = (ResourceTypeHandler) handlerMap.get(nodeName);
-		}
 		
 		return handler;
 	}

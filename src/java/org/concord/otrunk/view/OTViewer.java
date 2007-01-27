@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.43 $
- * $Date: 2007-01-24 22:11:24 $
+ * $Revision: 1.44 $
+ * $Date: 2007-01-27 23:46:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -276,6 +276,7 @@ public class OTViewer extends JFrame
 			if(args[0].equals("-f")) {
 				if(args.length > 1) {
 					File inFile = new File(args[1]);
+					currentAuthoredFile = inFile;
 					try {
 						URL url = inFile.toURL();
 						urlStr = url.toString();
@@ -896,37 +897,39 @@ public class OTViewer extends JFrame
 		     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		     */
 		    public void actionPerformed(ActionEvent arg0)
-		    {
+		    {		    	
 		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		        CCFileDialog dialog = new CCFileDialog(frame, "Save As", CCFileDialog.SAVE);
-		        CCFilenameFilter filenameFilter = new CCFilenameFilter("otml");
-		        dialog.setFilenameFilter(filenameFilter);
+		        
+		        MostRecentFileDialog mrfd = new MostRecentFileDialog("org.concord.otviewer.saveotml");
+		        mrfd.setFilenameFilter("otml");
+		        
 		        if(currentAuthoredFile != null) {
-		            dialog.setDirectory(currentAuthoredFile.getParentFile().getAbsolutePath());
-		            dialog.setFile(currentAuthoredFile.getName());
+		        	mrfd.setCurrentDirectory(currentAuthoredFile.getParentFile());
+		        	mrfd.setSelectedFile(currentAuthoredFile);
 		        }
-		        dialog.show();
+
+		        int retval = mrfd.showSaveDialog(frame);
 		        
-		        String fileName = dialog.getFile();
-		        if(fileName == null) {
-		            return;
+		        File file = null;
+		        if(retval == MostRecentFileDialog.APPROVE_OPTION) {
+		        	file = mrfd.getSelectedFile();
+		        	
+		        	String fileName = file.getPath();
+		        	currentAuthoredFile = file;
+		        	
+			        if(!fileName.toLowerCase().endsWith(".otml")){
+			            currentAuthoredFile = new File(currentAuthoredFile.getAbsolutePath()+".otml");
+			        }
+			        
+			        try {
+			        	Exporter.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
+			        } catch(Exception e){
+			        	e.printStackTrace();
+			        }	                    	
+			        
+			        frame.setTitle(fileName);
+
 		        }
-		        
-		        fileName = dialog.getDirectory() + fileName;
-		        currentAuthoredFile = new File(fileName);
-		        
-		        if(!fileName.toLowerCase().endsWith(".otml")){
-		            currentAuthoredFile = new File(currentAuthoredFile.getAbsolutePath()+".otml");
-		        }
-		        if(!currentAuthoredFile.exists() || checkForReplace(currentAuthoredFile)){
-		            try {
-		                Exporter.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
-		            } catch(Exception e){
-		                e.printStackTrace();
-		            }	                    	
-		        }
-		        
-		        frame.setTitle(fileName);
 		    }
 		};
 		saveAsAction.putValue(Action.NAME, "Save Authored Content As...");			

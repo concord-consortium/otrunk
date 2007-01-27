@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-01-24 22:11:23 $
+ * $Revision: 1.2 $
+ * $Date: 2007-01-27 23:46:22 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -47,7 +47,7 @@ public class LongTypeHandler extends PrimitiveResourceTypeHandler
 {
 	public LongTypeHandler()
 	{
-		super("long");
+		super("long", Long.class);
 	}
 	
 	/* (non-Javadoc)

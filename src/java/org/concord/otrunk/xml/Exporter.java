@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2006-10-11 17:26:00 $
+ * $Revision: 1.16 $
+ * $Date: 2007-01-27 23:46:22 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -150,31 +150,30 @@ public class Exporter
 		} else if(item instanceof OTResourceList  ||
 				item instanceof OTResourceMap) {
 			System.err.println("nested collections are illegal");
-		} else if(item instanceof byte []) {
-			// this is blob
-			// write out the blob and save a reference to it
-			System.err.println("Got a blob reference????");
 		} else {
 			// this is a litteral reference in a list or map so we need the type
 			String type = null;
-			if(item instanceof String) {
-				type = "string";
-			} else if(item instanceof Float) {
-				type = "float";
-			} else if(item instanceof Boolean) {
-				type = "boolean";
-			} else {
-				System.err.println("unknown list item type: " + item.getClass());
+			type = TypeService.getPrimitiveType(item.getClass());
+
+			if(type == null){
+				System.err.println("unknown list item type: " + item.getClass());				
+				return;
 			}
 			printIndent(indent, output);
 			output.print("<" + type + ">");
-			String itemString = item.toString();
-			if(itemString.length() > 40) {
-			    output.println();
-			    indentPrint(indent+1,itemString, output);
-			    printIndent(indent, output);
+
+			String itemString;
+			if(!(item instanceof byte[])) {
+				itemString = item.toString();
 			} else {
-			    output.print(itemString);
+				itemString = BlobTypeHandler.base64((byte[])item);
+			}
+			if(itemString.length() > 40) {
+				output.println();
+				indentPrint(indent+1,itemString, output);
+				printIndent(indent, output);
+			} else {
+				output.print(itemString);
 			}
 			output.println("</" + type + ">");
 		}

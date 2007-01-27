@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.9 $
+ * $Date: 2007-01-27 23:46:22 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -46,11 +46,12 @@ import java.util.Properties;
  */
 public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 {
+	public final static String GZIPPED_BASE64_PROTOCOL = "gzb64:";
 	URL contextURL;
 	
 	public BlobTypeHandler(URL context)
 	{
-		super("blob");
+		super("blob", byte[].class);
 		contextURL = context;
 	}
 	
@@ -61,6 +62,13 @@ public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 		throws HandleElementException
 	{		
 		try {
+			// check if the urlStr is a gzipped base64.
+			// gzb64:
+			if(urlStr != null && urlStr.startsWith(GZIPPED_BASE64_PROTOCOL)) {
+				String b64 = urlStr.substring(GZIPPED_BASE64_PROTOCOL.length());
+				return new XMLBlobResource(b64);
+			}
+			
 			URL url = new URL(contextURL, urlStr);
 			return new XMLBlobResource(url);			
 		} catch(Exception e) {
@@ -68,4 +76,8 @@ public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 		} 		
 	}
 
+	public static String base64(byte[] bytes)
+	{
+		return GZIPPED_BASE64_PROTOCOL + Base64.encodeBytes(bytes, Base64.GZIP);
+	}
 }

@@ -37,6 +37,11 @@ package org.concord.otrunk.xml;
  */
 public class HandleElementException extends Exception 
 {
+	/**
+	 * Not intended to be serialized, just added remove compile warning
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	public HandleElementException(String message)
 	{
 		super(message);
