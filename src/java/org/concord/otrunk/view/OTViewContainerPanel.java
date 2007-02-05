@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2007-01-24 22:11:24 $
+ * $Revision: 1.22 $
+ * $Date: 2007-02-05 18:57:47 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -33,22 +33,26 @@
 package org.concord.otrunk.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
 import java.util.Vector;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.view.OTFrame;
+import org.concord.framework.otrunk.view.OTFrameManager;
+import org.concord.framework.otrunk.view.OTFrameManagerAware;
 import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTViewContainer;
+import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
+import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 
 
@@ -69,15 +73,17 @@ public class OTViewContainerPanel extends JPanel
     private static final long serialVersionUID = 1L;
     
     OTObject currentObject = null;
+    boolean currentObjectEditable = false;
     OTObjectView currentView = null;
+    OTViewEntry currentViewEntry = null;
     
 	private OTViewFactory otViewFactory;
 	
 	protected OTFrameManager frameManager;
 
-	private JFrame myFrame;
-	private JScrollPane scrollPane = null;
-
+	private boolean useScrollPane = true;
+	private boolean autoRequestFocus = true;
+	
 	Vector containerListeners = new Vector();
 	
 	MyViewContainer viewContainer;
@@ -85,17 +91,15 @@ public class OTViewContainerPanel extends JPanel
 	/**
 	 * 
 	 */
-	public OTViewContainerPanel(OTFrameManager frameManager, JFrame frame)
+	public OTViewContainerPanel(OTFrameManager frameManager)
 	{
 		super(new BorderLayout());
 
 		viewContainer = new MyViewContainer();
 		
 		this.frameManager = frameManager;
-		myFrame = frame;
-		scrollPane = new JScrollPane(new JLabel("Loading..."));
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		add(scrollPane);		
+		JLabel loadingLabel = new JLabel("Loading...");
+		add(loadingLabel);		
 	}
 	
 	public void setOTViewFactory(OTViewFactory factory)
@@ -109,32 +113,45 @@ public class OTViewContainerPanel extends JPanel
 	    add(new JLabel(message));
 	}
 	
-	public void showFrame()
-	{
-		myFrame.setVisible(true);
-	}
-	
 	public OTObject getCurrentObject()
 	{
 	    return currentObject;
 	}
 	
-	public void setCurrentObject(OTObject otObject, OTFrame otFrame)
+	public void setCurrentObject(OTObject otObject)
 	{
-
-		if(otFrame != null) {
-			frameManager.setFrameObject(otObject, otFrame);
-			return;
-		}
+		// I'm not sure why editable is true by default here
+		// but that is how it was before
+		setCurrentObject(otObject, null, true);
+	}
 		
+	public void setCurrentObject(OTObject otObject, boolean editable)
+	{
+		setCurrentObject(otObject, null, editable);
+	}
+	
+	public void setCurrentObject(OTObject otObject, OTViewEntry viewEntry, 
+			boolean editable)
+	{
 		if(currentView != null) {
 		    currentView.viewClosed();
 		}
 			
 		currentObject = otObject;
-
+		currentObjectEditable = editable;
+		currentViewEntry = viewEntry;
+		
 		removeAll();
-		add(new JLabel("Loading..."));
+		// Unfortunately the size of this label matters, when these objects
+		// are embedded in tables inside of the htmleditorkit.  I think the
+		// editorkit gets messed up when the width of a component changes.
+		// It seems to be a problem only when it shrinks, not when it grows.	
+		// so instead of this:
+        // JLabel loading = new JLabel("Loading...");
+		// we'll use this which is really short.
+		JLabel loading = new JLabel("...");
+		loading.setBorder(BorderFactory.createLineBorder(Color.black));
+		add(loading);
 		revalidate();		
 		
 		SwingUtilities.invokeLater(new Runnable(){
@@ -142,76 +159,61 @@ public class OTViewContainerPanel extends JPanel
 		    {
 				JComponent newComponent = null;
 				if(currentObject != null) {
-				    currentView = otViewFactory.getObjectView(currentObject, viewContainer);
+					if(currentViewEntry != null) {
+						currentView = 
+							(OTObjectView)otViewFactory.getView(currentObject, currentViewEntry);
+
+					} else {
+						currentView = 
+							(OTObjectView)otViewFactory.getView(currentObject, OTObjectView.class);
+					}
+
+					if(currentView instanceof OTViewContainerAware){
+			        	((OTViewContainerAware)currentView).
+			        		setViewContainer(viewContainer);
+			        }			        
+					
+				    if(currentView instanceof OTFrameManagerAware){
+				    	((OTFrameManagerAware)currentView).setFrameManager(frameManager);
+				    }
+
 				    if(currentView == null) {
 				    	newComponent = new JLabel("No view for object: " + currentObject);
 				    } else {
-				    	newComponent = currentView.getComponent(currentObject, true);
+				    	newComponent = currentView.getComponent(currentObject, currentObjectEditable);
 					}
 				} else {
 					newComponent = new JLabel("Null object");
 				}
-				
-		    	scrollPane = new JScrollPane(newComponent);
-		    	scrollPane.getViewport().setViewPosition(new Point(0,0));
-				scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+				JComponent myComponent = newComponent;
+				
+				if(isUseScrollPane()) {
+					JScrollPane scrollPane = new JScrollPane(newComponent);
+					scrollPane.getViewport().setViewPosition(new Point(0,0));
+					scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+					myComponent = scrollPane;
+				}
 				removeAll();
-				add(scrollPane, BorderLayout.CENTER);
+				add(myComponent, BorderLayout.CENTER);
 				
 				revalidate();
 				notifyListeners();
-				newComponent.requestFocus();		        
+				if(isAutoRequestFocus()){
+					newComponent.requestFocus();
+				}
 		    }
 		});
 	}
 
-	/* (non-Javadoc)
-	 * @see org.concord.otrunk.view.OTViewContainer#setCurrentObject(org.concord.framework.otrunk.OTObject, org.concord.otrunk.view.OTFrame)
-	 */
-	/*public void setCurrentObject(Vector users, OTFrame otFrame)
-	{
-		if(users == null || users.size() == 0) return;
-		
-		if(currentView != null) {
-		    currentView.viewClosed();
-		}
-
-		currentObject = pfObject;
-
-		removeAll();
-		add(new JLabel("Loading..."));
-		revalidate();		
-		
-		SwingUtilities.invokeLater(new Runnable(){
-		    public void run()
-		    {
-				JComponent newComponent = null;
-				if(currentObject != null) {
-				    currentView = otViewFactory.getObjectView(currentObject, OTViewContainerPanel.this);
-				    if(currentView == null) {
-				        newComponent = new JLabel("No view for object: " + currentObject);
-						
-
-				    } else {
-				        newComponent = currentView.getComponent(true);
-				    }
-				} else {
-					newComponent = new JLabel("Null object");
-				}
-
-				removeAll();
-				add(newComponent, BorderLayout.CENTER);
-				revalidate();
-				notifyListeners();
-				newComponent.requestFocus();		        
-		    }
-		});
-	}*/
-
     public Component getCurrentComponent()
-    {
-        return getComponent(0);
+    {   
+    	Component currentComp = getComponent(0);
+    	if(currentComp instanceof JScrollPane) {
+    		currentComp = ((JScrollPane)currentComp).getViewport().getView();
+    	}
+
+        return currentComp;
     }
     
 	public void addViewContainerListener(OTViewContainerListener listener)
@@ -246,12 +248,28 @@ public class OTViewContainerPanel extends JPanel
 		public OTObject getCurrentObject() {
 		    return OTViewContainerPanel.this.getCurrentObject();
 		}
-		public void setCurrentObject(OTObject pfObject, OTFrame otFrame) {
-			OTViewContainerPanel.this.setCurrentObject(pfObject, otFrame);
+		public void setCurrentObject(OTObject pfObject) {
+			OTViewContainerPanel.this.setCurrentObject(pfObject);
 		}
 	}
 
-	public MyViewContainer getViewContainer() {
+	public OTViewContainer getViewContainer() {
 		return viewContainer;
+	}
+
+	public boolean isUseScrollPane() {
+		return useScrollPane;
+	}
+
+	public void setUseScrollPane(boolean useScrollPane) {
+		this.useScrollPane = useScrollPane;
+	}
+
+	public boolean isAutoRequestFocus() {
+		return autoRequestFocus;
+	}
+
+	public void setAutoRequestFocus(boolean autoRequestFocus) {
+		this.autoRequestFocus = autoRequestFocus;
 	}
 }

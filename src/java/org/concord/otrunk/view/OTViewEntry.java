@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2006-10-23 19:30:14 $
+ * $Revision: 1.5 $
+ * $Date: 2007-02-05 18:57:47 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,7 +32,6 @@
 */
 package org.concord.otrunk.view;
 
-import org.concord.framework.otrunk.OTObjectInterface;
 
 /**
  * OTViewEntry
@@ -40,15 +39,11 @@ import org.concord.framework.otrunk.OTObjectInterface;
  *
  * Date created: May 18, 2005
  *
+ * @deprecated use the org.concord.framework.otrunk.view.OTViewEntry instead
  * @author scott<p>
  *
  */
 public interface OTViewEntry
-    extends OTObjectInterface
+    extends org.concord.framework.otrunk.view.OTViewEntry
 {
-    public String getObjectClass();
-    public void setObjectClass(String objectClass);
-    
-    public String getViewClass();
-    public void setViewClass(String viewClass);
 }

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-01-24 22:11:24 $
+ * $Revision: 1.3 $
+ * $Date: 2007-02-05 18:57:47 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,66 +32,44 @@
 */
 package org.concord.otrunk.view.document;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.ComponentView;
 import javax.swing.text.Element;
 import javax.swing.text.Position;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.view.OTFrame;
-import org.concord.framework.otrunk.view.OTViewContainer;
-import org.concord.framework.otrunk.view.OTViewFactory;
+import org.concord.framework.otrunk.view.OTViewEntry;
+import org.concord.otrunk.view.OTViewContainerPanel;
 
 public class OTDocumentObjectView extends ComponentView
 {
 	OTDocument compoundDoc;
-	OTViewContainer viewContainer;
-    OTViewFactory viewFactory;
-	JPanel componentPanel;
-    private OTObject currentObject;
+    OTViewContainerPanel viewContainerPanel;
 	
-    /**
-     * A anonymous class to clarify the role of this object.  
-     * The object uses the view factory to create views and 
-     * then provides a view container to those views.
-     */
-    OTViewContainer myViewContainer = new OTViewContainer(){
-
-		public OTObject getCurrentObject() 
-		{
-			return OTDocumentObjectView.this.getCurrentObject();
-		}
-
-		public void setCurrentObject(OTObject otObject, OTFrame otFrame) 
-		{
-			OTDocumentObjectView.this.setCurrentObject(otObject, otFrame, false);
-		}
-    	
-    };
-    
     public OTDocumentObjectView(Element elem, OTDocument doc, 
-    		OTViewContainer vContainer, OTViewFactory factory) 
+    		AbstractOTDocumentView docView)
     {
     	super(elem);
     	compoundDoc = doc;
-    	viewContainer = vContainer;
-        viewFactory = factory;
+        viewContainerPanel = new OTViewContainerPanel(docView.getFrameManager());
+        viewContainerPanel.setOTViewFactory(docView.getViewFactory());
+        viewContainerPanel.setAutoRequestFocus(false);
+        viewContainerPanel.setUseScrollPane(false);
+        viewContainerPanel.setOpaque(false);
     }
 
     protected Component createComponent() 
     {
     	AttributeSet attr = getElement().getAttributes();
-    	String pfId = (String) attr.getAttribute("refid");
+    	String refId = (String) attr.getAttribute("refid");
     	String editStr = (String) attr.getAttribute("editable");
-  
+    	String viewId = (String) attr.getAttribute("viewid");
+    	
     	boolean editable = true;
     	
     	if(editStr != null && editStr.equalsIgnoreCase("false"))
@@ -99,14 +77,24 @@ public class OTDocumentObjectView extends ComponentView
     		editable = false;
     	}
     	
-    	if(pfId != null && pfId.length() > 0) {
-        	OTObject childObject = compoundDoc.getReferencedObject(pfId);        	
+    	if(refId != null && refId.length() > 0) {
+        	OTObject childObject = compoundDoc.getReferencedObject(refId);        	
         	if(childObject == null) {
-        		return new JLabel("Bad OTID: " + pfId);
+        		return new JLabel("Bad OTID: " + refId);
         	}
 
-        	setCurrentObject(childObject, null, editable);
-    		return componentPanel;
+        	OTViewEntry viewEntry = null;
+        	if(viewId != null && viewId.length() > 0) {
+        		viewEntry = (OTViewEntry)
+        			compoundDoc.getReferencedObject(viewId);
+        	}
+        	
+        	viewContainerPanel.setCurrentObject(childObject, 
+        			viewEntry, editable);
+
+        	// CHECKME we will probably have problems when this panel
+        	// changes sizes after its content is loaded
+    		return viewContainerPanel;
     	}
     	
     	return null;       	
@@ -143,58 +131,5 @@ public class OTDocumentObjectView extends ComponentView
     	}
     	bias[0] = Position.Bias.Backward;
     	return getEndOffset();
-    }
-        
-	/* (non-Javadoc)
-	 * @see org.concord.portfolio.browser.PfViewContainer#setCurrentObject(org.concord.portfolio.PortfolioObject)
-	 */
-	public void setCurrentObject(OTObject otObject, OTFrame otFrame, 
-			boolean editable)
-	{
-		if(otFrame != null) {
-			viewContainer.setCurrentObject(otObject, otFrame);
-			return;
-		}
-		
-		currentObject = otObject;
-		
-		if(componentPanel == null) {
-			componentPanel = new JPanel();
-			componentPanel.setLayout(new BorderLayout());
-			componentPanel.setOpaque(false);
-			
-		} else {
-			componentPanel.removeAll();
-		}
-		
-    	JComponent childComponent = 
-    		viewFactory.getComponent(otObject, myViewContainer, editable);		
-
-    	if(childComponent == null) {
-    		
-    	}
-    	componentPanel.add(childComponent, BorderLayout.CENTER);			
-	}
-	
-	/* (non-Javadoc)
-     * @see org.concord.framework.otrunk.view.OTViewContainer#getCurrentObject()
-     */
-    public OTObject getCurrentObject()
-    {
-        // TODO Auto-generated method stub
-        return currentObject;
-    }
-	/* (non-Javadoc)
-	 * @see org.concord.otrunk.view.OTViewContainer#getComponent(org.concord.framework.otrunk.OTObject, org.concord.otrunk.view.OTViewContainer, boolean)
-	 */
-	public JComponent getComponent(OTObject pfObject, boolean editable)
-	{
-		return viewFactory.getComponent(pfObject, myViewContainer, editable);		
-	}
-
-	public void setViewContainer(OTViewContainer container) 
-	{
-		viewContainer = container;
-	}
-
+    }        
 }
