@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2006-10-23 04:59:20 $
+ * $Revision: 1.2 $
+ * $Date: 2007-02-05 18:57:47 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -38,22 +38,16 @@ import javax.swing.text.View;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit.HTMLFactory;
 
-import org.concord.framework.otrunk.view.OTViewContainer;
-import org.concord.framework.otrunk.view.OTViewFactory;
-
 
 public class OTHTMLFactory extends HTMLFactory 
 {
 	private OTDocument compoundDoc;
-	private OTViewContainer viewContainer;
-	private OTViewFactory viewFactory;
+	private AbstractOTDocumentView documentView;
     
-	public OTHTMLFactory(OTDocument doc, OTViewContainer vContainer, 
-            OTViewFactory factory)
+	public OTHTMLFactory(OTDocument doc, AbstractOTDocumentView docView)
 	{
 		compoundDoc = doc;
-		viewContainer = vContainer;
-        viewFactory = factory;
+		documentView = docView;
 	}
 	
     public View create(Element elem) 
@@ -63,7 +57,7 @@ public class OTHTMLFactory extends HTMLFactory
 	    	HTML.Tag kind = (HTML.Tag) o;
 	    	if (kind == HTML.Tag.OBJECT) {
 	    		return new OTDocumentObjectView(elem, compoundDoc, 
-                        viewContainer, viewFactory);
+	    				documentView);
 	    	} 
 	    }
     	return super.create(elem);

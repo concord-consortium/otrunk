@@ -52,8 +52,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrame;
-import org.concord.framework.otrunk.view.OTViewContainer;
-import org.concord.framework.otrunk.view.OTViewFactory;
+import org.concord.framework.otrunk.view.OTFrameManagerAware;
 import org.concord.framework.otrunk.view.OTXHTMLHelper;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.w3c.dom.Document;
@@ -66,8 +65,9 @@ import org.xml.sax.helpers.DefaultHandler;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class OTDocumentView extends OTTextObjectView
-	implements ChangeListener, HyperlinkListener, OTXHTMLView
+public class OTDocumentView extends AbstractOTDocumentView
+	implements ChangeListener, HyperlinkListener, OTXHTMLView, 
+		OTFrameManagerAware
 {
 	public static boolean addedCustomLayout = false;
 	
@@ -102,11 +102,6 @@ public class OTDocumentView extends OTTextObjectView
 		pfDocument = (OTDocument)doc;
 	}
 
-	public void setViewFactory(OTViewFactory factory)
-	{
-        viewFactory = factory;	    
-	}
-    
 	public JComponent getComponent(OTObject otObject, boolean editable)
 	{
 		setup(otObject);
@@ -161,12 +156,18 @@ public class OTDocumentView extends OTTextObjectView
 		bodyText = substituteIncludables(bodyText);
 		
 		// default to html viewer for now
+		// FIXME the handling of the plain markup is to test the new view entry code
+		// it isn't quite valid because plain text might have html chars in it
+		// so it will get parsed incorrectly.
 		if(markupLanguage == null ||  
-				markupLanguage.equals(OTDocument.MARKUP_PFHTML)) {
+				markupLanguage.equals(OTDocument.MARKUP_PFHTML) || 
+				markupLanguage.equals(OTDocument.MARKUP_PLAIN)) {
 			if(editorPane == null) {
 				editorPane = new JEditorPane();
+				OTHTMLFactory kitViewFactory =
+					new OTHTMLFactory(pfDocument, this);
                 OTDocumentEditorKit editorKit = 
-                    new OTDocumentEditorKit(pfDocument, viewContainer, viewFactory);
+                    new OTDocumentEditorKit(pfDocument, kitViewFactory);
 				editorPane.setEditorKit(editorKit);
 				editorPane.setEditable(false);
 				editorPane.addHyperlinkListener(this);
@@ -229,7 +230,7 @@ public class OTDocumentView extends OTTextObjectView
 		
         // see if it has an OTXHTMLView 
         OTXHTMLView xhtmlView = (OTXHTMLView)
-            viewFactory.getView(referencedObject, OTXHTMLView.class);
+            getViewFactory().getView(referencedObject, OTXHTMLView.class);
         if(xhtmlView != null) {
             String replacement = xhtmlView.getXHTMLText(referencedObject);
             if(replacement == null) {
@@ -362,13 +363,15 @@ public class OTDocumentView extends OTTextObjectView
 	
 	public void hyperlinkUpdate(HyperlinkEvent e) 
 	{
-		OTFrame targetFrame = null;
 
 		if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 			try {
 				String linkTarget = e.getDescription();
 				if(linkTarget.startsWith("http") || linkTarget.startsWith("file")){
 					try {
+						// FIXME this should be changed to be a service 
+						// so external links can work in both a jnlp 
+						// env and a regular application env
 					    Class serviceManager = Class.forName("javax.jnlp.ServiceManager");
 					    Method lookupMethod = serviceManager.getMethod("lookup", new Class[]{String.class});					    
 					    Object basicService = lookupMethod.invoke(null, new Object[]{"javax.jnlp.BasicService"});
@@ -395,7 +398,13 @@ public class OTDocumentView extends OTTextObjectView
 				AttributeSet tagAttribs = (AttributeSet)attribs.getAttribute(HTML.Tag.A);
 				String target = (String)tagAttribs.getAttribute(HTML.Attribute.TARGET);
 
-				if(target != null) {
+				if(target == null) {
+					getViewContainer().setCurrentObject(linkObj);
+					
+				} else {
+					// they want to use a frame
+					OTFrame targetFrame = null;
+					
 					// get the frame object
 					// modify setCurrentObject to take a frame object
 					// then at the top level view container deal with this object
@@ -406,10 +415,10 @@ public class OTDocumentView extends OTTextObjectView
 						return;
 					}					
 					
+					getFrameManager().putObjectInFrame(linkObj, targetFrame);
 				}
 				
 				
-				viewContainer.setCurrentObject(linkObj, targetFrame);
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
@@ -425,8 +434,10 @@ public class OTDocumentView extends OTTextObjectView
         return updateFormatedView();
     }
 
-    public String getXHTMLImageText(OTXHTMLHelper helper, float containerDisplayWidth, float containerHeight) {
+    public String getXHTMLImageText(OTXHTMLHelper helper, float containerDisplayWidth, float containerHeight) 
+    {
         // TODO Auto-generated method stub
         return null;
     }
+
 }

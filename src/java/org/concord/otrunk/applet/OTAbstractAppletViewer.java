@@ -114,7 +114,7 @@ public abstract class OTAbstractAppletViewer extends JApplet
 			// frame
 			OTObject appletObject = getOTObject();
 
-			otContainer.setCurrentObject(appletObject, null);
+			otContainer.setCurrentObject(appletObject);
 			
 			///////////////////////////////
 			String saveUrlString = getParameter("author_state_save_url");

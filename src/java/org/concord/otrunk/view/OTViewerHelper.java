@@ -23,7 +23,6 @@
 
 package org.concord.otrunk.view;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,15 +31,11 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Hashtable;
-
-import javax.swing.JFrame;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
-import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTStateRoot;
@@ -66,9 +61,9 @@ public class OTViewerHelper
 	private OTDatabase otDB;
 	private OTDatabase userOtDB;	
 	private OTUser currentUser;
+	OTFrameManagerImpl frameManager; 
 	
-	Hashtable otContainers = new Hashtable();
-
+	
 	public static OTUserObject createUser(String name, OTObjectService objService)
 	throws Exception
 	{
@@ -77,7 +72,10 @@ public class OTViewerHelper
 		return user;
 	}
 
-
+	public OTViewerHelper()
+	{
+	}
+	
 	
 	public void loadOTrunk(OTDatabase otDB, Component parentComponent)
 		throws Exception
@@ -93,6 +91,10 @@ public class OTViewerHelper
 		if (viewService != null) {
 			viewFactory = viewService.getViewFactory(otrunk);
 		}
+		
+		// Maybe this shouldn't happen here
+		frameManager = new OTFrameManagerImpl();
+		frameManager.setViewFactory(viewFactory);
 	}
 
 	public OTDatabase loadOTDatabase(URL url)
@@ -191,33 +193,6 @@ public class OTViewerHelper
 		}
 	}	
 	
-	OTFrameManager frameManager = new OTFrameManager() {
-		public void setFrameObject(OTObject otObject,
-				OTFrame otFrame) {
-			// look up view container with the frame.
-			OTViewContainerPanel otContainer = 
-				(OTViewContainerPanel)otContainers.get(otFrame.getGlobalId());
-			
-			if(otContainer == null) {
-				JFrame jFrame = new JFrame(otFrame.getTitle());
-
-				otContainer = createViewContainerPanel(jFrame);
-				
-				jFrame.getContentPane().setLayout(new BorderLayout());
-
-				jFrame.getContentPane().add(otContainer, BorderLayout.CENTER);
-				jFrame.setSize(otFrame.getWidth(), otFrame.getHeight());
-				
-				otContainers.put(otFrame.getGlobalId(), otContainer);
-			}
-			
-			// call setCurrentObject on that view container with a null
-			// frame
-			otContainer.setCurrentObject(otObject, null);
-			otContainer.showFrame();
-		}
-	}; 
-	
 	/**
 	 * 
 	 * @param frame
@@ -225,18 +200,13 @@ public class OTViewerHelper
 	 */
 	public OTViewContainerPanel createViewContainerPanel()
 	{
-		return createViewContainerPanel(null);
-	}
-	
-	protected OTViewContainerPanel createViewContainerPanel(JFrame frame)
-	{
-		OTViewContainerPanel otContainer = new OTViewContainerPanel(frameManager, frame);
+		OTViewContainerPanel otContainer = new OTViewContainerPanel(frameManager);
 
 		otContainer.setOTViewFactory(getViewFactory());
 
 		return otContainer;
 	}
-
+	
 	public void loadUserData(OTDatabase userOtDB, String name)
 	throws Exception
 	{

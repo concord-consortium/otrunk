@@ -32,9 +32,6 @@ package org.concord.otrunk.view.document;
 import javax.swing.text.ViewFactory;
 import javax.swing.text.html.HTMLEditorKit;
 
-import org.concord.framework.otrunk.view.OTViewContainer;
-import org.concord.framework.otrunk.view.OTViewFactory;
-
 /**
  * @author scott
  *
@@ -51,11 +48,11 @@ public class OTDocumentEditorKit extends HTMLEditorKit
 	private OTHTMLFactory viewFactory;
 	
 	public OTDocumentEditorKit(OTDocument doc, 
-			OTViewContainer viewContainer, OTViewFactory otViewFactory)
+				OTHTMLFactory editorKitViewFactory)
 	{
 		super();
 	
-		viewFactory = new OTHTMLFactory(doc, viewContainer, otViewFactory);
+		viewFactory = editorKitViewFactory;
 	}
 	
     public ViewFactory getViewFactory()

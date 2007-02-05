@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2006-10-23 19:30:14 $
+ * $Revision: 1.8 $
+ * $Date: 2007-02-05 18:57:47 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -61,33 +61,23 @@ public class OTViewService extends DefaultOTObject
         this.resources = resources;
     }
 
+    /**
+     * If this method can be removed then this OTClass can be turned 
+     * into a pure interface.  But the only way I can see to remove it
+     * is to use a view or a wrapper which will need this object to 
+     * already exist.  So the only way to really remove it then is to 
+     * support this wrapper/controller or view as part of framework.  
+     * But that makes the framework more complicated.  
+     * 
+     * The alternative is to support methods in the OTClasses.  Then
+     * the entire view factory interface can be implemented by this. 
+     * 
+     * @param otrunk
+     * @return
+     */
     public OTViewFactory getViewFactory(OTrunk otrunk)
     {
-        OTViewFactoryImpl factory = new OTViewFactoryImpl(otrunk);
-        
-        // read in all the viewEntries and create a vector 
-        // of class entries.
-        OTObjectList viewEntries = resources.getViewEntries();
-        ClassLoader loader = OTViewService.class.getClassLoader();
-        
-        for(int i=0; i<viewEntries.size(); i++) {
-            OTViewEntry entry = (OTViewEntry)viewEntries.get(i);
-            String objClassStr = entry.getObjectClass();
-            String viewClassStr = entry.getViewClass();
-            
-            try {
-                Class objectClass = loader.loadClass(objClassStr);
-                Class viewClass = loader.loadClass(viewClassStr);
-                factory.addViewEntry(objectClass, viewClass);
-                
-            } catch (ClassNotFoundException e) {
-                System.err.println("Can't find view: " + viewClassStr + 
-                        " for object: " + objClassStr);
-                System.err.println("  error: " + e.toString());
-            }
-        }
-        
-        return factory;
+        return new OTViewFactoryImpl(otrunk, this);        
     }
 
     public OTObjectList getViewEntries()

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.44 $
- * $Date: 2007-01-27 23:46:23 $
+ * $Revision: 1.45 $
+ * $Date: 2007-02-05 18:57:46 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,7 +32,6 @@
 */
 package org.concord.otrunk.view;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -71,7 +70,6 @@ import javax.swing.event.TreeSelectionListener;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewFactory;
@@ -106,7 +104,7 @@ import org.concord.view.SwingUserMessageHandler;
  *
  */
 public class OTViewer extends JFrame
-	implements TreeSelectionListener, OTFrameManager,
+	implements TreeSelectionListener,
 		OTViewContainerListener
 {
     /**
@@ -128,6 +126,8 @@ public class OTViewer extends JFrame
     String baseFrameTitle = "OTrunk Viewer";
     
 	OTViewContainerPanel bodyPanel;
+	OTFrameManagerImpl frameManager;
+	
 	JTree folderTreeArea;
 	SimpleTreeModel folderTreeModel;
 	JTree dataTreeArea;
@@ -310,7 +310,8 @@ public class OTViewer extends JFrame
 				
 		setJMenuBar(menuBar);
 
-		bodyPanel = new OTViewContainerPanel(this, null);
+		frameManager = new OTFrameManagerImpl();
+		bodyPanel = new OTViewContainerPanel(frameManager);		
 		
 		bodyPanel.addViewContainerListener(this);
 		
@@ -433,7 +434,9 @@ public class OTViewer extends JFrame
 		}
 		
 		bodyPanel.setOTViewFactory(otViewFactory);
-		
+		// set the viewFactory of the frame manager
+		frameManager.setViewFactory(otViewFactory);
+
 		currentURL = url;
 
 		reloadWindow();
@@ -472,7 +475,7 @@ public class OTViewer extends JFrame
 			folderTreeModel.setRoot(new OTFolderNode(root));
 		}
 		
-		bodyPanel.setCurrentObject(root, null);
+		bodyPanel.setCurrentObject(root);
 		
 		if(showTree && !overrideShowTree) {
 			folderTreeModel.fireTreeStructureChanged((SimpleTreeNode)folderTreeModel.getRoot());
@@ -526,7 +529,7 @@ public class OTViewer extends JFrame
 	    			folderTreeModel.setRoot(new OTFolderNode(root));
 	    		}
 	    		
-	    		bodyPanel.setCurrentObject(root, null);
+	    		bodyPanel.setCurrentObject(root);
 
 	    		if(showTree) {
 	    			folderTreeModel.fireTreeStructureChanged((SimpleTreeNode)folderTreeModel.getRoot());
@@ -611,7 +614,7 @@ public class OTViewer extends JFrame
 
 			OTObject pfObject = node.getPfObject();
 
-			bodyPanel.setCurrentObject(pfObject, null);
+			bodyPanel.setCurrentObject(pfObject);
 			
 			if(splitPane.getRightComponent() != bodyPanel){
 			    splitPane.setRightComponent(bodyPanel);
@@ -639,32 +642,6 @@ public class OTViewer extends JFrame
             
 			splitPane.setRightComponent(scrollPane);
 		}
-	}
-	
-	public void setFrameObject(OTObject otObject, OTFrame otFrame)
-	{
-		// look up view container with the frame.
-		OTViewContainerPanel otContainer = (OTViewContainerPanel)otContainers.get(otFrame.getGlobalId());
-		
-		if(otContainer == null) {
-			JFrame jFrame = new JFrame(otFrame.getTitle());
-
-			otContainer = new OTViewContainerPanel(this, jFrame);
-
-			otContainer.setOTViewFactory(otViewFactory);
-			
-			jFrame.getContentPane().setLayout(new BorderLayout());
-
-			jFrame.getContentPane().add(otContainer, BorderLayout.CENTER);
-			jFrame.setSize(otFrame.getWidth(), otFrame.getHeight());
-			
-			otContainers.put(otFrame.getGlobalId(), otContainer);
-		}
-		
-		// call setCurrentObject on that view container with a null
-		// frame
-		otContainer.setCurrentObject(otObject, null);
-		otContainer.showFrame();
 	}
 	
 	public void createActions()
@@ -948,9 +925,6 @@ public class OTViewer extends JFrame
                 // instead there needs to be a way to added these actions through
                 // the xml 
                 Component currentComp = bodyPanel.getCurrentComponent();
-                if(currentComp instanceof JScrollPane) {
-                    currentComp = ((JScrollPane)currentComp).getViewport().getView();
-                }
                 Util.makeScreenShot(currentComp);
             }            
         };
@@ -966,9 +940,6 @@ public class OTViewer extends JFrame
             public void actionPerformed(ActionEvent e)
             {
                 Component currentComp = bodyPanel.getCurrentComponent();
-                if(currentComp instanceof JScrollPane) {
-                    currentComp = ((JScrollPane)currentComp).getViewport().getView();
-                }
                 Util.makeScreenShot(currentComp, 2, 2);
             }                        
         };

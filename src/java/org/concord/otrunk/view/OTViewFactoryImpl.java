@@ -35,17 +35,19 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTMultiUserView;
 import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
+import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTViewFactoryAware;
 
 /**
- * @author Informaiton Services
+ * @author scytacki
  *
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
@@ -57,9 +59,18 @@ public class OTViewFactoryImpl implements OTViewFactory
     Vector viewMap = new Vector();
     Vector userList = null;
         
-    public OTViewFactoryImpl(OTrunk otrunk)
+    public OTViewFactoryImpl(OTrunk otrunk, OTViewService viewService)
     {
         this.otrunk = otrunk;
+        
+        // read in all the viewEntries and create a vector 
+        // of class entries.
+        OTObjectList viewEntries = viewService.getViewEntries();
+        
+        for(int i=0; i<viewEntries.size(); i++) {
+            OTViewEntry entry = (OTViewEntry)viewEntries.get(i);
+            addViewEntry(entry);
+        }        
     }
     
     protected OTViewFactoryImpl(OTViewFactoryImpl parent)
@@ -68,9 +79,10 @@ public class OTViewFactoryImpl implements OTViewFactory
         this.otrunk = parent.otrunk;
     }
     
-    class ViewEntry {
+    class InternalViewEntry {
         Class objectClass;
         Class viewClass;
+        OTViewEntry otEntry;
     }
 
     public OTViewFactory createChildViewFactory()
@@ -95,6 +107,9 @@ public class OTViewFactoryImpl implements OTViewFactory
             OTViewContainer container, boolean editable)
     {
         OTObjectView view = getObjectView(otObject, container);
+
+        // FIXME this doesn't set the frame manager, this method
+        // should be removed from here, 
         
         if(view == null) {
             return new JLabel("No view for object: " + otObject);
@@ -109,7 +124,14 @@ public class OTViewFactoryImpl implements OTViewFactory
     public OTView getView(OTObject otObject, Class viewInterface)
     {
         OTView view = getViewInternal(otObject, viewInterface);
-                
+         
+        initView(view);
+        
+        return view;
+    }
+    
+    protected void initView(OTView view)
+    {
         if(view != null) { 
             if(view instanceof OTMultiUserView && 
                     userList != null) {
@@ -119,16 +141,48 @@ public class OTViewFactoryImpl implements OTViewFactory
             if(view instanceof OTViewFactoryAware) {
                 ((OTViewFactoryAware)view).setViewFactory(this);
             }
-        }
-        
-        return view;
+        }    	
     }
+    
+	public OTView getView(OTObject otObject, OTViewEntry viewEntry) 
+	{
+		// because we have the view entry we don't need to actually
+		// look up this view.
+        String viewClassStr = viewEntry.getViewClass();
+        String objClassStr = viewEntry.getObjectClass();
+
+        ClassLoader loader = getClass().getClassLoader();
+		
+        try {
+            Class objectClass = loader.loadClass(objClassStr);
+            Class viewClass = loader.loadClass(viewClassStr);
+
+            if(!objectClass.isInstance(otObject)){
+            	throw new RuntimeException("viewEntry: " + viewEntry + 
+            			" cannot handle otObject: " + otObject);
+            }
+
+            OTView view = (OTView)viewClass.newInstance();
+            initView(view);
+        	return view;                       
+        } catch (ClassNotFoundException e) {
+            System.err.println("Can't find view: " + viewClassStr + 
+                    " for object: " + objClassStr);
+            System.err.println("  error: " + e.toString());
+        } catch (InstantiationException e) {
+        	e.printStackTrace();
+        } catch (IllegalAccessException e) {
+        	e.printStackTrace();
+        }
+		
+		return null;
+	}
     
     private OTView getViewInternal(OTObject otObject, Class viewInterface)
     {
         OTView view = null;
         for(int i=0; i<viewMap.size(); i++) {
-            ViewEntry entry = (ViewEntry)viewMap.get(i);
+            InternalViewEntry entry = (InternalViewEntry)viewMap.get(i);
             if(entry.objectClass.isInstance(otObject) &&
                     viewInterface.isAssignableFrom(entry.viewClass)) {
                 try {
@@ -176,12 +230,29 @@ public class OTViewFactoryImpl implements OTViewFactory
     /* (non-Javadoc)
 	 * @see org.concord.otrunk.view.OTViewFactory#addViewEntry(java.lang.Class, java.lang.Class)
 	 */
-    public void addViewEntry(Class objectClass, Class viewClass)
+    public void addViewEntry(OTViewEntry entry)
     {
-        ViewEntry internalEntry = new ViewEntry();
-        internalEntry.objectClass = objectClass;
-        internalEntry.viewClass = viewClass;
-        viewMap.add(internalEntry);
+        String objClassStr = entry.getObjectClass();
+        String viewClassStr = entry.getViewClass();
+
+        ClassLoader loader = getClass().getClassLoader();
+        
+        try {
+            Class objectClass = loader.loadClass(objClassStr);
+            Class viewClass = loader.loadClass(viewClassStr);
+
+            InternalViewEntry internalEntry = new InternalViewEntry();
+            internalEntry.objectClass = objectClass;
+            internalEntry.viewClass = viewClass;
+            internalEntry.otEntry = entry;
+            viewMap.add(internalEntry);
+            
+        } catch (ClassNotFoundException e) {
+            System.err.println("Can't find view: " + viewClassStr + 
+                    " for object: " + objClassStr);
+            System.err.println("  error: " + e.toString());
+        }
+
     }
-    
+
 }

@@ -102,7 +102,11 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 
         String text = null;
 		if(pfDocument != null) {
-			OTObjectView objView = viewFactory.getObjectView(pfDocument, viewContainer);
+			OTObjectView objView = 
+				viewFactory.getObjectView(pfDocument, viewContainer);
+	        // CHECKME this doesn't set the frame manager, but it seems 
+	        // like it shouldn't need to, since this is an xhtml exporter
+
             OTXHTMLView xhtmlView = null;
             String bodyText = "";
             if(objView instanceof OTXHTMLView) {
@@ -203,7 +207,10 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
             dim = dimView.getPrintDimention(containerDisplayWidth, containerDisplayHeight);            
         }
         
-        OTObjectView objView = (OTObjectView)viewFactory.getObjectView(obj, viewContainer);
+        OTObjectView objView = 
+        	(OTObjectView)viewFactory.getObjectView(obj, viewContainer);
+        // CHECKME this doesn't set the frame manager, but it seems 
+        // like it shouldn't need to, since this is an xhtml exporter
         
         JComponent comp = objView.getComponent(obj, false);
         if(dim != null) comp.setSize(dim);
