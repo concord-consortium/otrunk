@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2007-01-08 20:06:16 $
- * $Author: scytacki $
+ * $Revision: 1.18 $
+ * $Date: 2007-02-06 02:19:00 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -95,7 +95,7 @@ public class ReflectionTypeDefinitions
 				if(memberConstructors.length > 1 || params == null || 
 						params.length == 0 ||
 						!OTResourceSchema.class.isAssignableFrom(params[0])) {
-					System.err.println("Invlaid constructor for OTrunk Object: " + className +
+					System.err.println("Invalid constructor for OTrunk Object: " + className +
 							"\n   If you are using an otml file check the import statements");
 					throw new RuntimeException("OTObjects should only have 1 constructor" + "\n" +
 							" whose first argument is the resource schema");
