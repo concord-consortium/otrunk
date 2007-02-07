@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.45 $
- * $Date: 2007-02-05 18:57:46 $
- * $Author: scytacki $
+ * $Revision: 1.46 $
+ * $Date: 2007-02-07 21:41:06 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -742,37 +742,42 @@ public class OTViewer extends JFrame
 		     */
 		    public void actionPerformed(ActionEvent arg0)
 		    {
-		        Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
-		        CCFileDialog dialog = new CCFileDialog(frame, "Save As", CCFileDialog.SAVE);
-		        CCFilenameFilter filenameFilter = new CCFilenameFilter("otml");
-		        dialog.setFilenameFilter(filenameFilter);
+Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+		        
+		        MostRecentFileDialog mrfd = new MostRecentFileDialog("org.concord.otviewer.saveotml");
+		        mrfd.setFilenameFilter("otml");
+		        
 		        if(currentUserFile != null) {
-		            dialog.setDirectory(currentUserFile.getParentFile().getAbsolutePath());
-		            dialog.setFile(currentUserFile.getName());
-		        }
-		        dialog.show();
-		        
-		        String fileName = dialog.getFile();
-		        if(fileName == null) {
-		            return;
+		            mrfd.setCurrentDirectory(currentUserFile.getParentFile());
+		            mrfd.setSelectedFile(currentUserFile);
 		        }
 		        
-		        fileName = dialog.getDirectory() + fileName;
-		        currentUserFile = new File(fileName);
+		        int retval = mrfd.showSaveDialog(frame);
 		        
-		        if(!fileName.toLowerCase().endsWith(".otml")){
-		            currentUserFile = new File(currentUserFile.getAbsolutePath()+".otml");
-		        }
-		        if(!currentUserFile.exists() || checkForReplace(currentUserFile)){
-		            try {
+		        File file = null;
+		        if(retval == MostRecentFileDialog.APPROVE_OPTION) {
+		        	file = mrfd.getSelectedFile();
+		        	
+		        	String fileName = file.getPath();
+		        	currentUserFile = file;
+		        	
+			        if(!fileName.toLowerCase().endsWith(".otml")){
+			        	currentUserFile = new File(currentUserFile.getAbsolutePath()+".otml");
+			        }
+			        
+			        try {
 		                Exporter.export(currentUserFile, userDataDB.getRoot(), userDataDB);
 		                userDataDB.setDirty(false);
 		                setTitle(baseFrameTitle + ": " + currentUserFile.toString());
-		            } catch(Exception e){
-		                e.printStackTrace();
-		            }	                    	
-		        }				
+			        } catch(Exception e){
+			        	e.printStackTrace();
+			        }	                    	
+			        
+			        frame.setTitle(fileName);
+
+		        }
 		    }
+		    	
 		};
 		saveUserDataAsAction.putValue(Action.NAME, "Save As...");
 		
