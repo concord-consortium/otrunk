@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.46 $
- * $Date: 2007-02-07 21:41:06 $
- * $Author: sfentress $
+ * $Revision: 1.47 $
+ * $Date: 2007-02-08 20:35:48 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -68,6 +68,8 @@ import javax.swing.WindowConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
+import org.concord.applesupport.AppleApplicationAdapter;
+import org.concord.applesupport.AppleApplicationUtil;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTViewContainer;
@@ -105,7 +107,7 @@ import org.concord.view.SwingUserMessageHandler;
  */
 public class OTViewer extends JFrame
 	implements TreeSelectionListener,
-		OTViewContainerListener
+		OTViewContainerListener, AppleApplicationAdapter
 {
     /**
      * first version of this class
@@ -176,9 +178,11 @@ public class OTViewer extends JFrame
 	public OTViewer(boolean showTree)
 	{
         super();
-        
+               
 		this.showTree = showTree;
         
+		AppleApplicationUtil.registerWithMacOSX(this);
+		
         try {
             // this overrides the default base frame title
             String title = System.getProperty(TITLE_PROP,null);
@@ -1288,6 +1292,29 @@ Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
 
 	public void setExitAction(AbstractAction exitAction) {
 		this.exitAction = exitAction;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.applesupport.AppleApplicationAdapter#about()
+	 */
+	public void about() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.applesupport.AppleApplicationAdapter#preferences()
+	 */
+	public void preferences() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.applesupport.AppleApplicationAdapter#quit()
+	 */
+	public void quit() {
+    	exitAction.actionPerformed(null);		        
 	}
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
