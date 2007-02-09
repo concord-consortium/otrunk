@@ -23,37 +23,60 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.5 $
+ * $Date: 2007-02-09 22:04:47 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.user;
 
+import org.concord.framework.otrunk.OTResourceCollection;
 import org.concord.framework.otrunk.OTResourceMap;
 
 
-final class OTUserResourceMap
+final class OTUserResourceMap extends OTUserResourceCollection
 	implements OTResourceMap
 {
-    OTUserDataObject parent;
-    OTResourceMap authoredMap;
-    
-    public OTUserResourceMap(OTUserDataObject parent, OTResourceMap authoredMap)
+    public OTUserResourceMap(OTUserDataObject parent, OTResourceMap authoredMap,
+	        String resourceName)
     {
-        this.parent = parent;
-        this.authoredMap = authoredMap;
+    	super(OTResourceMap.class, parent, authoredMap, resourceName);
     }
     
+	private OTResourceMap getUserMap()
+	{
+		return (OTResourceMap)getUserCollection();
+	}
+	
+	private OTResourceMap getMapForRead()
+	{
+		return (OTResourceMap)getCollectionForRead();
+	}
+	
+	protected void copyInto(OTResourceCollection userCollection,
+			OTResourceCollection authoredCollection)
+	{
+		OTResourceMap authoredMap = (OTResourceMap)authoredCollection;
+		OTResourceMap userMap = (OTResourceMap) userCollection;
+		
+		String [] keys = authoredMap.getKeys();		
+		for(int i=0; i<keys.length; i++) {
+			userMap.put(keys[i], authoredMap.get(keys[i]));
+		}
+	}
+
     /* (non-Javadoc)
      * @see org.concord.framework.otrunk.OTResourceMap#get(java.lang.String)
      */
     public Object get(String key)
     {
-        // TODO Handle user generated maps
-        return authoredMap.get(key);
+	    OTResourceMap mapForRead = getMapForRead();
+
+	    if(mapForRead == null) return null;
+	    
+		return mapForRead.get(key);
     }
     
     /* (non-Javadoc)
@@ -61,8 +84,11 @@ final class OTUserResourceMap
      */
     public String[] getKeys()
     {
-        // TODO Handle user generated maps
-        return authoredMap.getKeys();
+	    OTResourceMap mapForRead = getMapForRead();
+
+	    if(mapForRead == null) return new String[0];
+	    
+		return mapForRead.getKeys();
     }
     
     /* (non-Javadoc)
@@ -70,24 +96,8 @@ final class OTUserResourceMap
      */
     public void put(String key, Object resource)
     {
-        throw new UnsupportedOperationException("OTUserResourceMap does not support put");
-
-    }
-    
-    /* (non-Javadoc)
-     * @see org.concord.framework.otrunk.OTResourceCollection#removeAll()
-     */
-    public void removeAll()
-    {
-        throw new UnsupportedOperationException("OTUserResourceMap does not support removeAll");
-    }
-    
-    /* (non-Javadoc)
-     * @see org.concord.framework.otrunk.OTResourceCollection#size()
-     */
-    public int size()
-    {
-        // TODO Handle user generatored maps
-        return authoredMap.size();
-    }
+    	OTResourceMap userMap = getUserMap();
+    	
+    	userMap.put(key, resource);
+    }    
 }
