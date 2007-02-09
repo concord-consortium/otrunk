@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2006-05-18 22:24:21 $
+ * $Revision: 1.8 $
+ * $Date: 2007-02-09 22:04:47 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -40,11 +40,8 @@ import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
-import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTObjectRevision;
 import org.concord.otrunk.datamodel.OTRelativeID;
-import org.concord.otrunk.xml.XMLResourceList;
-import org.concord.otrunk.xml.XMLResourceMap;
 
 
 /**
@@ -59,7 +56,6 @@ import org.concord.otrunk.xml.XMLResourceMap;
 public class OTUserDataObject
 	implements OTDataObject, OTID
 {
-	private OTID userId;
 	private OTDataObject authoringObject;
 	private OTDataObject stateObject = null;
 	private OTTemplateDatabase database;
@@ -289,9 +285,11 @@ public class OTUserDataObject
 		// list so that the real list isn't created unless it is really
 		// used.
 		if(collectionClass.equals(OTResourceList.class)) {
-			collection =  new OTUserResourceList(this, (OTResourceList)resourceObj, key);
+			collection =  
+				new OTUserResourceList(this, (OTResourceList)resourceObj, key);
 		} else if(collectionClass.equals(OTResourceMap.class)) {
-			collection =  new OTUserResourceMap(this, (OTResourceMap)resourceObj);
+			collection =  
+				new OTUserResourceMap(this, (OTResourceMap)resourceObj, key);
 		}
 
 		resourceCollections.put(key, collection);
