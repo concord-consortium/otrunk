@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2006-05-18 19:48:26 $
+ * $Revision: 1.4 $
+ * $Date: 2007-02-09 22:02:52 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -40,6 +40,7 @@ public interface OTButton
     extends OTObjectInterface, OTActionView
 {
     public String getText();
+    public void setText(String text);
     
     public OTAction getAction();
     public void setAction(OTAction action);

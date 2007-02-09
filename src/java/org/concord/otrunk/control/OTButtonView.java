@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2007-01-24 22:11:24 $
+ * $Revision: 1.4 $
+ * $Date: 2007-02-09 22:02:52 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -37,16 +37,18 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 
+import org.concord.framework.otrunk.OTChangeEvent;
+import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTAction;
 import org.concord.framework.otrunk.view.OTObjectView;
 
 public class OTButtonView
-    implements OTObjectView
+    implements OTObjectView, OTChangeListener
 {
     OTButton otButton;
+    JButton jButton;
     
     public JComponent getComponent(OTObject otObject, boolean editable)
     {
@@ -54,13 +56,13 @@ public class OTButtonView
 
         OTAction action = otButton.getAction();
 
-        if(action == null) {
-            return new JLabel("invalid action");
-        }
-        
         String text;
         String buttonText = otButton.getText();
-        String actionText = action.getActionText();
+        String actionText = null;
+        if(action != null){
+        	action.getActionText();
+        }
+        
         if(buttonText != null) {
             text = buttonText;
         } else if(actionText != null) {
@@ -69,16 +71,33 @@ public class OTButtonView
             text = "default";
         }
         
-        JButton myButton = new JButton(text);
-        myButton.addActionListener(new ActionListener(){
+        jButton = new JButton(text);
+        
+        if(action != null){
+        	jButton.addActionListener(new ActionListener(){
 
-            public void actionPerformed(ActionEvent arg0)
-            {
-                otButton.getAction().doAction();                
-            }            
-        });
-        return myButton;
+        		public void actionPerformed(ActionEvent arg0)
+        		{
+        			otButton.getAction().doAction();                
+        		}            
+        	});
+        }
+        
+        otButton.addOTChangeListener(this);
+        return jButton;
     }
+
+	/* (non-Javadoc)
+     * @see org.concord.framework.otrunk.OTChangeListener#stateChanged(org.concord.framework.otrunk.OTChangeEvent)
+     */
+    public void stateChanged(OTChangeEvent e)
+    {
+        if(jButton != null) {
+            jButton.setText(otButton.getText());
+            return;
+        }
+    }
+    
 
     public void viewClosed()
     {
