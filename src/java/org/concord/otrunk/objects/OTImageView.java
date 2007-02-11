@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-02-11 02:11:16 $
+ * $Revision: 1.2 $
+ * $Date: 2007-02-11 02:11:54 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -46,8 +46,8 @@ import org.concord.framework.otrunk.view.OTObjectView;
 
 
 /**
- * PfImageObjectView
- * Class name and description
+ * OT Image View
+ * (Copied from pfImageView)
  *
  * Date created: Sep 10, 2004
  *
