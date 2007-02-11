@@ -29,7 +29,14 @@ public class OTFrameManagerImpl implements OTFrameManager
 		this.viewFactory = viewFactory;
 	}
 	
-	public void putObjectInFrame(OTObject otObject,
+	public void putObjectInFrame(OTObject otObject, 
+			OTFrame otFrame) 
+	{
+		putObjectInFrame(otObject, null, otFrame);
+	}
+	
+	public void putObjectInFrame(OTObject otObject, 
+			org.concord.framework.otrunk.view.OTViewEntry viewEntry,
 			OTFrame otFrame) {
 		// look up view container with the frame.
 		FrameContainer frameContainer = 
@@ -55,7 +62,7 @@ public class OTFrameManagerImpl implements OTFrameManager
 		
 		// call setCurrentObject on that view container with a null
 		// frame
-		frameContainer.container.setCurrentObject(otObject);
+		frameContainer.container.setCurrentObject(otObject, viewEntry, true);
 		frameContainer.frame.setVisible(true);
 	}
 }
