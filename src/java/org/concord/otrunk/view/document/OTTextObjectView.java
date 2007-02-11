@@ -55,7 +55,9 @@ public class OTTextObjectView
 		DocumentListener, OTChangeListener
 {
 	OTDocument pfObject;
+	
 	protected PlainDocument textAreaModel = null;
+	protected JTextArea textArea;
 
     JLabel labelView = null;
     private boolean changingText = false;
@@ -93,7 +95,7 @@ public class OTTextObjectView
 		
 			initTextAreaModel();
 		
-			JTextArea textArea = new JTextArea(textAreaModel);
+			textArea = new JTextArea(textAreaModel);
 			textArea.setLineWrap(true);
 			textArea.setWrapStyleWord(true);
 			JScrollPane scrollPane = new JScrollPane(textArea);
