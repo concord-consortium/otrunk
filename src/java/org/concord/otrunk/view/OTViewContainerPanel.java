@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.22 $
- * $Date: 2007-02-05 18:57:47 $
- * $Author: scytacki $
+ * $Revision: 1.23 $
+ * $Date: 2007-02-12 09:28:33 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -106,7 +106,11 @@ public class OTViewContainerPanel extends JPanel
 	{
 		otViewFactory = factory;
 	}
-		
+	
+	public OTViewFactory getOTViewFactory() {
+		return otViewFactory;
+	}
+	
 	public void setMessage(String message)
 	{
 	    removeAll();
