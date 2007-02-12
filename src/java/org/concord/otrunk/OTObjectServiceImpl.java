@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-01-08 20:06:16 $
+ * $Revision: 1.6 $
+ * $Date: 2007-02-12 05:37:47 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -36,11 +36,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
+import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceSchema;
-import org.concord.framework.otrunk.OTControllerService;
+import org.concord.otrunk.datamodel.DataObjectUtil;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTRelativeID;
@@ -314,5 +315,22 @@ public class OTObjectServiceImpl
         
         return childDataObject;
     }
+
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.OTObjectService#copyObject(org.concord.framework.otrunk.OTObject, int)
+	 */
+	public OTObject copyObject(OTObject original, int maxDepth) 
+	throws Exception	
+	{
+		// make a copy of the original objects data object
+		// it is easy to copy data objects than the actual objects
+		OTDataObject originalDataObject = 
+			getOTDataObject(original.getGlobalId());
+		
+		OTDataObject copyDataObject = 
+			DataObjectUtil.copy(originalDataObject, creationDb, maxDepth);
+
+		return getOTObject(copyDataObject.getGlobalId());		
+	}
 
 }
