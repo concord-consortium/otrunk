@@ -330,7 +330,7 @@ public class OTrunkImpl implements OTrunk
         } 
 
         OTDataObject userDataObject = db.getOTDataObject(null, authoredId);
-        
+
         boolean modified = false;
         if(userDataObject instanceof OTUserDataObject) {
             OTDataObject userModifications = ((OTUserDataObject)userDataObject).getExistingUserObject();
@@ -511,13 +511,14 @@ public class OTrunkImpl implements OTrunk
      * @return
      * @throws Exception
      */
-    OTObject getOrphanOTObject(OTID childID)
+    OTObject getOrphanOTObject(OTID childID, OTObjectServiceImpl oldService)
         throws Exception
     {
         for(int i=0; i<objectServices.size(); i++) {
             OTObjectServiceImpl objService = (OTObjectServiceImpl)objectServices.get(i);
-            if(objService.managesObject(childID)) {
-                return objService.getOTObject(childID);
+            // To avoid infinite loop, the objService must not equal to oldService
+            if(objService.managesObject(childID) && objService != oldService) {
+            	return objService.getOTObject(childID);
             }
         }
         
