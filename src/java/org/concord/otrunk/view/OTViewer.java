@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.47 $
- * $Date: 2007-02-08 20:35:48 $
- * $Author: scytacki $
+ * $Revision: 1.48 $
+ * $Date: 2007-02-12 14:57:34 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -1171,30 +1171,31 @@ Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
 	}
 	
 	public File getReportFile(){
-		File fileToSave;
-		CCFileDialog dialog = new CCFileDialog(new Frame(), "Save As html", CCFileDialog.SAVE);
-		CCFilenameFilter filenameFilter = new CCFilenameFilter("html");
-		dialog.setFilenameFilter(filenameFilter);
-		dialog.setMode(CCFileDialog.SAVE);
-		dialog.show();
+		Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
+		
+		MostRecentFileDialog mrfd = new MostRecentFileDialog("org.concord.otviewer.saveotml");
+		mrfd.setFilenameFilter("html");
+		
+		if(currentUserFile != null) {
+            mrfd.setCurrentDirectory(currentUserFile.getParentFile());
+        }
+        
+        int retval = mrfd.showSaveDialog(frame);
+        
+        File file = null;
+        if(retval == MostRecentFileDialog.APPROVE_OPTION) {
+        	file = mrfd.getSelectedFile();
+        	
+        	String fileName = file.getPath();
+        	
+	        if(!fileName.toLowerCase().endsWith(".html")){
+	        	file = new File(file.getAbsolutePath()+".html");
+	        }
 
-		String filestr = dialog.getDirectory() + dialog.getFile();
+	        return file;
 
-		if(filestr == null) {
-			return null;
-		}
-		else {
-			fileToSave = new File(filestr);
-            
-			if(!fileToSave.getName().toLowerCase().endsWith(".html")){
-				fileToSave = new File(fileToSave.getAbsolutePath()+".html");
-            }
-
-            if(!fileToSave.exists() || checkForReplace(fileToSave)){
-            	return fileToSave;
-            }
-		}
-
+        }
+        
         return null;
 	}
 	
