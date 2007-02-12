@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2007-02-12 05:37:47 $
- * $Author: scytacki $
+ * $Revision: 1.7 $
+ * $Date: 2007-02-12 23:51:09 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -102,8 +102,7 @@ public class OTObjectServiceImpl
             // access an object managed by another object service.
             // so in this case we delegate to the otrunk so it can find the 
             // appropriated object service.
-            return otrunk.getOrphanOTObject(childID);
-            
+        	return otrunk.getOrphanOTObject(childID, this);
         }
 
         return getOTObject(childDataObject);
@@ -281,7 +280,6 @@ public class OTObjectServiceImpl
         }
 
         OTDataObject childDataObject = mainDb.getOTDataObject(null, childID);
-                
         /*
          * FIXME: this is a bit a of a hack
          * it is to solve the problem caused by reports.  The report creates a 
@@ -312,7 +310,6 @@ public class OTObjectServiceImpl
             childDataObject = parentDb.getOTDataObject(null, childID);
         }
         */
-        
         return childDataObject;
     }
 
