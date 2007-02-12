@@ -23,17 +23,15 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2006-05-05 16:26:19 $
- * $Author: maven $
+ * $Revision: 1.3 $
+ * $Date: 2007-02-12 05:37:48 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.datamodel;
 
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
 
 public class DataObjectUtil
 {
@@ -45,33 +43,29 @@ public class DataObjectUtil
      */
     public static void copyInto(OTDataObject original, OTDataObject copy)
     {
-        String [] keys = original.getResourceKeys();
-        for(int i=0; i<keys.length; i++){
-            Object resource = original.getResource(keys[i]);
-            
-            if(resource instanceof OTResourceList){
-                OTResourceList copyList =
-                    (OTResourceList)copy.getResourceCollection(keys[i], 
-                            OTResourceList.class);
-                OTResourceList list = (OTResourceList)resource;
-                copyList.removeAll();
-                for(int j=0; j<list.size(); j++){
-                    copyList.add(list.get(j));
-                }
-            } else if(resource instanceof OTResourceMap){
-                OTResourceMap copyMap =
-                    (OTResourceMap)copy.getResourceCollection(keys[i], 
-                            OTResourceMap.class);                    
-                OTResourceMap map = (OTResourceMap)resource;
-                copyMap.removeAll();
-                String [] mapKeys = map.getKeys();
-                for(int j=0; j<mapKeys.length; j++){
-                    copyMap.put(mapKeys[j], map.get(mapKeys[j]));
-                }
-            } else {
-                copy.setResource(keys[i], resource);
-            }
-        }
-
+    	try {
+			copyInto(original, copy, 0);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
+     
+    public static void copyInto(OTDataObject source, OTDataObject dest,
+    		int maxDepth) throws Exception
+    {
+    	Copier.copyInto(source, dest, maxDepth);
+    }
+
+    
+    
+    public static OTDataObject copy(OTDataObject original, OTDatabase otDb, int maxDepth) 
+    	throws Exception
+    {
+    	OTDataObject copy = otDb.createDataObject();
+
+    	copyInto(original, copy, maxDepth);
+    	
+    	return copy;
+    }    
 }
