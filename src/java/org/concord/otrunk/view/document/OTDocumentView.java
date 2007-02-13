@@ -173,7 +173,15 @@ public class OTDocumentView extends AbstractOTDocumentView
 				editorPane.addHyperlinkListener(this);
 			}
 			bodyText = htmlizeText(bodyText);
+
+			// when this text is set it will recreate all the 
+			// OTDocumentObjectViews, so we need to clear and 
+			// close all the old panels first
+			removeAllSubViews();
+			
 			editorPane.setText(bodyText);
+			
+			
 			previewComponent = editorPane;
 			editorPane.setCaretPosition(0);
 		} else {

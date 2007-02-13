@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2007-02-05 18:57:47 $
+ * $Revision: 1.4 $
+ * $Date: 2007-02-13 22:58:31 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -51,16 +51,24 @@ public class OTDocumentObjectView extends ComponentView
 	OTDocument compoundDoc;
     OTViewContainerPanel viewContainerPanel;
 	
+    /**
+     * A new object view will be created each time the text of the 
+     * document is updated.  So this object needs to be careful
+     * about the listeners it adds to things.  
+     * One option would be to cache the panels used to display
+     * the objects in documentView, and that way new views don't
+     * need to be created each time the text is changed.
+     * 
+     * @param elem
+     * @param doc
+     * @param docView
+     */
     public OTDocumentObjectView(Element elem, OTDocument doc, 
     		AbstractOTDocumentView docView)
     {
     	super(elem);
     	compoundDoc = doc;
-        viewContainerPanel = new OTViewContainerPanel(docView.getFrameManager());
-        viewContainerPanel.setOTViewFactory(docView.getViewFactory());
-        viewContainerPanel.setAutoRequestFocus(false);
-        viewContainerPanel.setUseScrollPane(false);
-        viewContainerPanel.setOpaque(false);
+        viewContainerPanel = docView.createtViewContainerPanel();
     }
 
     protected Component createComponent() 
