@@ -29,16 +29,9 @@
  */
 package org.concord.otrunk;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.util.Collection;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.Vector;
 import java.util.WeakHashMap;
 
@@ -47,8 +40,6 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
@@ -59,9 +50,6 @@ import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTTemplateDatabase;
 import org.concord.otrunk.user.OTUserDataObject;
 import org.concord.otrunk.user.OTUserObject;
-import org.concord.otrunk.view.document.OTCompoundDoc;
-import org.concord.otrunk.xml.XMLDataObject;
-import org.concord.otrunk.xml.XMLDatabase;
 
 /**
  * @author scott
@@ -524,5 +512,9 @@ public class OTrunkImpl implements OTrunk
         
         System.err.println("Data object is not found for: " + childID);
         return null;
-    }    
+    }
+
+	public OTObjectServiceImpl getRootObjectService() {
+		return rootObjectService;
+	}    
 }
