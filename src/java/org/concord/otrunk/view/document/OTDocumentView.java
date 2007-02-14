@@ -98,7 +98,8 @@ public class OTDocumentView extends AbstractOTDocumentView
     
 	protected void setup(OTObject doc)
 	{
-		super.setup(doc);
+		//Don't call super.setup() to avoid listening to the ot object inneccesarily
+		pfObject = (OTDocument)doc;
 		pfDocument = (OTDocument)doc;
 	}
 
@@ -128,10 +129,11 @@ public class OTDocumentView extends AbstractOTDocumentView
 		    // need to add a listener so we can update the view pane
 		    tabbedPane.add("View", previewComponent);
 		
-		    JTextArea textArea = new JTextArea(textAreaModel);
+		    textArea = new JTextArea(textAreaModel);
 		    JScrollPane scrollPane = new JScrollPane(textArea);
 		    tabbedPane.add("Edit", scrollPane);
 		    
+		    parsedTextArea.setEnabled(false);
 		    scrollPane = new JScrollPane(parsedTextArea);
 		    tabbedPane.add("Parsed", scrollPane);
 		    
@@ -146,6 +148,8 @@ public class OTDocumentView extends AbstractOTDocumentView
 	public String updateFormatedView()
 	{		
         if(pfDocument == null) return null;
+        
+        //System.out.println(this+" updateFormatedView");
         
 		String markupLanguage = pfDocument.getMarkupLanguage();
 		if(markupLanguage == null) {
@@ -366,12 +370,14 @@ public class OTDocumentView extends AbstractOTDocumentView
 	 */
 	public void stateChanged(ChangeEvent event) 
 	{
+		//System.out.println(this+" -- TABS stateChanged");
+		
 		updateFormatedView();		
 	}
 	
 	public void hyperlinkUpdate(HyperlinkEvent e) 
 	{
-
+		
 		if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 			try {
 				String linkTarget = e.getDescription();

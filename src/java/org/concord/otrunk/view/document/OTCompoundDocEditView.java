@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-02-11 03:09:39 $
+ * $Revision: 1.2 $
+ * $Date: 2007-02-14 04:45:10 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -21,7 +21,6 @@ import javax.swing.JSplitPane;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
-import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.otrunk.view.OTObjectListViewer;
 import org.concord.swing.CustomDialog;
 
@@ -40,6 +39,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	implements ActionListener
 {
 	protected JPanel textPanel;
+	protected OTDocumentView previewView;
 	
 	/**
 	 * 
@@ -52,7 +52,9 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	public JComponent getComponent(OTObject otObject, boolean editable)
 	{
 		//Get the OTDocumentView view as the 'hardcoded' preview
-		OTObjectView previewView = (OTObjectView)getViewFactory().getView(otObject, OTDocumentView.class);
+		previewView = (OTDocumentView)getViewFactory().getView(otObject, OTDocumentView.class);
+		
+		//System.out.println("preview view is " + previewView);
 		
 		//Create a split pane with the preview pane and the text area 
 		JComponent editTextPane = super.getComponent(otObject, true);
@@ -81,12 +83,19 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		textPanel.add(editTextPane);
 		
 		//Create buttons and add to the bottom
-		JButton addObjectButton = new JButton("Insert Object");
 		JPanel buttonsPanel = new JPanel();
+
+		JButton addObjectButton = new JButton("Insert Object");
 		buttonsPanel.add(addObjectButton);
-		textPanel.add(buttonsPanel, BorderLayout.NORTH);
 		addObjectButton.setActionCommand("insertObject");
 		addObjectButton.addActionListener(this);
+		
+		JButton updatePreviewButton = new JButton("Update Preview");
+		buttonsPanel.add(updatePreviewButton);
+		updatePreviewButton.setActionCommand("updatePreview");
+		updatePreviewButton.addActionListener(this);
+		
+		textPanel.add(buttonsPanel, BorderLayout.NORTH);
 		
 		return textPanel;
 	}
@@ -105,24 +114,36 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 				return;
 			}
 			
-			OTObject objToInsert = showInsertObjectDialog();
+			OTObject objToInsert = getObjectToInsertFromUser();
 			
 			if (objToInsert == null){
 				//No object to insert. Either we couldn't find one, or the user changed his mind
 				return;
 			}
-			
-			//TODO: Create a new instance of the object to insert with this template
-			//and add a object reference in that case
-			//otCompDoc.addDocumentReference(objToInsert);
-			
+									
 			String strObjID = objToInsert.getGlobalId().toString();
 			
 			String strObjText = "<object refid=\"" + strObjID + "\"/>";
 			
 			int pos = textArea.getSelectionStart();
 			textArea.insert(strObjText, pos);
+			
+			updatePreviewView();
+			
 		}
+		else if (e.getActionCommand().equals("updatePreview")){
+			
+			updatePreviewView();
+		}
+
+	}
+
+	/**
+	 * 
+	 */
+	private void updatePreviewView()
+	{
+		previewView.updateFormatedView();
 	}
 
 	/**
@@ -130,7 +151,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	 * 
 	 * @return OT Object selected by the user
 	 */
-	private OTObject showInsertObjectDialog()
+	private OTObject getObjectToInsertFromUser()
 	{
 		//Show the user all the possible objects to insert so he can choose
 		OTObjectList objList = ((OTCompoundDoc)pfObject).getObjectsToInsert();		
@@ -143,6 +164,21 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		int retCode = CustomDialog.showOKCancelDialog(textPanel, selectPanel, "Choose object to add", true, true);
 		if (retCode == JOptionPane.OK_OPTION){
 			otObj = selectPanel.getCurrentOTObject();
+			
+			if (selectPanel.getCopyObject()){
+				//Create a new instance of the object to insert with this template
+				//and add a object reference in that case
+				try{
+					otObj = ((OTCompoundDoc)pfObject).getOTObjectService().copyObject(otObj, -1);
+					
+					//This is not necessary, since it gets doe automatically when the object reference 
+					//is added to the test of the coompund document
+					//otCompDoc.addDocumentReference(objToInsert);
+				
+				}catch(Exception ex){
+					ex.printStackTrace();
+				}
+			}
 		}
 		
 		return otObj;

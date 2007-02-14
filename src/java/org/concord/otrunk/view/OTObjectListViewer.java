@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-02-11 03:09:39 $
+ * $Revision: 1.2 $
+ * $Date: 2007-02-14 04:45:10 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -11,9 +11,8 @@ package org.concord.otrunk.view;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.LayoutManager;
 
-import javax.swing.JDialog;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
@@ -48,6 +47,8 @@ public class OTObjectListViewer extends JPanel
 	protected OTViewContainerPanel viewPanel;
 	
 	protected OTObject currentSelectedOTObj;
+	
+	protected JCheckBox copyCheck;
 	
 	/**
 	 * 
@@ -85,7 +86,7 @@ public class OTObjectListViewer extends JPanel
 		for (int i=0; i<otObjList.size(); i++){
 			otObj = otObjList.get(i);
 			rootFolder.addVirtualChild(otObj);
-			System.out.println("adding "+otObj);
+			//System.out.println("adding "+otObj);
 		}
 		
 		//Create the tree to display 
@@ -103,8 +104,13 @@ public class OTObjectListViewer extends JPanel
 		rightPanel.setPreferredSize(new Dimension(300,200));
 		rightPanel.add(viewPanel);
 		
+		copyCheck = new JCheckBox("Make just a copy of the object");
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.add(copyCheck);
+		
 		add(rightPanel);
 		add(tree, BorderLayout.WEST);
+		add(bottomPanel, BorderLayout.SOUTH);
 	}
 
 	/**
@@ -114,6 +120,11 @@ public class OTObjectListViewer extends JPanel
 	public OTObject getCurrentOTObject()
 	{
 		return currentSelectedOTObj;
+	}
+	
+	public boolean getCopyObject()
+	{
+		return copyCheck.isSelected();
 	}
 
 	/**

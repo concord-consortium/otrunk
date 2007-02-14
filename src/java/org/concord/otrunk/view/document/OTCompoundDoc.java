@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.otrunk.OTXMLString;
 import org.concord.otrunk.view.OTFolderObject;
 
@@ -207,5 +208,10 @@ public class OTCompoundDoc extends OTFolderObject
 	public OTObjectList getObjectsToInsert()
 	{
 		return resources.getObjectsToInsert();
+	}
+	
+	public OTObjectService getOTObjectService()
+	{
+		return resources.getOTObjectService();
 	}
 }
