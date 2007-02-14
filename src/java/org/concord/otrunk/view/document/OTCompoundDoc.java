@@ -181,8 +181,11 @@ public class OTCompoundDoc extends OTFolderObject
 		
 		// pattern to match the whole body of a resource file.
 		// this should match the object tag not the format of the 
-		// reference.
-		Pattern p = Pattern.compile("([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})");
+		// reference, but currently objects can be referenced in links
+		// and in objects.  And there can be viewEntry references
+		// So this pattern will match any uuid that starts with quotes
+		// and then grab everything after that to the end quote
+		Pattern p = Pattern.compile("\"([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}[^\"]*)\"");
 		Matcher m = p.matcher(bodyText);
 		while (m.find()) {
 			String idStr = m.group(1);
