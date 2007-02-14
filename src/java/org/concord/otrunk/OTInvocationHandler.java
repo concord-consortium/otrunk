@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2006-05-05 16:00:32 $
+ * $Revision: 1.16 $
+ * $Date: 2007-02-14 04:03:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -98,7 +98,7 @@ public class OTInvocationHandler
             return null;
         }
         
-        // copy the dataObject
+        // get the dataObject from the handler
         InvocationHandler handler = 
             Proxy.getInvocationHandler(target);
         if(!(handler instanceof OTInvocationHandler)){
@@ -108,7 +108,8 @@ public class OTInvocationHandler
      
         OTDataObject copyDataObject = 
             ((OTInvocationHandler)handler).dataObject;
-        
+
+        // copy the dataObject
         DataObjectUtil.copyInto(dataObject, copyDataObject);
         
         return null;        
