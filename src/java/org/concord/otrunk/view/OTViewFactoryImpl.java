@@ -40,6 +40,7 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTMultiUserView;
 import org.concord.framework.otrunk.view.OTObjectView;
 import org.concord.framework.otrunk.view.OTView;
+import org.concord.framework.otrunk.view.OTViewConfigAware;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
@@ -123,14 +124,26 @@ public class OTViewFactoryImpl implements OTViewFactory
 	 */
     public OTView getView(OTObject otObject, Class viewInterface)
     {
-        OTView view = getViewInternal(otObject, viewInterface);
+        InternalViewEntry entry = getViewInternal(otObject, viewInterface);
          
-        initView(view);
+        if(entry == null) {
+        	return null;
+        }
+        OTView view = null;
+        try {
+            view = (OTView)entry.viewClass.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        initView(view, entry.otEntry.getViewConfig());
         
         return view;
     }
     
-    protected void initView(OTView view)
+    protected void initView(OTView view, OTObject viewConfig)
     {
         if(view != null) { 
             if(view instanceof OTMultiUserView && 
@@ -141,6 +154,10 @@ public class OTViewFactoryImpl implements OTViewFactory
             if(view instanceof OTViewFactoryAware) {
                 ((OTViewFactoryAware)view).setViewFactory(this);
             }
+            
+            if(viewConfig != null && view instanceof OTViewConfigAware) {
+                ((OTViewConfigAware)view).setViewConfig(viewConfig);
+            }            
         }    	
     }
     
@@ -150,20 +167,24 @@ public class OTViewFactoryImpl implements OTViewFactory
 		// look up this view.
         String viewClassStr = viewEntry.getViewClass();
         String objClassStr = viewEntry.getObjectClass();
-
+        OTObject viewConfig = viewEntry.getViewConfig();
+        
+        
         ClassLoader loader = getClass().getClassLoader();
 		
         try {
             Class objectClass = loader.loadClass(objClassStr);
-            Class viewClass = loader.loadClass(viewClassStr);
 
             if(!objectClass.isInstance(otObject)){
-            	throw new RuntimeException("viewEntry: " + viewEntry + 
-            			" cannot handle otObject: " + otObject);
-            }
+        		throw new RuntimeException("viewEntry: " + viewEntry + 
+        				" cannot handle otObject: " + otObject);
+        	}
+            
+            OTView view = null;
+            Class viewClass = loader.loadClass(viewClassStr);
+            view = (OTView)viewClass.newInstance();
 
-            OTView view = (OTView)viewClass.newInstance();
-            initView(view);
+            initView(view, viewConfig);
         	return view;                       
         } catch (ClassNotFoundException e) {
             System.err.println("Can't find view: " + viewClassStr + 
@@ -178,31 +199,27 @@ public class OTViewFactoryImpl implements OTViewFactory
 		return null;
 	}
     
-    private OTView getViewInternal(OTObject otObject, Class viewInterface)
+    private InternalViewEntry getViewInternal(OTObject otObject, Class viewInterface)
     {
-        OTView view = null;
+    	InternalViewEntry match = null;
         for(int i=0; i<viewMap.size(); i++) {
             InternalViewEntry entry = (InternalViewEntry)viewMap.get(i);
+            // FIXME this should map
+            // 
             if(entry.objectClass.isInstance(otObject) &&
-                    viewInterface.isAssignableFrom(entry.viewClass)) {
-                try {
-                    view = (OTView)entry.viewClass.newInstance();
-                    break;
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+            		viewInterface.isAssignableFrom(entry.viewClass)) {
+            	match = entry;
+            	break;
             }
         }
 
         // can't find the view in our own list
         // check parent
-        if(view == null && parent != null) {
-            view = parent.getViewInternal(otObject, viewInterface);
+        if(match == null && parent != null) {
+            match = parent.getViewInternal(otObject, viewInterface);
         }
         
-        return view;        
+        return match;        
     }
     
     /* (non-Javadoc)
@@ -238,12 +255,13 @@ public class OTViewFactoryImpl implements OTViewFactory
         ClassLoader loader = getClass().getClassLoader();
         
         try {
-            Class objectClass = loader.loadClass(objClassStr);
-            Class viewClass = loader.loadClass(viewClassStr);
-
             InternalViewEntry internalEntry = new InternalViewEntry();
-            internalEntry.objectClass = objectClass;
-            internalEntry.viewClass = viewClass;
+            internalEntry.objectClass = loader.loadClass(objClassStr);
+            
+            if(viewClassStr != null){
+            	internalEntry.viewClass = loader.loadClass(viewClassStr);
+            }
+
             internalEntry.otEntry = entry;
             viewMap.add(internalEntry);
             

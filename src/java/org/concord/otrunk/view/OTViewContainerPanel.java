@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.23 $
- * $Date: 2007-02-12 09:28:33 $
- * $Author: swang $
+ * $Revision: 1.24 $
+ * $Date: 2007-02-14 04:03:09 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -146,6 +146,10 @@ public class OTViewContainerPanel extends JPanel
 		currentViewEntry = viewEntry;
 		
 		removeAll();
+		
+		if(otObject == null){
+			return;
+		}
 		// Unfortunately the size of this label matters, when these objects
 		// are embedded in tables inside of the htmleditorkit.  I think the
 		// editorkit gets messed up when the width of a component changes.
