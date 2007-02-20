@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-02-14 04:45:10 $
+ * $Revision: 1.3 $
+ * $Date: 2007-02-20 01:38:22 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -21,6 +21,7 @@ import javax.swing.JSplitPane;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.view.OTViewConfigAware;
 import org.concord.otrunk.view.OTObjectListViewer;
 import org.concord.swing.CustomDialog;
 
@@ -36,10 +37,11 @@ import org.concord.swing.CustomDialog;
  *
  */
 public class OTCompoundDocEditView extends AbstractOTDocumentView
-	implements ActionListener
+	implements OTViewConfigAware, ActionListener
 {
 	protected JPanel textPanel;
 	protected OTDocumentView previewView;
+	protected OTCompoundDocEditViewConfig viewConfig;
 	
 	/**
 	 * 
@@ -135,7 +137,6 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 			
 			updatePreviewView();
 		}
-
 	}
 
 	/**
@@ -154,7 +155,12 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	private OTObject getObjectToInsertFromUser()
 	{
 		//Show the user all the possible objects to insert so he can choose
-		OTObjectList objList = ((OTCompoundDoc)pfObject).getObjectsToInsert();		
+		if (viewConfig == null){
+			System.err.println("Error: view config not specified. No objects to insert.");
+			return null;
+		}
+		
+		OTObjectList objList = viewConfig.getObjectsToInsert();		
 		OTObject otObj = null;
 		
 		OTObjectListViewer selectPanel = new OTObjectListViewer(getFrameManager());
@@ -182,5 +188,13 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		}
 		
 		return otObj;
+	}
+
+	/**
+	 * @see org.concord.framework.otrunk.view.OTViewConfigAware#setViewConfig(org.concord.framework.otrunk.OTObject)
+	 */
+	public void setViewConfig(OTObject viewConfig)
+	{
+		this.viewConfig = (OTCompoundDocEditViewConfig)viewConfig;
 	}	
 }
