@@ -37,7 +37,7 @@ public class OTMapTestView implements OTObjectView {
 			Iterator iter = entries.iterator();
 			while(iter.hasNext()){
 				Map.Entry entry = (Map.Entry)iter.next();
-				map.put((String)entry.getKey(), entry.getValue());
+				otMap.put((String)entry.getKey(), entry.getValue());
 			}
 			
 			return new JLabel("Map Initialized");			
