@@ -17,21 +17,26 @@ import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.view.SimpleTreeModel;
 
 /**
+ * OTFolderObjectView
+ * View for OTFolderObject
+ *
+ * Date created: Feb 16, 2007
+ *
  * @author sfentress
  * 
  */
 public class OTFolderObjectView implements OTObjectView, OTViewContainerAware,
 		TreeSelectionListener {
 
-	private OTFolderObject otFolderObject;
+	protected OTFolderObject otFolderObject;
 
-	private JTree tree;
+	protected JTree tree;
 
-	private SimpleTreeModel treeModel;
+	protected SimpleTreeModel treeModel;
 
 	// private JScrollPane folderViewPane;
 	// private JEditorPane folderView;
-	private OTViewContainer viewContainer;
+	protected OTViewContainer viewContainer;
 
 	/*
 	 * (non-Javadoc)
@@ -50,7 +55,7 @@ public class OTFolderObjectView implements OTObjectView, OTViewContainerAware,
 		return treeScrollPane;
 	}
 
-	public void updateTreePane() {
+	protected void updateTreePane() {
 		treeModel.setRoot(new OTFolderNode((OTFolder) otFolderObject));
 		tree = new JTree(treeModel);
 
