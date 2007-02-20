@@ -72,4 +72,11 @@ public class AbstractOTDocumentView extends OTTextObjectView
 		}
 		viewContainerPanels.removeAllElements();
 	}
+	
+	public void viewClosed()
+	{
+		super.viewClosed();
+		
+		removeAllSubViews();
+	}
 }

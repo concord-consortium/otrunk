@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-02-14 04:45:10 $
- * $Author: imoncada $
+ * $Revision: 1.3 $
+ * $Date: 2007-02-20 05:32:19 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -140,8 +140,8 @@ public class OTObjectListViewer extends JPanel
 		if (node != null){
 			currentSelectedOTObj = node.getPfObject();
 			
+			viewPanel.setCurrentObject(currentSelectedOTObj);
 			if (currentSelectedOTObj != null){
-				viewPanel.setCurrentObject(currentSelectedOTObj);
 				viewPanel.setVisible(true);
 			}
 			else{
@@ -149,8 +149,13 @@ public class OTObjectListViewer extends JPanel
 			}
 		}
 		else{
+			viewPanel.setCurrentObject(null);
 			viewPanel.setVisible(false);
 		}
 	}
 
+	public void close()
+	{
+		viewPanel.setCurrentObject(null);
+	}
 }
