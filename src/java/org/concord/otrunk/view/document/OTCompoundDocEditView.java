@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2007-02-20 01:38:22 $
+ * $Revision: 1.4 $
+ * $Date: 2007-02-20 01:59:20 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -22,6 +22,7 @@ import javax.swing.JSplitPane;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.view.OTViewConfigAware;
+import org.concord.otrunk.view.OTObjectEditViewConfig;
 import org.concord.otrunk.view.OTObjectListViewer;
 import org.concord.swing.CustomDialog;
 
@@ -41,7 +42,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 {
 	protected JPanel textPanel;
 	protected OTDocumentView previewView;
-	protected OTCompoundDocEditViewConfig viewConfig;
+	protected OTObjectEditViewConfig viewConfig;
 	
 	/**
 	 * 
@@ -195,6 +196,6 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	 */
 	public void setViewConfig(OTObject viewConfig)
 	{
-		this.viewConfig = (OTCompoundDocEditViewConfig)viewConfig;
+		this.viewConfig = (OTObjectEditViewConfig)viewConfig;
 	}	
 }
