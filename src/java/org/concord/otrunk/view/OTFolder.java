@@ -47,6 +47,8 @@ public interface OTFolder
 	
 	public void addChild(OTObject pfObject);
 	
+	public void removeChild(OTObject pfObject);
+	
 	public void removeAllChildren();
 	
 	public int getChildCount();

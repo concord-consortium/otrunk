@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.4 $
+ * $Date: 2007-02-20 06:01:55 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -124,6 +124,14 @@ public class VirtualFolder
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.view.OTFolder#removeChild(org.concord.framework.otrunk.OTObject)
+	 */
+	public void removeChild(OTObject pfObject)
+	{
+		children.remove(pfObject);
 	}
 	
 }

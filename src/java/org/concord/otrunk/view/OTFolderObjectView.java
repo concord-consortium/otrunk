@@ -50,9 +50,9 @@ public class OTFolderObjectView implements OTObjectView, OTViewContainerAware,
 		treeModel = new SimpleTreeModel();
 		updateTreePane();
 		
-		JScrollPane treeScrollPane = new JScrollPane(tree);
+		//JScrollPane treeScrollPane = new JScrollPane(tree);
 
-		return treeScrollPane;
+		return tree;//ScrollPane;
 	}
 
 	protected void updateTreePane() {
