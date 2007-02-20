@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.18 $
- * $Date: 2007-02-06 02:19:00 $
- * $Author: imoncada $
+ * $Revision: 1.19 $
+ * $Date: 2007-02-20 00:16:40 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -153,7 +153,7 @@ public class ReflectionTypeDefinitions
 			
 			String resourceName = OTInvocationHandler.getResourceName(3,methodName);
 			Class resourceClass = methods[j].getReturnType();
-			String resourceType = TypeService.getPrimitiveType(resourceClass);
+			String resourceType = TypeService.getObjectPrimitiveType(resourceClass);
 
 			if(resourceType == null){
 			    // This resource type might be an interface that one of the other

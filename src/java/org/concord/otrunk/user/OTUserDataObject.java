@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-02-09 22:04:47 $
+ * $Revision: 1.9 $
+ * $Date: 2007-02-20 00:16:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -35,9 +35,9 @@ package org.concord.otrunk.user;
 import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTResourceCollection;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.datamodel.OTDataCollection;
+import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTObjectRevision;
@@ -264,10 +264,11 @@ public class OTUserDataObject
         return resource;
     }
     
-	public OTResourceCollection getResourceCollection(String key, Class collectionClass)
+	public OTDataCollection getResourceCollection(String key, 
+			Class collectionClass)
 	{
-	    OTResourceCollection collection = 
-	        (OTResourceCollection)resourceCollections.get(key);
+		OTDataCollection collection = 
+	        (OTDataCollection)resourceCollections.get(key);
 	    if(collection != null) {
 	        return collection;
 	    }
@@ -284,17 +285,16 @@ public class OTUserDataObject
 		// Here is the tricky part.  We want to make a pseudo
 		// list so that the real list isn't created unless it is really
 		// used.
-		if(collectionClass.equals(OTResourceList.class)) {
+		if(collectionClass.equals(OTDataList.class)) {
 			collection =  
-				new OTUserResourceList(this, (OTResourceList)resourceObj, key);
-		} else if(collectionClass.equals(OTResourceMap.class)) {
+				new OTUserDataList(this, (OTDataList)resourceObj, key);
+		} else if(collectionClass.equals(OTDataMap.class)) {
 			collection =  
-				new OTUserResourceMap(this, (OTResourceMap)resourceObj, key);
+				new OTUserDataMap(this, (OTDataMap)resourceObj, key);
 		}
 
 		resourceCollections.put(key, collection);
 
 	    return collection;
 	}
-
 }

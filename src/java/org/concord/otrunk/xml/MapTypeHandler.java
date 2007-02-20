@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-01-27 23:46:22 $
+ * $Revision: 1.9 $
+ * $Date: 2007-02-20 00:16:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -65,7 +65,7 @@ public class MapTypeHandler extends ResourceTypeHandler
 	public Object handleElement(OTXMLElement element, Properties elementProps,
 	        String relativePath, XMLDataObject parent)
 	{
-		XMLResourceMap map = new XMLResourceMap(parent);
+		XMLDataMap map = new XMLDataMap(parent);
 		
 		List children = element.getChildren();
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			

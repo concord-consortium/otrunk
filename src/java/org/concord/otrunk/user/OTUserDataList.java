@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-02-09 22:04:47 $
+ * $Revision: 1.1 $
+ * $Date: 2007-02-20 00:16:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,35 +32,35 @@
 */
 package org.concord.otrunk.user;
 
-import org.concord.framework.otrunk.OTResourceCollection;
-import org.concord.framework.otrunk.OTResourceList;
+import org.concord.otrunk.datamodel.OTDataCollection;
+import org.concord.otrunk.datamodel.OTDataList;
 
 
-final class OTUserResourceList extends OTUserResourceCollection
-	implements OTResourceList {
+final class OTUserDataList extends OTUserDataCollection
+	implements OTDataList {
 	
 	
-	OTUserResourceList(OTUserDataObject parent, OTResourceList authoredList,
+	OTUserDataList(OTUserDataObject parent, OTDataList authoredList,
 	        String resourceName)
 	{
-		super(OTResourceList.class, parent, authoredList, resourceName);
+		super(OTDataList.class, parent, authoredList, resourceName);
 	}
 
-	private OTResourceList getUserList()
+	private OTDataList getUserList()
 	{
-		return (OTResourceList)getUserCollection();
+		return (OTDataList)getUserCollection();
 	}
 	
-	private OTResourceList getListForRead()
+	private OTDataList getListForRead()
 	{
-		return (OTResourceList)getCollectionForRead();
+		return (OTDataList)getCollectionForRead();
 	}
 	
-	protected void copyInto(OTResourceCollection userCollection,
-			OTResourceCollection authoredCollection)
+	protected void copyInto(OTDataCollection userCollection,
+			OTDataCollection authoredCollection)
 	{
-		OTResourceList authoredList = (OTResourceList)authoredCollection;
-		OTResourceList userList = (OTResourceList) userCollection;
+		OTDataList authoredList = (OTDataList)authoredCollection;
+		OTDataList userList = (OTDataList) userCollection;
 		
 		for(int i=0; i<authoredList.size(); i++) {
 			userList.add(authoredList.get(i));
@@ -97,7 +97,7 @@ final class OTUserResourceList extends OTUserResourceCollection
 	 */
 	public Object get(int index)
 	{
-		OTResourceList listForRead = getListForRead();
+		OTDataList listForRead = getListForRead();
 
 		if(listForRead == null) return null;
 

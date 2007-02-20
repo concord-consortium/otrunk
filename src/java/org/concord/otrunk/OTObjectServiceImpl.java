@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-02-12 23:51:09 $
- * $Author: swang $
+ * $Revision: 1.8 $
+ * $Date: 2007-02-20 00:16:40 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -248,7 +248,7 @@ public class OTObjectServiceImpl
         }
         
         String otObjectClassStr = 
-            (String)childDataObject.getResource(OTrunkImpl.RES_CLASS_NAME);
+        	OTrunkImpl.getClassName(childDataObject);
         if(otObjectClassStr == null) {
             return null;
         }

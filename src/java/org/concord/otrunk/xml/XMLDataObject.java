@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.13 $
+ * $Date: 2007-02-20 00:16:40 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -36,9 +36,9 @@ import java.util.Collection;
 import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTResourceCollection;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.datamodel.OTDataCollection;
+import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
@@ -137,26 +137,9 @@ public class XMLDataObject
 	 */
 	public Object getResource(String key)
 	{
-		Object resource = resources.get(key);
-		
-		if(resource instanceof XMLBlobResource) {
-			byte [] bytes = ((XMLBlobResource)resource).getBytes();
-			return bytes;
-		}
-
 		return resources.get(key);
 	}
 
-	public boolean isBlobResource(String key)
-	{
-		return resources.get(key) instanceof XMLBlobResource;	    
-	}
-	
-	public XMLBlobResource getBlobResource(String key)
-	{
-	    return (XMLBlobResource)resources.get(key);
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#getResourceKeys()
 	 */
@@ -204,18 +187,18 @@ public class XMLDataObject
 		this.localId = localId;
 	}
 	
-	public OTResourceCollection getResourceCollection(String key, Class collectionClass)
+	public OTDataCollection getResourceCollection(String key, Class collectionClass)
 	{
 		Object listObj = getResource(key);
 		if(collectionClass.isInstance(listObj)) {
-			return (OTResourceCollection)listObj;
+			return (OTDataCollection)listObj;
 		}
 
-	    OTResourceCollection collection = null;
-		if(collectionClass.equals(OTResourceList.class)) {
-			collection =  new XMLResourceList(this);
-		} else if(collectionClass.equals(OTResourceMap.class)) {
-			collection =  new XMLResourceMap(this);
+	    OTDataCollection collection = null;
+		if(collectionClass.equals(OTDataList.class)) {
+			collection =  new XMLDataList(this);
+		} else if(collectionClass.equals(OTDataMap.class)) {
+			collection =  new XMLDataMap(this);
 		}
 		
 		if(collection != null) {

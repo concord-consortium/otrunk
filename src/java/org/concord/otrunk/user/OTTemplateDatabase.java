@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-09-14 16:22:33 $
+ * $Revision: 1.9 $
+ * $Date: 2007-02-20 00:16:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -35,10 +35,8 @@ package org.concord.otrunk.user;
 import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
-import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
 

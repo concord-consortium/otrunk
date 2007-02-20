@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.24 $
- * $Date: 2006-12-21 17:54:56 $
- * $Author: swang $
+ * $Revision: 1.25 $
+ * $Date: 2007-02-20 00:16:40 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -47,9 +47,9 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTResourceCollection;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.datamodel.OTDataCollection;
+import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
@@ -338,14 +338,14 @@ public class XMLDatabase
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.datamodel.OTDatabase#createCollection(org.concord.otrunk.datamodel.OTDataObject, java.lang.Class)
 	 */
-	public OTResourceCollection createCollection(OTDataObject parent,
+	public OTDataCollection createCollection(OTDataObject parent,
 			Class collectionClass)
 		throws Exception
 	{
-		if(collectionClass.equals(OTResourceList.class)) {
-			return new XMLResourceList((XMLDataObject)parent);
-		} else if(collectionClass.equals(OTResourceMap.class)) {
-			return new XMLResourceMap((XMLDataObject)parent);
+		if(collectionClass.equals(OTDataList.class)) {
+			return new XMLDataList((XMLDataObject)parent);
+		} else if(collectionClass.equals(OTDataMap.class)) {
+			return new XMLDataMap((XMLDataObject)parent);
 		}
 		
 		return null;
@@ -406,8 +406,8 @@ public class XMLDatabase
 					} else {
 					    xmlDObj.setResource(resourceKey, newResourceValue);
 					}
-				} else if(resourceValue instanceof XMLResourceList) {
-					XMLResourceList list = (XMLResourceList)resourceValue;
+				} else if(resourceValue instanceof XMLDataList) {
+					XMLDataList list = (XMLDataList)resourceValue;
 					for(int j=0; j<list.size(); j++) {
 						Object oldElement = list.get(j);
 						if(oldElement instanceof XMLDataObject) {
@@ -420,8 +420,8 @@ public class XMLDatabase
 						}
 					}
 					// the resource list value doesn't need to be updated
-				} else if(resourceValue instanceof XMLResourceMap) {
-					XMLResourceMap map = (XMLResourceMap)resourceValue;
+				} else if(resourceValue instanceof XMLDataMap) {
+					XMLDataMap map = (XMLDataMap)resourceValue;
 					String [] keys = map.getKeys();
 					for(int j=0; j<keys.length; j++) {
 						Object oldElement = map.get(keys[j]);

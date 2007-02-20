@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.11 $
+ * $Date: 2007-02-20 00:16:40 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -40,9 +40,9 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTrunk;
+import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
@@ -63,10 +63,10 @@ public class Importer
 			OTDatabase db, OTrunk otrunk)
 		throws Exception
 	{
-		TypeService typeService = new TypeService(importFile.toURL());
 		/**
 		 * deprecated this class so I'm not fixing it yet
 		 *
+		TypeService typeService = new TypeService(importFile.toURL());
 		ObjectTypeHandler objectTypeHandler = new ObjectTypeHandler(typeService);
 		typeService.registerUserType("object", objectTypeHandler);
 		
@@ -203,12 +203,13 @@ public class Importer
 				if(resourceValue instanceof XMLDataObject) {
 					newResourceValue = getOTID(importMap, localIdMap, db,
 							(XMLDataObject)resourceValue);
-				} else if(resourceValue instanceof XMLResourceList) {
-					XMLResourceList oldList = (XMLResourceList)resourceValue;
+				} else if(resourceValue instanceof XMLDataList) {
+					XMLDataList oldList = (XMLDataList)resourceValue;
 					// FIXME we should handle this differently so we dont' set it 
 					// twice
-					OTResourceList newList = (OTResourceList)otDObj.
-						getResourceCollection((String)resourceEntry.getKey(), OTResourceList.class);
+					OTDataList newList = (OTDataList)otDObj.
+						getResourceCollection((String)resourceEntry.getKey(), 
+								OTDataList.class);
 					for(int j=0; j<oldList.size(); j++) {
 						Object oldElement = oldList.get(j);
 						Object newElement = null;
@@ -221,14 +222,16 @@ public class Importer
 						newList.add(newElement);
 					}
 					newResourceValue = newList;
-				} else if(resourceValue instanceof XMLResourceMap) {
+				} else if(resourceValue instanceof XMLDataMap) {
 				    
-					OTResourceMap newMap = (OTResourceMap)otDObj.
-						getResourceCollection((String)resourceEntry.getKey(), OTResourceMap.class);
+					OTDataMap newMap = (OTDataMap)otDObj.
+						getResourceCollection((String)resourceEntry.getKey(), 
+								OTDataMap.class);
 					newResourceValue = newMap;
 				} else if(resourceValue instanceof XMLParsableString) {
 					System.out.println("got parsable string");
-					newResourceValue = ((XMLParsableString)resourceValue).parse(localIdMap);
+					newResourceValue = 
+						((XMLParsableString)resourceValue).parse(localIdMap);
 				} else {
 					newResourceValue = resourceValue;
 				}

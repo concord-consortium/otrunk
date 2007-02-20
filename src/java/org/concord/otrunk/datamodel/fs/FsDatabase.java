@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.9 $
+ * $Date: 2007-02-20 00:16:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -44,9 +44,9 @@ import java.util.Hashtable;
 import java.util.Properties;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTResourceCollection;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.datamodel.OTDataCollection;
+import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
@@ -225,13 +225,13 @@ public class FsDatabase implements OTDatabase
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDatabase#createCollection(java.lang.Class)
 	 */
-	public OTResourceCollection createCollection(OTDataObject parent, Class collectionClass)
+	public OTDataCollection createCollection(OTDataObject parent, Class collectionClass)
 		throws Exception
 	{
-		if(collectionClass.equals(OTResourceList.class)) {
-			return new FsResourceList((FsDataObject)parent);
-		} else if(collectionClass.equals(OTResourceMap.class)) {
-			return new FsResourceMap((FsDataObject)parent);
+		if(collectionClass.equals(OTDataList.class)) {
+			return new FsDataList((FsDataObject)parent);
+		} else if(collectionClass.equals(OTDataMap.class)) {
+			return new FsDataMap((FsDataObject)parent);
 		}
 		
 		// TODO Auto-generated method stub

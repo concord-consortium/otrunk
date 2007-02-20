@@ -6,8 +6,6 @@ package org.concord.otrunk.datamodel;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
 
 /**
  * @author scott
@@ -107,11 +105,11 @@ public class Copier
     		for(int i=0; i<keys.length; i++){
     			Object resource = original.getResource(keys[i]);
 
-    			if(resource instanceof OTResourceList){
-    				OTResourceList copyList =
-    					(OTResourceList)copy.getResourceCollection(keys[i], 
-    							OTResourceList.class);
-    				OTResourceList list = (OTResourceList)resource;
+    			if(resource instanceof OTDataList){
+    				OTDataList copyList =
+    					(OTDataList)copy.getResourceCollection(keys[i], 
+    							OTDataList.class);
+    				OTDataList list = (OTDataList)resource;
     				copyList.removeAll();
     				for(int j=0; j<list.size(); j++){
     					Object listItem = list.get(j);
@@ -119,11 +117,11 @@ public class Copier
     					listItem = handleChild(listItem, entry.maxDepth);
     					copyList.add(listItem);
     				}
-    			} else if(resource instanceof OTResourceMap){
-    				OTResourceMap copyMap =
-    					(OTResourceMap)copy.getResourceCollection(keys[i], 
-    							OTResourceMap.class);                    
-    				OTResourceMap map = (OTResourceMap)resource;
+    			} else if(resource instanceof OTDataMap){
+    				OTDataMap copyMap =
+    					(OTDataMap)copy.getResourceCollection(keys[i], 
+    							OTDataMap.class);                    
+    				OTDataMap map = (OTDataMap)resource;
     				copyMap.removeAll();
     				String [] mapKeys = map.getKeys();
     				for(int j=0; j<mapKeys.length; j++){

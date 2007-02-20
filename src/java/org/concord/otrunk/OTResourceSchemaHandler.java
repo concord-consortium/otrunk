@@ -39,6 +39,9 @@ import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.datamodel.BlobResource;
+import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 
 /**
@@ -103,9 +106,9 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        
 	    } else if(OTResourceMap.class.isAssignableFrom(returnType)) {
 	        try {					
-	            OTResourceMap map = (OTResourceMap)dataObject.getResourceCollection(
-	                    resourceName, OTResourceMap.class);
-	            return map;
+	            OTDataMap map = (OTDataMap)dataObject.getResourceCollection(
+	                    resourceName, OTDataMap.class);
+	            return new OTResourceMapImpl(map);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -113,8 +116,8 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        return null;
 	    } else if(OTObjectMap.class.isAssignableFrom(returnType)) {
 	        try {					
-	            OTResourceMap map = (OTResourceMap)dataObject.getResourceCollection(
-	                    resourceName, OTResourceMap.class);
+	            OTDataMap map = (OTDataMap)dataObject.getResourceCollection(
+	                    resourceName, OTDataMap.class);
 	            return new OTObjectMapImpl(map, objectService);
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -122,10 +125,10 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        
 	        return null;				
 	    } else if(OTResourceList.class.isAssignableFrom(returnType)) {
-	        try {					
-	            OTResourceList list = (OTResourceList)dataObject.getResourceCollection(
-	                    resourceName, OTResourceList.class);
-	            return list;
+	        try {	        	
+	            OTDataList list = (OTDataList)dataObject.getResourceCollection(
+	                    resourceName, OTDataList.class);
+	            return new OTResourceListImpl(list);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -133,14 +136,19 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        return null;				
 	    } else if(OTObjectList.class.isAssignableFrom(returnType)) {
 	        try {					
-	            OTResourceList list = (OTResourceList)dataObject.getResourceCollection(
-	                    resourceName, OTResourceList.class);
+	        	OTDataList list = (OTDataList)dataObject.getResourceCollection(
+	                    resourceName, OTDataList.class);
 	            return new OTObjectListImpl(list, objectService);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
 	        
-	        return null;				
+	        return null;	
+	    } else if(resourceValue instanceof BlobResource) {
+	    	BlobResource blob = (BlobResource)resourceValue;
+	    	if(returnType == byte[].class){
+	    		return blob.getBytes();
+	    	}
 	    } else if(resourceValue == null && returnType.isPrimitive()) {
 	        try {
 	            Field defaultField = proxyClass.getField("DEFAULT_" + resourceName);
@@ -158,7 +166,8 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	    if(!returnType.isInstance(resourceValue) &&
 	            !returnType.isPrimitive()){
 	        System.err.println("invalid resource value for: " + resourceName);
-	        System.err.println("  object type: " + dataObject.getResource(OTrunkImpl.RES_CLASS_NAME));
+	        System.err.println("  object type: " + 
+	        		OTrunkImpl.getClassName(dataObject));
 	        System.err.println("  resourceValue is: " + resourceValue.getClass());
 	        System.err.println("  expected type is: " + returnType);
 	        return null;
@@ -198,9 +207,9 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
             (new Exception("Don't handle removeAll yet")).printStackTrace();
             return null;
 		} else if(methodName.equals("toString")) {
-			return dataObject.getResource(OTrunkImpl.RES_CLASS_NAME) + "@" +  dataObject.getGlobalId();
+			return OTrunkImpl.getClassName(dataObject) + "@" +  dataObject.getGlobalId();
 		} else if(methodName.equals("hashCode")) {
-			String str = (String)dataObject.getResource(OTrunkImpl.RES_CLASS_NAME) + "@" +  dataObject.getGlobalId();
+			String str = OTrunkImpl.getClassName(dataObject) + "@" +  dataObject.getGlobalId();
 			Integer integer = new Integer(str.hashCode()); 
 			return integer;
 		} else if(methodName.equals("equals")) {
@@ -238,7 +247,9 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 			OTObject child = (OTObject)value;
 			OTID childId = child.getGlobalId();
 			value = childId;
-		} 
+		} else if(value instanceof byte[]) {
+			value = new BlobResource((byte[])value);
+		}
 		dataObject.setResource(name, value);			
 		
 		return true;

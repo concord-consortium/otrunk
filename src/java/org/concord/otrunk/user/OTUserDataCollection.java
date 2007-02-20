@@ -3,24 +3,24 @@
  */
 package org.concord.otrunk.user;
 
-import org.concord.framework.otrunk.OTResourceCollection;
+import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataObject;
 
 /**
  * @author scott
  *
  */
-public abstract class OTUserResourceCollection 
-	implements OTResourceCollection
+public abstract class OTUserDataCollection 
+	implements OTDataCollection
 {
 	private Class collectionType;
 	private OTUserDataObject parent;
-	private OTResourceCollection authoredCollection;
+	private OTDataCollection authoredCollection;
 	private String resourceName;
 	
-	public OTUserResourceCollection(Class collectionType, 
+	public OTUserDataCollection(Class collectionType, 
 			OTUserDataObject parent,
-			OTResourceCollection authoredCollection,
+			OTDataCollection authoredCollection,
 			String resourceName)
 	{
 		this.collectionType = collectionType;
@@ -29,7 +29,7 @@ public abstract class OTUserResourceCollection
 		this.resourceName = resourceName;		
 	}
 	
-	protected OTResourceCollection getExistingUserCollection()
+	protected OTDataCollection getExistingUserCollection()
 	{
 	    OTDataObject userState = parent.getExistingUserObject();
 	    if(userState == null) {
@@ -37,19 +37,19 @@ public abstract class OTUserResourceCollection
 	    }
 	    
 	    Object oldCollection = userState.getResource(resourceName);
-        return (OTResourceCollection)oldCollection;	    
+        return (OTDataCollection)oldCollection;	    
 	}
 	
-	protected OTResourceCollection getUserCollection()
+	protected OTDataCollection getUserCollection()
 	{
 	    OTDataObject userState = parent.getUserObject();
 	    Object oldCollection = userState.getResource(resourceName);
 	    if(oldCollection != null) {
-	        return (OTResourceCollection)oldCollection;
+	        return (OTDataCollection)oldCollection;
 	    }
 
-	    OTResourceCollection userCollection = 
-	    	(OTResourceCollection)userState.getResourceCollection(
+	    OTDataCollection userCollection = 
+	    	(OTDataCollection)userState.getResourceCollection(
 	    			resourceName, collectionType);
 	    if(authoredCollection != null) {
 	    	copyInto(userCollection, authoredCollection);
@@ -58,9 +58,9 @@ public abstract class OTUserResourceCollection
 	    return userCollection;
 	}
 	
-	protected OTResourceCollection getCollectionForRead()
+	protected OTDataCollection getCollectionForRead()
 	{
-	    OTResourceCollection userCollection = getExistingUserCollection();
+		OTDataCollection userCollection = getExistingUserCollection();
 	    if(userCollection != null) {
 	        return userCollection;
 	    }
@@ -76,12 +76,12 @@ public abstract class OTUserResourceCollection
 		return parent.resolveIDResource(object);
 	}
 	
-	protected abstract void copyInto(OTResourceCollection userCollection,
-			OTResourceCollection authoredCollection);
+	protected abstract void copyInto(OTDataCollection userCollection,
+			OTDataCollection authoredCollection);
 	
 	public int size()
 	{
-		OTResourceCollection collectionForRead = getCollectionForRead();
+		OTDataCollection collectionForRead = getCollectionForRead();
 
 		if(collectionForRead == null) return 0;
 
