@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="33754150-b594-11d9-9669-0800200c9a66" >
+  <imports>
+    <import class="org.concord.otrunk.OTSystem"/>
+    <import class="org.concord.otrunk.objects.OTImage"/>
+    <import class="org.concord.otrunk.view.OTFolderObject"/>
+    <import class="org.concord.otrunk.view.OTViewEntry"/>
+    <import class="org.concord.otrunk.view.OTViewService"/>
+    <import class="org.concord.otrunk.view.document.OTTextObject"/>    
+    <import class="org.concord.otrunk.view.document.OTCompoundDoc"/>
+  </imports>
+  <objects>
+    <OTSystem>
+      <services>
+        <OTViewService>
+          <viewEntries>
+            <OTViewEntry local_id="text_edit"
+              objectClass="org.concord.otrunk.view.document.OTTextObject" 
+              viewClass="org.concord.otrunk.view.document.OTTextObjectView"/>
+          </viewEntries>
+        </OTViewService>
+      </services>
+      <root>
+        <OTFolderObject> 
+        <children>  
+        <OTCompoundDoc>
+          <bodyText>
+            Hello World<br/>
+            <hr/>
+            My TextBox <object editable="true" refid="${textbox1}"/><br/>
+            My Image <object refid="${image1}" /><br/>
+            More text below
+          </bodyText>
+          <documentRefs>
+            <OTTextObject local_id="textbox1">
+              <bodyText>My text</bodyText>
+            </OTTextObject>          
+            <OTImage local_id="image1"
+            	imageBytes="http://www.concord.org/images/logos/cc/cc-logo.gif"/>
+          </documentRefs>
+        </OTCompoundDoc>      
+        </children>
+        </OTFolderObject>
+      </root>
+    </OTSystem>
+  </objects>
+</otrunk>
