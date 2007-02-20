@@ -62,13 +62,6 @@ public class OTCompoundDoc extends OTFolderObject
 		
 		public String getMarkupLanguage();
 		public void setMarkupLanguage(String lang);
-		
-		//This property is to specify the list of objects that can be inserted
-		//into the document using its edit view
-		//XXX: This is TEMPORARY just to demonstrate object insertion
-		//It will be replaced with a vew config parameter or view services 
-		public OTObjectList getObjectsToInsert();
-		public void setObjectsToInsert(OTObjectList list);
 	}
 
 	private ResourceSchema resources;
@@ -203,11 +196,6 @@ public class OTCompoundDoc extends OTFolderObject
 	public String getMarkupLanguage()
 	{
 		return resources.getMarkupLanguage();
-	}
-	
-	public OTObjectList getObjectsToInsert()
-	{
-		return resources.getObjectsToInsert();
 	}
 	
 	public OTObjectService getOTObjectService()
