@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.8 $
+ * $Date: 2007-02-20 00:16:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -37,9 +37,9 @@ import java.util.Date;
 import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTResourceCollection;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.datamodel.OTDataCollection;
+import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTObjectRevision;
@@ -149,11 +149,11 @@ public class FsDataObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#getResourceList(java.lang.String)
 	 */
-	public OTResourceCollection getResourceCollection(String key, Class collectionClass)
+	public OTDataCollection getResourceCollection(String key, Class collectionClass)
 	{
 		Object listObj = resources.get(key);
 		if(collectionClass.isInstance(listObj)) {
-			return (OTResourceCollection)listObj;
+			return (OTDataCollection)listObj;
 		}
 		
 		if(listObj != null) {
@@ -164,18 +164,16 @@ public class FsDataObject
 		
 		// create a resource list object
 		// add it as a resource with this name
-		if(collectionClass == OTResourceList.class) {
-		    FsResourceList list = new FsResourceList(this);
+		if(collectionClass == OTDataList.class) {
+		    FsDataList list = new FsDataList(this);
 		    resources.put(key, list);
 		    return list;
-		} else if(collectionClass == OTResourceMap.class) {
-		    FsResourceMap map = new FsResourceMap(this);
+		} else if(collectionClass == OTDataMap.class) {
+		    FsDataMap map = new FsDataMap(this);
 		    resources.put(key, map);
 		    return map;
 		}
 		
 		return null;
 	}
-
-	
 }

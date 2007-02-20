@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.8 $
+ * $Date: 2007-02-20 00:16:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -38,7 +38,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.OTResourceList;
+import org.concord.otrunk.datamodel.OTDataList;
 
 /**
  * OTObjectList
@@ -52,9 +52,9 @@ import org.concord.framework.otrunk.OTResourceList;
 public class OTObjectListImpl implements OTObjectList
 {
 	OTObjectService objService;
-	OTResourceList list;
+	OTDataList list;
 	
-	public OTObjectListImpl(OTResourceList resList, OTObjectService objectService)
+	public OTObjectListImpl(OTDataList resList, OTObjectService objectService)
 	{
 		this.objService = objectService;
 		this.list = resList;

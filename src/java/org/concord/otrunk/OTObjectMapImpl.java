@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.7 $
+ * $Date: 2007-02-20 00:16:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -38,7 +38,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.datamodel.OTDataMap;
 
 /**
  * PfObjectTable
@@ -52,9 +52,9 @@ import org.concord.framework.otrunk.OTResourceMap;
 public class OTObjectMapImpl implements OTObjectMap
 {
     OTObjectService objService;
-    OTResourceMap map;
+    OTDataMap map;
 
-	public OTObjectMapImpl(OTResourceMap map, OTObjectService objectService)
+	public OTObjectMapImpl(OTDataMap map, OTObjectService objectService)
 	{
         this.objService = objectService;
 		this.map = map;

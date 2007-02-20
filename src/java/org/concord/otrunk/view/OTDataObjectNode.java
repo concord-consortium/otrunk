@@ -31,11 +31,11 @@ package org.concord.otrunk.view;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceCollection;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 
 public class OTDataObjectNode 
@@ -61,7 +61,7 @@ public class OTDataObjectNode
 	{
 		String nodeName = "";
 		
-		String otObjectClass = (String)object.getResource(OTrunkImpl.RES_CLASS_NAME);
+		String otObjectClass = OTrunkImpl.getClassName(object);
 		String otObjectName = (String)object.getResource("name");
 		
 		if(name != null) {
@@ -148,12 +148,12 @@ public class OTDataObjectNode
 			// get the dataobject for this id
 			OTDataObject pfChild = pfParent.getDatabase().getOTDataObject(pfParent, (OTID)child); 
 			return new OTDataObjectNode(key, pfChild, otDatabase);
-		} else if(child instanceof OTResourceList) {
+		} else if(child instanceof OTDataList) {
 			// make node for list
-			return new OTResourceListNode(key, (OTResourceList) child, this);
-		} else if(child instanceof OTResourceMap) {
+			return new OTDataListNode(key, (OTDataList) child, this);
+		} else if(child instanceof OTDataMap) {
 			// make node for list
-			return new OTResourceMapNode(key, (OTResourceMap) child, this);		    
+			return new OTDataMapNode(key, (OTDataMap) child, this);		    
 		} else  {
 			// make a leaf node that displays the toString of
 			return new OTJavaObjectNode(key, child);

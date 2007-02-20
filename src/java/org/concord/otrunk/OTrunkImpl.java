@@ -77,6 +77,11 @@ public class OTrunkImpl implements OTrunk
 	
     Vector objectServices = new Vector();
     
+    public final static String getClassName(OTDataObject dataObject)
+    {
+    	return (String)dataObject.getResource(OTrunkImpl.RES_CLASS_NAME);
+    }
+    
 	//private transient PrintWriter pw;
 	
 	public OTrunkImpl(OTDatabase db)

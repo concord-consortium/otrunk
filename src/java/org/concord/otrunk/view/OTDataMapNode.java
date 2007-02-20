@@ -29,8 +29,8 @@
  */
 package org.concord.otrunk.view;
 
-import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.util.SimpleTreeNode;
+import org.concord.otrunk.datamodel.OTDataMap;
 
 
 /**
@@ -39,13 +39,13 @@ import org.concord.framework.util.SimpleTreeNode;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class OTResourceMapNode implements SimpleTreeNode 
+public class OTDataMapNode implements SimpleTreeNode 
 {
-	private OTResourceMap map;
+	private OTDataMap map;
 	private String name;
 	private OTDataObjectNode owner;
 	
-	public OTResourceMapNode(String name, OTResourceMap map, 
+	public OTDataMapNode(String name, OTDataMap map, 
 	        OTDataObjectNode owner)
 	{
 		this.name = name;

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-01-27 23:46:22 $
+ * $Revision: 1.1 $
+ * $Date: 2007-02-20 00:16:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,7 +34,7 @@ package org.concord.otrunk.xml;
 
 import java.util.Hashtable;
 
-import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.datamodel.OTDataMap;
 
 
 /**
@@ -46,12 +46,13 @@ import org.concord.framework.otrunk.OTResourceMap;
  * @author scott<p>
  *
  */
-public class XMLResourceMap implements OTResourceMap
+public class XMLDataMap 
+	implements OTDataMap
 {
 	Hashtable hTable = new Hashtable();
 	XMLDataObject dataObject;
 	
-	public XMLResourceMap(XMLDataObject parent)
+	public XMLDataMap(XMLDataObject parent)
 	{
 	    dataObject = parent;
 	    if(dataObject == null) {
@@ -78,10 +79,6 @@ public class XMLResourceMap implements OTResourceMap
 	 */
 	public Object get(String key)
 	{
-		Object value = hTable.get(key);
-		if(value instanceof XMLBlobResource){
-			return ((XMLBlobResource)value).getBytes();
-		}
 		return hTable.get(key);
 	}
 

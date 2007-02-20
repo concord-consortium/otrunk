@@ -23,52 +23,67 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.1 $
+ * $Date: 2007-02-20 00:16:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
-package org.concord.otrunk.xml;
+package org.concord.otrunk.datamodel.fs;
 
+import java.io.Serializable;
 import java.util.Vector;
 
-import org.concord.framework.otrunk.OTResourceList;
+import org.concord.otrunk.datamodel.OTDataList;
 
 
 /**
- * XMLResourceList
+ * FsResourceList
  * Class name and description
  *
- * Date created: Oct 4, 2004
+ * Date created: Aug 23, 2004
  *
  * @author scott<p>
  *
  */
-public class XMLResourceList
-	implements OTResourceList
+public class FsDataList
+	implements OTDataList, Serializable
 {
 	Vector list = new Vector();
-	XMLDataObject dataObject;
-	
-	public XMLResourceList(XMLDataObject parent)
+	boolean readOnly;
+	private FsDataObject dataObject = null;
+		
+	FsDataList(FsDataObject dataObject)
 	{
-	    dataObject = parent;
-	    if(dataObject == null) {
-	        throw new UnsupportedOperationException("passing null parent not allowed");
-	    }
+		this.dataObject = dataObject;
 	}
 		
 	private void updateModifiedTime()
 	{
 		dataObject.updateModifiedTime();
 	}
-			
+		
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceList#setReadOnly(boolean)
+	 */
+	public void setReadOnly(boolean readOnly)
+	{
+		// TODO Auto-generated method stub
+		this.readOnly = readOnly;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceList#size()
+	 */
+	public int size() {
+		return list.size();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#get(int)
 	 */
-	public Object get(int index)
+	public Object get(int index) 
 	{
 		return list.get(index);
 	}
@@ -76,42 +91,52 @@ public class XMLResourceList
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#add(java.lang.Object)
 	 */
-	public void add(Object object)
+	public void add(Object object) 
 	{
-		list.add(object);
+		if(readOnly) {
+			// TODO should throw an exception
+			return;
+		}
+
 		updateModifiedTime();
+		list.add(object);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#add(int, java.lang.Object)
 	 */
-	public void add(int index, Object object)
+	public void add(int index, Object object) 
 	{
-		list.add(index, object);
-		updateModifiedTime();
-	}
+		if(readOnly) {
+			// TODO should throw an exception
+			return;
+		}
 
-	public void set(int index, Object object)
-	{
-		list.set(index, object);
 		updateModifiedTime();
+		list.add(index, object);
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.concord.otrunk.OTResourceCollection#size()
+	 * @see org.concord.otrunk.OTResourceList#set(int, java.lang.Object)
 	 */
-	public int size()
+	public void set(int index, Object object) 
 	{
-		return list.size();
-	}
+		if(readOnly) {
+			// TODO should throw an exception
+			return;
+		}
 
+		updateModifiedTime();
+		list.set(index, object);
+	}
+	
 	/* (non-Javadoc)
-	 * @see org.concord.otrunk.OTResourceCollection#removeAll()
+	 * @see org.concord.otrunk.OTResourceList#removeAll()
 	 */
 	public void removeAll()
 	{
-		list.removeAllElements();
 		updateModifiedTime();
+		list.removeAllElements();
 	}
 
 	/* (non-Javadoc)
@@ -119,8 +144,8 @@ public class XMLResourceList
 	 */
 	public void remove(int index)
 	{
-		list.remove(index);
 		updateModifiedTime();
+		list.remove(index);
 	}
 
 	/* (non-Javadoc)
@@ -128,8 +153,7 @@ public class XMLResourceList
 	 */
 	public void remove(Object obj)
 	{
-		list.remove(obj);
 		updateModifiedTime();
+		list.remove(obj);
 	}
-
 }

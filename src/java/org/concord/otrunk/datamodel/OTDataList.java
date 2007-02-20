@@ -22,40 +22,38 @@
  * END LICENSE */
 
 /*
- * Created on Aug 16, 2004
+ * Last modification information:
+ * $Revision: 1.1 $
+ * $Date: 2007-02-20 00:16:41 $
+ * $Author: scytacki $
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * Licence Information
+ * Copyright 2004 The Concord Consortium 
  */
 package org.concord.otrunk.datamodel;
 
-import org.concord.framework.otrunk.OTID;
 
 /**
- * @author scott
+ * OTResourceList
+ * Class name and description
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * Date created: Nov 8, 2004
+ *
+ * @author scott<p>
+ *
  */
-public interface OTDataObject 
+public interface OTDataList extends OTDataCollection
 {
-	public OTID getGlobalId();
-	
-	public void setResource(String key, Object resource);
-	public Object getResource(String key);
-	public String [] getResourceKeys();
 
-	/**
-	 * This returns a collection of resources.  There are currently only 2
-	 * classes that can be used here: OTResourceList and OTResourceMap
-	 * 
-	 * @param key
-	 * @param collectionClass
-	 * @return
-	 */
-	public OTDataCollection getResourceCollection(String key, Class collectionClass);
+	public abstract Object get(int index);
+
+	public abstract void add(Object object);
+
+	public abstract void add(int index, Object object);
 	
-	public OTObjectRevision getCurrentRevision();
+	public void set(int index, Object object);
 	
-	public OTDatabase getDatabase();
+	public void remove(int index);
+	
+	public void remove(Object obj);
 }

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.22 $
- * $Date: 2007-01-27 23:46:22 $
+ * $Revision: 1.23 $
+ * $Date: 2007-02-20 00:16:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -43,6 +43,9 @@ import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.OTXMLString;
+import org.concord.otrunk.datamodel.BlobResource;
+import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataMap;
 
 /**
  * DOTypeService
@@ -66,7 +69,13 @@ public class TypeService
     public final static String LIST = "list";
     public final static String MAP = "map";
     public final static String OBJECT = "object";
-    
+
+    /**
+     * These types are the same for OTObjects and OTDataObjects
+     * 
+     * @param klass
+     * @return
+     */
 	public static String getPrimitiveType(Class klass)
 	{
 		if(String.class.isAssignableFrom(klass)) {
@@ -88,7 +97,27 @@ public class TypeService
 		} else if(Double.class.isAssignableFrom(klass) ||
 				Double.TYPE.equals(klass)) {
 			return DOUBLE;
-		} else if(klass.isArray() && 
+		} 
+	
+		return null;
+	}
+	
+	/**
+	 * This will return the type of the allowable classes or interfaces for
+	 * OTObjectS
+	 * 
+	 * @param klass
+	 * @return
+	 */
+	public static String getObjectPrimitiveType(Class klass)
+	{
+		String type = getPrimitiveType(klass);
+		
+		if(type != null){
+			return type;
+		}
+
+		if(klass.isArray() && 
 				klass.getComponentType().equals(Byte.TYPE)) {
 			return BLOB;
 		} else if(OTResourceList.class.isAssignableFrom(klass) ||
@@ -97,11 +126,41 @@ public class TypeService
 		} else if(OTResourceMap.class.isAssignableFrom(klass) ||
 				OTObjectMap.class.isAssignableFrom(klass)) {
 			return MAP;
-		} else if(OTID.class.isAssignableFrom(klass) ||
-				OTObject.class.isAssignableFrom(klass) ) {
+		} else if(OTObject.class.isAssignableFrom(klass) ) {
+			// OTIDs used to be allowed here.
+			// If an OTID is the type of a parameter, I think the code which
+			// translates these will get messed up.  So they are not allowed
+			// now
 			return OBJECT;
 		}
-	
+		return null;
+	}
+
+	/**
+	 * This will return the type of the allowable classes or interfaces for
+	 * resources in OTDataObjectS
+	 * 
+	 * @param klass
+	 * @return
+	 */
+	public static String getDataPrimitiveType(Class klass)
+	{
+		String type = getPrimitiveType(klass);
+		
+		if(type != null){
+			return type;
+		}
+
+		if(BlobResource.class.isAssignableFrom(klass)) {
+			return BLOB;
+		} else if(OTDataList.class.isAssignableFrom(klass)) {
+			return LIST;
+		} else if(OTDataMap.class.isAssignableFrom(klass)) {
+			return MAP;
+		} else if(OTID.class.isAssignableFrom(klass) ) {
+			return OBJECT;
+		}
+		
 		return null;
 	}
 	

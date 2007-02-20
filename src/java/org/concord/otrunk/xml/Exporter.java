@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.16 $
- * $Date: 2007-01-27 23:46:22 $
+ * $Revision: 1.17 $
+ * $Date: 2007-02-20 00:16:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -42,10 +42,11 @@ import java.io.Writer;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.OTXMLString;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.BlobResource;
+import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 
@@ -147,13 +148,13 @@ public class Exporter
 			// this is an object reference
 			// recurse
             exportID(output, parentDataObj, (OTID)item, indent);
-		} else if(item instanceof OTResourceList  ||
-				item instanceof OTResourceMap) {
+		} else if(item instanceof OTDataList  ||
+				item instanceof OTDataMap) {
 			System.err.println("nested collections are illegal");
 		} else {
 			// this is a litteral reference in a list or map so we need the type
 			String type = null;
-			type = TypeService.getPrimitiveType(item.getClass());
+			type = TypeService.getDataPrimitiveType(item.getClass());
 
 			if(type == null){
 				System.err.println("unknown list item type: " + item.getClass());				
@@ -163,10 +164,15 @@ public class Exporter
 			output.print("<" + type + ">");
 
 			String itemString;
-			if(!(item instanceof byte[])) {
+			if(!(item instanceof BlobResource)) {
 				itemString = item.toString();
 			} else {
-				itemString = BlobTypeHandler.base64((byte[])item);
+				BlobResource blob = (BlobResource)item;
+				if(blob.getBlobURL() != null){
+					itemString = blob.getBlobURL().toExternalForm(); 
+				} else {
+					itemString = BlobTypeHandler.base64(blob.getBytes());
+				}
 			}
 			if(itemString.length() > 40) {
 				output.println();
@@ -212,7 +218,7 @@ public class Exporter
 		}
 		// System.err.println("writting object: " + id);		
 		
-		String objectClass = (String)dataObj.getResource(OTrunkImpl.RES_CLASS_NAME);
+		String objectClass = OTrunkImpl.getClassName(dataObj);
 		if(!writtenClasses.contains(objectClass)) {
 			writtenClasses.add(objectClass);
 		}
@@ -239,18 +245,7 @@ public class Exporter
 				continue;
 			}
 
-			Object resource = null;
-			if(dataObj instanceof XMLDataObject) {
-			    XMLDataObject xmlDataObj = (XMLDataObject)dataObj;
-			    if(xmlDataObj.isBlobResource(resourceKeys[i])){
-			        XMLBlobResource blob = xmlDataObj.getBlobResource(resourceKeys[i]);
-			        resource = blob.getBlobURL();
-			    }			    
-			} 
-			
-			if(resource == null) {
-			    resource = dataObj.getResource(resourceKeys[i]);
-			}
+			Object resource = dataObj.getResource(resourceKeys[i]);
 			
 			printIndent(resourceIndent, output);
 			output.print("<" + resourceKeys[i] + ">");
@@ -260,9 +255,9 @@ public class Exporter
 			    output.println();
                 exportID(output, dataObj, (OTID)resource, resourceIndent+1);
 				printIndent(resourceIndent, output);
-			} else if(resource instanceof OTResourceList) {
+			} else if(resource instanceof OTDataList) {
 			    output.println();
-				OTResourceList list = (OTResourceList)resource;
+			    OTDataList list = (OTDataList)resource;
 				for(int j=0;j<list.size(); j++) {
 					Object listElement = list.get(j);
 					if(listElement == null) {
@@ -273,9 +268,9 @@ public class Exporter
 							listElement, resourceIndent+1);
 				}
 				printIndent(resourceIndent, output);
-			} else if(resource instanceof OTResourceMap) {
+			} else if(resource instanceof OTDataMap) {
 			    output.println();
-			    OTResourceMap map = (OTResourceMap)resource;
+			    OTDataMap map = (OTDataMap)resource;
 			    String [] mapKeys = map.getKeys();
 			    int entryIndent = resourceIndent+1;
 			    for(int j=0; j<mapKeys.length; j++) {
@@ -287,10 +282,18 @@ public class Exporter
 			        indentPrint(entryIndent, "</entry>", output);			        
 			    }
 			    printIndent(resourceIndent, output);
-			} else if(resource instanceof byte []) {
-				// this is non xml blob reference
-				// write out the blob and save a reference to it
-				System.err.println("Got a non xml blob reference????");
+			} else if(resource instanceof BlobResource){
+				BlobResource blob = (BlobResource) resource;
+				Object blobUrl = blob.getBlobURL();
+				if(blobUrl != null){
+					output.print(blobUrl);
+				} else {
+					String base64Str = 
+						BlobTypeHandler.base64(blob.getBytes());
+					output.println();
+					indentPrint(resourceIndent+1, base64Str, output);
+					printIndent(resourceIndent, output);
+				}
 			} else if(resource == null){
 			    System.err.println("Got null resource value");
 			} else if(resource instanceof Integer ||

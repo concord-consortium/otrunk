@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-02-09 22:04:47 $
+ * $Revision: 1.1 $
+ * $Date: 2007-02-20 00:16:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,34 +32,34 @@
 */
 package org.concord.otrunk.user;
 
-import org.concord.framework.otrunk.OTResourceCollection;
-import org.concord.framework.otrunk.OTResourceMap;
+import org.concord.otrunk.datamodel.OTDataCollection;
+import org.concord.otrunk.datamodel.OTDataMap;
 
 
-final class OTUserResourceMap extends OTUserResourceCollection
-	implements OTResourceMap
+final class OTUserDataMap extends OTUserDataCollection
+	implements OTDataMap
 {
-    public OTUserResourceMap(OTUserDataObject parent, OTResourceMap authoredMap,
-	        String resourceName)
+    public OTUserDataMap(OTUserDataObject parent, 
+    		OTDataMap authoredMap, String resourceName)
     {
-    	super(OTResourceMap.class, parent, authoredMap, resourceName);
+    	super(OTDataMap.class, parent, authoredMap, resourceName);
     }
     
-	private OTResourceMap getUserMap()
+	private OTDataMap getUserMap()
 	{
-		return (OTResourceMap)getUserCollection();
+		return (OTDataMap)getUserCollection();
 	}
 	
-	private OTResourceMap getMapForRead()
+	private OTDataMap getMapForRead()
 	{
-		return (OTResourceMap)getCollectionForRead();
+		return (OTDataMap)getCollectionForRead();
 	}
 	
-	protected void copyInto(OTResourceCollection userCollection,
-			OTResourceCollection authoredCollection)
+	protected void copyInto(OTDataCollection userCollection,
+			OTDataCollection authoredCollection)
 	{
-		OTResourceMap authoredMap = (OTResourceMap)authoredCollection;
-		OTResourceMap userMap = (OTResourceMap) userCollection;
+		OTDataMap authoredMap = (OTDataMap)authoredCollection;
+		OTDataMap userMap = (OTDataMap) userCollection;
 		
 		String [] keys = authoredMap.getKeys();		
 		for(int i=0; i<keys.length; i++) {
@@ -72,7 +72,7 @@ final class OTUserResourceMap extends OTUserResourceCollection
      */
     public Object get(String key)
     {
-	    OTResourceMap mapForRead = getMapForRead();
+    	OTDataMap mapForRead = getMapForRead();
 
 	    if(mapForRead == null) return null;
 	    
@@ -84,7 +84,7 @@ final class OTUserResourceMap extends OTUserResourceCollection
      */
     public String[] getKeys()
     {
-	    OTResourceMap mapForRead = getMapForRead();
+    	OTDataMap mapForRead = getMapForRead();
 
 	    if(mapForRead == null) return new String[0];
 	    
@@ -96,7 +96,7 @@ final class OTUserResourceMap extends OTUserResourceCollection
      */
     public void put(String key, Object resource)
     {
-    	OTResourceMap userMap = getUserMap();
+    	OTDataMap userMap = getUserMap();
     	
     	userMap.put(key, resource);
     }    

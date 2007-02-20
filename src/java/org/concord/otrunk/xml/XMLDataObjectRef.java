@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.7 $
+ * $Date: 2007-02-20 00:16:40 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -77,12 +77,12 @@ public class XMLDataObjectRef extends XMLDataObject
 		// TODO Auto-generated method stub		
 	}
 	
-	public void setReferenceSource(XMLResourceList list, int index)
+	public void setReferenceSource(XMLDataList list, int index)
 	{
 		// TODO
 	}
 	
-	public void setReferenceSource(XMLResourceMap map, String key)
+	public void setReferenceSource(XMLDataMap map, String key)
 	{
 		// TODO
 	}

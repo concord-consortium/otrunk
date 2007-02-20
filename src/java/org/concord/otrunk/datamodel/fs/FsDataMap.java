@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.1 $
+ * $Date: 2007-02-20 00:16:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -33,28 +33,28 @@
 package org.concord.otrunk.datamodel.fs;
 
 import java.io.Serializable;
-import java.util.Vector;
+import java.util.Hashtable;
 
-import org.concord.framework.otrunk.OTResourceList;
+import org.concord.otrunk.datamodel.OTDataMap;
 
 
 /**
- * FsResourceList
+ * FsResourceMap
  * Class name and description
  *
- * Date created: Aug 23, 2004
+ * Date created: Sep 29, 2004
  *
  * @author scott<p>
  *
  */
-public class FsResourceList
-	implements OTResourceList, Serializable
+public class FsDataMap
+	implements OTDataMap, Serializable
 {
-	Vector list = new Vector();
+	Hashtable map = new Hashtable();
 	boolean readOnly;
 	private FsDataObject dataObject = null;
-		
-	FsResourceList(FsDataObject dataObject)
+	
+	FsDataMap(FsDataObject dataObject)
 	{
 		this.dataObject = dataObject;
 	}
@@ -63,35 +63,19 @@ public class FsResourceList
 	{
 		dataObject.updateModifiedTime();
 	}
-		
+	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#setReadOnly(boolean)
 	 */
 	public void setReadOnly(boolean readOnly)
 	{
-		// TODO Auto-generated method stub
 		this.readOnly = readOnly;
 	}
-	
+		
 	/* (non-Javadoc)
-	 * @see org.concord.otrunk.OTResourceList#size()
+	 * @see org.concord.otrunk.OTResourceMap#put(java.lang.String, java.lang.Object)
 	 */
-	public int size() {
-		return list.size();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.concord.otrunk.OTResourceList#get(int)
-	 */
-	public Object get(int index) 
-	{
-		return list.get(index);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.concord.otrunk.OTResourceList#add(java.lang.Object)
-	 */
-	public void add(Object object) 
+	public void put(String key, Object resource)
 	{
 		if(readOnly) {
 			// TODO should throw an exception
@@ -99,61 +83,43 @@ public class FsResourceList
 		}
 
 		updateModifiedTime();
-		list.add(object);
+
+		map.put(key, resource);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.concord.otrunk.OTResourceList#add(int, java.lang.Object)
+	 * @see org.concord.otrunk.OTResourceMap#get(java.lang.String)
 	 */
-	public void add(int index, Object object) 
+	public Object get(String key)
 	{
-		if(readOnly) {
-			// TODO should throw an exception
-			return;
-		}
-
-		updateModifiedTime();
-		list.add(index, object);
+		return map.get(key);
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see org.concord.otrunk.OTResourceList#set(int, java.lang.Object)
+	 * @see org.concord.otrunk.OTResourceMap#getKeys()
 	 */
-	public void set(int index, Object object) 
+	public String[] getKeys()
 	{
-		if(readOnly) {
-			// TODO should throw an exception
-			return;
-		}
-
-		updateModifiedTime();
-		list.set(index, object);
+		Object [] keys = map.keySet().toArray();
+		String [] strKeys = new String [keys.length];
+		System.arraycopy(keys, 0, strKeys, 0, keys.length);
+		return strKeys;
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see org.concord.otrunk.OTResourceList#removeAll()
+	 * @see org.concord.otrunk.OTResourceCollection#size()
+	 */
+	public int size()
+	{
+		return map.size();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.OTResourceCollection#removeAll()
 	 */
 	public void removeAll()
 	{
-		updateModifiedTime();
-		list.removeAllElements();
+		map.clear();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.concord.framework.otrunk.OTResourceList#remove(int)
-	 */
-	public void remove(int index)
-	{
-		updateModifiedTime();
-		list.remove(index);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.concord.framework.otrunk.OTResourceList#remove(java.lang.Object)
-	 */
-	public void remove(Object obj)
-	{
-		updateModifiedTime();
-		list.remove(obj);
-	}
 }

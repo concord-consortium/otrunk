@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.4 $
+ * $Date: 2007-02-20 00:16:39 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -113,7 +113,7 @@ public class OTReferenceMap
 			stateObject.setResource("template-id", template.getGlobalId());
 
 			stateObject.setResource(OTrunkImpl.RES_CLASS_NAME, 
-			        template.getResource(OTrunkImpl.RES_CLASS_NAME));
+					OTrunkImpl.getClassName(template));
 			
             return stateObject;
         } catch (Exception e) {

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.4 $
+ * $Date: 2007-02-20 00:16:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -39,8 +39,6 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTUser;
-import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.datamodel.OTDataObject;
 
 /**
  * PfUserObject
