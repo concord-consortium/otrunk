@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-02-20 01:59:20 $
- * $Author: imoncada $
+ * $Revision: 1.5 $
+ * $Date: 2007-02-20 05:32:19 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -188,6 +188,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 			}
 		}
 		
+		selectPanel.close();
 		return otObj;
 	}
 
@@ -198,4 +199,16 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	{
 		this.viewConfig = (OTObjectEditViewConfig)viewConfig;
 	}	
+	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.view.document.AbstractOTDocumentView#viewClosed()
+	 */
+	public void viewClosed() 
+	{
+		super.viewClosed();
+		
+		if(previewView != null){
+			previewView.viewClosed();
+		}
+	}
 }
