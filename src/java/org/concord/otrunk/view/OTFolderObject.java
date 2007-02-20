@@ -75,6 +75,11 @@ public class OTFolderObject extends DefaultOTObject
 		children.add(pfObject);
 	}
 	
+	public void removeChild(OTObject pfObject)
+	{
+		OTObjectList children = resources.getChildren();
+		children.remove(pfObject);
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.objects.PfFolder#removeAllChildren()
@@ -108,5 +113,10 @@ public class OTFolderObject extends DefaultOTObject
 	{
 		OTObjectList children = resources.getChildren();
 		return children.size();		
+	}
+	
+	public String toString()
+	{
+		return "OTFolderObject " +getName()+" " +super.toString();
 	}
 }
