@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-02-20 05:32:19 $
- * $Author: scytacki $
+ * $Revision: 1.6 $
+ * $Date: 2007-02-22 23:31:13 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -15,16 +15,13 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.view.OTViewConfigAware;
 import org.concord.otrunk.view.OTObjectEditViewConfig;
 import org.concord.otrunk.view.OTObjectListViewer;
-import org.concord.swing.CustomDialog;
 
 /**
  * OTCompoundDocEditView
@@ -155,40 +152,11 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	 */
 	private OTObject getObjectToInsertFromUser()
 	{
-		//Show the user all the possible objects to insert so he can choose
-		if (viewConfig == null){
-			System.err.println("Error: view config not specified. No objects to insert.");
-			return null;
-		}
-		
-		OTObjectList objList = viewConfig.getObjectsToInsert();		
 		OTObject otObj = null;
 		
-		OTObjectListViewer selectPanel = new OTObjectListViewer(getFrameManager());
-		selectPanel.setOTViewFactory(getViewFactory());
-		selectPanel.setOtObjList(objList);
-
-		int retCode = CustomDialog.showOKCancelDialog(textPanel, selectPanel, "Choose object to add", true, true);
-		if (retCode == JOptionPane.OK_OPTION){
-			otObj = selectPanel.getCurrentOTObject();
-			
-			if (selectPanel.getCopyObject()){
-				//Create a new instance of the object to insert with this template
-				//and add a object reference in that case
-				try{
-					otObj = ((OTCompoundDoc)pfObject).getOTObjectService().copyObject(otObj, -1);
-					
-					//This is not necessary, since it gets doe automatically when the object reference 
-					//is added to the test of the coompund document
-					//otCompDoc.addDocumentReference(objToInsert);
-				
-				}catch(Exception ex){
-					ex.printStackTrace();
-				}
-			}
-		}
+		otObj = OTObjectListViewer.showDialog(textPanel, "Choose object to add", getFrameManager(),
+				getViewFactory(), viewConfig, ((OTCompoundDoc)pfObject).getOTObjectService());
 		
-		selectPanel.close();
 		return otObj;
 	}
 
