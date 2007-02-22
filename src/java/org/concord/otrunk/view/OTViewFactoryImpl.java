@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTMultiUserView;
 import org.concord.framework.otrunk.view.OTObjectView;
@@ -59,10 +60,14 @@ public class OTViewFactoryImpl implements OTViewFactory
     OTViewFactoryImpl parent;
     Vector viewMap = new Vector();
     Vector userList = null;
-        
-    public OTViewFactoryImpl(OTrunk otrunk, OTViewService viewService)
+    OTObjectService objectService;    
+    
+    
+    public OTViewFactoryImpl(OTrunk otrunk, OTViewService viewService,
+    		OTObjectService objectService)
     {
         this.otrunk = otrunk;
+        this.objectService = objectService;
         
         // read in all the viewEntries and create a vector 
         // of class entries.
@@ -272,5 +277,13 @@ public class OTViewFactoryImpl implements OTViewFactory
         }
 
     }
+
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.view.OTViewFactory#getObjectService()
+	 */
+	public OTObjectService getObjectService() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
