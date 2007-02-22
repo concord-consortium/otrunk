@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-02-20 06:01:56 $
+ * $Revision: 1.3 $
+ * $Date: 2007-02-22 23:31:13 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -20,10 +20,16 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.TreePath;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.OTFrameManager;
+import org.concord.framework.otrunk.view.OTFrameManagerAware;
+import org.concord.framework.otrunk.view.OTViewConfigAware;
+import org.concord.framework.otrunk.view.OTViewFactory;
+import org.concord.framework.otrunk.view.OTViewFactoryAware;
 
 /**
  * OTFolderObjectEditView
  * Edit view for the OTFolderObject
+ * Allows the user to add and delete objects from the folder structure
  *
  * Date created: Feb 19, 2007
  *
@@ -31,10 +37,15 @@ import org.concord.framework.otrunk.OTObject;
  *
  */
 public class OTFolderObjectEditView extends OTFolderObjectView 
-	implements MouseListener
+	implements MouseListener, OTFrameManagerAware, OTViewFactoryAware, OTViewConfigAware
 {
 	protected OTObject parentObject;
 	protected OTObject selectedObject;
+	protected OTFolderNode selectedNode;
+	
+	protected OTFrameManager frameManager;
+	protected OTViewFactory viewFactory;
+	protected OTObjectEditViewConfig viewConfig;
 	
 	protected JMenu menu;
 	
@@ -45,15 +56,15 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	public void valueChanged(TreeSelectionEvent e) 
 	{		
 		OTFolderNode parentNode = null;
-		OTFolderNode node = null;
+		selectedNode = null;
 		
 		TreePath path = tree.getSelectionPath();
 		if (path == null) return;
 
-	    node = (OTFolderNode)path.getLastPathComponent();
-		if (node == null) return;
+		selectedNode = (OTFolderNode)path.getLastPathComponent();
+		if (selectedNode == null) return;
 		
-		selectedObject = (OTObject)node.getObject();
+		selectedObject = (OTObject)selectedNode.getObject();
 		
 		TreePath parentPath;
 		parentPath = path.getParentPath();
@@ -94,7 +105,7 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	}
 	
 	/**
-	 * 
+	 * Shows a pop up menu with the edit actions
 	 */
 	protected void showEditPopUpMenu(MouseEvent evt)
 	{
@@ -108,17 +119,38 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	}
 
 	/**
-	 * 
+	 * Creates a new pop up menu with the edit actions
+	 * Right now only "add" and "delete" are implemented
 	 */
 	protected void createMenu()
 	{		
 		menu = new JMenu();
-		menu.add(new OTFolderObjectAction("insert"));
+		//"Add" action is only for folders
+		if (selectedObject instanceof OTFolder){
+			menu.add(new OTFolderObjectAction("add"));
+		}
+		//Delete action only for objects with a parent folder
 		if (parentObject != null){
 			menu.add(new OTFolderObjectAction("delete"));
 		}
 	}
 	
+	/**
+	 * @see org.concord.framework.otrunk.view.OTFrameManagerAware#setFrameManager(org.concord.framework.otrunk.view.OTFrameManager)
+	 */
+	public void setFrameManager(OTFrameManager frameManager)
+	{
+		this.frameManager = frameManager;		
+	}
+
+	/**
+	 * @see org.concord.framework.otrunk.view.OTViewFactoryAware#setViewFactory(org.concord.framework.otrunk.view.OTViewFactory)
+	 */
+	public void setViewFactory(OTViewFactory viewFactory)
+	{
+		this.viewFactory = viewFactory;
+	}
+
 	class OTFolderObjectAction extends AbstractAction
 	{
 		/**
@@ -129,8 +161,8 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 			super(actionCommand);
 			putValue(Action.ACTION_COMMAND_KEY, actionCommand);
 			
-			if (actionCommand.equals("insert")){
-				putValue(Action.NAME, "Insert object");
+			if (actionCommand.equals("add")){
+				putValue(Action.NAME, "Add object");
 			}
 			else if (actionCommand.equals("delete")){
 				putValue(Action.NAME, "Delete object");
@@ -143,15 +175,73 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		public void actionPerformed(ActionEvent e)
 		{
 			System.out.println("action command: "+e.getActionCommand());
-			if (e.getActionCommand().equals("insert")){
-				System.out.println("insert object not implemented yet");
+			if (e.getActionCommand().equals("add")){
+				addObject();
 			}
 			else if (e.getActionCommand().equals("delete")){
 				
-				if (parentObject instanceof OTFolder){
-					((OTFolder)parentObject).removeChild(selectedObject);
-				}
+				deleteSelectedObject();
 			}
 		}
+
+		/**
+		 * Adds an ot object to the selected folder. Lets the user pick which object to add.
+		 */
+		private void addObject()
+		{
+			OTObject otObj = getObjectToInsertFromUser();
+			
+			if (otObj == null) return;
+			
+			if (selectedObject instanceof OTFolder){
+				((OTFolder)selectedObject).addChild(otObj);
+				
+				treeModel.fireTreeStructureChanged(selectedNode);
+			}
+			else{
+				System.err.println("Error: OT Objects can only be added to OT Folders.");
+			}
+		}
+
+		/**
+		 * Shows a dialog with the list of possible objects to insert and lets the user choose
+		 * 
+		 * @return OT Object selected by the user
+		 */
+		private OTObject getObjectToInsertFromUser()
+		{
+			OTObject otObj = null;
+			
+			otObj = OTObjectListViewer.showDialog(tree, "Choose object to add to the tree", frameManager,
+					viewFactory, viewConfig, null);		//Last parameter is null because we don't have an ot object service yet
+			
+			return otObj;
+		}
+		
+		/**
+		 * Deletes the selected object from its parent folder
+		 */
+		private void deleteSelectedObject()
+		{
+			if (parentObject instanceof OTFolder){
+				((OTFolder)parentObject).removeChild(selectedObject);
+			}
+			else{
+				System.err.println("Error: OT Object deletion only available for objects inside of folders.");
+			}
+		}
+	}
+
+	/**
+	 * @see org.concord.framework.otrunk.view.OTViewConfigAware#setViewConfig(org.concord.framework.otrunk.OTObject)
+	 */
+	public void setViewConfig(OTObject viewConfig)
+	{
+		if (!(viewConfig instanceof OTObjectEditViewConfig)){
+			System.err.println("Error: the specified view config should be an istance of OTObjectEditViewConfig.");
+			return;
+		}
+		
+		this.viewConfig = (OTObjectEditViewConfig)viewConfig;
 	}
 }

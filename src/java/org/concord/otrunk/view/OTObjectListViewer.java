@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2007-02-20 05:32:19 $
- * $Author: scytacki $
+ * $Revision: 1.4 $
+ * $Date: 2007-02-22 23:31:13 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -10,9 +10,11 @@
 package org.concord.otrunk.view;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
@@ -20,9 +22,11 @@ import javax.swing.event.TreeSelectionListener;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.otrunk.VirtualFolder;
+import org.concord.swing.CustomDialog;
 import org.concord.view.SimpleTreeModel;
 
 
@@ -31,6 +35,9 @@ import org.concord.view.SimpleTreeModel;
  * 
  * Given a list of OT Objects, this panel shows them in a tree view
  * and it keeps track of the object selected by the user.
+ * 
+ * There is a static convenience method to show this panel in a modal dialog
+ * and let the user choose an object.
  *
  * Date created: Feb 10, 2007
  *
@@ -49,6 +56,71 @@ public class OTObjectListViewer extends JPanel
 	protected OTObject currentSelectedOTObj;
 	
 	protected JCheckBox copyCheck;
+	
+	/**
+	 * Convenience method to show this viewer in a modal dialog and let the user choose an object
+	 * It returns the object chosen by the user. If the "copy object" checkbox was checked, it
+	 * makes a copy of the object and returns it.
+	 * It receives a bunch of parameters in order to display the OT objects.
+	 * The most crutial parameter is viewConfig, which has the list of objects to be displayed in the dialog
+	 * 
+	 * @param parent		Parent of the dialog
+	 * @param title			Title of the dialog to be displayed
+	 * @param frameManager	the OT frame manager, used to pass it to the views of the objects displayed in the dialog
+	 * @param viewFactory	the OT View factory, used to create the views for the objects displayed in the dialog
+	 * @param viewConfig	An OT object edit view config that has the list of objects to display
+	 * @param otObjService	An OT Object service, used to make a copy of the OT object
+	 * @return	The OT object selected by the user
+	 */
+	public static OTObject showDialog(Component parent, String title, OTFrameManager frameManager, OTViewFactory viewFactory,
+			OTObjectEditViewConfig viewConfig, OTObjectService otObjService)
+	{
+		OTObject otObj;
+		
+		//Show the user all the possible objects to insert so he can choose
+		if (viewConfig == null){
+			System.err.println("Error: view config not specified. No objects to insert.");
+			return null;
+		}
+				
+		OTObjectListViewer selectPanel = new OTObjectListViewer(frameManager);
+		selectPanel.setOTViewFactory(viewFactory);
+		OTObjectList objList = viewConfig.getObjectsToInsert();
+		selectPanel.setOtObjList(objList);
+		
+		//If there is no object service, we cannot copy the object!
+		if (otObjService == null){
+			selectPanel.allowCopyObject(false);
+			System.err.println("Warning: object cannot be copied because the OT Object Service is null.");
+		}
+		
+		int retCode = CustomDialog.showOKCancelDialog(parent, selectPanel, title, true, true);
+		selectPanel.close();
+		
+		if (retCode == JOptionPane.OK_OPTION){
+			otObj = selectPanel.getCurrentOTObject();
+			if (selectPanel.getCopyObject()){
+				if (otObjService != null){
+					//Create a new instance of the object to insert with this template
+					//and add a object reference in that case
+					try{
+						otObj = otObjService.copyObject(otObj, -1);
+					}
+					catch(Exception ex){
+						System.err.println("Warning: object could not be copied.");
+						ex.printStackTrace();
+					}
+				}
+				else{
+					System.err.println("Warning: object could not be copied because the OT Object Service was null.");
+				}
+			}
+			return otObj;			
+		}
+		else{
+			return null;
+		}
+	}
 	
 	/**
 	 * 
@@ -126,6 +198,14 @@ public class OTObjectListViewer extends JPanel
 	{
 		return copyCheck.isSelected();
 	}
+	
+	public void allowCopyObject(boolean b)
+	{
+		copyCheck.setEnabled(b);
+		if (!b){
+			copyCheck.setSelected(false);
+		}
+	}
 
 	/**
 	 * Listens to the selection on the tree and keeps track of the selected object 
@@ -154,6 +234,9 @@ public class OTObjectListViewer extends JPanel
 		}
 	}
 
+	/**
+	 * This method should be called in order to release all the references in the views
+	 */
 	public void close()
 	{
 		viewPanel.setCurrentObject(null);
