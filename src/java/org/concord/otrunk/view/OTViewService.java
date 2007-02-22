@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-02-22 22:40:09 $
+ * $Revision: 1.10 $
+ * $Date: 2007-02-22 23:05:03 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -77,7 +77,7 @@ public class OTViewService extends DefaultOTObject
      */
     public OTViewFactory getViewFactory(OTrunk otrunk)
     {
-        return new OTViewFactoryImpl(otrunk, this, getOTObjectService());        
+        return new OTViewFactoryImpl(otrunk, this);        
     }
 
     public OTObjectList getViewEntries()
