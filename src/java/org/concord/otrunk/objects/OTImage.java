@@ -23,16 +23,16 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-02-11 02:11:16 $
- * $Author: imoncada $
+ * $Revision: 1.2 $
+ * $Date: 2007-02-23 04:16:05 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.objects;
 
-import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectInterface;
 
 
 /**
@@ -44,7 +44,7 @@ import org.concord.framework.otrunk.OTObject;
  * @author imoncada<p>
  *
  */
-public interface OTImage extends OTObject
+public interface OTImage extends OTObjectInterface
 {
 	/**
 	 * @return Returns the imageURL.
