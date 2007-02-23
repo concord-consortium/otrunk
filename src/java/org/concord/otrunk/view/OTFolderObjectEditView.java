@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2007-02-22 23:31:13 $
+ * $Revision: 1.4 $
+ * $Date: 2007-02-23 04:39:05 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -187,8 +187,10 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		/**
 		 * Adds an ot object to the selected folder. Lets the user pick which object to add.
 		 */
-		private void addObject()
+		protected void addObject()
 		{
+			if (selectedObject == null) return;
+			
 			OTObject otObj = getObjectToInsertFromUser();
 			
 			if (otObj == null) return;
@@ -205,6 +207,7 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 
 		/**
 		 * Shows a dialog with the list of possible objects to insert and lets the user choose
+		 * selected object is guaranteed to be not null
 		 * 
 		 * @return OT Object selected by the user
 		 */
@@ -213,7 +216,7 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 			OTObject otObj = null;
 			
 			otObj = OTObjectListViewer.showDialog(tree, "Choose object to add to the tree", frameManager,
-					viewFactory, viewConfig, null);		//Last parameter is null because we don't have an ot object service yet
+					viewFactory, viewConfig, selectedObject.getOTObjectService(), true, true);		//Last parameter is null because we don't have an ot object service yet
 			
 			return otObj;
 		}
@@ -221,7 +224,7 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		/**
 		 * Deletes the selected object from its parent folder
 		 */
-		private void deleteSelectedObject()
+		protected void deleteSelectedObject()
 		{
 			if (parentObject instanceof OTFolder){
 				((OTFolder)parentObject).removeChild(selectedObject);

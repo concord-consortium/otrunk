@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-02-22 23:31:13 $
+ * $Revision: 1.5 $
+ * $Date: 2007-02-23 04:39:05 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -73,7 +73,7 @@ public class OTObjectListViewer extends JPanel
 	 * @return	The OT object selected by the user
 	 */
 	public static OTObject showDialog(Component parent, String title, OTFrameManager frameManager, OTViewFactory viewFactory,
-			OTObjectEditViewConfig viewConfig, OTObjectService otObjService)
+			OTObjectEditViewConfig viewConfig, OTObjectService otObjService, boolean enableCopyOption, boolean defaultCopyOption)
 	{
 		OTObject otObj;
 		
@@ -87,10 +87,11 @@ public class OTObjectListViewer extends JPanel
 		selectPanel.setOTViewFactory(viewFactory);
 		OTObjectList objList = viewConfig.getObjectsToInsert();
 		selectPanel.setOtObjList(objList);
+		selectPanel.configCopyObjectOption(enableCopyOption, defaultCopyOption);
 		
 		//If there is no object service, we cannot copy the object!
 		if (otObjService == null){
-			selectPanel.allowCopyObject(false);
+			selectPanel.configCopyObjectOption(false, false);
 			System.err.println("Warning: object cannot be copied because the OT Object Service is null.");
 		}
 		
@@ -99,7 +100,7 @@ public class OTObjectListViewer extends JPanel
 		
 		if (retCode == JOptionPane.OK_OPTION){
 			otObj = selectPanel.getCurrentOTObject();
-			if (selectPanel.getCopyObject()){
+			if (selectPanel.getCopyObjectOption()){
 				if (otObjService != null){
 					//Create a new instance of the object to insert with this template
 					//and add a object reference in that case
@@ -194,17 +195,20 @@ public class OTObjectListViewer extends JPanel
 		return currentSelectedOTObj;
 	}
 	
-	public boolean getCopyObject()
+	public boolean getCopyObjectOption()
 	{
 		return copyCheck.isSelected();
 	}
 	
-	public void allowCopyObject(boolean b)
+	public void configCopyObjectOption(boolean enableCopyOption, boolean defaultCopyOption)
 	{
-		copyCheck.setEnabled(b);
-		if (!b){
-			copyCheck.setSelected(false);
-		}
+		copyCheck.setEnabled(enableCopyOption);
+		copyCheck.setSelected(defaultCopyOption);
+	}
+	
+	public void setCopyObjectOption(boolean b)
+	{
+		copyCheck.setSelected(b);
 	}
 
 	/**
