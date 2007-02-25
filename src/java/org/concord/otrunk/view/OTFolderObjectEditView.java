@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-02-23 04:39:05 $
+ * $Revision: 1.5 $
+ * $Date: 2007-02-25 07:19:32 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -42,6 +42,8 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	protected OTObject parentObject;
 	protected OTObject selectedObject;
 	protected OTFolderNode selectedNode;
+	protected OTFolderNode parentNode;
+	protected TreePath selectedPath;
 	
 	protected OTFrameManager frameManager;
 	protected OTViewFactory viewFactory;
@@ -55,19 +57,19 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	 */
 	public void valueChanged(TreeSelectionEvent e) 
 	{		
-		OTFolderNode parentNode = null;
+		parentNode = null;
 		selectedNode = null;
 		
-		TreePath path = tree.getSelectionPath();
-		if (path == null) return;
+		selectedPath = tree.getSelectionPath();
+		if (selectedPath == null) return;
 
-		selectedNode = (OTFolderNode)path.getLastPathComponent();
+		selectedNode = (OTFolderNode)selectedPath.getLastPathComponent();
 		if (selectedNode == null) return;
 		
 		selectedObject = (OTObject)selectedNode.getObject();
 		
 		TreePath parentPath;
-		parentPath = path.getParentPath();
+		parentPath = selectedPath.getParentPath();
 		
 		if (parentPath != null){
 			parentNode = (OTFolderNode)parentPath.getLastPathComponent();
@@ -85,6 +87,9 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	{
 		super.updateTreePane();
 		tree.addMouseListener(this);
+		//Allow editing node names
+		tree.setEditable(true);
+		tree.setDragEnabled(true);
 	}
 
 	public void mouseClicked(MouseEvent e){}
@@ -133,6 +138,12 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		if (parentObject != null){
 			menu.add(new OTFolderObjectAction("delete"));
 		}
+		//Edit action 
+		menu.add(new OTFolderObjectAction("rename"));
+		menu.addSeparator();
+		//Move
+		menu.add(new OTFolderObjectAction("moveup"));
+		menu.add(new OTFolderObjectAction("movedown"));
 	}
 	
 	/**
@@ -165,7 +176,16 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 				putValue(Action.NAME, "Add object");
 			}
 			else if (actionCommand.equals("delete")){
-				putValue(Action.NAME, "Delete object");
+				putValue(Action.NAME, "Delete");
+			}
+			else if (actionCommand.equals("rename")){
+				putValue(Action.NAME, "Rename");
+			}
+			else if (actionCommand.equals("moveup")){
+				putValue(Action.NAME, "Move up");
+			}
+			else if (actionCommand.equals("movedown")){
+				putValue(Action.NAME, "Move down");
 			}
 		}
 		
@@ -176,12 +196,127 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		{
 			System.out.println("action command: "+e.getActionCommand());
 			if (e.getActionCommand().equals("add")){
+
 				addObject();
 			}
 			else if (e.getActionCommand().equals("delete")){
 				
 				deleteSelectedObject();
 			}
+			else if (e.getActionCommand().equals("rename")){
+				
+				editSelectedObject();
+			}
+			else if (e.getActionCommand().equals("moveup")){
+				
+				moveUpSelectedObject();
+			}
+			else if (e.getActionCommand().equals("movedown")){
+				
+				moveDownSelectedObject();
+			}
+		}
+
+		/**
+		 * @param string
+		 */
+		protected void moveUpSelectedObject()
+		{
+			if (selectedObject == null || parentObject == null){
+				System.err.println("Error: cannot move if selected object or parent are null");
+				return;
+			}
+			
+			int index = parentNode.getIndexOfChild(selectedNode);
+			
+			//Determine if it's the first child
+			if (index == 0){
+				TreePath upPath = selectedPath.getParentPath().getParentPath();
+				
+				if (upPath == null){
+					//No path to move to
+					System.err.println("Cannot move more up.");
+					return;
+				}
+
+				((OTFolder)parentObject).removeChild(selectedObject);
+				OTFolderNode upNode = (OTFolderNode)upPath.getLastPathComponent();
+				OTFolderObject upObject = (OTFolderObject)upNode.getPfObject();
+				
+				int upIndex = upNode.getIndexOfChild(parentNode);
+				upObject.addChild(upIndex, selectedObject);
+			}
+			else{
+				((OTFolder)parentObject).removeChild(selectedObject);
+				
+				OTFolderNode upNode = (OTFolderNode)parentNode.getChild(index -1);
+				OTObject upObject = upNode.getPfObject();
+				
+				if (upObject instanceof OTFolder){
+					OTFolder upFolder = (OTFolder)upObject;
+					upFolder.addChild(selectedObject);
+				}
+				else{
+					((OTFolder)parentObject).addChild(index - 1, selectedObject);
+				}
+			}
+
+			treeModel.fireTreeStructureChanged(selectedNode);
+		}
+
+		/**
+		 * @param string
+		 */
+		protected void moveDownSelectedObject()
+		{
+			if (selectedObject == null || parentObject == null){
+				System.err.println("Error: cannot move if selected object or parent are null");
+				return;
+			}
+			
+			int index = parentNode.getIndexOfChild(selectedNode);
+			
+			//Determine if it's the last child
+			if (index == parentNode.getChildCount() - 1){
+				TreePath upPath = selectedPath.getParentPath().getParentPath();
+				
+				if (upPath == null){
+					//No path to move to
+					System.err.println("Cannot move more down.");
+					return;
+				}
+				
+				((OTFolder)parentObject).removeChild(selectedObject);
+				OTFolderNode upNode = (OTFolderNode)upPath.getLastPathComponent();
+				OTFolderObject upObject = (OTFolderObject)upNode.getPfObject();
+				
+				int upIndex = upNode.getIndexOfChild(parentNode);
+				upObject.addChild(upIndex + 1, selectedObject);
+			}
+			else{
+				((OTFolder)parentObject).removeChild(selectedObject);
+
+				OTFolderNode upNode = (OTFolderNode)parentNode.getChild(index);
+				OTObject upObject = upNode.getPfObject();
+				
+				if (upObject instanceof OTFolder){
+					OTFolder upFolder = (OTFolder)upObject;
+					upFolder.addChild(0, selectedObject);
+				}
+				else{
+					((OTFolder)parentObject).addChild(index, selectedObject);
+				}
+			}
+
+			treeModel.fireTreeStructureChanged(selectedNode);
+		}
+		
+		/**
+		 * 
+		 */
+		protected void editSelectedObject()
+		{
+			tree.startEditingAtPath(tree.getSelectionPath());
 		}
 
 		/**
