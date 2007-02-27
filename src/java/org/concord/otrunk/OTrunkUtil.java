@@ -13,7 +13,19 @@ import org.concord.framework.otrunk.OTObject;
  * @author scott
  *
  */
-public class OTrunkUtil {
+public class OTrunkUtil 
+{
+
+	/**
+	 * This should be redone to only work with OTObjects, and it should
+	 * use the data model under the OTObject, instead of reflection on the 
+	 * object itself.
+	 * 
+	 * @param propertyPath
+	 * @param root
+	 * @return
+	 * @throws NoSuchMethodException
+	 */
 	public static Object getPropertyValue(String propertyPath, Object root)
 	   throws NoSuchMethodException
 	{
@@ -38,8 +50,9 @@ public class OTrunkUtil {
 			method = objClass.getMethod("get" + methodCase, null);
 		} catch (NoSuchMethodException e) {
 			// do nothing because we should try the is method
+			method = objClass.getMethod("is" + methodCase, null);
 		}
-		method = objClass.getMethod("is" + methodCase, null);
+		
 		try {
 			return method.invoke(obj, null);
 		} catch (InvocationTargetException e) {
@@ -109,11 +122,9 @@ public class OTrunkUtil {
 			if(toks.hasMoreTokens()){
 				currentObject = 
 					getNonPathPropertyValue(propertyName, currentObject);
-				continue;
 			} else {
-				
-			}
-			
+				setNonPathPropertyValue(propertyName, currentObject, value);				
+			}		
 		}
 	}
 
