@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.25 $
- * $Date: 2007-03-05 18:33:37 $
+ * $Revision: 1.26 $
+ * $Date: 2007-03-05 18:41:52 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -188,8 +188,8 @@ public class OTViewContainerPanel extends JPanel
 				    if(currentView == null) {
 				    	newComponent = new JLabel("No view for object: " + currentObject);
 				    } else {
-				    	System.out.println("(sfentress) Testing: creating a new component");
 				    	newComponent = currentView.getComponent(currentObject, currentObjectEditable);
+				    	System.out.println("(sfentress) Testing: created new component: " + newComponent.getName());
 					}
 				} else {
 					newComponent = new JLabel("Null object");
