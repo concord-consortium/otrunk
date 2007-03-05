@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.28 $
- * $Date: 2007-03-05 19:14:55 $
- * $Author: sfentress $
+ * $Revision: 1.29 $
+ * $Date: 2007-03-05 20:18:59 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -35,7 +35,7 @@ package org.concord.otrunk.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -43,6 +43,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
 import org.concord.framework.otrunk.OTObject;
@@ -87,6 +88,18 @@ public class OTViewContainerPanel extends JPanel
 	Vector containerListeners = new Vector();
 	
 	MyViewContainer viewContainer;
+
+	/**
+	 * This is used to ignore the scrollRectToVisible method
+	 * both in the viewport and in the ourselves.  This method
+	 * is called when the content of a child component is initialized.  One place
+	 * where it is called is when the caret position is changed during loading.
+	 * If the scrolling is not disabled then this causes the view to scroll to
+	 * the bottom.  If this view is embedded in another view then the scroll 
+	 * "event" is propgated to the parent and it is scrolled so the bottom of this
+	 * embedded view is visible.
+	 */
+	private boolean disableScrolling = true;
 	
 	/**
 	 * 
@@ -137,6 +150,7 @@ public class OTViewContainerPanel extends JPanel
 	public void setCurrentObject(OTObject otObject, OTViewEntry viewEntry, 
 			boolean editable)
 	{
+		disableScrolling = true;
 		if(currentView != null) {
 		    currentView.viewClosed();
 		}
@@ -197,8 +211,25 @@ public class OTViewContainerPanel extends JPanel
 				JComponent myComponent = newComponent;
 				
 				if(isUseScrollPane()) {
-					JScrollPane scrollPane = new JScrollPane(newComponent);
-					scrollPane.getViewport().setViewPosition(new Point(0,0));
+					JScrollPane scrollPane = new JScrollPane();
+					scrollPane.setViewport(new JViewport(){
+						/**
+						 * Not intended to be serialized, just added remove compile warning
+						 */
+						private static final long serialVersionUID = 1L;
+						
+						public void scrollRectToVisible(Rectangle contentRect) {
+							// disabling this removes the flicker that occurs during the loading of the page.
+							// if we could 
+							if(disableScrolling){
+								return;
+							}
+
+							super.scrollRectToVisible(contentRect);							
+						}
+					});
+					scrollPane.setViewportView(newComponent);
+					
 					scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 					myComponent = scrollPane;
 				}
@@ -210,10 +241,39 @@ public class OTViewContainerPanel extends JPanel
 				if(isAutoRequestFocus()){
 					newComponent.requestFocus();
 				}
+				
+				// We have to queue this up, because during the setup of this
+				// component other things might be queued, that cause scrolling
+				// to happen. 
+				// this way the scrolling should remain diabled until all 
+				// of them are complete.
+				SwingUtilities.invokeLater(new Runnable(){
+					/* (non-Javadoc)
+					 * @see java.lang.Runnable#run()
+					 */
+					public void run() {
+						// TODO Auto-generated method stub
+						disableScrolling = false;						
+					}
+				});
 		    }
 		});
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.JComponent#scrollRectToVisible(java.awt.Rectangle)
+	 */
+	public void scrollRectToVisible(Rectangle aRect) 
+	{
+		// disabling this removes the flicker that occurs during the loading of the page.
+		// if we could 
+		if(disableScrolling){
+			return;
+		}
+
+		super.scrollRectToVisible(aRect);					
+	}
+	
     public Component getCurrentComponent()
     {   
     	Component currentComp = getComponent(0);

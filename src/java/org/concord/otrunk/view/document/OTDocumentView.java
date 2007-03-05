@@ -184,10 +184,14 @@ public class OTDocumentView extends AbstractOTDocumentView
 			removeAllSubViews();
 			
 			editorPane.setText(bodyText);
-			
-			
+						
 			previewComponent = editorPane;
-			editorPane.setCaretPosition(0);
+
+			// we used to set thie caret pos so the view would
+			// scroll to the top, but now we disable scrolling
+			// during the load, and that seems to work better
+			// there is no flicker that way.			
+			//editorPane.setCaretPosition(0);					
 		} else {
 		    System.err.println("xhtml markup not supported");
 		}
@@ -273,21 +277,13 @@ public class OTDocumentView extends AbstractOTDocumentView
 		if(inText == null) {
 			return null;
 		}
-		
-		
-		Pattern editablePattern = Pattern.compile("editable=\"([^\"]*)\"");
-		
+						
 		Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
 		Matcher m = p.matcher(inText);
 		StringBuffer parsed = new StringBuffer();
 		while(m.find()) {
 			String id = m.group(1);
-			
-			// FIXME
-			// check if it has editable attribute
-			String tag = m.group(0);
-			
-			
+						
 			String replacement = getIncludableReplacement(id);
 						
 			try {
