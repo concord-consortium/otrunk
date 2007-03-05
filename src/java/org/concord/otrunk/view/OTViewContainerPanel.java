@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.24 $
- * $Date: 2007-02-14 04:03:09 $
- * $Author: scytacki $
+ * $Revision: 1.25 $
+ * $Date: 2007-03-05 18:33:37 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -188,6 +188,7 @@ public class OTViewContainerPanel extends JPanel
 				    if(currentView == null) {
 				    	newComponent = new JLabel("No view for object: " + currentObject);
 				    } else {
+				    	System.out.println("(sfentress) Testing: creating a new component");
 				    	newComponent = currentView.getComponent(currentObject, currentObjectEditable);
 					}
 				} else {
