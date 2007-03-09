@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-02-20 00:16:39 $
+ * $Revision: 1.5 $
+ * $Date: 2007-03-09 05:29:25 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -57,12 +57,7 @@ public class OTUserObject extends DefaultOTObject
 	}
 	
 	private ResourceSchema resources;
-	public OTUserObject(ResourceSchema resources) 
-	{
-		super(resources);
-		this.resources = resources;		
-	}
-				
+
 	/**
 	 * Cache of user data objects.  These are virtual data objects
 	 * that have an authoring object and create a user state object
@@ -74,11 +69,19 @@ public class OTUserObject extends DefaultOTObject
 	Hashtable userDataObjects = new Hashtable();
 	
 
+	public OTUserObject(ResourceSchema resources) 
+	{
+		super(resources);
+		this.resources = resources;		
+	}
+				
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.PfUser#getUserId()
 	 */
 	public OTID getUserId()
 	{
-		return getGlobalId();
+		return resources.getGlobalId();
 	}
+	
+	
 }
