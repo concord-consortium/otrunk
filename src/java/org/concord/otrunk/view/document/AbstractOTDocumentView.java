@@ -12,12 +12,14 @@ import org.concord.otrunk.view.OTViewContainerPanel;
 
 public class AbstractOTDocumentView extends OTTextObjectView 
 	implements OTFrameManagerAware, OTViewContainerAware, 
-		OTViewFactoryAware 
+		OTViewFactoryAware
 {
 	private OTFrameManager frameManager;
     private OTViewFactory viewFactory = null;
 	private OTViewContainer viewContainer;
 
+	private String viewMode = null;
+	
 	private Vector viewContainerPanels = new Vector();
 	
 	public void setFrameManager(OTFrameManager frameManager) 
@@ -50,6 +52,16 @@ public class AbstractOTDocumentView extends OTTextObjectView
 		return viewFactory;
 	}
 
+	public String getViewMode() 
+	{
+		return viewMode;
+	}
+
+	public void setViewMode(String viewMode) 
+	{
+		this.viewMode = viewMode;
+	}
+
 	public OTViewContainerPanel createtViewContainerPanel()
 	{
 		OTViewContainerPanel viewContainerPanel = 
@@ -58,6 +70,7 @@ public class AbstractOTDocumentView extends OTTextObjectView
         viewContainerPanel.setAutoRequestFocus(false);
         viewContainerPanel.setUseScrollPane(false);
         viewContainerPanel.setOpaque(false);
+        viewContainerPanel.setViewMode(getViewMode());
         
         viewContainerPanels.add(viewContainerPanel);
         return viewContainerPanel;
