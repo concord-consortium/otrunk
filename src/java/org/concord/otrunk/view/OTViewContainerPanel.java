@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.29 $
- * $Date: 2007-03-05 20:18:59 $
+ * $Revision: 1.30 $
+ * $Date: 2007-03-09 12:08:04 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -100,6 +100,8 @@ public class OTViewContainerPanel extends JPanel
 	 * embedded view is visible.
 	 */
 	private boolean disableScrolling = true;
+
+	private String viewMode = null;
 	
 	/**
 	 * 
@@ -183,11 +185,11 @@ public class OTViewContainerPanel extends JPanel
 				if(currentObject != null) {
 					if(currentViewEntry != null) {
 						currentView = 
-							(OTObjectView)otViewFactory.getView(currentObject, currentViewEntry);
+							(OTObjectView)otViewFactory.getView(currentObject, currentViewEntry, getViewMode());
 
 					} else {
 						currentView = 
-							(OTObjectView)otViewFactory.getView(currentObject, OTObjectView.class);
+							(OTObjectView)otViewFactory.getView(currentObject, OTObjectView.class, getViewMode());
 					}
 
 					if(currentView instanceof OTViewContainerAware){
@@ -339,5 +341,18 @@ public class OTViewContainerPanel extends JPanel
 
 	public void setAutoRequestFocus(boolean autoRequestFocus) {
 		this.autoRequestFocus = autoRequestFocus;
+	}
+
+	/**
+	 * @param viewMode
+	 */
+	public void setViewMode(String viewMode) 
+	{
+		this.viewMode  = viewMode;
+	}
+	
+	public String getViewMode()
+	{
+		return viewMode;
 	}
 }

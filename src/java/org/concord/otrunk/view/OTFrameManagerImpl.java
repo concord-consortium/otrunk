@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTFrameManager;
+import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 
 public class OTFrameManagerImpl implements OTFrameManager 
@@ -32,12 +33,21 @@ public class OTFrameManagerImpl implements OTFrameManager
 	public void putObjectInFrame(OTObject otObject, 
 			OTFrame otFrame) 
 	{
-		putObjectInFrame(otObject, null, otFrame);
+		putObjectInFrame(otObject, null, otFrame, null);
 	}
 	
 	public void putObjectInFrame(OTObject otObject, 
 			org.concord.framework.otrunk.view.OTViewEntry viewEntry,
-			OTFrame otFrame) {
+			OTFrame otFrame) 
+	{
+		putObjectInFrame(otObject, viewEntry, otFrame, null);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.view.OTFrameManager#putObjectInFrame(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewEntry, org.concord.framework.otrunk.view.OTFrame, java.lang.String)
+	 */
+	public void putObjectInFrame(OTObject otObject, OTViewEntry viewEntry, OTFrame otFrame, String viewMode) 
+	{
 		// look up view container with the frame.
 		FrameContainer frameContainer = 
 			(FrameContainer)frameContainers.get(otFrame.getGlobalId());
@@ -62,6 +72,7 @@ public class OTFrameManagerImpl implements OTFrameManager
 		
 		// call setCurrentObject on that view container with a null
 		// frame
+		frameContainer.container.setViewMode(viewMode);
 		frameContainer.container.setCurrentObject(otObject, viewEntry, true);
 		frameContainer.frame.setVisible(true);
 	}
