@@ -52,8 +52,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrame;
-import org.concord.framework.otrunk.view.OTFrameManagerAware;
-import org.concord.framework.otrunk.view.OTXHTMLHelper;
+import org.concord.framework.otrunk.view.OTObjectView;
+import org.concord.framework.otrunk.view.OTView;
+import org.concord.framework.otrunk.view.OTViewConfigAware;
+import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -66,8 +68,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class OTDocumentView extends AbstractOTDocumentView
-	implements ChangeListener, HyperlinkListener, OTXHTMLView, 
-		OTFrameManagerAware
+	implements ChangeListener, HyperlinkListener, OTXHTMLView,
+		OTViewConfigAware
 {
 	public static boolean addedCustomLayout = false;
 	
@@ -82,6 +84,8 @@ public class OTDocumentView extends AbstractOTDocumentView
     DocumentBuilder xmlDocumentBuilder = null;   
     
     JTextArea parsedTextArea = null;
+
+	private OTDocumentViewConfig viewConfig;
     
 	public final static String XHTML_PREFIX = 
 		"<?xml version='1.0' encoding='UTF-8'?>\n" +
@@ -234,42 +238,82 @@ public class OTDocumentView extends AbstractOTDocumentView
         
         return replacement;        
     }
-    
-	public String getIncludableReplacement(String idStr)
+
+    /**
+     * This method gets the object with idStr and tries to get the view
+     * entry with the viewIdStr.  If the viewIdStr is not null then it
+     * gets the view for that view entry and the current view mode, and 
+     * determines if it is a {@link OTXHTMLView}.  If it is then it gets the html text
+     * of that view.  If the viewIdStr is null then asks the viewFactory
+     * for a view of this object which implements the OTXHTMLView interface.
+     * If such a view exists then that is used to get the text.  
+     * 
+     * The text
+     * returned is intended for use by the Matcher.appendReplacement method.  
+     * So $0 means to just leave the text as is.  Because of this any text
+     * needs to be escaped, specifically $ and \ needs to be escaped. 
+     * {@link #escapeReplacement(String)}
+     * 
+     * So far this is only used by the substitueIncludables method
+     * 
+     * @see #escapeReplacement(String)   
+     * @see #substituteIncludables(String)
+     * 
+     */
+	public String getIncludableReplacement(String idStr, String viewIdStr)
 	{
-		
 		// lookup the object at this id	    	   
 		OTObject referencedObject = pfDocument.getReferencedObject(idStr);
 		if(referencedObject == null) {
 			return "$0";
 		}
-		
-        // see if it has an OTXHTMLView 
-        OTXHTMLView xhtmlView = (OTXHTMLView)
-            getViewFactory().getView(referencedObject, OTXHTMLView.class);
-        if(xhtmlView != null) {
-            String replacement = xhtmlView.getXHTMLText(referencedObject);
-            if(replacement == null) {
-                // this is an empty embedded object
-                System.err.println("empty embedd obj: " + idStr);
-                return "";
-            } 
-            return escapeReplacement(replacement);
-        }
-        
-        return "$0";
-        /*
-        // this will be deprecated
-		// see if is one of the incluables (PfQuery)
-		// replace the object reference with the appropriate stuff
-		if(!(referencedObject instanceof PfQuery)){
-			return "$0";
+
+		OTViewEntry viewEntry = null;
+		if(viewIdStr != null){
+			OTObject viewEntryTmp =  pfDocument.getReferencedObject(viewIdStr);
+			if(viewEntryTmp instanceof OTViewEntry){
+				viewEntry = (OTViewEntry)viewEntryTmp;
+			} else {
+				System.err.println("viewid reference to a non viewEntry object");
+				System.err.println("  doc: " + pfDocument.getGlobalId());
+				System.err.println("  refid: " + idStr);
+				System.err.println("  viewid: " + viewIdStr);				
+			}
+			
 		}
 		
-		String replacement = ((PfQuery)referencedObject).getDocumentText();
+		OTView view = null;
 		
-        return escapeReplacement(replacement);
-        */        
+		if(viewEntry != null){
+			view = getViewFactory().getView(referencedObject, viewEntry, getViewMode());
+		} else {
+			view = getViewFactory().getView(referencedObject, OTXHTMLView.class, getViewMode());
+			// if there isnt' a xhtml view and there is a view mode, then see if 
+			// that viewMode of the jcomponent view is an xhtmlview.
+			// this logic is really contorted.  The mixing of viewmodes and
+			// renderings needs to be well defined.
+			if(view == null && getViewMode() != null){
+				view = getViewFactory().getView(referencedObject, OTObjectView.class, getViewMode());				
+			}
+		}
+
+		if(view instanceof OTXHTMLView){
+	        OTXHTMLView xhtmlView = (OTXHTMLView)view;
+	        try{
+	        	String replacement = xhtmlView.getXHTMLText(referencedObject);
+	        	if(replacement == null) {
+	        		// this is an empty embedded object
+	        		System.err.println("empty embedd obj: " + idStr);
+	        		return "";
+	        	} 
+	        	return escapeReplacement(replacement);			
+	        } catch(Exception e) {
+	        	System.err.println("Failed to generate xhtml version of embedded object");
+	        	e.printStackTrace();
+	        }
+		}
+		
+        return "$0";
 	}
 	
 	public String substituteIncludables(String inText)
@@ -279,12 +323,20 @@ public class OTDocumentView extends AbstractOTDocumentView
 		}
 						
 		Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
+		Pattern pViewId = Pattern.compile("viewid=\"([^\"]*)\""); 
 		Matcher m = p.matcher(inText);
 		StringBuffer parsed = new StringBuffer();
 		while(m.find()) {
 			String id = m.group(1);
-						
-			String replacement = getIncludableReplacement(id);
+			
+			String element = m.group(0);
+			Matcher mViewId = pViewId.matcher(element);
+			String viewIdStr = null;
+			if(mViewId.find()){
+				viewIdStr = mViewId.group(1);
+			}
+			
+			String replacement = getIncludableReplacement(id, viewIdStr);
 						
 			try {
 				m.appendReplacement(parsed, replacement);
@@ -407,6 +459,8 @@ public class OTDocumentView extends AbstractOTDocumentView
                 // this is a hack because i don't really know what is going on here
 				AttributeSet tagAttribs = (AttributeSet)attribs.getAttribute(HTML.Tag.A);
 				String target = (String)tagAttribs.getAttribute(HTML.Attribute.TARGET);
+				String viewEntryId = (String)tagAttribs.getAttribute("viewid");
+				String modeStr = (String)tagAttribs.getAttribute("mode");
 
 				if(target == null) {
 					getViewContainer().setCurrentObject(linkObj);
@@ -420,12 +474,18 @@ public class OTDocumentView extends AbstractOTDocumentView
 					// then at the top level view container deal with this object
 					targetFrame = (OTFrame)pfDocument.getReferencedObject(target);
 
+					OTViewEntry viewEntry = null;
+					if(viewEntryId != null){
+						viewEntry = (OTViewEntry) pfDocument.getReferencedObject(viewEntryId);
+					}
+					
 					if(targetFrame == null) {
 						System.err.println("Invalid link target attrib: " + target);
 						return;
 					}					
 					
-					getFrameManager().putObjectInFrame(linkObj, targetFrame);
+					getFrameManager().putObjectInFrame(linkObj, viewEntry, targetFrame, 
+							modeStr);
 				}
 				
 				
@@ -444,10 +504,13 @@ public class OTDocumentView extends AbstractOTDocumentView
         return updateFormatedView();
     }
 
-    public String getXHTMLImageText(OTXHTMLHelper helper, float containerDisplayWidth, float containerHeight) 
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.view.OTViewConfigAware#setViewConfig(org.concord.framework.otrunk.OTObject)
+	 */
+	public void setViewConfig(OTObject viewConfig) 
+	{
+		this.viewConfig = (OTDocumentViewConfig) viewConfig;		
+		setViewMode(this.viewConfig.getMode());
+	}
 
 }

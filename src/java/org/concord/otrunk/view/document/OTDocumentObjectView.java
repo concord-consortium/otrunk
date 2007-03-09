@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-02-13 22:58:31 $
+ * $Revision: 1.5 $
+ * $Date: 2007-03-09 17:29:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -77,6 +77,13 @@ public class OTDocumentObjectView extends ComponentView
     	String refId = (String) attr.getAttribute("refid");
     	String editStr = (String) attr.getAttribute("editable");
     	String viewId = (String) attr.getAttribute("viewid");
+
+    	// By convention this attribute should only be used by OTXHTMLViews
+    	// which need to change the mode of view.  If this is used in the 
+    	// actual text of a document it will prevent the mode abstraction
+    	// from working.    Most like you should use the viewid attribute
+    	// instead
+    	String modeStr = (String) attr.getAttribute("mode");
     	
     	boolean editable = true;
     	
@@ -95,6 +102,13 @@ public class OTDocumentObjectView extends ComponentView
         	if(viewId != null && viewId.length() > 0) {
         		viewEntry = (OTViewEntry)
         			compoundDoc.getReferencedObject(viewId);
+        	}
+
+        	if(modeStr != null){
+        		if(modeStr.length() == 0){
+        			modeStr = null;
+        		}
+        		viewContainerPanel.setViewMode(modeStr);
         	}
         	
         	viewContainerPanel.setCurrentObject(childObject, 
