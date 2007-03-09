@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-02-20 00:16:41 $
+ * $Revision: 1.9 $
+ * $Date: 2007-03-09 05:26:13 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -58,6 +58,8 @@ import org.concord.otrunk.datamodel.OTUUID;
 public class FsDataObject
 	implements OTDataObject, Serializable
 {
+	private static final long serialVersionUID = 1L;
+	
 	private OTID globalId;
 	Hashtable resources = new Hashtable();
 	Date creationTime = null;
