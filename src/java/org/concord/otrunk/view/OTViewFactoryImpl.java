@@ -34,11 +34,14 @@ import java.util.Vector;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTMultiUserView;
 import org.concord.framework.otrunk.view.OTObjectView;
+import org.concord.framework.otrunk.view.OTRequestedViewEntryAware;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewConfigAware;
 import org.concord.framework.otrunk.view.OTViewContainer;
@@ -59,11 +62,12 @@ public class OTViewFactoryImpl implements OTViewFactory
     OTViewFactoryImpl parent;
     Vector viewMap = new Vector();
     Vector userList = null;
-    
+    OTViewService viewService;
     
     public OTViewFactoryImpl(OTrunk otrunk, OTViewService viewService)
     {
         this.otrunk = otrunk;
+        this.viewService = viewService;
         
         // read in all the viewEntries and create a vector 
         // of class entries.
@@ -143,6 +147,23 @@ public class OTViewFactoryImpl implements OTViewFactory
         
         return view;
     }
+
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.view.OTViewFactory#getView(org.concord.framework.otrunk.OTObject, java.lang.Class, java.lang.String)
+	 */
+	public OTView getView(OTObject otObject, Class viewInterface, String modeStr) 
+	{
+		if(modeStr == null){
+			return getView(otObject, viewInterface);			
+		}
+		
+		InternalViewEntry entry = getViewInternal(otObject, viewInterface);
+		if(entry == null) {
+			return null;
+		}
+		OTViewEntry viewEntry = entry.otEntry;
+		return getView(otObject, viewEntry, modeStr);
+	}
     
     protected void initView(OTView view, OTObject viewConfig)
     {
@@ -273,5 +294,44 @@ public class OTViewFactoryImpl implements OTViewFactory
         }
 
     }
+
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.view.OTViewFactory#getView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewEntry, java.lang.String)
+	 */
+	public OTView getView(OTObject otObject, OTViewEntry viewEntry, String modeStr) 
+	{
+		if(modeStr == null){
+			return getView(otObject, viewEntry);			
+		}
+		
+		OTViewMode mode = null;
+		OTObjectList modes = viewService.getModes();
+		for(int i=0; i<modes.size(); i++){
+			OTViewMode curMode = (OTViewMode)modes.get(i);
+			if(curMode.getName().equals(modeStr)){
+				mode = curMode;
+				break;
+			}
+		}
+		
+		OTObjectMap map = mode.getMap();
+		OTID viewEntryId = viewEntry.getGlobalId();
+		OTViewEntry modeViewEntry = (OTViewEntry)map.getObject(viewEntryId.toString());
+		if(modeViewEntry == null){
+			modeViewEntry = mode.getDefault();
+		}
+
+		// pass the viewEntry was requested to the newly created view
+		// this is useful for mode views that want to display other modes of
+		// the original view entry.
+		// this entry might have been specified by the user, or it could have 
+		// been determined by looking up an interface and object type.
+		OTView view = getView(otObject, modeViewEntry);
+		if(view instanceof OTRequestedViewEntryAware) {
+			((OTRequestedViewEntryAware)view).setRequestedViewEntry(viewEntry);
+		}
+		
+		return view;
+	}
 
 }

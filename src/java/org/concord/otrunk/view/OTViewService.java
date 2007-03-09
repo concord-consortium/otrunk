@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-02-22 23:05:03 $
+ * $Revision: 1.11 $
+ * $Date: 2007-03-09 12:08:04 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -51,6 +51,8 @@ public class OTViewService extends DefaultOTObject
 {
     public static interface ResourceSchema extends OTResourceSchema {
         public OTObjectList getViewEntries();
+        
+        public OTObjectList getModes();
     }
     
     ResourceSchema resources;
@@ -83,5 +85,10 @@ public class OTViewService extends DefaultOTObject
     public OTObjectList getViewEntries()
     {
     	return resources.getViewEntries();
+    }
+    
+    public OTObjectList getModes()
+    {
+    	return resources.getModes();
     }
 }
