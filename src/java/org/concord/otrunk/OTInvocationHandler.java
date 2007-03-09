@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.16 $
- * $Date: 2007-02-14 04:03:09 $
+ * $Revision: 1.17 $
+ * $Date: 2007-03-09 05:26:13 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -36,11 +36,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import org.concord.framework.otrunk.OTObjectInterface;
-import org.concord.framework.otrunk.OTResourceCollection;
-import org.concord.framework.otrunk.OTResourceList;
-import org.concord.framework.otrunk.OTResourceMap;
-import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.otrunk.datamodel.DataObjectUtil;
 import org.concord.otrunk.datamodel.OTDataObject;
 

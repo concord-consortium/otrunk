@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-02-20 00:16:41 $
+ * $Revision: 1.2 $
+ * $Date: 2007-03-09 05:26:13 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -50,6 +50,8 @@ import org.concord.otrunk.datamodel.OTDataMap;
 public class FsDataMap
 	implements OTDataMap, Serializable
 {
+	private static final long serialVersionUID = 1L;
+	
 	Hashtable map = new Hashtable();
 	boolean readOnly;
 	private FsDataObject dataObject = null;
