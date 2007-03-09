@@ -52,7 +52,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrame;
-import org.concord.framework.otrunk.view.OTObjectView;
+import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewConfigAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
@@ -293,7 +293,7 @@ public class OTDocumentView extends AbstractOTDocumentView
 			// this logic is really contorted.  The mixing of viewmodes and
 			// renderings needs to be well defined.
 			if(view == null && getViewMode() != null){
-				view = getViewFactory().getView(referencedObject, OTObjectView.class, getViewMode());				
+				view = getViewFactory().getView(referencedObject, OTJComponentView.class, getViewMode());				
 			}
 		}
 

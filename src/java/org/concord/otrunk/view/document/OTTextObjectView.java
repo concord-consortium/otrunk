@@ -42,7 +42,7 @@ import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.view.OTObjectView;
+import org.concord.framework.otrunk.view.OTJComponentView;
 
 /**
  * @author scott
@@ -51,7 +51,7 @@ import org.concord.framework.otrunk.view.OTObjectView;
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class OTTextObjectView 
-	implements OTObjectView, 
+	implements OTJComponentView, 
 		DocumentListener, OTChangeListener
 {
 	OTDocument pfObject;
@@ -165,7 +165,7 @@ public class OTTextObjectView
 	}
 	
 	/* (non-Javadoc)
-     * @see org.concord.framework.otrunk.view.OTObjectView#viewClosed()
+     * @see org.concord.framework.otrunk.view.OTJComponentView#viewClosed()
      */
     public void viewClosed()
     {
