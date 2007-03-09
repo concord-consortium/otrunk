@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.30 $
- * $Date: 2007-03-09 12:08:04 $
+ * $Revision: 1.31 $
+ * $Date: 2007-03-09 17:51:58 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -49,7 +49,7 @@ import javax.swing.SwingUtilities;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTFrameManagerAware;
-import org.concord.framework.otrunk.view.OTObjectView;
+import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
@@ -75,7 +75,7 @@ public class OTViewContainerPanel extends JPanel
     
     OTObject currentObject = null;
     boolean currentObjectEditable = false;
-    OTObjectView currentView = null;
+    OTJComponentView currentView = null;
     OTViewEntry currentViewEntry = null;
     
 	private OTViewFactory otViewFactory;
@@ -185,11 +185,11 @@ public class OTViewContainerPanel extends JPanel
 				if(currentObject != null) {
 					if(currentViewEntry != null) {
 						currentView = 
-							(OTObjectView)otViewFactory.getView(currentObject, currentViewEntry, getViewMode());
+							(OTJComponentView)otViewFactory.getView(currentObject, currentViewEntry, getViewMode());
 
 					} else {
 						currentView = 
-							(OTObjectView)otViewFactory.getView(currentObject, OTObjectView.class, getViewMode());
+							(OTJComponentView)otViewFactory.getView(currentObject, OTJComponentView.class, getViewMode());
 					}
 
 					if(currentView instanceof OTViewContainerAware){

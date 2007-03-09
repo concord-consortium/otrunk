@@ -10,9 +10,9 @@ import javax.swing.JLabel;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTResourceMap;
-import org.concord.framework.otrunk.view.OTObjectView;
+import org.concord.framework.otrunk.view.OTJComponentView;
 
-public class OTMapTestView implements OTObjectView {
+public class OTMapTestView implements OTJComponentView {
 
 	HashMap map;
 	

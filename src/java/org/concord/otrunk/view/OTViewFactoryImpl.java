@@ -40,7 +40,7 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTMultiUserView;
-import org.concord.framework.otrunk.view.OTObjectView;
+import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTRequestedViewEntryAware;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewConfigAware;
@@ -112,7 +112,7 @@ public class OTViewFactoryImpl implements OTViewFactory
     public JComponent getComponent(OTObject otObject,
             OTViewContainer container, boolean editable)
     {
-        OTObjectView view = getObjectView(otObject, container);
+        OTJComponentView view = getObjectView(otObject, container);
 
         // FIXME this doesn't set the frame manager, this method
         // should be removed from here, 
@@ -250,10 +250,10 @@ public class OTViewFactoryImpl implements OTViewFactory
     /* (non-Javadoc)
 	 * @see org.concord.otrunk.view.OTViewFactory#getObjectView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer)
 	 */
-    public OTObjectView getObjectView(OTObject otObject,
+    public OTJComponentView getObjectView(OTObject otObject,
             OTViewContainer container)
     {
-        OTObjectView view = (OTObjectView)getView(otObject, OTObjectView.class);
+        OTJComponentView view = (OTJComponentView)getView(otObject, OTJComponentView.class);
         
         if(view == null) {
             return null;

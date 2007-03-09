@@ -11,7 +11,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.view.OTObjectView;
+import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.view.SimpleTreeModel;
@@ -25,7 +25,7 @@ import org.concord.view.SimpleTreeModel;
  * @author sfentress
  * 
  */
-public class OTFolderObjectView implements OTObjectView, OTViewContainerAware,
+public class OTFolderObjectView implements OTJComponentView, OTViewContainerAware,
 		TreeSelectionListener {
 
 	protected OTFolderObject otFolderObject;
@@ -41,7 +41,7 @@ public class OTFolderObjectView implements OTObjectView, OTViewContainerAware,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.concord.framework.otrunk.view.OTObjectView#getComponent(org.concord.framework.otrunk.OTObject,
+	 * @see org.concord.framework.otrunk.view.OTJComponentView#getComponent(org.concord.framework.otrunk.OTObject,
 	 *      boolean)
 	 */
 	public JComponent getComponent(OTObject otObject, boolean editable) {
@@ -67,7 +67,7 @@ public class OTFolderObjectView implements OTObjectView, OTViewContainerAware,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.concord.framework.otrunk.view.OTObjectView#viewClosed()
+	 * @see org.concord.framework.otrunk.view.OTJComponentView#viewClosed()
 	 */
 	public void viewClosed() {
 		// TODO Auto-generated method stub
