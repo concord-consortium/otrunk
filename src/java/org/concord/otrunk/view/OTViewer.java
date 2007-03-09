@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.48 $
- * $Date: 2007-02-12 14:57:34 $
- * $Author: sfentress $
+ * $Revision: 1.49 $
+ * $Date: 2007-03-09 11:57:11 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -86,8 +86,6 @@ import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.XMLDatabase;
-import org.concord.swing.CCFileDialog;
-import org.concord.swing.CCFilenameFilter;
 import org.concord.swing.MostRecentFileDialog;
 import org.concord.swing.StreamRecord;
 import org.concord.swing.StreamRecordView;
@@ -1284,7 +1282,7 @@ Frame frame = (Frame)SwingUtilities.getRoot(OTViewer.this);
 		commDialog.setBounds(200, 200, 500, 300);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-			    commDialog.show();
+			    commDialog.setVisible(true);
 			    justStarted = false;
 			    updateMenuBar();
 			}
