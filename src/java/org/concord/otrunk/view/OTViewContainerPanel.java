@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.31 $
- * $Date: 2007-03-09 17:51:58 $
+ * $Revision: 1.32 $
+ * $Date: 2007-03-11 23:38:44 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -48,13 +48,13 @@ import javax.swing.SwingUtilities;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrameManager;
-import org.concord.framework.otrunk.view.OTFrameManagerAware;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
+import org.concord.framework.otrunk.view.OTXHTMLView;
 
 
 /**
@@ -192,15 +192,25 @@ public class OTViewContainerPanel extends JPanel
 							(OTJComponentView)otViewFactory.getView(currentObject, OTJComponentView.class, getViewMode());
 					}
 
+					// FIXME this is a hack for now we want to automatically
+					// handle xhtml views by wrapping them in a component
+					if(currentView == null){
+						OTXHTMLView xhtmlView = 
+							(OTXHTMLView)otViewFactory.getView(currentObject, OTXHTMLView.class, getViewMode());
+						// make an OTDocumentView with this as the text
+						// but to maintain the correct lifecycle order this can't
+						// happen until the getComponent is called on the view
+						currentView = new OTXHTMLWrapperView(xhtmlView, currentObject);
+						
+						((OTXHTMLWrapperView)currentView).setViewServiceProvider(
+								otViewFactory.getViewServiceProvider());
+					}
+					
 					if(currentView instanceof OTViewContainerAware){
 			        	((OTViewContainerAware)currentView).
 			        		setViewContainer(viewContainer);
 			        }			        
 					
-				    if(currentView instanceof OTFrameManagerAware){
-				    	((OTFrameManagerAware)currentView).setFrameManager(frameManager);
-				    }
-
 				    if(currentView == null) {
 				    	newComponent = new JLabel("No view for object: " + currentObject);
 				    } else {

@@ -39,7 +39,6 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTStateRoot;
-import org.concord.otrunk.OTUserListService;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
@@ -82,8 +81,7 @@ public class OTViewerHelper
 	{
 		this.otDB = otDB;
 		otrunk = new OTrunkImpl(otDB,
-				new Object[] { new SwingUserMessageHandler(parentComponent),
-				new OTUserListService() });
+				new Object[] { new SwingUserMessageHandler(parentComponent)});
 
 		OTViewService viewService = (OTViewService)otrunk.getService(OTViewService.class);
 
@@ -95,6 +93,10 @@ public class OTViewerHelper
 		// Maybe this shouldn't happen here
 		frameManager = new OTFrameManagerImpl();
 		frameManager.setViewFactory(viewFactory);
+		
+		viewFactory.addViewService(otrunk);
+		viewFactory.addViewService(frameManager);
+
 	}
 
 	public OTDatabase loadOTDatabase(URL url)

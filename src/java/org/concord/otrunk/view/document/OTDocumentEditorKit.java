@@ -47,8 +47,7 @@ public class OTDocumentEditorKit extends HTMLEditorKit
 	
 	private OTHTMLFactory viewFactory;
 	
-	public OTDocumentEditorKit(OTDocument doc, 
-				OTHTMLFactory editorKitViewFactory)
+	public OTDocumentEditorKit(OTHTMLFactory editorKitViewFactory)
 	{
 		super();
 	

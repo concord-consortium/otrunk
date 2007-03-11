@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2006-10-23 04:59:20 $
+ * $Revision: 1.2 $
+ * $Date: 2007-03-11 23:38:44 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,7 +32,6 @@
 */
 package org.concord.otrunk.view.document;
 
-import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 
 
@@ -58,8 +57,4 @@ public interface OTDocument
 	public boolean getInput();
 	
 	public String getMarkupLanguage();
-	
-	public OTObject getReferencedObject(OTID id);	
-	
-	public OTObject getReferencedObject(String id);
 }
