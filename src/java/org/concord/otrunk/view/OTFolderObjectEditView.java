@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-02-25 07:19:32 $
- * $Author: imoncada $
+ * $Revision: 1.6 $
+ * $Date: 2007-03-11 23:38:44 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -21,10 +21,8 @@ import javax.swing.tree.TreePath;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrameManager;
-import org.concord.framework.otrunk.view.OTFrameManagerAware;
 import org.concord.framework.otrunk.view.OTViewConfigAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
-import org.concord.framework.otrunk.view.OTViewFactoryAware;
 
 /**
  * OTFolderObjectEditView
@@ -37,7 +35,7 @@ import org.concord.framework.otrunk.view.OTViewFactoryAware;
  *
  */
 public class OTFolderObjectEditView extends OTFolderObjectView 
-	implements MouseListener, OTFrameManagerAware, OTViewFactoryAware, OTViewConfigAware
+	implements MouseListener, OTViewConfigAware
 {
 	protected OTObject parentObject;
 	protected OTObject selectedObject;
@@ -45,8 +43,6 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	protected OTFolderNode parentNode;
 	protected TreePath selectedPath;
 	
-	protected OTFrameManager frameManager;
-	protected OTViewFactory viewFactory;
 	protected OTObjectEditViewConfig viewConfig;
 	
 	protected JMenu menu;
@@ -146,24 +142,13 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		menu.add(new OTFolderObjectAction("movedown"));
 	}
 	
-	/**
-	 * @see org.concord.framework.otrunk.view.OTFrameManagerAware#setFrameManager(org.concord.framework.otrunk.view.OTFrameManager)
-	 */
-	public void setFrameManager(OTFrameManager frameManager)
-	{
-		this.frameManager = frameManager;		
-	}
-
-	/**
-	 * @see org.concord.framework.otrunk.view.OTViewFactoryAware#setViewFactory(org.concord.framework.otrunk.view.OTViewFactory)
-	 */
-	public void setViewFactory(OTViewFactory viewFactory)
-	{
-		this.viewFactory = viewFactory;
-	}
-
 	class OTFolderObjectAction extends AbstractAction
 	{
+		/**
+		 * Not intended to be serialized, just added remove compile warning
+		 */
+		private static final long serialVersionUID = 1L;
+		
 		/**
 		 *
 		 */
@@ -348,6 +333,11 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		 */
 		private OTObject getObjectToInsertFromUser()
 		{
+			OTViewFactory viewFactory = 
+				(OTViewFactory)getViewService(OTViewFactory.class);
+			OTFrameManager frameManager = 
+				   (OTFrameManager)getViewService(OTFrameManager.class);
+			
 			OTObject otObj = null;
 			
 			otObj = OTObjectListViewer.showDialog(tree, "Choose object to add to the tree", frameManager,

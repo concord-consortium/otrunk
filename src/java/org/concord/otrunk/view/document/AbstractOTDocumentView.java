@@ -2,34 +2,27 @@ package org.concord.otrunk.view.document;
 
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTFrameManager;
-import org.concord.framework.otrunk.view.OTFrameManagerAware;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
-import org.concord.framework.otrunk.view.OTViewFactoryAware;
 import org.concord.otrunk.view.OTViewContainerPanel;
 
 public class AbstractOTDocumentView extends OTTextObjectView 
-	implements OTFrameManagerAware, OTViewContainerAware, 
-		OTViewFactoryAware
+	implements OTViewContainerAware
 {
-	private OTFrameManager frameManager;
-    private OTViewFactory viewFactory = null;
 	private OTViewContainer viewContainer;
 
 	private String viewMode = null;
 	
 	private Vector viewContainerPanels = new Vector();
 	
-	public void setFrameManager(OTFrameManager frameManager) 
-	{
-		this.frameManager = frameManager;
-	}
-	
 	public OTFrameManager getFrameManager() 
 	{
-		return frameManager;
+		return (OTFrameManager)getViewService(OTFrameManager.class);
 	}
 
 	public void setViewContainer(OTViewContainer container) 
@@ -42,14 +35,9 @@ public class AbstractOTDocumentView extends OTTextObjectView
 		return viewContainer;
 	}
 	
-	public void setViewFactory(OTViewFactory factory) 
-	{
-		viewFactory = factory;
-	}
-
 	public OTViewFactory getViewFactory()
 	{
-		return viewFactory;
+		return (OTViewFactory)getViewService(OTViewFactory.class);
 	}
 
 	public String getViewMode() 
@@ -91,5 +79,26 @@ public class AbstractOTDocumentView extends OTTextObjectView
 		super.viewClosed();
 		
 		removeAllSubViews();
+	}
+	
+	public OTObject getReferencedObject(OTID id)
+	{	
+    	try {
+            OTObjectService objService = pfObject.getOTObjectService();
+    		return objService.getOTObject(id);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
+	}
+	
+	public OTObject getReferencedObject(String id)
+	{
+        OTObjectService objService = pfObject.getOTObjectService();
+	    OTID linkId = objService.getOTID(id);
+	    if(linkId == null) {
+	        return null;
+	    }
+	    return getReferencedObject(linkId);
 	}
 }

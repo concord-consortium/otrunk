@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-03-09 17:29:23 $
+ * $Revision: 1.6 $
+ * $Date: 2007-03-11 23:38:44 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -48,7 +48,7 @@ import org.concord.otrunk.view.OTViewContainerPanel;
 
 public class OTDocumentObjectView extends ComponentView
 {
-	OTDocument compoundDoc;
+	AbstractOTDocumentView docView;
     OTViewContainerPanel viewContainerPanel;
 	
     /**
@@ -63,11 +63,10 @@ public class OTDocumentObjectView extends ComponentView
      * @param doc
      * @param docView
      */
-    public OTDocumentObjectView(Element elem, OTDocument doc, 
-    		AbstractOTDocumentView docView)
+    public OTDocumentObjectView(Element elem, AbstractOTDocumentView docView)
     {
     	super(elem);
-    	compoundDoc = doc;
+    	this.docView = docView;
         viewContainerPanel = docView.createtViewContainerPanel();
     }
 
@@ -93,7 +92,7 @@ public class OTDocumentObjectView extends ComponentView
     	}
     	
     	if(refId != null && refId.length() > 0) {
-        	OTObject childObject = compoundDoc.getReferencedObject(refId);        	
+        	OTObject childObject = docView.getReferencedObject(refId);        	
         	if(childObject == null) {
         		return new JLabel("Bad OTID: " + refId);
         	}
@@ -101,7 +100,7 @@ public class OTDocumentObjectView extends ComponentView
         	OTViewEntry viewEntry = null;
         	if(viewId != null && viewId.length() > 0) {
         		viewEntry = (OTViewEntry)
-        			compoundDoc.getReferencedObject(viewId);
+        			docView.getReferencedObject(viewId);
         	}
 
         	if(modeStr != null){

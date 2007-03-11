@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.49 $
- * $Date: 2007-03-09 11:57:11 $
+ * $Revision: 1.50 $
+ * $Date: 2007-03-11 23:38:44 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -79,7 +79,6 @@ import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTMLToXHTMLConverter;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTStateRoot;
-import org.concord.otrunk.OTUserListService;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -421,7 +420,7 @@ public class OTViewer extends JFrame
 		xmlDB = new XMLDatabase(url, System.err);
 		
 		otrunk = new OTrunkImpl(xmlDB,
-				new Object [] {new SwingUserMessageHandler(this), new OTUserListService()});
+				new Object [] {new SwingUserMessageHandler(this)});
 			
 		OTViewService viewService = 
 		    (OTViewService)otrunk.getService(OTViewService.class);
@@ -434,6 +433,9 @@ public class OTViewer extends JFrame
 		if(myViewFactory != null) {
 		    otViewFactory = myViewFactory;
 		}
+		
+		otViewFactory.addViewService(otrunk);
+		otViewFactory.addViewService(frameManager);
 		
 		bodyPanel.setOTViewFactory(otViewFactory);
 		// set the viewFactory of the frame manager

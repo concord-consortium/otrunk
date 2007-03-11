@@ -4,13 +4,13 @@
 package org.concord.otrunk.view;
 
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.AbstractOTView;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
@@ -25,7 +25,8 @@ import org.concord.view.SimpleTreeModel;
  * @author sfentress
  * 
  */
-public class OTFolderObjectView implements OTJComponentView, OTViewContainerAware,
+public class OTFolderObjectView extends AbstractOTView 
+	implements OTJComponentView, OTViewContainerAware,
 		TreeSelectionListener {
 
 	protected OTFolderObject otFolderObject;

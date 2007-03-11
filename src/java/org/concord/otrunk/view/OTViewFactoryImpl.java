@@ -39,7 +39,6 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTrunk;
-import org.concord.framework.otrunk.view.OTMultiUserView;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTRequestedViewEntryAware;
 import org.concord.framework.otrunk.view.OTView;
@@ -48,7 +47,8 @@ import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
-import org.concord.framework.otrunk.view.OTViewFactoryAware;
+import org.concord.framework.otrunk.view.OTViewServiceProvider;
+import org.concord.framework.otrunk.view.OTViewServiceProviderAware;
 
 /**
  * @author scytacki
@@ -61,8 +61,9 @@ public class OTViewFactoryImpl implements OTViewFactory
     OTrunk otrunk;
     OTViewFactoryImpl parent;
     Vector viewMap = new Vector();
-    Vector userList = null;
     OTViewService viewService;
+    Vector services = new Vector();
+    OTViewServiceProvider serviceProvider;
     
     public OTViewFactoryImpl(OTrunk otrunk, OTViewService viewService)
     {
@@ -76,13 +77,23 @@ public class OTViewFactoryImpl implements OTViewFactory
         for(int i=0; i<viewEntries.size(); i++) {
             OTViewEntry entry = (OTViewEntry)viewEntries.get(i);
             addViewEntry(entry);
-        }        
+        }
+        
+        initServices();
     }
     
     protected OTViewFactoryImpl(OTViewFactoryImpl parent)
     {
         this.parent = parent;
         this.otrunk = parent.otrunk;
+        
+        initServices();
+    }
+    
+    protected void initServices()
+    {    	
+        serviceProvider = new OTViewServiceProviderImpl();        
+        services.add(this);
     }
     
     class InternalViewEntry {
@@ -94,13 +105,6 @@ public class OTViewFactoryImpl implements OTViewFactory
     public OTViewFactory createChildViewFactory()
     {
     	return new OTViewFactoryImpl(this);
-    }
-    
-    /* (non-Javadoc)
-	 * @see org.concord.otrunk.view.OTViewFactory#setUserList(java.util.Vector)
-	 */
-    public void setUserList(Vector userList) {
-    	this.userList = userList;
     }
     
     /* (non-Javadoc)
@@ -168,15 +172,10 @@ public class OTViewFactoryImpl implements OTViewFactory
     protected void initView(OTView view, OTObject viewConfig)
     {
         if(view != null) { 
-            if(view instanceof OTMultiUserView && 
-                    userList != null) {
-                ((OTMultiUserView)view).setUserList(otrunk, userList);                
-            }
-            
-            if(view instanceof OTViewFactoryAware) {
-                ((OTViewFactoryAware)view).setViewFactory(this);
-            }
-            
+        	if(view instanceof OTViewServiceProviderAware) {
+        		((OTViewServiceProviderAware)view).setViewServiceProvider(serviceProvider);
+        	}
+        	
             if(viewConfig != null && view instanceof OTViewConfigAware) {
                 ((OTViewConfigAware)view).setViewConfig(viewConfig);
             }            
@@ -334,4 +333,43 @@ public class OTViewFactoryImpl implements OTViewFactory
 		return view;
 	}
 
+	class OTViewServiceProviderImpl implements OTViewServiceProvider
+	{
+
+		/* (non-Javadoc)
+		 * @see org.concord.framework.otrunk.view.OTViewServiceProvider#getViewService(java.lang.Class)
+		 */
+		public Object getViewService(Class serviceClass) 
+		{			
+			for(int i=0; i<services.size(); i++){
+				if(serviceClass.isAssignableFrom(services.get(i).getClass())){
+					return services.get(i);
+				}
+			}
+			
+			// We now look in the parent factory
+			if(parent != null){
+				return parent.serviceProvider.getViewService(serviceClass);
+			}
+			
+			return null;
+		}		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.view.OTViewFactory#addService(java.lang.Object)
+	 */
+	public void addViewService(Object service) 
+	{
+		services.add(service);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.view.OTViewFactory#getViewServiceProvider()
+	 */
+	public OTViewServiceProvider getViewServiceProvider() 
+	{
+		return serviceProvider;
+	}
+	
 }

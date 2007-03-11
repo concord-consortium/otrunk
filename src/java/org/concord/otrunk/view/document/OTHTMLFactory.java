@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-02-05 18:57:47 $
+ * $Revision: 1.3 $
+ * $Date: 2007-03-11 23:38:44 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -41,12 +41,10 @@ import javax.swing.text.html.HTMLEditorKit.HTMLFactory;
 
 public class OTHTMLFactory extends HTMLFactory 
 {
-	private OTDocument compoundDoc;
 	private AbstractOTDocumentView documentView;
     
-	public OTHTMLFactory(OTDocument doc, AbstractOTDocumentView docView)
+	public OTHTMLFactory(AbstractOTDocumentView docView)
 	{
-		compoundDoc = doc;
 		documentView = docView;
 	}
 	
@@ -56,8 +54,7 @@ public class OTHTMLFactory extends HTMLFactory
 	    if (o instanceof HTML.Tag) {
 	    	HTML.Tag kind = (HTML.Tag) o;
 	    	if (kind == HTML.Tag.OBJECT) {
-	    		return new OTDocumentObjectView(elem, compoundDoc, 
-	    				documentView);
+	    		return new OTDocumentObjectView(elem, documentView);
 	    	} 
 	    }
     	return super.create(elem);

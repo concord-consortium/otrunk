@@ -172,10 +172,8 @@ public class OTDocumentView extends AbstractOTDocumentView
 				markupLanguage.equals(OTDocument.MARKUP_PLAIN)) {
 			if(editorPane == null) {
 				editorPane = new JEditorPane();
-				OTHTMLFactory kitViewFactory =
-					new OTHTMLFactory(pfDocument, this);
-                OTDocumentEditorKit editorKit = 
-                    new OTDocumentEditorKit(pfDocument, kitViewFactory);
+				OTHTMLFactory kitViewFactory = new OTHTMLFactory(this);
+                OTDocumentEditorKit editorKit = new OTDocumentEditorKit(kitViewFactory);
 				editorPane.setEditorKit(editorKit);
 				editorPane.setEditable(false);
 				editorPane.addHyperlinkListener(this);
@@ -263,14 +261,14 @@ public class OTDocumentView extends AbstractOTDocumentView
 	public String getIncludableReplacement(String idStr, String viewIdStr)
 	{
 		// lookup the object at this id	    	   
-		OTObject referencedObject = pfDocument.getReferencedObject(idStr);
+		OTObject referencedObject = getReferencedObject(idStr);
 		if(referencedObject == null) {
 			return "$0";
 		}
 
 		OTViewEntry viewEntry = null;
 		if(viewIdStr != null){
-			OTObject viewEntryTmp =  pfDocument.getReferencedObject(viewIdStr);
+			OTObject viewEntryTmp =  getReferencedObject(viewIdStr);
 			if(viewEntryTmp instanceof OTViewEntry){
 				viewEntry = (OTViewEntry)viewEntryTmp;
 			} else {
@@ -447,7 +445,7 @@ public class OTDocumentView extends AbstractOTDocumentView
 				}
 				
 				
-			    OTObject linkObj = pfDocument.getReferencedObject(linkTarget);
+			    OTObject linkObj = getReferencedObject(linkTarget);
 				if(linkObj == null) {
 					System.err.println("Invalid link: " + e.getDescription());
 					return;
@@ -472,11 +470,11 @@ public class OTDocumentView extends AbstractOTDocumentView
 					// get the frame object
 					// modify setCurrentObject to take a frame object
 					// then at the top level view container deal with this object
-					targetFrame = (OTFrame)pfDocument.getReferencedObject(target);
+					targetFrame = (OTFrame)getReferencedObject(target);
 
 					OTViewEntry viewEntry = null;
 					if(viewEntryId != null){
-						viewEntry = (OTViewEntry) pfDocument.getReferencedObject(viewEntryId);
+						viewEntry = (OTViewEntry) getReferencedObject(viewEntryId);
 					}
 					
 					if(targetFrame == null) {
