@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.9 $
+ * $Date: 2007-03-12 20:59:31 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -33,7 +33,6 @@
 package org.concord.otrunk;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
 import org.concord.framework.otrunk.OTControllerService;
@@ -165,13 +164,15 @@ public class OTObjectServiceImpl
             }
         }
         
+        OTResourceSchemaHandler handler = null;
+        
         Object constructorParams [] = new Object [params.length];
         int nextParam = 0;
         if(params[0].isInterface() && 
                 OTResourceSchema.class.isAssignableFrom(params[0])){
             Class schemaClass = params[0];
                 
-            InvocationHandler handler = 
+            handler = 
                 new OTResourceSchemaHandler(dataObject, otrunk, this, schemaClass);
 
             Class [] interfaceList = new Class[] { schemaClass };
@@ -200,6 +201,11 @@ public class OTObjectServiceImpl
         OTObject otObject = null;
         try {
             otObject = (OTObject)resourceConstructor.newInstance(constructorParams);
+            
+            // now we need to pass the otObject to the schema handler so it can
+            // set that as the source of OTChangeEvents
+            handler.setEventSource(otObject);
+            
         } catch (Exception e) {
             e.printStackTrace();
             return null;

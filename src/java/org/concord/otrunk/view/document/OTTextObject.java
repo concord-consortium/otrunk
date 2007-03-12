@@ -70,7 +70,6 @@ public class OTTextObject extends OTFolderObject
 	 */
 	public void setBodyText(String bodyText) {
 		resources.setBodyText(bodyText);
-		notifyOTChange();
 	}
 	
 	public boolean getInput()

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-03-12 19:14:04 $
+ * $Revision: 1.12 $
+ * $Date: 2007-03-12 20:59:31 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,7 +34,6 @@ package org.concord.otrunk;
 
 import java.lang.reflect.Method;
 
-import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.otrunk.datamodel.OTDataObject;
@@ -67,7 +66,7 @@ public class OTBasicObjectHandler extends OTResourceSchemaHandler
 	{
 	    if(otObject == null) {
 	        otObject = (OTObject)proxy;
-	        changeEvent = new OTChangeEvent(otObject);
+	        setEventSource(otObject);
 	    }
 	    
 	    if(otObject != proxy) {

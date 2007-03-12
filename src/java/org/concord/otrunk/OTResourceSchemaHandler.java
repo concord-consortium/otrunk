@@ -73,7 +73,8 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
      */
     protected boolean hasListeners = false;
     protected OTChangeEvent changeEvent;
-
+    protected OTObject changeEventSource;
+    
     /**
      * @param dataObject
      * @param db
@@ -88,6 +89,11 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
         // TODO Auto-generated constructor stub
     }
 
+    public void setEventSource(OTObject src)
+    {
+    	changeEventSource = src;
+    }
+    
 	public Object handleGet(String resourceName, Class returnType, Class proxyClass)
 	throws Exception
 	{
@@ -328,6 +334,10 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
     	}
     	
         Vector toBeRemoved = null;
+        
+        if(changeEvent == null) {
+        	changeEvent = new OTChangeEvent(changeEventSource);
+        }
         
         changeEvent.setProperty(property);
         changeEvent.setOperation(operation);
