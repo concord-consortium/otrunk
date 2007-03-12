@@ -169,7 +169,6 @@ public class OTCompoundDoc extends OTFolderObject
 	{
 	    OTXMLString xmlString = new OTXMLString(bodyText);
 		resources.setBodyText(xmlString);
-		notifyOTChange();
 
 		removeAllDocumentReference();
 		
