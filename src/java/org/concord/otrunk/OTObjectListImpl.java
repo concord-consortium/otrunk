@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.9 $
+ * $Date: 2007-03-12 19:14:04 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,6 +34,7 @@ package org.concord.otrunk;
 
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
@@ -49,13 +50,16 @@ import org.concord.otrunk.datamodel.OTDataList;
  * @author scott<p>
  *
  */
-public class OTObjectListImpl implements OTObjectList
+public class OTObjectListImpl extends OTCollectionImpl 
+	implements OTObjectList
 {
 	OTObjectService objService;
 	OTDataList list;
 	
-	public OTObjectListImpl(OTDataList resList, OTObjectService objectService)
+	public OTObjectListImpl(String property, OTDataList resList, 
+			OTResourceSchemaHandler handler, OTObjectService objectService)
 	{
+		super(property, handler);
 		this.objService = objectService;
 		this.list = resList;
 	}
@@ -99,6 +103,7 @@ public class OTObjectListImpl implements OTObjectList
 		}
 
 		list.add(id);
+		notifyOTChange(OTChangeEvent.OP_ADD, obj);
 	}
 	
 	public void add(int index, OTObject obj)
@@ -109,6 +114,7 @@ public class OTObjectListImpl implements OTObjectList
 		}
 
 		list.add(index, id);
+		notifyOTChange(OTChangeEvent.OP_ADD, obj);
 	}
 
 	/*
@@ -119,6 +125,8 @@ public class OTObjectListImpl implements OTObjectList
 	public void add(OTID id)
 	{
 		list.add(id);
+		// TODO this should be checked to see if this is the right thing here
+		notifyOTChange(OTChangeEvent.OP_ADD, id);
 	}
 	
 	public int size()
@@ -129,6 +137,7 @@ public class OTObjectListImpl implements OTObjectList
 	public void removeAll()
 	{
 		list.removeAll();
+		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null);
 	}
 
 	/**
@@ -142,6 +151,7 @@ public class OTObjectListImpl implements OTObjectList
 		}
 
 		list.remove(id);
+		notifyOTChange(OTChangeEvent.OP_REMOVE, obj);
 	}
 
 	/**
@@ -149,6 +159,10 @@ public class OTObjectListImpl implements OTObjectList
 	 */
 	public void remove(int index)
 	{
+		OTID id = (OTID)list.get(index);
 		list.remove(index);
+
+		// TODO this should be checked to see if this is the right thing here
+		notifyOTChange(OTChangeEvent.OP_REMOVE, id);		
 	}
 }

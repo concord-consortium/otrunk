@@ -9,8 +9,13 @@ import org.concord.otrunk.datamodel.BlobResource;
  * @author scott
  *
  */
-public class OTResourceCollectionImpl 
+public class OTResourceCollectionImpl extends OTCollectionImpl
 {
+	public OTResourceCollectionImpl(String property, OTResourceSchemaHandler handler)
+	{
+		super(property, handler);
+	}
+
 	protected final static Object translateToData(Object resource)
 	{
 		if(resource instanceof byte[]){

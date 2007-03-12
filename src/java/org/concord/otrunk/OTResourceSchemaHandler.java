@@ -29,9 +29,13 @@
  */
 package org.concord.otrunk;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Vector;
 
+import org.concord.framework.otrunk.OTChangeEvent;
+import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
@@ -56,6 +60,20 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
     OTrunkImpl db;
     OTObjectService objectService;
     
+    Vector changeListeners = new Vector();
+
+    /**
+     * This can be used by a user of an object to turn off the listening
+     * 
+     */
+    protected boolean doNotifyListeners = true;
+    
+    /**
+     * An internal variable to speed up skipping of the listener notification
+     */
+    protected boolean hasListeners = false;
+    protected OTChangeEvent changeEvent;
+
     /**
      * @param dataObject
      * @param db
@@ -108,7 +126,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        try {					
 	            OTDataMap map = (OTDataMap)dataObject.getResourceCollection(
 	                    resourceName, OTDataMap.class);
-	            return new OTResourceMapImpl(map);
+	            return new OTResourceMapImpl(resourceName, map, this);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -118,7 +136,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        try {					
 	            OTDataMap map = (OTDataMap)dataObject.getResourceCollection(
 	                    resourceName, OTDataMap.class);
-	            return new OTObjectMapImpl(map, objectService);
+	            return new OTObjectMapImpl(resourceName, map, this, objectService);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -128,7 +146,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        try {	        	
 	            OTDataList list = (OTDataList)dataObject.getResourceCollection(
 	                    resourceName, OTDataList.class);
-	            return new OTResourceListImpl(list);
+	            return new OTResourceListImpl(resourceName, list, this);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -138,7 +156,8 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	        try {					
 	        	OTDataList list = (OTDataList)dataObject.getResourceCollection(
 	                    resourceName, OTDataList.class);
-	            return new OTObjectListImpl(list, objectService);
+	            return new OTObjectListImpl(resourceName, list, this, 
+	            		objectService);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -185,6 +204,45 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 		throws Throwable
 	{
 		String methodName = method.getName();
+
+		if(methodName.equals("addOTChangeListener")) {
+		    // param OTChangeListener listener
+		    
+		    // should check to see if this listener is already
+		    // added
+		    WeakReference listenerRef = new WeakReference(args[0]);
+		    changeListeners.add(listenerRef);
+		    hasListeners = true;
+		    return null;
+		}
+		
+		if(methodName.equals("removeOTChangeListener")) {
+		    // param OTChangeListener listener		    
+		    for(int i=0; i<changeListeners.size(); i++) {
+		        WeakReference ref = (WeakReference)changeListeners.get(i);
+		        if(args[0] == ref.get()) {
+		            changeListeners.remove(i);
+		            return null;
+		        }
+		    }
+		    if(changeListeners.size() == 0) {
+		    	hasListeners = false;
+		    }
+		    return null;
+		}
+		
+		if(methodName.equals("setDoNotifyChangeListeners")) {
+		    setDoNotifyListeners(((Boolean)args[0]).booleanValue());
+		    return null;
+		}
+
+		if(methodName.equals("notifyOTChange")) {
+			// FIXME
+		    notifyOTChange(null, null, null);
+		    return null;
+		}
+
+
 		if(methodName.equals("isResourceSet")) {
 		    String resourceName = (String)args[0];
 		    Object resourceValue = dataObject.getResource(resourceName);
@@ -252,7 +310,55 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 		}
 		dataObject.setResource(name, value);			
 		
+		notifyOTChange(name, OTChangeEvent.OP_SET, value);
+
 		return true;
 	}
+
+	public void setDoNotifyListeners(boolean doNotify)
+	{
+	    doNotifyListeners = doNotify;
+	}
 	
+    public void notifyOTChange(String property, String operation, 
+    		Object value)
+    {
+    	if(!doNotifyListeners || !hasListeners){
+    		return;
+    	}
+    	
+        Vector toBeRemoved = null;
+        
+        changeEvent.setProperty(property);
+        changeEvent.setOperation(operation);
+        changeEvent.setValue(value);
+        
+        for(int i=0;i<changeListeners.size(); i++){
+            WeakReference ref = (WeakReference)changeListeners.get(i);
+            Object listener = ref.get();
+            if(listener != null) {
+                ((OTChangeListener)listener).stateChanged(changeEvent);
+            } else {
+                // the listener was gc'd so lets mark it to be removed
+                if(toBeRemoved == null) {
+                    toBeRemoved = new Vector();
+                }
+                toBeRemoved.add(ref);
+            }
+        }
+
+        // clear the value so it doesn't remain around and 
+        // so it can be garbage collected
+        changeEvent.setValue(null);
+
+        if(toBeRemoved != null) {
+            for(int i=0; i<toBeRemoved.size(); i++) {
+                changeListeners.remove(toBeRemoved.get(i));
+            }
+            if(changeListeners.size() == 0){
+            	hasListeners = false;
+            }
+        }
+    }
+
 }
