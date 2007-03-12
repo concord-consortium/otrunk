@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.8 $
+ * $Date: 2007-03-12 19:14:04 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,6 +34,7 @@ package org.concord.otrunk;
 
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectMap;
@@ -49,13 +50,16 @@ import org.concord.otrunk.datamodel.OTDataMap;
  * @author scott<p>
  *
  */
-public class OTObjectMapImpl implements OTObjectMap
+public class OTObjectMapImpl extends OTCollectionImpl 
+	implements OTObjectMap
 {
     OTObjectService objService;
     OTDataMap map;
-
-	public OTObjectMapImpl(OTDataMap map, OTObjectService objectService)
+    
+    
+	public OTObjectMapImpl(String resourceName, OTDataMap map, OTResourceSchemaHandler handler, OTObjectService objectService)
 	{
+		super(resourceName, handler);
         this.objService = objectService;
 		this.map = map;
 	}
@@ -103,70 +107,10 @@ public class OTObjectMapImpl implements OTObjectMap
 		try {
 			OTID objId = pfObj.getGlobalId();			
 			map.put(key, objId);
+			notifyOTChange(OTChangeEvent.OP_PUT, key);
 		} catch (Exception e) {
 			e.printStackTrace();	
 		}
 	}
-		
-	/* (non-Javadoc)
-	 * @see org.concord.portfolio.objects.PfFolder#addChild(int, org.concord.portfolio.PortfolioObject)
-	 */
-	public void addChild(int index, OTObject pfObject)
-	{
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.concord.portfolio.objects.PfFolder#addChild(org.concord.portfolio.PortfolioObject)
-	 */
-	public void addChild(OTObject pfObject)
-	{
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.concord.portfolio.objects.PfFolder#getChild(int)
-	 */
-	public Object getChild(int index)
-	{
-		Vector keys = getObjectKeys();
-		String key = (String)keys.get(index);
-		return getObject(key);
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.concord.portfolio.objects.PfFolder#getChildCount()
-	 */
-	public int getChildCount()
-	{
-		Vector keys = getObjectKeys();
-		return keys.size();
-	}
-
-	
-	/* (non-Javadoc)
-	 * @see org.concord.portfolio.objects.PfFolder#removeAllChildren()
-	 */
-	public void removeAllChildren()
-	{
-	}
-	
-	public Vector getChildVector()
-	{
-		Vector childVector = new Vector();
-		for(int i=0; i<getChildCount(); i++) {
-			childVector.add(getChild(i));
-		}
-		
-		return childVector;
-	}
-	
-	public void setChildVector(Vector childVector)
-	{
-		return;
-	}
-	
-
 }
 

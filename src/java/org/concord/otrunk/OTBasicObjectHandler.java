@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2005-08-26 13:59:53 $
+ * $Revision: 1.11 $
+ * $Date: 2007-03-12 19:14:04 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,12 +32,9 @@
 */
 package org.concord.otrunk;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import java.util.Vector;
 
 import org.concord.framework.otrunk.OTChangeEvent;
-import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.otrunk.datamodel.OTDataObject;
@@ -54,10 +51,7 @@ import org.concord.otrunk.datamodel.OTDataObject;
  */
 public class OTBasicObjectHandler extends OTResourceSchemaHandler
 {
-    Vector changeListeners = new Vector();
-    private boolean doNotifyListeners = true;
     OTObject otObject;
-    private OTChangeEvent changeEvent;
     
 	public OTBasicObjectHandler(OTDataObject dataObject, OTrunkImpl db, 
             OTObjectService objectService, Class objectInterface)
@@ -91,79 +85,7 @@ public class OTBasicObjectHandler extends OTResourceSchemaHandler
 			return null;
 		}
 
-		if(methodName.equals("addOTChangeListener")) {
-		    // param OTChangeListener listener
-		    
-		    // should check to see if this listener is already
-		    // added
-		    WeakReference listenerRef = new WeakReference(args[0]);
-		    changeListeners.add(listenerRef);
-		    return null;
-		}
-		
-		if(methodName.equals("removeOTChangeListener")) {
-		    // param OTChangeListener listener		    
-		    for(int i=0; i<changeListeners.size(); i++) {
-		        WeakReference ref = (WeakReference)changeListeners.get(i);
-		        if(args[0] == ref.get()) {
-		            changeListeners.remove(i);
-		            return null;
-		        }
-		    }
-		    return null;
-		}
-		
-		if(methodName.equals("setDoNotifyChangeListeners")) {
-		    setDoNotifyListeners(((Boolean)args[0]).booleanValue());
-		    return null;
-		}
-
-		if(methodName.equals("notifyOTChange")) {
-		    notifyOTChange();
-		    return null;
-		}
-
 		
 		return super.invoke(proxy, method, args);
-	}
-	
-	protected boolean setResource(String name, Object value)
-	{
-	    boolean changed = super.setResource(name, value);
-	    if(changed && doNotifyListeners) {
-	        notifyOTChange();
-	    }
-	    
-	    return changed;
-	}
-
-	public void setDoNotifyListeners(boolean doNotify)
-	{
-	    doNotifyListeners = doNotify;
-	}
-	
-    public void notifyOTChange()
-    {
-        Vector toBeRemoved = null;
-        
-        for(int i=0;i<changeListeners.size(); i++){
-            WeakReference ref = (WeakReference)changeListeners.get(i);
-            Object listener = ref.get();
-            if(listener != null) {
-                ((OTChangeListener)listener).stateChanged(changeEvent);
-            } else {
-                // the listener was gc'd so lets mark it to be removed
-                if(toBeRemoved == null) {
-                    toBeRemoved = new Vector();
-                }
-                toBeRemoved.add(ref);
-            }
-        }
-        
-        if(toBeRemoved != null) {
-            for(int i=0; i<toBeRemoved.size(); i++) {
-                changeListeners.remove(toBeRemoved.get(i));
-            }
-        }
-    }
+	}	
 }

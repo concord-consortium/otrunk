@@ -3,6 +3,7 @@
  */
 package org.concord.otrunk;
 
+import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.otrunk.datamodel.OTDataList;
 
@@ -16,10 +17,13 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	OTDataList list;
 	
 	/**
+	 * @param handler 
 	 * 
 	 */
-	public OTResourceListImpl(OTDataList list) 
+	public OTResourceListImpl(String property, OTDataList list, 
+			OTResourceSchemaHandler handler) 
 	{
+		super(property, handler);
 		this.list = list;
 	}
 	
@@ -28,6 +32,7 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	 */
 	public void add(Object object) {
 		list.add(translateToData(object));
+		notifyOTChange(OTChangeEvent.OP_ADD, object);
 	}
 
 	/* (non-Javadoc)
@@ -35,6 +40,7 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	 */
 	public void add(int index, Object object) {
 		list.add(index, translateToData(object));
+		notifyOTChange(OTChangeEvent.OP_ADD, object);
 	}
 
 	/* (non-Javadoc)
@@ -48,7 +54,9 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	 * @see org.concord.framework.otrunk.OTResourceList#remove(int)
 	 */
 	public void remove(int index) {
+		Object obj = list.get(index);
 		list.remove(index);
+		notifyOTChange(OTChangeEvent.OP_REMOVE, obj);
 	}
 
 	/* (non-Javadoc)
@@ -56,8 +64,9 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	 */
 	public void remove(Object obj) {
 		list.remove(obj);
+		notifyOTChange(OTChangeEvent.OP_REMOVE, obj);
 		
-		// if this fails we need to search for the byte[] in 
+		// FIXME if this fails we need to search for the byte[] in 
 		// BlobResources
 	}
 
@@ -73,6 +82,7 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	 */
 	public void removeAll() {
 		list.removeAll();
+		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null);
 	}
 
 	/* (non-Javadoc)
