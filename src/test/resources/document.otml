@@ -5,21 +5,22 @@
     <import class="org.concord.otrunk.view.OTFolderObject"/>
     <import class="org.concord.otrunk.view.OTViewEntry"/>
     <import class="org.concord.otrunk.view.OTViewService"/>
-    <import class="org.concord.framework.otrunk.view.OTFrame"/>
     <import class="org.concord.otrunk.view.document.OTTextObject"/>
+    <import class="org.concord.otrunk.view.control.OTButton"/>    
   </imports>
   <objects>
     <OTSystem>
       <services>
         <OTViewService>
           <viewEntries>
-            <OTViewEntry
+            <OTViewEntry local_id="text_edit"
               objectClass="org.concord.otrunk.view.document.OTTextObject" 
               viewClass="org.concord.otrunk.view.document.OTTextObjectView"/>
           </viewEntries>
         </OTViewService>
       </services>
       <root>
+        
         <OTTextObject local_id="text_object" name="User Test"/>
       </root>
     </OTSystem>
