@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-03-12 20:59:31 $
+ * $Revision: 1.10 $
+ * $Date: 2007-03-13 03:08:57 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,6 +34,7 @@ package org.concord.otrunk;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
+import java.util.Vector;
 
 import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTID;
@@ -51,7 +52,8 @@ public class OTObjectServiceImpl
     OTrunkImpl otrunk;
     protected OTDatabase creationDb;
     protected OTDatabase mainDb;
-    
+    protected Vector listeners = new Vector();
+
     public OTObjectServiceImpl(OTrunkImpl otrunk)
     {
         this.otrunk = otrunk;
@@ -79,6 +81,9 @@ public class OTObjectServiceImpl
         
         OTObject newObject = loadOTObject(dataObject, objectClass);
         dataObject.setResource(OTrunkImpl.RES_CLASS_NAME, objectClass.getName());
+
+        // TODO this is actually called twice, once by loadOTObject and 
+        // once here.  is that what should happen?
         newObject.init();
         
         return newObject;
@@ -130,6 +135,8 @@ public class OTObjectServiceImpl
             otObject = setResourcesFromSchema(dataObject, otObjectClass);
         }
         
+        notifyLoaded(otObject);
+        
         otObject.init();
         
         otrunk.putLoadedObject(otObject, dataObject);
@@ -138,6 +145,16 @@ public class OTObjectServiceImpl
     }
     
     /**
+	 * @param otObject
+	 */
+	protected void notifyLoaded(OTObject otObject) 
+	{
+		for(int i=0; i < listeners.size(); i++) {
+			((OTObjectServiceListener)listeners.get(i)).objectLoaded(otObject);
+		}
+	}
+
+	/**
      * Track down the objects schema by looking at the type
      * of class of the argument to setResources method
      * 
@@ -334,6 +351,19 @@ public class OTObjectServiceImpl
 			DataObjectUtil.copy(originalDataObject, creationDb, maxDepth);
 
 		return getOTObject(copyDataObject.getGlobalId());		
+	}
+
+	public void addObjectServiceListener(OTObjectServiceListener listener)
+	{
+		if(listeners.contains(listener)) {
+			return;
+		}
+		listeners.add(listener);
+	}
+
+	public void removeObjectServiceListener(OTObjectServiceListener listener)
+	{
+		listeners.remove(listener);
 	}
 
 }
