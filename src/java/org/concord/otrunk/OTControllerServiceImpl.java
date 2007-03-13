@@ -264,10 +264,6 @@ public class OTControllerServiceImpl implements OTControllerService {
 	}
 
 	public OTObject getOTObject(Object realObject) {		
-		return getOTObject(realObject, null);
-	}
-	
-	public OTObject getOTObject(Object realObject, Class controllerClass) {
 		
 		// check if we already have a controller, if so then return its otObject
 		OTController controller = (OTController)controllerFromRealMap.get(realObject);
@@ -278,16 +274,13 @@ public class OTControllerServiceImpl implements OTControllerService {
 
 		// Figure out which otObjectClass we should be using
 		// this comes from the controller class we found
-		if(controllerClass == null) {
 			// TODO this should look for matches up the inheritance tree.
-			controllerClass = (Class)controllerClassesFromRealObject.get(realObject.getClass());
+		Class controllerClass = (Class)controllerClassesFromRealObject.get(realObject.getClass());
 
-			if(controllerClass == null) {
-				System.err.println("can't find controller class for realObject: " 
-						+ realObject.getClass());
-				return null;
-			}
-
+		if(controllerClass == null) {
+			System.err.println("can't find controller class for realObject: " 
+					+ realObject.getClass());
+			return null;
 		}
 
 		Class otObjectClass = getOTObjectClass(controllerClass);
