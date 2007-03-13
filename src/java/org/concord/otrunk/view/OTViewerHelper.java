@@ -54,6 +54,7 @@ public class OTViewerHelper
 	public final static String NO_USER_PROP = "otrunk.view.no_user";
 	public final static String SINGLE_USER_PROP = "otrunk.view.single_user";
 	public final static String DEBUG_PROP = "otrunk.view.debug";
+	public final static String TRACE_PROP = "otrunk.trace";
 	
 	private OTrunk otrunk;
 	private OTViewFactory viewFactory;
@@ -62,6 +63,15 @@ public class OTViewerHelper
 	private OTUser currentUser;
 	OTFrameManagerImpl frameManager; 
 	
+	public static boolean isDebug()
+	{
+		return Boolean.getBoolean(DEBUG_PROP);
+	}
+
+	public static boolean isTrace()
+	{
+		return Boolean.getBoolean(TRACE_PROP);
+	}
 	
 	public static OTUserObject createUser(String name, OTObjectService objService)
 	throws Exception

@@ -50,6 +50,7 @@ import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTTemplateDatabase;
 import org.concord.otrunk.user.OTUserDataObject;
 import org.concord.otrunk.user.OTUserObject;
+import org.concord.otrunk.view.OTViewerHelper;
 
 /**
  * @author scott
@@ -103,6 +104,10 @@ public class OTrunkImpl implements OTrunk
         rootObjectService = new OTObjectServiceImpl(this);
         rootObjectService.setCreationDb(rootDb);
         rootObjectService.setMainDb(rootDb);
+        
+        if(OTViewerHelper.isTrace()) {
+        	rootObjectService.addObjectServiceListener(new TraceListener("root: " + db));
+        }
         
 		// We should look up if there are any sevices.
 		try {
@@ -246,6 +251,10 @@ public class OTrunkImpl implements OTrunk
         objService.setMainDb(db);
         
         objectServices.add(objService);
+
+        if(OTViewerHelper.isTrace()){
+        	objService.addObjectServiceListener(new TraceListener("" + db));
+        }
         
         return objService;
     }
@@ -521,5 +530,5 @@ public class OTrunkImpl implements OTrunk
 
 	public OTObjectServiceImpl getRootObjectService() {
 		return rootObjectService;
-	}    
+	}	
 }

@@ -44,6 +44,8 @@ public interface OTSystem extends OTObject
 	public void setRoot(OTObject root);
 	
 	public OTObjectList getServices();	
+
+	public OTObjectList getLibrary();
 	
 	public OTObject getFirstObject();
 	
