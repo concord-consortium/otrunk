@@ -54,7 +54,7 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTView;
-import org.concord.framework.otrunk.view.OTViewConfigAware;
+import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.w3c.dom.Document;
@@ -69,7 +69,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class OTDocumentView extends AbstractOTDocumentView
 	implements ChangeListener, HyperlinkListener, OTXHTMLView,
-		OTViewConfigAware
+		OTViewEntryAware
 {
 	public static boolean addedCustomLayout = false;
 	
@@ -85,7 +85,7 @@ public class OTDocumentView extends AbstractOTDocumentView
     
     JTextArea parsedTextArea = null;
 
-	private OTDocumentViewConfig viewConfig;
+	private OTDocumentViewConfig viewEntry;
     
 	public final static String XHTML_PREFIX = 
 		"<?xml version='1.0' encoding='UTF-8'?>\n" +
@@ -505,10 +505,12 @@ public class OTDocumentView extends AbstractOTDocumentView
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.view.OTViewConfigAware#setViewConfig(org.concord.framework.otrunk.OTObject)
 	 */
-	public void setViewConfig(OTObject viewConfig) 
+	public void setViewEntry(OTViewEntry viewEntry) 
 	{
-		this.viewConfig = (OTDocumentViewConfig) viewConfig;		
-		setViewMode(this.viewConfig.getMode());
+		if(viewEntry instanceof OTDocumentViewConfig){
+			this.viewEntry = (OTDocumentViewConfig) viewEntry;		
+			setViewMode(this.viewEntry.getMode());
+		}
 	}
 
 }

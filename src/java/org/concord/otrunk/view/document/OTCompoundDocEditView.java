@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-02-23 04:39:05 $
- * $Author: imoncada $
+ * $Revision: 1.8 $
+ * $Date: 2007-03-13 11:55:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -19,7 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.view.OTViewConfigAware;
+import org.concord.framework.otrunk.view.OTViewEntry;
+import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.otrunk.view.OTObjectEditViewConfig;
 import org.concord.otrunk.view.OTObjectListViewer;
 
@@ -35,11 +36,11 @@ import org.concord.otrunk.view.OTObjectListViewer;
  *
  */
 public class OTCompoundDocEditView extends AbstractOTDocumentView
-	implements OTViewConfigAware, ActionListener
+	implements OTViewEntryAware, ActionListener
 {
 	protected JPanel textPanel;
 	protected OTDocumentView previewView;
-	protected OTObjectEditViewConfig viewConfig;
+	protected OTObjectEditViewConfig viewEntry;
 	
 	/**
 	 * 
@@ -155,17 +156,17 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		OTObject otObj = null;
 		
 		otObj = OTObjectListViewer.showDialog(textPanel, "Choose object to add", getFrameManager(),
-				getViewFactory(), viewConfig, ((OTCompoundDoc)pfObject).getOTObjectService(), true, false);
+				getViewFactory(), viewEntry, ((OTCompoundDoc)pfObject).getOTObjectService(), true, false);
 		
 		return otObj;
 	}
 
 	/**
-	 * @see org.concord.framework.otrunk.view.OTViewConfigAware#setViewConfig(org.concord.framework.otrunk.OTObject)
+	 * @see org.concord.framework.otrunk.view.OTViewEntryAware#setViewEntry(OTViewEntry)
 	 */
-	public void setViewConfig(OTObject viewConfig)
+	public void setViewEntry(OTViewEntry viewEntry)
 	{
-		this.viewConfig = (OTObjectEditViewConfig)viewConfig;
+		this.viewEntry = (OTObjectEditViewConfig)viewEntry;
 	}	
 	
 	/* (non-Javadoc)
