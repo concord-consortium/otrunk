@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-03-09 05:26:13 $
+ * $Revision: 1.10 $
+ * $Date: 2007-03-13 17:13:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -119,7 +119,7 @@ public class FsDataObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#setResource(java.lang.String, java.lang.Object)
 	 */
-	public void setResource(String key, Object resource)
+	public boolean setResource(String key, Object resource)
 	{
 		Object oldObject = resources.get(key);		
 		resources.put(key, resource);
@@ -127,6 +127,8 @@ public class FsDataObject
 		if(oldObject == null || !oldObject.equals(resource)) {
 			updateModifiedTime();
 		}		
+		
+		return true;
 	}
 
 	/* (non-Javadoc)

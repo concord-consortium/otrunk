@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-02-20 00:16:39 $
+ * $Revision: 1.10 $
+ * $Date: 2007-03-13 17:13:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -205,12 +205,32 @@ public class OTUserDataObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#setResource(java.lang.String, java.lang.Object)
 	 */
-	public void setResource(String key, Object resource)
+	public boolean setResource(String key, Object resource)
 	{
 	    Object oldObject = getResource(key);
 	    if(oldObject != null &&
 	            oldObject.equals(resource)){
-	        return;
+	        return false;
+	    }
+
+	    // Need to check if the object being passed in 
+	    // is a user version of an authored object
+	    // and that user version has not changed
+	    // The only way to do this now is to get the OTDataObject
+	    // from our database for the old object, and then get
+	    // its id.  This call will be wasteful if a new object
+	    // is being set to replace the old object without ever
+	    // accessing the old object. 
+	    if(oldObject instanceof OTID){
+	    	try {
+	    		OTDataObject oldDataObject = 
+	    			database.getOTDataObject(this, (OTID)oldObject);
+	    		if(oldDataObject.getGlobalId().equals(resource)){
+	    			return false;
+	    		}
+	    	} catch (Exception e){
+	    		e.printStackTrace();
+	    	}	    	
 	    }
 	    
 	    // special hack for -0.0 and 0.0 
@@ -219,7 +239,7 @@ public class OTUserDataObject
 	            resource instanceof Float) {
 	        if(((Float)oldObject).floatValue() == 
 	            ((Float)resource).floatValue()){
-	            return;
+	            return false;
 	        }
 	    }
 	    
@@ -229,6 +249,8 @@ public class OTUserDataObject
         resource = resolveIDResource(resource);
         	    
 		userObject.setResource(key, resource);
+		
+		return true;
 	}
 	
     /**

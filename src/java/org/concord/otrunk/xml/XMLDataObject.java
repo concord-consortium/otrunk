@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.14 $
+ * $Date: 2007-03-13 17:13:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -63,8 +63,6 @@ public class XMLDataObject
 	private String localId = null;
 	
 	Hashtable resources = new Hashtable();
-
-	
 	
 	XMLDataObject(OTXMLElement element, OTID id, XMLDatabase db)
 	{
@@ -101,35 +99,38 @@ public class XMLDataObject
 		globalId = id;
 	}
 	
-	public void setResource(String key, Object resource)
+	public boolean setResource(String key, Object resource)
 	{
-	    setResource(key, resource, true);
+	    return setResource(key, resource, true);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#setResource(java.lang.String, java.lang.Object)
 	 */
-	void setResource(String key, Object resource, boolean markDirty)
+	boolean setResource(String key, Object resource, boolean markDirty)
 	{
-		Object oldObject = resources.get(key);		
+		Object oldObject;		
 
 		// Hashtables can't know the different between null and empty
 		// so if it is null we'll just remove it
 	    if(resource == null) {
-	        resources.remove(key);
+	        oldObject = resources.remove(key);
 	    } else {
-			resources.put(key, resource);			
+	    	oldObject = resources.put(key, resource);			
 		}
 
-	    if(!markDirty) return;
+	    if(!markDirty) return true;
 	    
 		if((oldObject == null && resource == null) || 
 		         (oldObject != null && 
 		                 oldObject.equals(resource))) {		    
 		    // the object wasn't really modified
+			return false;
 		} else {
 			updateModifiedTime();
 		}		
+		
+		return true;
 	}
 	
 	/* (non-Javadoc)
