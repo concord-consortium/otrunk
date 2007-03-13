@@ -5,7 +5,7 @@ package org.concord.otrunk.view;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTRequestedViewEntryAware;
-import org.concord.framework.otrunk.view.OTViewConfigAware;
+import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 
@@ -14,9 +14,9 @@ import org.concord.framework.otrunk.view.OTXHTMLView;
  *
  */
 public class OTAuthorEmbedDefaultView 
-	implements OTXHTMLView, OTViewConfigAware, OTRequestedViewEntryAware
+	implements OTXHTMLView, OTViewEntryAware, OTRequestedViewEntryAware
 {
-	private OTAuthorEmbedDefaultViewConfig viewConfig;
+	private OTAuthorEmbedDefaultViewConfig viewEntry;
 	private OTViewEntry requestedViewEntry;
 
 	/* (non-Javadoc)
@@ -54,9 +54,9 @@ public class OTAuthorEmbedDefaultView
 				"</tr></td>" +
 				"<tr><td>" +
 				"<a href=\"" + otObject.getGlobalId() + "\" + " +
-						"target=\"" + viewConfig.getFrame().getGlobalId() + "\" " +
+						"target=\"" + viewEntry.getFrame().getGlobalId() + "\" " +
 						linkViewIdStr + 
-						"mode=\"" + viewConfig.getPopupViewMode() + "\" >edit</a>" +
+						"mode=\"" + viewEntry.getPopupViewMode() + "\" >edit</a>" +
 						"</td></tr></table>";
 		// System.out.println(text);
 		return text;
@@ -65,9 +65,9 @@ public class OTAuthorEmbedDefaultView
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.view.OTViewConfigAware#setViewConfig(org.concord.framework.otrunk.OTObject)
 	 */
-	public void setViewConfig(OTObject viewConfig) 
+	public void setViewEntry(OTViewEntry viewConfig) 
 	{
-		this.viewConfig = (OTAuthorEmbedDefaultViewConfig) viewConfig;
+		this.viewEntry = (OTAuthorEmbedDefaultViewConfig) viewConfig;
 	}
 
 	/* (non-Javadoc)

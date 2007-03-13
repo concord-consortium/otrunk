@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2007-03-11 23:38:44 $
+ * $Revision: 1.7 $
+ * $Date: 2007-03-13 11:55:41 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -21,7 +21,8 @@ import javax.swing.tree.TreePath;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrameManager;
-import org.concord.framework.otrunk.view.OTViewConfigAware;
+import org.concord.framework.otrunk.view.OTViewEntry;
+import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
 
 /**
@@ -35,7 +36,7 @@ import org.concord.framework.otrunk.view.OTViewFactory;
  *
  */
 public class OTFolderObjectEditView extends OTFolderObjectView 
-	implements MouseListener, OTViewConfigAware
+	implements MouseListener, OTViewEntryAware
 {
 	protected OTObject parentObject;
 	protected OTObject selectedObject;
@@ -43,7 +44,7 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	protected OTFolderNode parentNode;
 	protected TreePath selectedPath;
 	
-	protected OTObjectEditViewConfig viewConfig;
+	protected OTObjectEditViewConfig viewEntry;
 	
 	protected JMenu menu;
 	
@@ -341,7 +342,7 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 			OTObject otObj = null;
 			
 			otObj = OTObjectListViewer.showDialog(tree, "Choose object to add to the tree", frameManager,
-					viewFactory, viewConfig, selectedObject.getOTObjectService(), true, true);		//Last parameter is null because we don't have an ot object service yet
+					viewFactory, viewEntry, selectedObject.getOTObjectService(), true, true);		//Last parameter is null because we don't have an ot object service yet
 			
 			return otObj;
 		}
@@ -361,15 +362,15 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	}
 
 	/**
-	 * @see org.concord.framework.otrunk.view.OTViewConfigAware#setViewConfig(org.concord.framework.otrunk.OTObject)
+	 * @see org.concord.framework.otrunk.view.OTViewEntryAware#setViewEntry(OTViewEntry)
 	 */
-	public void setViewConfig(OTObject viewConfig)
+	public void setViewEntry(OTViewEntry viewEntry)
 	{
-		if (!(viewConfig instanceof OTObjectEditViewConfig)){
+		if (!(viewEntry instanceof OTObjectEditViewConfig)){
 			System.err.println("Error: the specified view config should be an istance of OTObjectEditViewConfig.");
 			return;
 		}
 		
-		this.viewConfig = (OTObjectEditViewConfig)viewConfig;
+		this.viewEntry = (OTObjectEditViewConfig)viewEntry;
 	}
 }

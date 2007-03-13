@@ -1,15 +1,14 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-02-20 01:59:20 $
- * $Author: imoncada $
+ * $Revision: 1.2 $
+ * $Date: 2007-03-13 11:55:41 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
 */
 package org.concord.otrunk.view;
 
-import org.concord.framework.otrunk.OTObjectInterface;
 import org.concord.framework.otrunk.OTObjectList;
 
 
@@ -23,7 +22,7 @@ import org.concord.framework.otrunk.OTObjectList;
  *
  */
 public interface OTObjectEditViewConfig
-	extends OTObjectInterface
+	extends org.concord.framework.otrunk.view.OTViewEntry
 {
 	//This property is to specify the list of objects that can be inserted
 	//into the document using its edit view

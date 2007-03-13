@@ -42,10 +42,10 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTRequestedViewEntryAware;
 import org.concord.framework.otrunk.view.OTView;
-import org.concord.framework.otrunk.view.OTViewConfigAware;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
+import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTViewServiceProvider;
 import org.concord.framework.otrunk.view.OTViewServiceProviderAware;
@@ -147,7 +147,7 @@ public class OTViewFactoryImpl implements OTViewFactory
             e.printStackTrace();
         }
 
-        initView(view, entry.otEntry.getViewConfig());
+        initView(view, entry.otEntry);
         
         return view;
     }
@@ -169,15 +169,15 @@ public class OTViewFactoryImpl implements OTViewFactory
 		return getView(otObject, viewEntry, modeStr);
 	}
     
-    protected void initView(OTView view, OTObject viewConfig)
+    protected void initView(OTView view, OTViewEntry viewEntry)
     {
         if(view != null) { 
         	if(view instanceof OTViewServiceProviderAware) {
         		((OTViewServiceProviderAware)view).setViewServiceProvider(serviceProvider);
         	}
         	
-            if(viewConfig != null && view instanceof OTViewConfigAware) {
-                ((OTViewConfigAware)view).setViewConfig(viewConfig);
+            if(view instanceof OTViewEntryAware) {
+                ((OTViewEntryAware)view).setViewEntry(viewEntry);
             }            
         }    	
     }
@@ -187,9 +187,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 		// because we have the view entry we don't need to actually
 		// look up this view.
         String viewClassStr = viewEntry.getViewClass();
-        String objClassStr = viewEntry.getObjectClass();
-        OTObject viewConfig = viewEntry.getViewConfig();
-        
+        String objClassStr = viewEntry.getObjectClass();        
         
         ClassLoader loader = getClass().getClassLoader();
 		
@@ -205,7 +203,7 @@ public class OTViewFactoryImpl implements OTViewFactory
             Class viewClass = loader.loadClass(viewClassStr);
             view = (OTView)viewClass.newInstance();
 
-            initView(view, viewConfig);
+            initView(view, viewEntry);
         	return view;                       
         } catch (ClassNotFoundException e) {
             System.err.println("Can't find view: " + viewClassStr + 
