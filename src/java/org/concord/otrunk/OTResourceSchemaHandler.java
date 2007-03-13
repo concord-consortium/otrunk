@@ -314,10 +314,13 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 		} else if(value instanceof byte[]) {
 			value = new BlobResource((byte[])value);
 		}
-		dataObject.setResource(name, value);			
 		
-		notifyOTChange(name, OTChangeEvent.OP_SET, value);
-
+		// setResource should only return true if the dataObject was 
+		// actually changed with this call
+		if(dataObject.setResource(name, value)){
+			notifyOTChange(name, OTChangeEvent.OP_SET, value);			
+		}
+		
 		return true;
 	}
 

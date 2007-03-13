@@ -41,7 +41,21 @@ public interface OTDataObject
 {
 	public OTID getGlobalId();
 	
-	public void setResource(String key, Object resource);
+	/**
+	 * This should return true if the data object was
+	 * changed with this call.   Most implementations check if the new 
+	 * resource is differnt than the old resource, before setting the 
+	 * resource.  So in that case it should return false if it decided
+	 * not to set the resource.  This return value can be used to decide
+	 * whether to notify listeners of a change.  The return value is used
+	 * so an equality check doesn't have to be done twice.  
+	 * 
+	 * @param key
+	 * @param resource
+	 * @return
+	 */
+	public boolean setResource(String key, Object resource);
+	
 	public Object getResource(String key);
 	public String [] getResourceKeys();
 

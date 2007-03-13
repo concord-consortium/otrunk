@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-02-20 00:16:39 $
+ * $Revision: 1.10 $
+ * $Date: 2007-03-13 17:13:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -63,6 +63,7 @@ public class OTTemplateDatabase
      * the userdataobject that this database returns for that id.
      */
 	protected Hashtable mappedIdCache = new Hashtable();
+	
 	OTDatabase rootDb;
 	OTDatabase stateDb;
 	OTReferenceMap map;
