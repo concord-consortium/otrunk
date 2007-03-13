@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.32 $
- * $Date: 2007-03-11 23:38:44 $
- * $Author: scytacki $
+ * $Revision: 1.33 $
+ * $Date: 2007-03-13 15:22:26 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -335,6 +335,10 @@ public class OTViewContainerPanel extends JPanel
 
 	public OTViewContainer getViewContainer() {
 		return viewContainer;
+	}
+	
+	public OTJComponentView getView() {
+		return currentView;
 	}
 
 	public boolean isUseScrollPane() {

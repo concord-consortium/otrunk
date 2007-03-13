@@ -53,6 +53,8 @@ public abstract class OTAbstractAppletViewer extends JApplet
 	protected OTAbstractAppletViewer master;
 	protected Action stateAction;
 	protected JButton authorSaveButton;
+	
+	private OTViewContainerPanel otContainer;
 
 	public OTAbstractAppletViewer()
 	{
@@ -101,8 +103,7 @@ public abstract class OTAbstractAppletViewer extends JApplet
 		// get the otml url
 		try {
 			// look up view container with the frame.
-			OTViewContainerPanel otContainer = 
-				getViewerHelper().createViewContainerPanel(); 
+			otContainer = getViewerHelper().createViewContainerPanel(); 
 	
 			getContentPane().setLayout(new BorderLayout());
 	
@@ -236,6 +237,11 @@ public abstract class OTAbstractAppletViewer extends JApplet
 	
 		// try to get the viewfactory from the master applet
 		return getMaster().getOTrunk();
+	}
+	
+	public OTViewContainerPanel getOTContainer()
+	{
+		return otContainer;
 	}
 
 	public OTID getID(String id)
