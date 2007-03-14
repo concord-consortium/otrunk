@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-03-13 11:55:41 $
- * $Author: scytacki $
+ * $Revision: 1.8 $
+ * $Date: 2007-03-14 02:29:22 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -36,7 +36,7 @@ import org.concord.framework.otrunk.view.OTViewFactory;
  *
  */
 public class OTFolderObjectEditView extends OTFolderObjectView 
-	implements MouseListener, OTViewEntryAware
+	implements MouseListener
 {
 	protected OTObject parentObject;
 	protected OTObject selectedObject;
@@ -341,8 +341,8 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 			
 			OTObject otObj = null;
 			
-			otObj = OTObjectListViewer.showDialog(tree, "Choose object to add to the tree", frameManager,
-					viewFactory, viewEntry, selectedObject.getOTObjectService(), true, true);		//Last parameter is null because we don't have an ot object service yet
+			otObj = OTObjectListViewer.showDialog(tree, "Choose object to add to the tree", frameManager, viewFactory, 
+					viewEntry.getObjectsToInsert(), selectedObject.getOTObjectService(), true, true);		//Last parameter is null because we don't have an ot object service yet
 			
 			return otObj;
 		}

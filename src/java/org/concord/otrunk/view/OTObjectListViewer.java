@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-02-23 04:39:05 $
+ * $Revision: 1.6 $
+ * $Date: 2007-03-14 02:29:22 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -68,24 +68,25 @@ public class OTObjectListViewer extends JPanel
 	 * @param title			Title of the dialog to be displayed
 	 * @param frameManager	the OT frame manager, used to pass it to the views of the objects displayed in the dialog
 	 * @param viewFactory	the OT View factory, used to create the views for the objects displayed in the dialog
-	 * @param viewConfig	An OT object edit view config that has the list of objects to display
-	 * @param otObjService	An OT Object service, used to make a copy of the OT object
+	 * @param objList		An list of OT objects to choose from 
+	 * @param otObjService	An OT Object service, used to make a copy of the OT object, or null, if object copying is not needed.
+	 * @param enableCopyOption	Determines whether the "copy object" checkbox should be enabled or not
+	 * @param defaultCopyOption	Determines if the "copy object" checkbox is selected by default or not
 	 * @return	The OT object selected by the user
 	 */
 	public static OTObject showDialog(Component parent, String title, OTFrameManager frameManager, OTViewFactory viewFactory,
-			OTObjectEditViewConfig viewConfig, OTObjectService otObjService, boolean enableCopyOption, boolean defaultCopyOption)
+			OTObjectList objList, OTObjectService otObjService, boolean enableCopyOption, boolean defaultCopyOption)
 	{
 		OTObject otObj;
 		
 		//Show the user all the possible objects to insert so he can choose
-		if (viewConfig == null){
-			System.err.println("Error: view config not specified. No objects to insert.");
+		if (objList == null || objList.size() == 0){
+			System.err.println("Error: list of objects is empty or null. No objects to insert.");
 			return null;
 		}
 				
 		OTObjectListViewer selectPanel = new OTObjectListViewer(frameManager);
 		selectPanel.setOTViewFactory(viewFactory);
-		OTObjectList objList = viewConfig.getObjectsToInsert();
 		selectPanel.setOtObjList(objList);
 		selectPanel.configCopyObjectOption(enableCopyOption, defaultCopyOption);
 		
