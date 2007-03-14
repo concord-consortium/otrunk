@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-03-13 11:55:41 $
- * $Author: scytacki $
+ * $Revision: 1.9 $
+ * $Date: 2007-03-14 02:29:22 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -155,8 +155,8 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	{
 		OTObject otObj = null;
 		
-		otObj = OTObjectListViewer.showDialog(textPanel, "Choose object to add", getFrameManager(),
-				getViewFactory(), viewEntry, ((OTCompoundDoc)pfObject).getOTObjectService(), true, false);
+		otObj = OTObjectListViewer.showDialog(textPanel, "Choose object to add", getFrameManager(), getViewFactory(), 
+				viewEntry.getObjectsToInsert(), ((OTCompoundDoc)pfObject).getOTObjectService(), true, false);
 		
 		return otObj;
 	}
