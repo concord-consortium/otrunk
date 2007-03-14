@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-03-14 02:29:22 $
+ * $Revision: 1.9 $
+ * $Date: 2007-03-14 02:38:17 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -36,7 +36,7 @@ import org.concord.framework.otrunk.view.OTViewFactory;
  *
  */
 public class OTFolderObjectEditView extends OTFolderObjectView 
-	implements MouseListener
+	implements MouseListener, OTViewEntryAware
 {
 	protected OTObject parentObject;
 	protected OTObject selectedObject;
