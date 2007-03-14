@@ -366,4 +366,14 @@ public class OTControllerServiceImpl implements OTControllerService {
 		controllerClassesFromOTObject.put(klass, viewClass);		
 	}
 
+	/**
+	 * @see org.concord.framework.otrunk.OTControllerService#loadRealObject(org.concord.framework.otrunk.OTObject, java.lang.Object)
+	 */
+	public void loadRealObject(OTObject otObject, Object realObject)
+	{
+		OTController controller = getControllerInternal(otObject, realObject);
+		
+		controller.loadRealObject(realObject);
+	}
+
 }
