@@ -31,19 +31,13 @@ package org.concord.otrunk.view;
 
 import java.util.Vector;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTrunk;
-import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTRequestedViewEntryAware;
 import org.concord.framework.otrunk.view.OTView;
-import org.concord.framework.otrunk.view.OTViewContainer;
-import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
@@ -107,27 +101,6 @@ public class OTViewFactoryImpl implements OTViewFactory
     	return new OTViewFactoryImpl(this);
     }
     
-    /* (non-Javadoc)
-     * @see org.concord.otrunk.view.OTViewFactoryImpl#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, boolean)
-     */
-    /* (non-Javadoc)
-	 * @see org.concord.otrunk.view.OTViewFactory#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, boolean)
-	 */
-    public JComponent getComponent(OTObject otObject,
-            OTViewContainer container, boolean editable)
-    {
-        OTJComponentView view = getObjectView(otObject, container);
-
-        // FIXME this doesn't set the frame manager, this method
-        // should be removed from here, 
-        
-        if(view == null) {
-            return new JLabel("No view for object: " + otObject);
-        }
-        
-        return view.getComponent(otObject, editable);
-    }
-
     /* (non-Javadoc)
 	 * @see org.concord.otrunk.view.OTViewFactory#getView(org.concord.framework.otrunk.OTObject, java.lang.Class)
 	 */
@@ -239,28 +212,6 @@ public class OTViewFactoryImpl implements OTViewFactory
         }
         
         return match;        
-    }
-    
-    /* (non-Javadoc)
-     * @see org.concord.otrunk.view.OTViewFactoryImpl#getObjectView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer)
-     */
-    /* (non-Javadoc)
-	 * @see org.concord.otrunk.view.OTViewFactory#getObjectView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer)
-	 */
-    public OTJComponentView getObjectView(OTObject otObject,
-            OTViewContainer container)
-    {
-        OTJComponentView view = (OTJComponentView)getView(otObject, OTJComponentView.class);
-        
-        if(view == null) {
-            return null;
-        }
-        
-        if(view instanceof OTViewContainerAware){
-        	((OTViewContainerAware)view).setViewContainer(container);
-        }
-        
-        return view;
     }
     
     /* (non-Javadoc)

@@ -38,11 +38,13 @@ import javax.swing.SwingUtilities;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.OTJComponentService;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTPrintDimension;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewFactory;
+import org.concord.framework.otrunk.view.OTViewServiceProvider;
 import org.concord.framework.otrunk.view.OTXHTMLHelper;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.swing.util.ComponentScreenshot;
@@ -102,10 +104,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 
         String text = null;
 		if(pfDocument != null) {
-			OTJComponentView objView = 
-				viewFactory.getObjectView(pfDocument, viewContainer);
-	        // CHECKME this doesn't set the frame manager, but it seems 
-	        // like it shouldn't need to, since this is an xhtml exporter
+			OTJComponentView objView = getOTJComponentView(pfDocument);
 
             OTXHTMLView xhtmlView = null;
             String bodyText = "";
@@ -196,7 +195,23 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
         return saver.getText();
     }
 
-
+    protected OTJComponentView getOTJComponentView(OTObject obj)
+    {
+        OTViewServiceProvider serviceProvider = viewFactory.getViewServiceProvider();
+        OTJComponentService jComponentService = (OTJComponentService)
+        	serviceProvider.getViewService(OTJComponentService.class);
+        return 
+        	jComponentService.getObjectView(obj, viewContainer);    	
+    }
+    
+    protected JComponent getJComponent(OTObject obj)
+    {
+        OTJComponentView objView = getOTJComponentView(obj);
+        
+        JComponent comp = objView.getComponent(obj, false);
+        return comp;
+    }
+    
     public String embedOTObject(OTObject obj) {
         OTView view = viewFactory.getView(obj, OTPrintDimension.class);
         if(view == null) view = (OTView)viewFactory.getView(obj, OTJComponentView.class);
@@ -207,12 +222,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
             dim = dimView.getPrintDimention(containerDisplayWidth, containerDisplayHeight);            
         }
         
-        OTJComponentView objView = 
-        	(OTJComponentView)viewFactory.getObjectView(obj, viewContainer);
-        // CHECKME this doesn't set the frame manager, but it seems 
-        // like it shouldn't need to, since this is an xhtml exporter
-        
-        JComponent comp = objView.getComponent(obj, false);
+        JComponent comp = getJComponent(obj);
         if(dim != null) comp.setSize(dim);
         else {
             Dimension dim2 = comp.getPreferredSize();
