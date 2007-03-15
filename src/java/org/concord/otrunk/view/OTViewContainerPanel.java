@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.33 $
- * $Date: 2007-03-13 15:22:26 $
+ * $Revision: 1.34 $
+ * $Date: 2007-03-15 17:36:43 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -36,6 +36,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Rectangle;
+import java.io.ByteArrayOutputStream;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -55,6 +56,7 @@ import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTXHTMLView;
+import org.concord.swing.util.ComponentScreenshot;
 
 
 /**
@@ -368,5 +370,19 @@ public class OTViewContainerPanel extends JPanel
 	public String getViewMode()
 	{
 		return viewMode;
+	}
+	
+	public void saveScreenshotAsByteArrayOutputStream(ByteArrayOutputStream out, String type)
+	throws Throwable
+	{
+		ComponentScreenshot.saveScreenshotAsByteArrayOutputStream(this, out, type);
+	}
+	
+	public ByteArrayOutputStream saveScreenshotAsByteArrayOutputStream(String type)
+	throws Throwable
+	{
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ComponentScreenshot.saveScreenshotAsByteArrayOutputStream(this, out, type);
+		return out;
 	}
 }
