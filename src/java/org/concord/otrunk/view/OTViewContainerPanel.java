@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.34 $
- * $Date: 2007-03-15 17:36:43 $
+ * $Revision: 1.35 $
+ * $Date: 2007-03-15 18:53:57 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -378,6 +378,12 @@ public class OTViewContainerPanel extends JPanel
 		ComponentScreenshot.saveScreenshotAsByteArrayOutputStream(this, out, type);
 	}
 	
+	/**
+	 * 
+	 * @param type "png" or "gif" are best bets
+	 * @return ByteArrayOutputStream representing image
+	 * @throws Throwable
+	 */
 	public ByteArrayOutputStream saveScreenshotAsByteArrayOutputStream(String type)
 	throws Throwable
 	{
