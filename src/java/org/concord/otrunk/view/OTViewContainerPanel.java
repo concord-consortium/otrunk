@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.35 $
- * $Date: 2007-03-15 18:53:57 $
+ * $Revision: 1.36 $
+ * $Date: 2007-03-16 16:42:15 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -36,6 +36,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.Vector;
 
@@ -384,11 +385,17 @@ public class OTViewContainerPanel extends JPanel
 	 * @return ByteArrayOutputStream representing image
 	 * @throws Throwable
 	 */
-	public ByteArrayOutputStream saveScreenshotAsByteArrayOutputStream(String type)
+	public ByteArrayOutputStream getScreenshotAsByteArrayOutputStream(String type)
 	throws Throwable
 	{
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ComponentScreenshot.saveScreenshotAsByteArrayOutputStream(this, out, type);
 		return out;
+	}
+	
+	public BufferedImage getScreenShot() throws Exception
+	{
+		BufferedImage image = ComponentScreenshot.getScreenshot(this);
+		return image;
 	}
 }
