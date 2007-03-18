@@ -325,13 +325,13 @@ public class OTControllerServiceImpl implements OTControllerService {
 		controllerFromOTMap.put(otObject, controller);
 		realObjectFromOTMap.put(otObject, new WeakReference(realObject));
 		
-		// in this case the realObject is already initialized
-		controller.registerRealObject(realObject);
-
 		// save the object so the otObject will pickup all the properties
 		// from the real object
 		controller.saveRealObject(realObject);
 
+		// in this case the realObject is already initialized
+		controller.registerRealObject(realObject);
+		
 		return otObject;
 	}
 	
