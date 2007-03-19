@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.36 $
- * $Date: 2007-03-16 16:42:15 $
+ * $Revision: 1.37 $
+ * $Date: 2007-03-19 15:37:16 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -376,7 +376,7 @@ public class OTViewContainerPanel extends JPanel
 	public void saveScreenshotAsByteArrayOutputStream(ByteArrayOutputStream out, String type)
 	throws Throwable
 	{
-		ComponentScreenshot.saveScreenshotAsByteArrayOutputStream(this, out, type);
+		ComponentScreenshot.saveScreenshotAsOutputStream(this, out, type);
 	}
 	
 	/**
@@ -388,9 +388,8 @@ public class OTViewContainerPanel extends JPanel
 	public ByteArrayOutputStream getScreenshotAsByteArrayOutputStream(String type)
 	throws Throwable
 	{
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ComponentScreenshot.saveScreenshotAsByteArrayOutputStream(this, out, type);
-		return out;
+		return ComponentScreenshot.saveScreenshotAsByteArrayOutputStream(this, type);
+		
 	}
 	
 	public BufferedImage getScreenShot() throws Exception
