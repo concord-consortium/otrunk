@@ -23,7 +23,14 @@ public class OTXHTMLWrapperView extends OTDocumentView
 
 	public OTXHTMLWrapperView(OTXHTMLView view, OTObject object)
 	{
+		if(view == null) {
+			throw new IllegalArgumentException("view can't be null");
+		}
 		this.xhtmlView = view;
+		
+		if(object == null) {
+			throw new IllegalArgumentException("object can't be null");
+		}
 		this.xhtmlObject =object;
 	}
 	
