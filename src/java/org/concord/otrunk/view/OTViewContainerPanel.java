@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.37 $
- * $Date: 2007-03-19 15:37:16 $
- * $Author: sfentress $
+ * $Revision: 1.38 $
+ * $Date: 2007-03-20 21:18:29 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -51,6 +51,7 @@ import javax.swing.SwingUtilities;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentView;
+import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
@@ -184,46 +185,7 @@ public class OTViewContainerPanel extends JPanel
 		SwingUtilities.invokeLater(new Runnable(){
 		    public void run()
 		    {
-				JComponent newComponent = null;
-				if(currentObject != null) {
-					if(currentViewEntry != null) {
-						currentView = 
-							(OTJComponentView)otViewFactory.getView(currentObject, currentViewEntry, getViewMode());
-
-					} else {
-						currentView = 
-							(OTJComponentView)otViewFactory.getView(currentObject, OTJComponentView.class, getViewMode());
-					}
-
-					// FIXME this is a hack for now we want to automatically
-					// handle xhtml views by wrapping them in a component
-					if(currentView == null){
-						OTXHTMLView xhtmlView = 
-							(OTXHTMLView)otViewFactory.getView(currentObject, OTXHTMLView.class, getViewMode());
-						// make an OTDocumentView with this as the text
-						// but to maintain the correct lifecycle order this can't
-						// happen until the getComponent is called on the view
-						currentView = new OTXHTMLWrapperView(xhtmlView, currentObject);
-						
-						((OTXHTMLWrapperView)currentView).setViewServiceProvider(
-								otViewFactory.getViewServiceProvider());
-					}
-					
-					if(currentView instanceof OTViewContainerAware){
-			        	((OTViewContainerAware)currentView).
-			        		setViewContainer(viewContainer);
-			        }			        
-					
-				    if(currentView == null) {
-				    	newComponent = new JLabel("No view for object: " + currentObject);
-				    } else {
-				    	newComponent = currentView.getComponent(currentObject, currentObjectEditable);
-				    }
-				} else {
-					newComponent = new JLabel("Null object");
-				}
-
-				JComponent myComponent = newComponent;
+				JComponent myComponent = createJComponent(); 
 				
 				if(isUseScrollPane()) {
 					JScrollPane scrollPane = new JScrollPane();
@@ -243,7 +205,7 @@ public class OTViewContainerPanel extends JPanel
 							super.scrollRectToVisible(contentRect);							
 						}
 					});
-					scrollPane.setViewportView(newComponent);
+					scrollPane.setViewportView(myComponent);
 					
 					scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 					myComponent = scrollPane;
@@ -254,7 +216,7 @@ public class OTViewContainerPanel extends JPanel
 				revalidate();
 				notifyListeners();
 				if(isAutoRequestFocus()){
-					newComponent.requestFocus();
+					myComponent.requestFocus();
 				}
 				
 				// We have to queue this up, because during the setup of this
@@ -275,6 +237,73 @@ public class OTViewContainerPanel extends JPanel
 		});
 	}
 
+	/**
+	 * This method trys to make a view of the current object and viewEntry if 
+	 * there is one.
+	 * 
+	 * @return
+	 */
+	protected JComponent createJComponent()
+	{
+		if(currentObject == null) {
+			return new JLabel("Null object");
+		}
+		
+		OTView genericView = null;
+		if(currentViewEntry != null) {
+			genericView = 
+				otViewFactory.getView(currentObject, currentViewEntry, getViewMode());
+		} else {
+			// FIXME this method should only return instances of OTJComponentView
+			// or null, but right now the mode can mess that up
+			genericView = 
+				otViewFactory.getView(currentObject, OTJComponentView.class, getViewMode());
+			if(genericView != null && !(genericView instanceof OTJComponentView)){
+				System.err.println("getView(" + currentObject + 
+						", OTJComponentView.class, \"" + getViewMode() + "\") " +
+						"returned non OTJComponentView : " +
+						genericView);
+			}
+		}
+
+		if(genericView instanceof OTJComponentView){
+			currentView = (OTJComponentView) genericView;
+		}
+
+		// FIXME this is a hack - the goal is to automatically
+		// handle xhtml views by wrapping them in a component
+		// but this should be abstracted, because we will at some point have
+		// more than just xhtml views, so probably there should be a service
+		// in the view factory or the viewfactory itself should be able to 
+		// translate between views. 
+		if(currentView == null){
+			OTXHTMLView xhtmlView = 
+				(OTXHTMLView)otViewFactory.getView(currentObject, OTXHTMLView.class, getViewMode());
+
+			if(xhtmlView != null){
+				// make an OTDocumentView with this as the text
+				// but to maintain the correct lifecycle order this can't
+				// happen until the getComponent is called on the view
+				currentView = new OTXHTMLWrapperView(xhtmlView, currentObject);
+
+				((OTXHTMLWrapperView)currentView).setViewServiceProvider(
+						otViewFactory.getViewServiceProvider());					
+			}
+		}
+
+		if(currentView instanceof OTViewContainerAware){
+			((OTViewContainerAware)currentView).
+			setViewContainer(viewContainer);
+		}			        
+
+		if(currentView == null) {
+			return new JLabel("No view for object: " + currentObject);
+		} 
+		
+		
+		return currentView.getComponent(currentObject, currentObjectEditable);
+	}
+	
 	/* (non-Javadoc)
 	 * @see javax.swing.JComponent#scrollRectToVisible(java.awt.Rectangle)
 	 */

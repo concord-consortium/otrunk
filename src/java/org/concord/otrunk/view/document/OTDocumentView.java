@@ -73,8 +73,6 @@ public class OTDocumentView extends AbstractOTDocumentView
 {
 	public static boolean addedCustomLayout = false;
 	
-	OTDocument pfDocument;		
-    
 	JTabbedPane tabbedPane = null;
 	JComponent previewComponent = null;
 	
@@ -104,7 +102,6 @@ public class OTDocumentView extends AbstractOTDocumentView
 	{
 		//Don't call super.setup() to avoid listening to the ot object inneccesarily
 		pfObject = (OTDocument)doc;
-		pfDocument = (OTDocument)doc;
 	}
 
 	public JComponent getComponent(OTObject otObject, boolean editable)
@@ -151,16 +148,16 @@ public class OTDocumentView extends AbstractOTDocumentView
 
 	public String updateFormatedView()
 	{		
-        if(pfDocument == null) return null;
+        if(pfObject == null) return null;
         
         //System.out.println(this+" updateFormatedView");
         
-		String markupLanguage = pfDocument.getMarkupLanguage();
+		String markupLanguage = pfObject.getMarkupLanguage();
 		if(markupLanguage == null) {
 			markupLanguage = System.getProperty("org.concord.portfolio.markup", null);
 		}
 		
-		String bodyText = pfDocument.getDocumentText();
+		String bodyText = pfObject.getDocumentText();
 		bodyText = substituteIncludables(bodyText);
 		
 		// default to html viewer for now
@@ -273,7 +270,7 @@ public class OTDocumentView extends AbstractOTDocumentView
 				viewEntry = (OTViewEntry)viewEntryTmp;
 			} else {
 				System.err.println("viewid reference to a non viewEntry object");
-				System.err.println("  doc: " + pfDocument.getGlobalId());
+				System.err.println("  doc: " + pfObject.getGlobalId());
 				System.err.println("  refid: " + idStr);
 				System.err.println("  viewid: " + viewIdStr);				
 			}
@@ -495,10 +492,11 @@ public class OTDocumentView extends AbstractOTDocumentView
 
     public String getXHTMLText(OTObject otObject) 
     {
-        // this is a bit of a hack
-        // the sequence of initializing the object should be the same
-        // if this being used xhtmlText view or as a swing component 
-        pfDocument = (OTDocument)otObject;
+        if(otObject == null){
+        	throw new IllegalArgumentException("otObject can't be null");
+        }
+        pfObject = (OTDocument)otObject;
+        
         return updateFormatedView();
     }
 
