@@ -115,6 +115,11 @@ public class OTFolderObject extends DefaultOTObject
 		return children.size();		
 	}
 	
+	public OTObjectList getChildren()
+	{
+		return resources.getChildren();
+	}
+	
 	public String toString()
 	{
 		return "OTFolderObject " +getName()+" " +super.toString();

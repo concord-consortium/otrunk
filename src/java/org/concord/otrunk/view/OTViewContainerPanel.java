@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.38 $
- * $Date: 2007-03-20 21:18:29 $
+ * $Revision: 1.39 $
+ * $Date: 2007-03-23 21:06:48 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -159,6 +159,7 @@ public class OTViewContainerPanel extends JPanel
 		disableScrolling = true;
 		if(currentView != null) {
 		    currentView.viewClosed();
+		    currentView = null;
 		}
 			
 		currentObject = otObject;
