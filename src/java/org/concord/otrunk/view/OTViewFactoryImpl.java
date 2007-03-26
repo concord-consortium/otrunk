@@ -31,7 +31,6 @@ package org.concord.otrunk.view;
 
 import java.util.Vector;
 
-import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
@@ -43,6 +42,7 @@ import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTViewServiceProvider;
 import org.concord.framework.otrunk.view.OTViewServiceProviderAware;
+import org.concord.otrunk.OTrunkUtil;
 
 /**
  * @author scytacki
@@ -263,8 +263,10 @@ public class OTViewFactoryImpl implements OTViewFactory
 		}
 		
 		OTObjectMap map = mode.getMap();
-		OTID viewEntryId = viewEntry.getGlobalId();
-		OTViewEntry modeViewEntry = (OTViewEntry)map.getObject(viewEntryId.toString());
+
+		OTViewEntry modeViewEntry = 
+			(OTViewEntry)OTrunkUtil.getObjectFromMapWithIdKeys(map, viewEntry);
+
 		if(modeViewEntry == null){
 			modeViewEntry = mode.getDefault();
 		}

@@ -6,8 +6,13 @@ package org.concord.otrunk;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
+import java.util.Vector;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectMap;
+import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.view.OTViewEntry;
 
 /**
  * @author scott
@@ -128,4 +133,43 @@ public class OTrunkUtil
 		}
 	}
 
+	/**
+	 * This method is needed if you use an object map which uses object ids for
+	 * its keys.  This is useful if you want to look up one object using another
+	 * object.  You cannot simply do 
+	 * OTObject valueObject = map.getObject(keyObject.getGlobalId().toString());
+	 * 
+	 * because when running in user mode the keyObject id will not be the same
+	 * as what is in the map.  It is wrapped with a template/user object so 
+	 * changes to it can be saved correctly.
+	 * 
+	 * @param map
+	 * @param keyObject
+	 * @return
+	 */
+	public static OTObject getObjectFromMapWithIdKeys(
+			OTObjectMap map, OTObject keyObject)
+	
+	{
+		OTObjectService objectService = keyObject.getOTObjectService();
+		
+		Vector keys = map.getObjectKeys();
+		for(int i=0; i<keys.size(); i++) {
+		    String currentKey = (String)keys.get(i);
+		    
+		    OTID currentKeyId = objectService.getOTID(currentKey);
+		    try {
+		    	OTObject currentKeyObject = 
+		    		objectService.getOTObject(currentKeyId); 
+
+		    	if(currentKeyObject == keyObject) {
+		    		return (OTViewEntry)map.getObject(currentKey);
+		    	}
+		    } catch (Exception e){
+		    	e.printStackTrace();
+		    }
+		}
+
+		return null;
+	}
 }
