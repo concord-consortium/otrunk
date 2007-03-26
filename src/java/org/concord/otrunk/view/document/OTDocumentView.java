@@ -255,7 +255,8 @@ public class OTDocumentView extends AbstractOTDocumentView
      * @see #substituteIncludables(String)
      * 
      */
-	public String getIncludableReplacement(String idStr, String viewIdStr)
+	public String getIncludableReplacement(String idStr, String viewIdStr,
+			String modeStr)
 	{
 		// lookup the object at this id	    	   
 		OTObject referencedObject = getReferencedObject(idStr);
@@ -278,17 +279,26 @@ public class OTDocumentView extends AbstractOTDocumentView
 		}
 		
 		OTView view = null;
+
+		String viewMode = getViewMode();
+		if(modeStr != null){
+			if(modeStr.length()==0){
+				viewMode = null;
+			} else {
+				viewMode = modeStr;
+			}
+		}
 		
 		if(viewEntry != null){
-			view = getViewFactory().getView(referencedObject, viewEntry, getViewMode());
+			view = getViewFactory().getView(referencedObject, viewEntry, viewMode);
 		} else {
-			view = getViewFactory().getView(referencedObject, OTXHTMLView.class, getViewMode());
+			view = getViewFactory().getView(referencedObject, OTXHTMLView.class, viewMode);
 			// if there isnt' a xhtml view and there is a view mode, then see if 
 			// that viewMode of the jcomponent view is an xhtmlview.
 			// this logic is really contorted.  The mixing of viewmodes and
 			// renderings needs to be well defined.
 			if(view == null && getViewMode() != null){
-				view = getViewFactory().getView(referencedObject, OTJComponentView.class, getViewMode());				
+				view = getViewFactory().getView(referencedObject, OTJComponentView.class, viewMode);				
 			}
 		}
 
@@ -319,6 +329,7 @@ public class OTDocumentView extends AbstractOTDocumentView
 						
 		Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
 		Pattern pViewId = Pattern.compile("viewid=\"([^\"]*)\""); 
+		Pattern pMode = Pattern.compile("mode=\"([^\"]*)\""); 
 		Matcher m = p.matcher(inText);
 		StringBuffer parsed = new StringBuffer();
 		while(m.find()) {
@@ -331,7 +342,13 @@ public class OTDocumentView extends AbstractOTDocumentView
 				viewIdStr = mViewId.group(1);
 			}
 			
-			String replacement = getIncludableReplacement(id, viewIdStr);
+			Matcher mMode = pMode.matcher(element);
+			String modeStr = null;
+			if(mMode.find()){
+				modeStr = mMode.group(1);
+			}
+
+			String replacement = getIncludableReplacement(id, viewIdStr, modeStr);
 						
 			try {
 				m.appendReplacement(parsed, replacement);
@@ -478,6 +495,12 @@ public class OTDocumentView extends AbstractOTDocumentView
 						System.err.println("Invalid link target attrib: " + target);
 						return;
 					}					
+					
+					if(modeStr != null && modeStr.length() == 0){
+						modeStr = null;
+					} else if(modeStr == null){
+						modeStr = getViewMode();
+					}
 					
 					getFrameManager().putObjectInFrame(linkObj, viewEntry, targetFrame, 
 							modeStr);

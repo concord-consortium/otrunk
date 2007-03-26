@@ -32,6 +32,8 @@ package org.concord.otrunk;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTChangeEvent;
@@ -56,12 +58,23 @@ import org.concord.otrunk.datamodel.OTDataObject;
  */
 public class OTResourceSchemaHandler extends OTInvocationHandler
 {
-    Class schemaInterface = null;
+	public final static boolean traceListeners =
+		Boolean.getBoolean("otrunk.trace.listeners");
+	
+	Class schemaInterface = null;
     OTrunkImpl db;
     OTObjectService objectService;
     
     Vector changeListeners = new Vector();
 
+    /**
+     * This is for debugging purposes it contains a mapping from
+     * the weakreference object to the toString of the listener it
+     * referenced.  This way when the listener is gc'd we can printout
+     * its "label" (toString value).
+     */
+    Map changeListenerLabels;
+    
     /**
      * This can be used by a user of an object to turn off the listening
      * 
@@ -218,16 +231,35 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 		    // added
 		    WeakReference listenerRef = new WeakReference(args[0]);
 		    changeListeners.add(listenerRef);
+		    
+		    // debugging instrumentation
+		    // ignore instances of the tracelistener
+		    if(traceListeners &&
+		    		!(args[0] instanceof TraceListener)){
+		    	System.out.println("addOTChangeListener(obj:" + proxy + 
+		    			", listener:" + args[0]);
+		    	
+		    	if(changeListenerLabels == null){
+		    		changeListenerLabels = new HashMap();
+		    		changeListenerLabels.put(listenerRef, "" + args[0]);
+		    	}
+		    }
 		    hasListeners = true;
 		    return null;
 		}
 		
 		if(methodName.equals("removeOTChangeListener")) {
+		    if(traceListeners){
+		    	System.out.println("removeOTChangeListener(obj:" + proxy + 
+		    			", listener:" + args[0]);
+		    }
+
 		    // param OTChangeListener listener		    
 		    for(int i=0; i<changeListeners.size(); i++) {
 		        WeakReference ref = (WeakReference)changeListeners.get(i);
 		        if(args[0] == ref.get()) {
 		            changeListeners.remove(i);
+
 		            return null;
 		        }
 		    }
@@ -355,6 +387,10 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
                 // the listener was gc'd so lets mark it to be removed
                 if(toBeRemoved == null) {
                     toBeRemoved = new Vector();
+                }
+                if(traceListeners){
+                	System.out.println("otChangeListener garbage collected:" +
+                			changeListenerLabels.get(ref));
                 }
                 toBeRemoved.add(ref);
             }
