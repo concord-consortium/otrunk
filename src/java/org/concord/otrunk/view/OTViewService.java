@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-03-09 12:08:04 $
+ * $Revision: 1.12 $
+ * $Date: 2007-03-26 14:31:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -53,6 +53,8 @@ public class OTViewService extends DefaultOTObject
         public OTObjectList getViewEntries();
         
         public OTObjectList getModes();
+        
+        public String getCurrentMode();
     }
     
     ResourceSchema resources;
@@ -90,5 +92,10 @@ public class OTViewService extends DefaultOTObject
     public OTObjectList getModes()
     {
     	return resources.getModes();
+    }
+    
+    public String getCurrentMode()
+    {
+    	return resources.getCurrentMode();
     }
 }

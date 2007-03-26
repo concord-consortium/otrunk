@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.51 $
- * $Date: 2007-03-14 00:30:32 $
+ * $Revision: 1.52 $
+ * $Date: 2007-03-26 14:31:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -439,6 +439,10 @@ public class OTViewer extends JFrame
 		otViewFactory.addViewService(new OTJComponentServiceImpl(otViewFactory));
 		
 		bodyPanel.setOTViewFactory(otViewFactory);
+		
+		// set the current mode from the viewservice to the main bodyPanel
+		bodyPanel.setViewMode(viewService.getCurrentMode());
+		
 		// set the viewFactory of the frame manager
 		frameManager.setViewFactory(otViewFactory);
 
