@@ -12,7 +12,6 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.view.OTViewEntry;
 
 /**
  * @author scott
@@ -163,7 +162,7 @@ public class OTrunkUtil
 		    		objectService.getOTObject(currentKeyId); 
 
 		    	if(currentKeyObject == keyObject) {
-		    		return (OTViewEntry)map.getObject(currentKey);
+		    		return map.getObject(currentKey);
 		    	}
 		    } catch (Exception e){
 		    	e.printStackTrace();
