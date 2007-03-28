@@ -35,15 +35,8 @@ public class OTPrototypeEventMappingHelper
 		for(int i=0; i<mapping.size(); i++){
 			OTPrototypeMapEntry entry = (OTPrototypeMapEntry) mapping.get(i);
 			
-			try {
-				Object propertyValue = 
-					OTrunkUtil.getPropertyValue(entry.getModelProperty(), model);
-				OTrunkUtil.setPropertyValue(entry.getPrototypeProperty(), 
-						prototypeCopy, propertyValue);
-			} catch (NoSuchMethodException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			updateValue(model, entry.getModelProperty(), prototypeCopy,
+					entry.getPrototypeProperty(),null);
 		}
 		
 		setupListeners();
@@ -116,13 +109,26 @@ public class OTPrototypeEventMappingHelper
 			// argh!!
 			// FIXME this removes us on the root object which might not
 			// be the one being changed
-			((OTChangeNotifying)dest).removeOTChangeListener(destListener);
+			if(destListener != null) {
+				((OTChangeNotifying)dest).removeOTChangeListener(destListener);
+			}
 			OTrunkUtil.setPropertyValue(destProperty, dest, propertyValue);
-			((OTChangeNotifying)dest).addOTChangeListener(destListener);						
+			if(destListener != null){
+				((OTChangeNotifying)dest).addOTChangeListener(destListener);
+			}
 		} catch (NoSuchMethodException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * 
+	 */
+	public void removeAllListeners()
+	{
+		((OTChangeNotifying)model).removeOTChangeListener(modelListener);
+		((OTChangeNotifying)prototypeCopy).removeOTChangeListener(prototypeCopyListener);		
 	}
 }

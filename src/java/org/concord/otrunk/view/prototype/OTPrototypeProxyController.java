@@ -71,4 +71,13 @@ public class OTPrototypeProxyController extends DefaultOTObject implements
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.view.prototype.OTPrototypeController#close()
+	 */
+	public void close()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }

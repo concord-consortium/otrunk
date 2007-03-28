@@ -41,6 +41,7 @@ public class OTPrototypeEventController extends DefaultOTObject implements
 	private ResourceSchema resources;
 	
 	protected WeakHashMap referenceMap;
+	OTPrototypeEventMappingHelper helper;
 	
 	public OTPrototypeEventController(ResourceSchema resources) {
 		super(resources);
@@ -71,7 +72,7 @@ public class OTPrototypeEventController extends DefaultOTObject implements
 			}			
 		}
 		
-		OTPrototypeEventMappingHelper helper = 
+		helper = 
 			new OTPrototypeEventMappingHelper(model, prototypeCopy, 
 					resources);
 		
@@ -88,5 +89,10 @@ public class OTPrototypeEventController extends DefaultOTObject implements
 		referenceMap.put(component, helper);
 
 		return component;
+	}
+	
+	public void close()
+	{
+		helper.removeAllListeners();
 	}
 }

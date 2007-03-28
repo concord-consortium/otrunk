@@ -24,4 +24,9 @@ public interface OTPrototypeController extends OTObject
 	JComponent getComponent(OTObject model, OTPrototypeViewEntry config, 
 			OTViewFactory otViewFactory);
 
+	/**
+	 * 
+	 */
+	void close();
+
 }

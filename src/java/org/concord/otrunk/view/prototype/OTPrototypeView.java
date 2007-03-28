@@ -96,7 +96,7 @@ public class OTPrototypeView extends AbstractOTView
 
 	public void viewClosed() {
 		// TODO Auto-generated method stub
-
+		controller.close();
 	}
 
 	/* (non-Javadoc)
