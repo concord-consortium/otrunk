@@ -7,11 +7,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTResourceList;
 
 /**
  * @author scott
@@ -49,26 +53,68 @@ public class OTrunkUtil
 		// find the get or is method on the object with this name
 		Class objClass = obj.getClass();
 		String methodCase = propertyToMethodCase(propertyName);
-		Method method = null;
-		try {
-			method = objClass.getMethod("get" + methodCase, null);
-		} catch (NoSuchMethodException e) {
-			// do nothing because we should try the is method
-			method = objClass.getMethod("is" + methodCase, null);
+		
+		if(propertyName.endsWith("]")){
+			Pattern arrayPattern = Pattern.compile("(.*)\\[(\\d*)\\]");
+			Matcher m = arrayPattern.matcher(methodCase);
+			if(m.matches()){
+				methodCase = m.group(1);
+				String indexStr = m.group(2);
+				
+				// get the ObjectList
+				// call set with this index
+				String methodName = "get" + methodCase;
+
+				Method getListMethod = objClass.getMethod(methodName, null);
+				Object list = null;
+				try {
+					list = getListMethod.invoke(obj, null);
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+								
+				// remove the old one 
+				int index = Integer.parseInt(indexStr);
+				
+				if(list instanceof OTObjectList){
+					OTObjectList objList = (OTObjectList) list;
+					return objList.get(index);
+				} else if(list instanceof OTResourceList){
+					OTResourceList resList = (OTResourceList) list;
+					return resList.get(index);
+				}
+			}
+		} else {
+
+			Method method = null;
+			try {
+				method = objClass.getMethod("get" + methodCase, null);
+			} catch (NoSuchMethodException e) {
+				// do nothing because we should try the is method
+				method = objClass.getMethod("is" + methodCase, null);
+			}
+
+			try {
+				return method.invoke(obj, null);
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
-		try {
-			return method.invoke(obj, null);
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return null;
 	}
 
@@ -79,36 +125,91 @@ public class OTrunkUtil
 		// find the get or is method on the object with this name
 		Class objClass = obj.getClass();
 		String methodCase = propertyToMethodCase(propertyName);
-		
-		// because we don't have an easy way to figure out the correct
-		// arguments for the set method, we'll just get them all 
-		// and select the first one with a matching name.
-		String methodName = "set" + methodCase;
-		Method [] methods = objClass.getMethods();
 		Method setMethod = null;
-		for(int i=0; i<methods.length; i++){
-			if(methods[i].getName().equals(methodName)){
-				setMethod = methods[i];
-				break;
+		Object [] params = null;
+
+		// check if this is an array reference
+		if(propertyName.endsWith("]")){
+			if(value == null){
+				System.err.println("cannot store null values in a list");
+				return;
+			}
+			
+			Pattern arrayPattern = Pattern.compile("(.*)\\[(\\d*)\\]");
+			Matcher m = arrayPattern.matcher(methodCase);
+			if(m.matches()){
+				methodCase = m.group(1);
+				String indexStr = m.group(2);
+				
+				// get the ObjectList
+				// call set with this index
+				String methodName = "get" + methodCase;
+
+				Method getListMethod = objClass.getMethod(methodName, null);
+				Object list = null;
+				try {
+					list = getListMethod.invoke(obj, null);
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+								
+				// remove the old one 
+				int index = Integer.parseInt(indexStr);
+				
+				if(list instanceof OTObjectList){
+					OTObjectList objList = (OTObjectList) list;
+					if(objList.size() >= (index+1)){
+						objList.remove(index);
+					}					
+					objList.add(index, (OTObject)value);
+				} else if(list instanceof OTResourceList){
+					OTObjectList objList = (OTObjectList) list;
+					if(objList.size() >= (index+1)){
+						objList.remove(index);
+					}
+					objList.add(index, (OTObject)value);					
+				}
+			}
+		} else {
+
+			// because we don't have an easy way to figure out the correct
+			// arguments for the set method, we'll just get them all 
+			// and select the first one with a matching name.
+			String methodName = "set" + methodCase;
+			Method [] methods = objClass.getMethods();
+			for(int i=0; i<methods.length; i++){
+				if(methods[i].getName().equals(methodName)){
+					setMethod = methods[i];
+					break;
+				}
+			}
+
+			params = new Object[]{value};
+			if(setMethod == null){
+				throw new NoSuchMethodException("propertyName: " + propertyName);
+			}
+			
+			try {
+				setMethod.invoke(obj, params);
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
-
-		if(setMethod == null){
-			throw new NoSuchMethodException("propertyName: " + propertyName);
-		}
 		
-		try {
-			setMethod.invoke(obj, new Object[]{value});
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	public final static String propertyToMethodCase(String property)
 	{
@@ -132,6 +233,8 @@ public class OTrunkUtil
 		}
 	}
 
+	
+	
 	/**
 	 * This method is needed if you use an object map which uses object ids for
 	 * its keys.  This is useful if you want to look up one object using another
