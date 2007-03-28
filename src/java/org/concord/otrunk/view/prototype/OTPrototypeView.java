@@ -45,48 +45,9 @@ public class OTPrototypeView extends AbstractOTView
 			OTJComponentView currentView =
 				(OTJComponentView)otViewFactory.getView(prototype, viewEntry.getViewEntry());
 
-			/**
-			 * Should set these things here
-			 * but this code needs to go in a common place
-			 * so we stop doing it over and over
-			if(currentView instanceof OTViewContainerAware){
-				((OTViewContainerAware)currentView).
-				setViewContainer(viewContainer);
-			}			        
-				
-			if(currentView instanceof OTFrameManagerAware){
-				((OTFrameManagerAware)currentView).setFrameManager(frameManager);
-			}
-			 */
 			component = currentView.getComponent(prototype, false);
 		}
-		/*
-		OTPrototypeViewInvocationHandler invokeHandler =
-			new OTPrototypeViewInvocationHandler(templateObject, otObject, this);
 
-		OTObject proxy = (OTObject)Proxy.newProxyInstance(getClass().getClassLoader(), 
-				templateObject.getClass().getInterfaces(), invokeHandler);
-		
-		OTJComponentView currentView =
-			(OTJComponentView)otViewFactory.getView(proxy, config.getViewEntry());
-        *
-        */
-		
-		/**
-		 * Should set these things here
-		 * but this code needs to go in a common place
-		 * so we stop doing it over and over
-		if(currentView instanceof OTViewContainerAware){
-			((OTViewContainerAware)currentView).
-			setViewContainer(viewContainer);
-		}			        
-			
-		if(currentView instanceof OTFrameManagerAware){
-			((OTFrameManagerAware)currentView).setFrameManager(frameManager);
-		}
-		 */
-
-		
 		if(component == null) {
 			return new JLabel("No view for object: " + prototype);
 		} else {
