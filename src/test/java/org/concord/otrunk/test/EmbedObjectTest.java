@@ -12,7 +12,6 @@ import javax.swing.WindowConstants;
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.view.OTViewContainerPanel;
 import org.concord.otrunk.view.OTViewerHelper;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -31,49 +30,22 @@ public class EmbedObjectTest extends JFrame {
 		this.xmlString = xmlString;
 		this.viewerHelper = new OTViewerHelper();
 		try {
-			viewerHelper.loadOTrunk(loadOTDatabase(), this);
+			ByteArrayInputStream bais = new ByteArrayInputStream(xmlString.getBytes());
+			XMLDatabase otDatabase = new XMLDatabase(bais, null, null);
+			viewerHelper.loadOTrunk(otDatabase, this);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		setupView();
-	}
-	
-	public OTDatabase loadOTDatabase() {
-		ByteArrayInputStream bais = new ByteArrayInputStream(xmlString.getBytes());
-		XMLDatabase otDB = null;
-		try {
-			otDB = new XMLDatabase(bais, null, null);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		setupFrame();
 		
-		return otDB;
-	}
-	
-	public void setupView()
-	{
-        setTitle("Embed Object Test App");
-        
-		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		
-		addWindowListener( new WindowAdapter() {
-		    public void windowClosing(WindowEvent e)
-		    {
-		    	System.exit(0);		        
-		    }			
-		});				
-	
 		try {
 			// look up view container with the frame.
 			otContainer = viewerHelper.createViewContainerPanel(); 
 			otContainer.setPreferredSize(new Dimension(800,600));
-	
-			getContentPane().setLayout(new BorderLayout());
-	
-			getContentPane().removeAll();
-			
+
+			// add the ot pane to the content pane
 			getContentPane().add(otContainer, BorderLayout.CENTER);
 	
 			// call setCurrentObject on that view container with a null
@@ -87,6 +59,22 @@ public class EmbedObjectTest extends JFrame {
 		}		
 	}
 
+	public void setupFrame()
+	{
+		setTitle("Embed Object Test App");        
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);		
+		addWindowListener( new WindowAdapter() {
+		    public void windowClosing(WindowEvent e)
+		    {
+		    	System.exit(0);		        
+		    }			
+		});				
+	
+		// setup the contentpane of the frame
+		getContentPane().setLayout(new BorderLayout());	
+		getContentPane().removeAll();			
+	}
+	
 	public OTObject getOTObject()
 		throws Exception
 	{
