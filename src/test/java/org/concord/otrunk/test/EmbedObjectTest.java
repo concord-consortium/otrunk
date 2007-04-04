@@ -20,14 +20,10 @@ public class EmbedObjectTest extends JFrame {
 	
 	private OTViewContainerPanel otContainer;
 	private OTViewerHelper viewerHelper;
-	private String xmlString;
-	private String objID;
 	
-	public EmbedObjectTest(String xmlString, String objID) {
+	public EmbedObjectTest(String xmlString) {
 		super();
 
-		this.objID = objID;
-		this.xmlString = xmlString;
 		this.viewerHelper = new OTViewerHelper();
 		try {
 			ByteArrayInputStream bais = new ByteArrayInputStream(xmlString.getBytes());
@@ -80,6 +76,8 @@ public class EmbedObjectTest extends JFrame {
 	{
 		OTObject root = viewerHelper.getRootObject();
 		
+		return root;
+		/*
 		OTObject otObject = root;
 		if(objID != null && objID.length() > 0){
 			OTID id = getID(objID);
@@ -88,6 +86,7 @@ public class EmbedObjectTest extends JFrame {
 		}
 	
 		return otObject;
+		*/
 	}
 	
 	public OTID getID(String id)
@@ -107,6 +106,7 @@ public class EmbedObjectTest extends JFrame {
 					"<import class=\"org.concord.otrunk.view.document.OTCompoundDoc\"/>" +
 					"<import class=\"org.concord.otrunk.view.OTViewEntry\"/>" +
 					"<import class=\"org.concord.otrunk.ui.OTImage\"/>" +
+					"<import class=\"org.concord.otrunk.ui.swing.OTImageViewConfig\"/>" +
 					"<import class=\"org.concord.otrunk.view.OTViewService\"/>" +
 					"<import class=\"org.concord.framework.otrunk.view.OTFrame\"/>" +
 					"<import class=\"org.concord.data.state.OTUnitValue\"/>" +
@@ -123,6 +123,12 @@ public class EmbedObjectTest extends JFrame {
 										" viewClass=\"org.concord.data.state.OTUnitValueView\">" +
 										" <precision>1</precision>" +
 									"</OTUnitValueViewConfig>" +
+									"<OTImageViewConfig" +
+										" objectClass=\"org.concord.otrunk.ui.OTImage\"" +
+										" viewClass=\"org.concord.otrunk.ui.swing.OTImageView\">" +
+										" <preferredWidth>50</preferredWidth>" +
+										" <preferredHeight>50</preferredHeight>" +
+									"</OTImageViewConfig>" +
 									"<OTViewEntry " +
 										" objectClass=\"org.concord.otrunk.ui.notebook.OTNotebook\"" +
 										" viewClass=\"org.concord.otrunk.ui.notebook.OTNotebookView\">" +
@@ -144,10 +150,6 @@ public class EmbedObjectTest extends JFrame {
 										" viewClass=\"org.concord.otrunk.ui.notebook.OTNotebookMeasurementView\">" +
 									"</OTViewEntry>" +
 									"<OTViewEntry" +
-										" objectClass=\"org.concord.otrunk.ui.OTImage\"" +
-										" viewClass=\"org.concord.otrunk.ui.swing.OTImageView\">" +
-									"</OTViewEntry>" +
-									"<OTViewEntry" +
 										" objectClass=\"org.concord.otrunk.view.document.OTTextObject\"" +
 										" viewClass=\"org.concord.otrunk.view.document.OTTextObjectView\">" +
 									"</OTViewEntry>" +
@@ -155,62 +157,43 @@ public class EmbedObjectTest extends JFrame {
 							"</OTViewService>" +
 						"</services>" +
 						"<root>" +
-							"<OTFolderObject name=\"OTNotebook Test\">" +
-								"<children>" +
-									"<OTUnitValue local_id=\"unitvalue1\" name=\"UnitValue Test\" value=\"20.653\" unit=\"NONY\"/>" +
-									"<OTNotebookMeasurement name=\"Measurement test\">" +
-										"<notes>" +
-											"<OTText local_id=\"textbox1\">" +
-												"<text>My text</text>" +
-											"</OTText>" +
-										"</notes>" +
-										"<unitValue>" +
-											"<OTUnitValue refid=\"${unitvalue1}\"/>" +
-										"</unitValue>" +
-										"<image>" +
-											"<OTImage local_id=\"image1\"" +
-												" imageBytes=\"http://www.concord.org/images/logos/cc/cc-logo.gif\"/>" +
-										"</image>" +
-									"</OTNotebookMeasurement>" +
-									"<OTNotebook name=\"Notebook test\" local_id=\"notebook1\">" +
-										"<entries>" +
-											"<OTNotebookMeasurement>" +
-												"<notes>" +
-													"<OTText>" +
-														"<text>My text</text>" +
-													"</OTText>" +
-												"</notes>" +
-												"<unitValue>" +
-													"<OTUnitValue value=\"26.653\" unit=\"cm\"/>" +
-												"</unitValue>" +
-												"<image>" +
-													"<OTImage" +
-														" imageBytes=\"http://www.concord.org/images/logos/cc/cc-logo.gif\"/>" +
-												"</image>" +
-											"</OTNotebookMeasurement>" +
-											"<OTNotebookMeasurement>" +
-												"<notes>" +
-													"<OTText>" +
-														"<text>My text</text>" +
-													"</OTText>" +
-												"</notes>" +
-												"<unitValue>" +
-													"<OTUnitValue value=\"39.657\" unit=\"cm\"/>" +
-												"</unitValue>" +
-												"<image>" +
-													"<OTImage " +
-														" imageBytes=\"http://www.concord.org/images/logos/cc/cc-logo.gif\"/>" +
-												"</image>" +
-											"</OTNotebookMeasurement>" +
-										"</entries>" +
-									"</OTNotebook>" +
-								"</children>" +
-							"</OTFolderObject>" +
-						"</root>" +
-					"</OTSystem>" +
-				"</objects>" +
-			"</otrunk>";
-		EmbedObjectTest test = new EmbedObjectTest(xmlString, "notebook1");
+							"<OTNotebook name=\"Notebook test\" local_id=\"notebook1\">" +
+							"<entries>" +
+								"<OTNotebookMeasurement>" +
+									"<notes>" +
+										"<OTText>" +
+											"<text>My text</text>" +
+										"</OTText>" +
+									"</notes>" +
+									"<unitValue>" +
+										"<OTUnitValue value=\"26.653\" unit=\"cm\"/>" +
+									"</unitValue>" +
+									"<image>" +
+										"<OTImage" +
+											" imageBytes=\"http://www.concord.org/images/logos/cc/cc-logo.gif\"/>" +
+									"</image>" +
+								"</OTNotebookMeasurement>" +
+								"<OTNotebookMeasurement>" +
+									"<notes>" +
+										"<OTText>" +
+											"<text>My text</text>" +
+										"</OTText>" +
+									"</notes>" +
+									"<unitValue>" +
+										"<OTUnitValue value=\"39.657\" unit=\"cm\"/>" +
+									"</unitValue>" +
+									"<image>" +
+										"<OTImage " +
+										" imageBytes=\"http://www.concord.org/images/logos/cc/cc-logo.gif\"/>" +
+									"</image>" +
+								"</OTNotebookMeasurement>" +
+							"</entries>" +
+						"</OTNotebook>" +
+					"</root>" +
+				"</OTSystem>" +
+			"</objects>" +
+		"</otrunk>";
+		EmbedObjectTest test = new EmbedObjectTest(xmlString);
 		test.pack();
 		test.show();
 	}
