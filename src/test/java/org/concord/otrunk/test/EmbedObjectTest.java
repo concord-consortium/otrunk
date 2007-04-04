@@ -128,6 +128,7 @@ public class EmbedObjectTest extends JFrame {
 										" viewClass=\"org.concord.otrunk.ui.swing.OTImageView\">" +
 										" <preferredWidth>50</preferredWidth>" +
 										" <preferredHeight>50</preferredHeight>" +
+										" <zoomEnabled>true</zoomEnabled>" +
 									"</OTImageViewConfig>" +
 									"<OTViewEntry " +
 										" objectClass=\"org.concord.otrunk.ui.notebook.OTNotebook\"" +
