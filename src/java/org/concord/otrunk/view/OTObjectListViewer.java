@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2007-03-14 02:29:22 $
+ * $Revision: 1.7 $
+ * $Date: 2007-04-05 02:10:58 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -101,6 +101,8 @@ public class OTObjectListViewer extends JPanel
 		
 		if (retCode == JOptionPane.OK_OPTION){
 			otObj = selectPanel.getCurrentOTObject();
+			if (otObj == null) return null;
+			
 			if (selectPanel.getCopyObjectOption()){
 				if (otObjService != null){
 					//Create a new instance of the object to insert with this template

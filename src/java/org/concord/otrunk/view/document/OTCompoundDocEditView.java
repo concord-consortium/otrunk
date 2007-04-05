@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-03-14 02:29:22 $
+ * $Revision: 1.10 $
+ * $Date: 2007-04-05 02:10:58 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -56,19 +56,25 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		previewView = (OTDocumentView)getViewFactory().getView(otObject, OTDocumentView.class);
 		
 		//System.out.println("preview view is " + previewView);
-		
+				
 		//Create a split pane with the preview pane and the text area 
 		JComponent editTextPane = super.getComponent(otObject, true);
 		JPanel editPane = createTextPanel(editTextPane);
 		
-		JComponent previewPane = previewView.getComponent(otObject, false);
-		
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-		                           editPane, previewPane);
-		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(150);
-
-		return splitPane;
+		//If preview is not available, don't use it then
+		if (previewView == null){
+			return editPane;
+		}
+		else{
+			JComponent previewPane = previewView.getComponent(otObject, false);
+			
+			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+			                           editPane, previewPane);
+			splitPane.setOneTouchExpandable(true);
+			splitPane.setDividerLocation(150);
+	
+			return splitPane;
+		}
 	}
 	
 	/**
@@ -143,6 +149,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	 */
 	private void updatePreviewView()
 	{
+		if (previewView == null) return;
 		previewView.updateFormatedView();
 	}
 
