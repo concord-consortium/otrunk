@@ -191,11 +191,42 @@ public class OTrunkUtil
 				}
 			}
 
-			params = new Object[]{value};
 			if(setMethod == null){
 				throw new NoSuchMethodException("propertyName: " + propertyName);
 			}
 			
+			Class paramType = setMethod.getParameterTypes()[0];
+			if(value instanceof String){
+				String valueStr = (String) value;
+				if(paramType == Float.class ||
+						paramType == Float.TYPE){
+					value = Float.valueOf(valueStr);
+				} else if(paramType == Integer.class ||
+						paramType == Integer.TYPE){
+					value = Integer.valueOf(valueStr);
+				} else if(paramType == Boolean.class ||
+						paramType == Boolean.TYPE){
+					value = Boolean.valueOf(valueStr);
+				} else if(paramType == Double.class ||
+						paramType == Double.TYPE){
+					value = Double.valueOf(valueStr);
+				} else if(paramType == Long.class ||
+						paramType == Long.TYPE){
+					value = Long.valueOf(valueStr);
+				} else if(paramType == Short.class ||
+						paramType == Short.TYPE){
+					value = Short.valueOf(valueStr);
+				}
+			}
+			
+			if(paramType == String.class &&
+					(value.getClass().isPrimitive() ||
+							Number.class.isAssignableFrom(value.getClass())))
+			{
+				value = "" + value;
+			}
+			
+			params = new Object[]{value};
 			try {
 				setMethod.invoke(obj, params);
 			} catch (InvocationTargetException e) {
