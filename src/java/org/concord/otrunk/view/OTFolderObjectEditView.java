@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-03-14 02:38:17 $
+ * $Revision: 1.10 $
+ * $Date: 2007-04-05 02:59:40 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -334,6 +334,8 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		 */
 		private OTObject getObjectToInsertFromUser()
 		{
+			if (viewEntry == null) return null;
+			
 			OTViewFactory viewFactory = 
 				(OTViewFactory)getViewService(OTViewFactory.class);
 			OTFrameManager frameManager = 
@@ -367,7 +369,8 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	public void setViewEntry(OTViewEntry viewEntry)
 	{
 		if (!(viewEntry instanceof OTObjectEditViewConfig)){
-			System.err.println("Error: the specified view config should be an istance of OTObjectEditViewConfig.");
+			System.err.println("Error: the specified view config should be an istance of OTObjectEditViewConfig. View entry specified is: " + viewEntry);
+			this.viewEntry = null;
 			return;
 		}
 		
