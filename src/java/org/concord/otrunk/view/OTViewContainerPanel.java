@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.40 $
- * $Date: 2007-04-05 13:13:16 $
+ * $Revision: 1.41 $
+ * $Date: 2007-04-05 13:50:13 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -338,17 +338,17 @@ public class OTViewContainerPanel extends JPanel
 	
 	protected void disableScrolling()
 	{
-		System.out.println("disable Scrolling: " + unwantedScrollingCount + " " 
-				+ currentObject.getGlobalId());
+		// System.out.println("disable Scrolling: " + unwantedScrollingCount + " " 
+		//		+ currentObject.getGlobalId());
 		unwantedScrollingCount++;
 	}
 	
 	protected void enableScrolling()
 	{
 		unwantedScrollingCount--;
-		System.out.println("enabling Scrolling: " + 
-				unwantedScrollingCount + " " + 
-				currentObject.getGlobalId().toString());
+		//System.out.println("enabling Scrolling: " + 
+		//		unwantedScrollingCount + " " + 
+		//		currentObject.getGlobalId().toString());
 
 		if(unwantedScrollingCount > 0){
 			System.err.println("unwantedScrollingCount dropped below 0");
