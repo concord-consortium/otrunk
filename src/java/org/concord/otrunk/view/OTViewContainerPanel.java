@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.39 $
- * $Date: 2007-03-23 21:06:48 $
+ * $Revision: 1.40 $
+ * $Date: 2007-04-05 13:13:16 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -95,15 +95,24 @@ public class OTViewContainerPanel extends JPanel
 
 	/**
 	 * This is used to ignore the scrollRectToVisible method
-	 * both in the viewport and in the ourselves.  This method
+	 * both in the viewport and in the ourselves.  scrollRectToVisible
 	 * is called when the content of a child component is initialized.  One place
 	 * where it is called is when the caret position is changed during loading.
 	 * If the scrolling is not disabled then this causes the view to scroll to
 	 * the bottom.  If this view is embedded in another view then the scroll 
 	 * "event" is propgated to the parent and it is scrolled so the bottom of this
 	 * embedded view is visible.
+	 * 
+	 * This is a count, so that scrolling stays disabled until all of the 
+	 * scroll causing operations have finished.  This happens because setCurrentObject
+	 * is called multiple times not in the awt thread.  The first one disables
+	 * scrolling and queues up an invokeLater to enable it again.  Then the second
+	 * call to setCurrentObject happens before the queued up enableScrolling is
+	 * run.  And then the enableScrolling is run before the gui operations happen
+	 * from the second call. So without a counter, the scrolling would be enabled while some of theThis is a bit dangerous
+	 * so it would be better have some kind of logging so we can track this better.
 	 */
-	private boolean disableScrolling = true;
+	private int unwantedScrollingCount = 0;
 
 	private String viewMode = null;
 	
@@ -156,7 +165,6 @@ public class OTViewContainerPanel extends JPanel
 	public void setCurrentObject(OTObject otObject, OTViewEntry viewEntry, 
 			boolean editable)
 	{
-		disableScrolling = true;
 		if(currentView != null) {
 		    currentView.viewClosed();
 		    currentView = null;
@@ -171,6 +179,9 @@ public class OTViewContainerPanel extends JPanel
 		if(otObject == null){
 			return;
 		}
+		
+		disableScrolling();
+
 		// Unfortunately the size of this label matters, when these objects
 		// are embedded in tables inside of the htmleditorkit.  I think the
 		// editorkit gets messed up when the width of a component changes.
@@ -199,7 +210,8 @@ public class OTViewContainerPanel extends JPanel
 						public void scrollRectToVisible(Rectangle contentRect) {
 							// disabling this removes the flicker that occurs during the loading of the page.
 							// if we could 
-							if(disableScrolling){
+							System.out.println("scRV viewport: " + currentObject.getGlobalId().toString());
+							if(!isScrollingAllowed()){
 								return;
 							}
 
@@ -231,7 +243,7 @@ public class OTViewContainerPanel extends JPanel
 					 */
 					public void run() {
 						// TODO Auto-generated method stub
-						disableScrolling = false;						
+						enableScrolling();
 					}
 				});
 		    }
@@ -312,11 +324,35 @@ public class OTViewContainerPanel extends JPanel
 	{
 		// disabling this removes the flicker that occurs during the loading of the page.
 		// if we could 
-		if(disableScrolling){
+		if(!isScrollingAllowed()){
 			return;
 		}
 
 		super.scrollRectToVisible(aRect);					
+	}
+	
+	protected boolean isScrollingAllowed()
+	{
+		return unwantedScrollingCount <=0;
+	}
+	
+	protected void disableScrolling()
+	{
+		System.out.println("disable Scrolling: " + unwantedScrollingCount + " " 
+				+ currentObject.getGlobalId());
+		unwantedScrollingCount++;
+	}
+	
+	protected void enableScrolling()
+	{
+		unwantedScrollingCount--;
+		System.out.println("enabling Scrolling: " + 
+				unwantedScrollingCount + " " + 
+				currentObject.getGlobalId().toString());
+
+		if(unwantedScrollingCount > 0){
+			System.err.println("unwantedScrollingCount dropped below 0");
+		}
 	}
 	
     public Component getCurrentComponent()
