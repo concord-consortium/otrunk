@@ -9,7 +9,6 @@ import java.io.ByteArrayInputStream;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.otrunk.view.OTViewContainerPanel;
@@ -106,7 +105,7 @@ public class EmbedObjectTest extends JFrame {
 					"<import class=\"org.concord.otrunk.view.document.OTCompoundDoc\"/>" +
 					"<import class=\"org.concord.otrunk.view.OTViewEntry\"/>" +
 					"<import class=\"org.concord.otrunk.ui.OTImage\"/>" +
-					"<import class=\"org.concord.otrunk.ui.swing.OTImageViewConfig\"/>" +
+					"<import class=\"org.concord.otrunk.ui.OTImageViewConfig\"/>" +
 					"<import class=\"org.concord.otrunk.view.OTViewService\"/>" +
 					"<import class=\"org.concord.framework.otrunk.view.OTFrame\"/>" +
 					"<import class=\"org.concord.data.state.OTUnitValue\"/>" +
@@ -170,8 +169,7 @@ public class EmbedObjectTest extends JFrame {
 										"<OTUnitValue value=\"26.653\" unit=\"cm\"/>" +
 									"</unitValue>" +
 									"<image>" +
-										"<OTImage" +
-											" imageBytes=\"http://www.concord.org/images/logos/cc/cc-logo.gif\"/>" +
+										"<OTImage imageBytes=\"http://www.concord.org/images/logos/cc/cc-logo.gif\"/>" +
 									"</image>" +
 								"</OTNotebookMeasurement>" +
 								"<OTNotebookMeasurement>" +
@@ -184,8 +182,7 @@ public class EmbedObjectTest extends JFrame {
 										"<OTUnitValue value=\"39.657\" unit=\"cm\"/>" +
 									"</unitValue>" +
 									"<image>" +
-										"<OTImage " +
-										" imageBytes=\"http://www.concord.org/images/logos/cc/cc-logo.gif\"/>" +
+										"<OTImage imageBytes=\"http://www.concord.org/images/logos/cc/cc-logo.gif\"/>" +
 									"</image>" +
 								"</OTNotebookMeasurement>" +
 							"</entries>" +
