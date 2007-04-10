@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-04-05 02:10:58 $
- * $Author: imoncada $
+ * $Revision: 1.11 $
+ * $Date: 2007-04-10 21:13:41 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -54,6 +54,10 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	{
 		//Get the OTDocumentView view as the 'hardcoded' preview
 		previewView = (OTDocumentView)getViewFactory().getView(otObject, OTDocumentView.class);
+		
+		//set mode of OTDocumentView to mode set for OTObjectEditViewConfig, so objects
+		//in the Doc will be in the correct mode
+		previewView.setViewMode(viewEntry.getMode());
 		
 		//System.out.println("preview view is " + previewView);
 				
@@ -130,7 +134,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 									
 			String strObjID = objToInsert.getGlobalId().toString();
 			
-			String strObjText = "<object refid=\"" + strObjID + "\"/>";
+			String strObjText = "<object refid=\"" + strObjID + "\" />";
 			
 			int pos = textArea.getSelectionStart();
 			textArea.insert(strObjText, pos);
