@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-03-13 11:55:41 $
- * $Author: scytacki $
+ * $Revision: 1.3 $
+ * $Date: 2007-04-10 21:13:41 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -28,4 +28,7 @@ public interface OTObjectEditViewConfig
 	//into the document using its edit view
 	public OTObjectList getObjectsToInsert();
 	public void setObjectsToInsert(OTObjectList list);
+	
+	public String getMode();
+	public void setMode(String mode);
 }

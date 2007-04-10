@@ -270,6 +270,9 @@ public class OTViewFactoryImpl implements OTViewFactory
 		if(modeViewEntry == null){
 			modeViewEntry = mode.getDefault();
 		}
+		if(modeViewEntry == null){
+			return getView(otObject, viewEntry);			
+		}
 
 		// pass the viewEntry was requested to the newly created view
 		// this is useful for mode views that want to display other modes of
