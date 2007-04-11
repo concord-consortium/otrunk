@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.53 $
- * $Date: 2007-04-11 20:52:25 $
+ * $Revision: 1.54 $
+ * $Date: 2007-04-11 20:56:00 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -390,6 +390,9 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			if (otrunk != null){
 				OTViewService viewService = (OTViewService) otrunk
 					.getService(OTViewService.class);
+				if(!viewService.getShowLeftPanel()){
+					splitPane.getLeftComponent().setVisible(false);
+				}
 				if(viewService.getFrame() != null){
 					int cornerX = 100;
 					int cornerY = 100;
@@ -399,10 +402,6 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 					setBounds(cornerX, cornerY, cornerX + sizeX, cornerY
 							+ sizeY);
 					repaint();
-				}
-				if(!viewService.getShowLeftPanel()){
-					System.out.println("soo!");
-					splitPane.getLeftComponent().setVisible(false);
 				}
 			}
 		}
