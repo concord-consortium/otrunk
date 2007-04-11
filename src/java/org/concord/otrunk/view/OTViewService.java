@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2007-03-26 14:31:09 $
- * $Author: scytacki $
+ * $Revision: 1.13 $
+ * $Date: 2007-04-11 20:52:25 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -36,6 +36,7 @@ import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTrunk;
+import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTViewFactory;
 
 /**
@@ -50,11 +51,18 @@ import org.concord.framework.otrunk.view.OTViewFactory;
 public class OTViewService extends DefaultOTObject
 {
     public static interface ResourceSchema extends OTResourceSchema {
+    	
         public OTObjectList getViewEntries();
         
         public OTObjectList getModes();
         
         public String getCurrentMode();
+        
+        public OTFrame getFrame();
+        
+        public boolean getShowLeftPanel();
+        
+        public static boolean DEFAULT_showLeftPanel = true;
     }
     
     ResourceSchema resources;
@@ -98,4 +106,12 @@ public class OTViewService extends DefaultOTObject
     {
     	return resources.getCurrentMode();
     }
+
+	public OTFrame getFrame() {
+		return resources.getFrame();
+	}
+	
+	public boolean getShowLeftPanel() {
+		return resources.getShowLeftPanel();
+	}
 }
