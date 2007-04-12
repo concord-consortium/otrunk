@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.23 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.24 $
+ * $Date: 2007-04-12 17:58:56 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -119,6 +119,8 @@ public class TypeService
 
 		if(klass.isArray() && 
 				klass.getComponentType().equals(Byte.TYPE)) {
+			return BLOB;
+		} else if(URL.class.isAssignableFrom(klass)){
 			return BLOB;
 		} else if(OTResourceList.class.isAssignableFrom(klass) ||
 				OTObjectList.class.isAssignableFrom(klass)) {

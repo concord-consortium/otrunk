@@ -32,6 +32,7 @@ package org.concord.otrunk;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -186,6 +187,8 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	    	BlobResource blob = (BlobResource)resourceValue;
 	    	if(returnType == byte[].class){
 	    		return blob.getBytes();
+	    	} else if(returnType == URL.class){
+	    		return blob.getBlobURL();
 	    	}
 	    } else if(resourceValue == null && returnType.isPrimitive()) {
 	        try {
@@ -345,6 +348,8 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 			value = childId;
 		} else if(value instanceof byte[]) {
 			value = new BlobResource((byte[])value);
+		} else if(value instanceof URL){
+			value = new BlobResource((URL)value);
 		}
 		
 		// setResource should only return true if the dataObject was 
