@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.55 $
- * $Date: 2007-04-13 19:09:24 $
+ * $Revision: 1.56 $
+ * $Date: 2007-04-13 19:57:10 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -1069,7 +1069,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 			public void actionPerformed(ActionEvent e) {
 				try {
-					reloadWindow();
+					reload();
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -1094,6 +1094,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		} else {
 			fileMenu = menuBar.getMenu(0);
 			fileMenu.removeAll();
+		}
+		
+		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)){
+			userMode = OTViewerHelper.NO_USER_MODE;
 		}
 
 		if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
@@ -1128,7 +1132,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 		fileMenu.add(showConsoleAction);
 		
-		if (Boolean.getBoolean(OTViewerHelper.RELOAD_PROP)) {
+		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)) {
 			fileMenu.add(reloadAction);
 		}
 
