@@ -55,7 +55,7 @@ public class OTViewerHelper
 	public final static String SINGLE_USER_PROP = "otrunk.view.single_user";
 	public final static String DEBUG_PROP = "otrunk.view.debug";
 	public final static String TRACE_PROP = "otrunk.trace";
-	public final static String RELOAD_PROP = "otrunk.view.reload";
+	public final static String AUTHOR_PROP = "otrunk.view.author";
 	
 	private OTrunk otrunk;
 	private OTViewFactory viewFactory;
