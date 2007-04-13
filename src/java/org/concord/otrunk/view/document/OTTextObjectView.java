@@ -29,6 +29,7 @@
  */
 package org.concord.otrunk.view.document;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -98,7 +99,8 @@ public class OTTextObjectView extends AbstractOTJComponentView
 			textArea.setLineWrap(true);
 			textArea.setWrapStyleWord(true);
 			JScrollPane scrollPane = new JScrollPane(textArea);
-	
+
+			textArea.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		
 			return scrollPane;
 		} else {
