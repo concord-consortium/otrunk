@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.54 $
- * $Date: 2007-04-11 20:56:00 $
+ * $Revision: 1.55 $
+ * $Date: 2007-04-13 19:09:24 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -405,6 +405,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				}
 			}
 		}
+		
 	}
 
 	public void initWithWizard(String url) {
@@ -1058,6 +1059,23 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			}
 		};
 		showConsoleAction.putValue(Action.NAME, "Show Console");
+		
+		reloadAction = new AbstractAction() {
+
+			/**
+			 * nothing to serizile here
+			 */
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e) {
+				try {
+					reloadWindow();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		};
+		reloadAction.putValue(Action.NAME, "Reload window");
 
 		exitAction = new ExitAction();
 
@@ -1109,6 +1127,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		fileMenu.add(exportToHtmlAction);
 
 		fileMenu.add(showConsoleAction);
+		
+		if (Boolean.getBoolean(OTViewerHelper.RELOAD_PROP)) {
+			fileMenu.add(reloadAction);
+		}
 
 		JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem(debugAction);
 		debugItem.setSelected(Boolean.getBoolean(OTViewerHelper.DEBUG_PROP));
