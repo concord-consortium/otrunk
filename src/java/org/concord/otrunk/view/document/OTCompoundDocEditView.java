@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-04-10 21:13:41 $
+ * $Revision: 1.12 $
+ * $Date: 2007-04-24 15:07:08 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -178,7 +178,12 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	public void setViewEntry(OTViewEntry viewEntry)
 	{
 		this.viewEntry = (OTObjectEditViewConfig)viewEntry;
-	}	
+	}
+	
+	public OTObjectEditViewConfig getViewEntry()
+	{
+		return viewEntry;
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.view.document.AbstractOTDocumentView#viewClosed()
