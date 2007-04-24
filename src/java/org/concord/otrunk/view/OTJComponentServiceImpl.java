@@ -54,4 +54,18 @@ public class OTJComponentServiceImpl implements OTJComponentService
         
         return view;
 	}
+	
+	public OTJComponentView getObjectView(OTObject otObject, OTViewContainer container, String mode) {
+		OTJComponentView view = 
+        	(OTJComponentView)viewFactory.getView(otObject, OTJComponentView.class, mode);
+		if(view == null) {
+            return null;
+        }
+        
+        if(view instanceof OTViewContainerAware){
+        	((OTViewContainerAware)view).setViewContainer(container);
+        }
+        
+        return view;
+	}
 }
