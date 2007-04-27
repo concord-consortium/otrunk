@@ -5,6 +5,7 @@ package org.concord.otrunk;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -220,6 +221,20 @@ public class OTrunkUtil
 				} else if(paramType == Short.class ||
 						paramType == Short.TYPE){
 					value = Short.valueOf(valueStr);
+				} else if(paramType == URL.class){
+					try {
+						value = new URL(valueStr);
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					}
+				} else if(paramType == byte[].class){
+					try {
+						URL url = new URL(valueStr);
+						setBlobUrl((OTObject)obj, methodCase, url);
+						return;
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 			
@@ -328,7 +343,6 @@ public class OTrunkUtil
 	public static void setBlobUrl(OTObject object, String propertyName, URL url)
 	{
 		// This is a hack because there isn't a better way yet
-		
 		OTDataObject dataObject = null;
 		try {
 	        dataObject = getDataObject(object);
