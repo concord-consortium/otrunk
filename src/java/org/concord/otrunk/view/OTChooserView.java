@@ -17,7 +17,6 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectInterface;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.AbstractOTJComponentView;
-import org.concord.framework.otrunk.view.OTChooserViewEntry;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
