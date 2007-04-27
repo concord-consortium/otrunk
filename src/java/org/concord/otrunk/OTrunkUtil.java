@@ -230,7 +230,7 @@ public class OTrunkUtil
 				} else if(paramType == byte[].class){
 					try {
 						URL url = new URL(valueStr);
-						setBlobUrl((OTObject)obj, methodCase, url);
+						setBlobUrl((OTObject)obj, propertyName, url);
 						return;
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
