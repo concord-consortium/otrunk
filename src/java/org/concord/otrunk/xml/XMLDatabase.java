@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.25 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.26 $
+ * $Date: 2007-04-27 17:56:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
@@ -509,6 +510,14 @@ public class XMLDatabase
         // standard anon relative id (I don't know if that will
         // work) otherwise we could hash something into an id
         return new OTRelativeID(null, new OTPathID("/" + localIdStr));        
+    }
+
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.datamodel.OTDatabase#createBlobResource(java.net.URL)
+     */
+    public BlobResource createBlobResource(URL url)
+    {
+    	return new XMLBlobResource(url);
     }
 	
 }

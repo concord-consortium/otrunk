@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-02-20 00:16:41 $
+ * $Revision: 1.10 $
+ * $Date: 2007-04-27 17:56:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -39,11 +39,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
@@ -307,5 +309,14 @@ public class FsDatabase implements OTDatabase
     public OTID getRelativeOTID(OTID parent, String relativePath)
     {
         throw new UnsupportedOperationException("FsDatabase does not support getRelativeOTID not supported");
+    }
+
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.datamodel.OTDatabase#createBlobResource(java.net.URL)
+     */
+    public BlobResource createBlobResource(URL url)
+    {
+	    // TODO Auto-generated method stub
+	    return null;
     }
 }
