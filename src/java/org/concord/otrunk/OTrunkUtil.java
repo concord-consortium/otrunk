@@ -5,6 +5,7 @@ package org.concord.otrunk;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -16,6 +17,9 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceList;
+import org.concord.otrunk.datamodel.BlobResource;
+import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDatabase;
 
 /**
  * @author scott
@@ -304,5 +308,37 @@ public class OTrunkUtil
 		}
 
 		return null;
+	}
+	
+	private static OTDataObject getDataObject(OTObject object)
+		throws Exception
+	{
+		OTID id = object.getGlobalId();
+		OTObjectServiceImpl objServiceImpl = 
+			(OTObjectServiceImpl)object.getOTObjectService();
+
+		OTDataObject dataObject = objServiceImpl.mainDb.getOTDataObject(null, id);
+		if(dataObject == null && objServiceImpl.creationDb != null){
+			dataObject = objServiceImpl.creationDb.getOTDataObject(null, id);
+		}
+		
+		return dataObject;
+	}
+	
+	public static void setBlobUrl(OTObject object, String propertyName, URL url)
+	{
+		// This is a hack because there isn't a better way yet
+		
+		OTDataObject dataObject = null;
+		try {
+	        dataObject = getDataObject(object);
+        } catch (Exception e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+		
+        OTDatabase db = dataObject.getDatabase();
+        BlobResource blobRes = db.createBlobResource(url);
+        dataObject.setResource(propertyName, blobRes);        
 	}
 }

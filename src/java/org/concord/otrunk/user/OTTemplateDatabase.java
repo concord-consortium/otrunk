@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-03-13 17:13:09 $
+ * $Revision: 1.11 $
+ * $Date: 2007-04-27 17:56:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,9 +32,11 @@
 */
 package org.concord.otrunk.user;
 
+import java.net.URL;
 import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTRelativeID;
@@ -230,6 +232,14 @@ public class OTTemplateDatabase
     {
         // do nothing
 
+    }
+
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.datamodel.OTDatabase#createBlobResource(java.net.URL)
+     */
+    public BlobResource createBlobResource(URL url)
+    {
+    	return stateDb.createBlobResource(url);
     }
 
 }

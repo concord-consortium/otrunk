@@ -23,14 +23,16 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.12 $
+ * $Date: 2007-04-27 17:56:20 $
  * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.datamodel;
+
+import java.net.URL;
 
 import org.concord.framework.otrunk.OTID;
 
@@ -97,4 +99,5 @@ public interface OTDatabase
 	
 	public void close();
 
+	public BlobResource createBlobResource(URL url);
 }
