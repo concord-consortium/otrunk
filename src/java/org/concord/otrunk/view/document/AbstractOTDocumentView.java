@@ -5,10 +5,8 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
-import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.otrunk.view.OTViewContainerPanel;
 
 public class AbstractOTDocumentView extends OTTextObjectView 
@@ -20,11 +18,6 @@ public class AbstractOTDocumentView extends OTTextObjectView
 	
 	private Vector viewContainerPanels = new Vector();
 	
-	public OTFrameManager getFrameManager() 
-	{
-		return (OTFrameManager)getViewService(OTFrameManager.class);
-	}
-
 	public void setViewContainer(OTViewContainer container) 
 	{
 		viewContainer = container;
@@ -35,11 +28,6 @@ public class AbstractOTDocumentView extends OTTextObjectView
 		return viewContainer;
 	}
 	
-	public OTViewFactory getViewFactory()
-	{
-		return (OTViewFactory)getViewService(OTViewFactory.class);
-	}
-
 	public String getViewMode() 
 	{
 		return viewMode;
