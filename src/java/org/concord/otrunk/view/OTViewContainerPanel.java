@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.41 $
- * $Date: 2007-04-05 13:50:13 $
+ * $Revision: 1.42 $
+ * $Date: 2007-04-30 15:26:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -58,6 +58,7 @@ import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTXHTMLView;
+import org.concord.otrunk.view.document.OTCompoundDoc;
 import org.concord.swing.util.ComponentScreenshot;
 
 
@@ -192,13 +193,21 @@ public class OTViewContainerPanel extends JPanel
 		JLabel loading = new JLabel("...");
 		loading.setBorder(BorderFactory.createLineBorder(Color.black));
 		add(loading);
-		revalidate();		
+
+		revalidate();				
 		
-		SwingUtilities.invokeLater(new Runnable(){
+		// By doing a double invokeLater we make sure this code doesn't get
+		// run until much later in the process.  Unless something else is doing
+		// an double invoke latter, this will execute after all of the currently
+		// queued up code which calls invokeLater.
+		// For some reason this allows popups to incrementally draw them selves
+		// without it, the popup blocks until the inside content is rendered
+		// before showing anything
+		final Runnable createComponentTask = new Runnable(){
 		    public void run()
 		    {
-				JComponent myComponent = createJComponent(); 
-				
+		    	JComponent myComponent = createJComponent(); 
+
 				if(isUseScrollPane()) {
 					JScrollPane scrollPane = new JScrollPane();
 					scrollPane.setViewport(new JViewport(){
@@ -210,7 +219,6 @@ public class OTViewContainerPanel extends JPanel
 						public void scrollRectToVisible(Rectangle contentRect) {
 							// disabling this removes the flicker that occurs during the loading of the page.
 							// if we could 
-							System.out.println("scRV viewport: " + currentObject.getGlobalId().toString());
 							if(!isScrollingAllowed()){
 								return;
 							}
@@ -247,7 +255,32 @@ public class OTViewContainerPanel extends JPanel
 					}
 				});
 		    }
-		});
+		};
+
+		/**
+		 * This is disabled for now but we might have to come back to it it
+		 * fixed a loading problems with sidebars that were popup windows.
+		 * 
+		 * Only do a double invoke later if the item is a sidebar item
+		 * 
+		 *
+		String otObjectClassName = otObject.getClass().getInterfaces()[0].getName();
+		System.out.println(otObjectClassName);
+		if(otObject.getClass().getInterfaces()[0].getName().endsWith("OTUDLSideBarItem")){
+			System.out.println("delaying sidebar item update");
+			SwingUtilities.invokeLater(new Runnable(){
+				public void run()
+				{
+
+					SwingUtilities.invokeLater(createComponentTask);
+				} 
+			});			
+		} else {
+			SwingUtilities.invokeLater(createComponentTask);
+		}
+		*/
+		
+		SwingUtilities.invokeLater(createComponentTask);
 	}
 
 	/**
