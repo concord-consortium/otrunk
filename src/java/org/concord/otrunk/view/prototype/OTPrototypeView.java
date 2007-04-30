@@ -24,8 +24,7 @@ public class OTPrototypeView extends AbstractOTView
 	
 	public JComponent getComponent(OTObject otObject, boolean editable) 
 	{
-		OTViewFactory otViewFactory = 
-			   (OTViewFactory)getViewService(OTViewFactory.class);
+		OTViewFactory otViewFactory = getViewFactory();
 		
 		// for now just ignore the passed in object
 		// and look up the view for our object, 

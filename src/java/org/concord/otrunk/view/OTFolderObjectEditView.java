@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-04-05 02:59:40 $
- * $Author: imoncada $
+ * $Revision: 1.11 $
+ * $Date: 2007-04-30 18:43:02 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -336,10 +336,8 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		{
 			if (viewEntry == null) return null;
 			
-			OTViewFactory viewFactory = 
-				(OTViewFactory)getViewService(OTViewFactory.class);
-			OTFrameManager frameManager = 
-				   (OTFrameManager)getViewService(OTFrameManager.class);
+			OTViewFactory viewFactory = getViewFactory();
+			OTFrameManager frameManager = getFrameManager();
 			
 			OTObject otObj = null;
 			
