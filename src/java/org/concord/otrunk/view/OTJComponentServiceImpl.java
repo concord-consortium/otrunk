@@ -3,12 +3,16 @@
  */
 package org.concord.otrunk.view;
 
+import java.util.HashMap;
+
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTJComponentService;
 import org.concord.framework.otrunk.view.OTJComponentView;
+import org.concord.framework.otrunk.view.OTJComponentViewContext;
+import org.concord.framework.otrunk.view.OTJComponentViewContextAware;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
@@ -24,6 +28,11 @@ public class OTJComponentServiceImpl implements OTJComponentService
 {
 	OTViewFactory viewFactory;
 	
+	// For now we'll keep these in a regular hashtable we might need to do
+	// some weak referenceing here
+	HashMap objToView = new HashMap();
+	HashMap objToComponent = new HashMap();
+	
 	public OTJComponentServiceImpl(OTViewFactory viewFactory)
 	{
 		this.viewFactory = viewFactory;
@@ -37,9 +46,21 @@ public class OTJComponentServiceImpl implements OTJComponentService
         if(view == null) {
             return new JLabel("No view for object: " + otObject);
         }
+
+        return getComponent(otObject, view, editable);
         
-        return view.getComponent(otObject, editable);
 	}
+
+	/* (non-Javadoc)
+     * @see org.concord.framework.otrunk.view.OTJComponentService#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTJComponentView, boolean)
+     */
+    public JComponent getComponent(OTObject otObject, OTJComponentView view, 
+                                   boolean editable)
+    {
+        JComponent component = view.getComponent(otObject, editable);
+        objToComponent.put(otObject, component);
+        return component;
+    }
 
 	public OTJComponentView getObjectView(OTObject otObject,
 			OTViewContainer container) 
@@ -122,6 +143,28 @@ public class OTJComponentServiceImpl implements OTJComponentService
         	((OTViewContainerAware)view).setViewContainer(container);
         }
         
+        if(view instanceof OTJComponentViewContextAware){
+        	((OTJComponentViewContextAware)view).setOTJComponentViewContext(viewContext);
+        }        	
+        
+        objToView.put(otObject, view);
+        
         return view;
     }
+    
+    OTJComponentViewContext viewContext = new OTJComponentViewContext()
+    {
+
+		public JComponent getComponentByObject(OTObject obj)
+        {
+			return (JComponent)objToComponent.get(obj);
+        }
+
+		public OTView getViewByObject(OTObject obj)
+        {
+			return (OTView)objToView.get(obj);
+        }
+    	
+    };
+
 }

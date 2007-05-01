@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.44 $
- * $Date: 2007-05-01 17:08:49 $
+ * $Revision: 1.45 $
+ * $Date: 2007-05-01 20:29:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -331,8 +331,8 @@ public class OTViewContainerPanel extends JPanel
 			return new JLabel("No view for object: " + currentObject);
 		} 
 		
-		
-		return currentView.getComponent(currentObject, currentObjectEditable);
+		return jComponentService.getComponent(currentObject, 
+				currentView, currentObjectEditable);
 	}
 	
 	/* (non-Javadoc)
