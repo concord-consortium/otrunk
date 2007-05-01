@@ -165,6 +165,10 @@ public class OTTextObjectView extends AbstractOTJComponentView
 		}
 	}
 	
+	public boolean isChangingText(){
+		return changingText;
+	}
+	
 	/* (non-Javadoc)
      * @see org.concord.framework.otrunk.view.OTJComponentView#viewClosed()
      */
