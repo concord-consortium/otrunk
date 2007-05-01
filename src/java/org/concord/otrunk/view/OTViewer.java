@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.56 $
- * $Date: 2007-04-13 19:57:10 $
- * $Author: sfentress $
+ * $Revision: 1.57 $
+ * $Date: 2007-05-01 17:08:49 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -72,7 +72,6 @@ import org.concord.applesupport.AppleApplicationAdapter;
 import org.concord.applesupport.AppleApplicationUtil;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewFactory;
@@ -473,7 +472,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		otViewFactory.addViewService(otrunk);
 		otViewFactory.addViewService(frameManager);
 		otViewFactory
-				.addViewService(new OTJComponentServiceImpl(otViewFactory));
+				.addViewService(new OTJComponentServiceFactoryImpl(otViewFactory));
 
 		bodyPanel.setOTViewFactory(otViewFactory);
 

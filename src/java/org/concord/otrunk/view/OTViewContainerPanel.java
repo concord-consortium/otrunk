@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.43 $
- * $Date: 2007-04-30 17:57:50 $
+ * $Revision: 1.44 $
+ * $Date: 2007-05-01 17:08:49 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -51,6 +51,7 @@ import javax.swing.SwingUtilities;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentService;
+import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
@@ -81,7 +82,7 @@ public class OTViewContainerPanel extends JPanel
     OTJComponentView currentView = null;
     OTViewEntry currentViewEntry = null;
     
-	private OTViewFactory otViewFactory;
+    private OTJComponentService jComponentService;	
 	
 	protected OTFrameManager frameManager;
 
@@ -129,13 +130,40 @@ public class OTViewContainerPanel extends JPanel
 		add(loadingLabel);		
 	}
 	
-	public void setOTViewFactory(OTViewFactory factory)
+	public OTJComponentService getOTJComponentService()
 	{
-		otViewFactory = factory;
+		return jComponentService;
 	}
 	
-	public OTViewFactory getOTViewFactory() {
-		return otViewFactory;
+	/**
+	 * This method is for legacy the object really only needs 
+	 * OTJComponentService.  But to make the migration easier this method is still
+	 * available.  And each time it is called more a new jComponentService is
+	 * created. 
+	 * 
+	 * @param factory
+	 */
+	public void setOTViewFactory(OTViewFactory factory)
+	{
+		// get the OTJComponentService so we can create the OTJComponentView
+		OTViewServiceProvider viewServiceProvider = 
+			factory.getViewServiceProvider();
+		OTJComponentServiceFactory componentServiceFactory =
+			(OTJComponentServiceFactory) viewServiceProvider.getViewService(OTJComponentServiceFactory.class);
+		jComponentService = componentServiceFactory.createOTJComponentService();
+	}
+		
+	/**
+	 * This is the preferred method for giving this object the ability to create new views
+	 * Using this method will allow this object to share the jComponentService with
+	 * other viewContainerPanels or view creators.  This way those views can access
+	 * each other though the OTViewHost interface.
+	 * 
+	 * @param jComponentService
+	 */
+	public void setOTJComponentService(OTJComponentService jComponentService)
+	{
+		this.jComponentService = jComponentService;
 	}
 	
 	public void setMessage(String message)
@@ -294,10 +322,7 @@ public class OTViewContainerPanel extends JPanel
 		}
 		
 		// get the OTJComponentService so we can create the OTJComponentView
-		OTViewServiceProvider viewServiceProvider = 
-			otViewFactory.getViewServiceProvider();
-		OTJComponentService jComponentService = 
-			(OTJComponentService) viewServiceProvider.getViewService(OTJComponentService.class);
+		OTJComponentService jComponentService = getOTJComponentService();
 		
 		currentView = jComponentService.getObjectView(currentObject, viewContainer,
 				getViewMode(), currentViewEntry);		
