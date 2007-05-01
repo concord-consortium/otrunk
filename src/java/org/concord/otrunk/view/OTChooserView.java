@@ -35,18 +35,23 @@ public class OTChooserView extends AbstractOTJComponentView implements OTViewEnt
 	
 	JPanel mainPanel;
 	
+	String property;
+	
+	String mode;
+	
 	public JComponent getComponent(OTObject otObject, boolean editable) {
 		
 		this.otObject = otObject;
+		property = ((OTChooserViewEntry)viewEntry).getPropertyName();
+		mode = ((OTChooserViewEntry)viewEntry).getFinalViewMode();
 		
 		if (viewEntry instanceof OTChooserViewEntry){
 			mainPanel = new JPanel();
 			mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 			name = (otObject.getName() != null? otObject.getName() : "object");
 			insertButton = new JButton();
-			insertButton.setText("Insert " + name);
 			insertButton.addActionListener(this);
-			mainPanel.add(insertButton);
+			updatePanel();
 			return mainPanel;
 		} else {
 			System.err.println("OTChooserView must be used in a OTChooserViewEntry");
@@ -62,10 +67,38 @@ public class OTChooserView extends AbstractOTJComponentView implements OTViewEnt
 	public void setViewEntry(OTViewEntry viewConfig) {
 		viewEntry = viewConfig;
 	}
-
+	
+	private void updatePanel(){
+		
+		try {
+			if (OTrunkUtil.getNonPathPropertyValue(property, otObject) != null){
+				
+			insertButton.setText("loading...");
+			insertButton.setEnabled(false);
+			try {
+			//	URL url = new URL(sUrl);
+				
+				JComponent mwPanel = getChildComponent(otObject, null, false,
+						"normal");
+				mainPanel.removeAll();
+				mainPanel.add(mwPanel);
+				insertButton.setText("Change " + name);
+				mainPanel.add(insertButton);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				insertButton.setText("Insert " + name);
+			}
+			insertButton.setEnabled(true);
+			} else {
+				insertButton.setText("Insert " + name);
+				mainPanel.add(insertButton);
+			}
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	public void actionPerformed(ActionEvent e) {
-		String property = ((OTChooserViewEntry)viewEntry).getPropertyName();
-		String mode = ((OTChooserViewEntry)viewEntry).getFinalViewMode();
 		
 		String value = (String) JOptionPane.showInputDialog(insertButton,
 				"Please specify the URL of the object's location:",
@@ -78,12 +111,7 @@ public class OTChooserView extends AbstractOTJComponentView implements OTViewEnt
 			try {
 			//	URL url = new URL(sUrl);
 				OTrunkUtil.setNonPathPropertyValue(property, otObject, value);
-				JComponent mwPanel = getChildComponent(otObject, null, false,
-						"normal");
-				mainPanel.removeAll();
-				mainPanel.add(mwPanel);
-				insertButton.setText("Change " + name);
-				mainPanel.add(insertButton);
+				
 			} catch (NoSuchMethodException ex){
 				System.err.println("** No such property \"" + property + "\" for " + otObject.getName());
 				ex.printStackTrace();
@@ -93,9 +121,8 @@ public class OTChooserView extends AbstractOTJComponentView implements OTViewEnt
 					    "Bad URL: An object cannot be loaded from the specified location",
 					    "Warning",
 					    JOptionPane.ERROR_MESSAGE);
-				insertButton.setText("Insert " + name);
 			}
-			insertButton.setEnabled(true);
+			updatePanel();
 		}
 		
 	}

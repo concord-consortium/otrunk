@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2007-04-24 15:07:08 $
+ * $Revision: 1.13 $
+ * $Date: 2007-05-01 17:36:29 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -18,7 +18,11 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import org.concord.framework.otrunk.OTChangeEvent;
+import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.otrunk.view.OTObjectEditViewConfig;
@@ -41,6 +45,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	protected JPanel textPanel;
 	protected OTDocumentView previewView;
 	protected OTObjectEditViewConfig viewEntry;
+	protected OTObject document;
 	
 	/**
 	 * 
@@ -52,8 +57,11 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 
 	public JComponent getComponent(OTObject otObject, boolean editable)
 	{
+		document = otObject;
+		((OTChangeNotifying)document).addOTChangeListener(this);
+		
 		//Get the OTDocumentView view as the 'hardcoded' preview
-		previewView = (OTDocumentView)getViewFactory().getView(otObject, OTDocumentView.class);
+		previewView = (OTDocumentView)getViewFactory().getView(document, OTDocumentView.class);
 		
 		//set mode of OTDocumentView to mode set for OTObjectEditViewConfig, so objects
 		//in the Doc will be in the correct mode
@@ -62,7 +70,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		//System.out.println("preview view is " + previewView);
 				
 		//Create a split pane with the preview pane and the text area 
-		JComponent editTextPane = super.getComponent(otObject, true);
+		JComponent editTextPane = super.getComponent(document, true);
 		JPanel editPane = createTextPanel(editTextPane);
 		
 		//If preview is not available, don't use it then
@@ -70,7 +78,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 			return editPane;
 		}
 		else{
-			JComponent previewPane = previewView.getComponent(otObject, false);
+			JComponent previewPane = previewView.getComponent(document, false);
 			
 			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 			                           editPane, previewPane);
@@ -151,7 +159,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	/**
 	 * 
 	 */
-	private void updatePreviewView()
+	public void updatePreviewView()
 	{
 		if (previewView == null) return;
 		previewView.updateFormatedView();
@@ -195,5 +203,26 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		if(previewView != null){
 			previewView.viewClosed();
 		}
+	}
+	
+	public void stateChanged(OTChangeEvent e){
+
+        if(isChangingText()){
+            // we have caused this event ourselves
+            return;
+        }
+        
+        if(labelView != null) {
+            labelView.setText(pfObject.getDocumentText());
+            return;
+        }
+        
+        try {
+            textAreaModel.replace(0, textAreaModel.getLength(), pfObject.getDocumentText(), null);
+        } catch (Exception exc) {
+         //   exc.printStackTrace();
+        }
+        updatePreviewView();
+        
 	}
 }
