@@ -107,7 +107,7 @@ public class OTViewerHelper
 		
 		viewFactory.addViewService(otrunk);
 		viewFactory.addViewService(frameManager);
-		viewFactory.addViewService(new OTJComponentServiceImpl(viewFactory));
+		viewFactory.addViewService(new OTJComponentServiceFactoryImpl(viewFactory));
 
 	}
 
