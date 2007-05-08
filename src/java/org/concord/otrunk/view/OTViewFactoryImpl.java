@@ -34,7 +34,6 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
-import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTRequestedViewEntryAware;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewEntry;
@@ -52,16 +51,14 @@ import org.concord.otrunk.OTrunkUtil;
  */
 public class OTViewFactoryImpl implements OTViewFactory 
 {
-    OTrunk otrunk;
     OTViewFactoryImpl parent;
     Vector viewMap = new Vector();
     OTViewService viewService;
     Vector services = new Vector();
     OTViewServiceProvider serviceProvider;
     
-    public OTViewFactoryImpl(OTrunk otrunk, OTViewService viewService)
+    public OTViewFactoryImpl(OTViewService viewService)
     {
-        this.otrunk = otrunk;
         this.viewService = viewService;
         
         // read in all the viewEntries and create a vector 
@@ -79,7 +76,6 @@ public class OTViewFactoryImpl implements OTViewFactory
     protected OTViewFactoryImpl(OTViewFactoryImpl parent)
     {
         this.parent = parent;
-        this.otrunk = parent.otrunk;
         
         initServices();
     }
@@ -325,5 +321,13 @@ public class OTViewFactoryImpl implements OTViewFactory
 	{
 		return serviceProvider;
 	}
+
+	/* (non-Javadoc)
+     * @see org.concord.framework.otrunk.view.OTViewFactory#getDefaultMode()
+     */
+    public String getDefaultMode()
+    {
+    	return viewService.getCurrentMode();
+    }
 	
 }

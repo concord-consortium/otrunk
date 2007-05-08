@@ -35,11 +35,13 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.WeakHashMap;
 
+import org.concord.framework.otrunk.OTBundle;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
@@ -67,7 +69,8 @@ public class OTrunkImpl implements OTrunk
     protected Hashtable userObjectServices = new Hashtable();
 	protected Hashtable userDataObjects = new Hashtable();
 	protected WeakHashMap objectWrappers = new WeakHashMap();
-	protected Vector services = null;
+
+	OTServiceContext serviceContext = new OTServiceContextImpl();	
 
 	protected OTDatabase rootDb;
 	
@@ -83,21 +86,18 @@ public class OTrunkImpl implements OTrunk
     	return (String)dataObject.getResource(OTrunkImpl.RES_CLASS_NAME);
     }
     
-	//private transient PrintWriter pw;
-	
-	public OTrunkImpl(OTDatabase db)
+    public OTrunkImpl(OTDatabase db)
 	{
-		this(db, null);
+		this(db, null, null);
 	}
 
-	public OTrunkImpl(OTDatabase db, Object [] services)
+	public OTrunkImpl(OTDatabase db, Object [] services, Class [] serviceClasses)
 	{		
 		this.rootDb = db;
 		databases.add(db);
 		if(services != null) {
-			this.services = new Vector();
-			for(int i=0; i<services.length; i++) {
-				this.services.add(services[i]);
+			for(int i=0; i<services.length; i++){
+				serviceContext.addService(serviceClasses[i], services[i]);
 			}
 		}
 		
@@ -116,12 +116,25 @@ public class OTrunkImpl implements OTrunk
 				return;
 			}
 			
+			// This is deprecated but we use it anyhow for backward compatibility
+			// if we switch to the 1.5 compiler we could turn off this warning.
 			OTObjectList serviceList = ((OTSystem)root).getServices();
 			
-			if(this.services == null) {
-				this.services = new Vector();
+			OTObjectList bundleList = ((OTSystem)root).getBundles();
+			
+			Vector combined = new Vector();
+			combined.addAll(serviceList.getVector());
+			combined.addAll(bundleList.getVector());
+			
+			for(int i=0; i<combined.size(); i++){
+				OTBundle bundle = (OTBundle)combined.get(i);
+				bundle.registerServices(serviceContext);
 			}
-			this.services.addAll(serviceList.getVector());
+			
+			for(int i=0; i<combined.size(); i++){
+				OTBundle bundle = (OTBundle)combined.get(i);
+				bundle.initializeBundle(serviceContext);
+			}			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -230,18 +243,7 @@ public class OTrunkImpl implements OTrunk
 	
 	public Object getService(Class serviceInterface)
 	{
-        if(services == null) {
-            return null;
-        }
-        
-		for(int j=0; j<services.size(); j++) {
-			Object service = services.get(j);
-			if(serviceInterface.isInstance(service)) {
-				return service;
-			}
-		}
-		
-		return null;
+		return serviceContext.getService(serviceInterface);
 	}
 	
     public OTObjectService createObjectService(OTDatabase db)

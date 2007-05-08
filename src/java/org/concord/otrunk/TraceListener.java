@@ -30,6 +30,7 @@ public class TraceListener implements OTObjectServiceListener, OTChangeListener
 	public void objectLoaded(OTObject object) 
 	{
 		if(object instanceof OTChangeNotifying) {
+			System.out.println("otObject loaded: " + object);
 			((OTChangeNotifying)object).addOTChangeListener(this);
 		}
 	}
