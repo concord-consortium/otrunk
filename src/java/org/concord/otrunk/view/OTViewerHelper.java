@@ -37,6 +37,7 @@ import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTViewFactory;
+import org.concord.framework.text.UserMessageHandler;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTrunkImpl;
@@ -55,6 +56,7 @@ public class OTViewerHelper
 	public final static String SINGLE_USER_PROP = "otrunk.view.single_user";
 	public final static String DEBUG_PROP = "otrunk.view.debug";
 	public final static String TRACE_PROP = "otrunk.trace";
+	public final static String TRACE_LISTENERS_PROP = "otrunk.trace.listeners";
 	public final static String AUTHOR_PROP = "otrunk.view.author";
 	
 	private OTrunk otrunk;
@@ -92,15 +94,12 @@ public class OTViewerHelper
 	{
 		this.otDB = otDB;
 		otrunk = new OTrunkImpl(otDB,
-				new Object[] { new SwingUserMessageHandler(parentComponent)});
+				new Object[] { new SwingUserMessageHandler(parentComponent)},
+				new Class[] {UserMessageHandler.class});
 
-		OTViewService viewService = (OTViewService)otrunk.getService(OTViewService.class);
-
-		viewFactory = null;
-		if (viewService != null) {
-			viewFactory = viewService.getViewFactory(otrunk);
-		}
-		
+		viewFactory = 
+			(OTViewFactory) otrunk.getService(OTViewFactory.class);
+			
 		// Maybe this shouldn't happen here
 		frameManager = new OTFrameManagerImpl();
 		frameManager.setViewFactory(viewFactory);

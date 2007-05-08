@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2007-04-11 20:52:25 $
- * $Author: sfentress $
+ * $Revision: 1.14 $
+ * $Date: 2007-05-08 18:55:31 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -33,9 +33,10 @@
 package org.concord.otrunk.view;
 
 import org.concord.framework.otrunk.DefaultOTObject;
+import org.concord.framework.otrunk.OTBundle;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
-import org.concord.framework.otrunk.OTrunk;
+import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTViewFactory;
 
@@ -49,6 +50,7 @@ import org.concord.framework.otrunk.view.OTViewFactory;
  *
  */
 public class OTViewService extends DefaultOTObject
+	implements OTBundle
 {
     public static interface ResourceSchema extends OTResourceSchema {
     	
@@ -73,25 +75,6 @@ public class OTViewService extends DefaultOTObject
         this.resources = resources;
     }
 
-    /**
-     * If this method can be removed then this OTClass can be turned 
-     * into a pure interface.  But the only way I can see to remove it
-     * is to use a view or a wrapper which will need this object to 
-     * already exist.  So the only way to really remove it then is to 
-     * support this wrapper/controller or view as part of framework.  
-     * But that makes the framework more complicated.  
-     * 
-     * The alternative is to support methods in the OTClasses.  Then
-     * the entire view factory interface can be implemented by this. 
-     * 
-     * @param otrunk
-     * @return
-     */
-    public OTViewFactory getViewFactory(OTrunk otrunk)
-    {
-        return new OTViewFactoryImpl(otrunk, this);        
-    }
-
     public OTObjectList getViewEntries()
     {
     	return resources.getViewEntries();
@@ -107,11 +90,35 @@ public class OTViewService extends DefaultOTObject
     	return resources.getCurrentMode();
     }
 
-	public OTFrame getFrame() {
-		return resources.getFrame();
-	}
-	
-	public boolean getShowLeftPanel() {
-		return resources.getShowLeftPanel();
-	}
+	/* (non-Javadoc)
+     * @see org.concord.framework.otrunk.OTBundle#registerServices(org.concord.framework.otrunk.OTServiceContext)
+     */
+    public void registerServices(OTServiceContext serviceContext)
+    {
+        OTViewFactoryImpl factory =  new OTViewFactoryImpl(this);
+        serviceContext.addService(OTViewFactory.class, factory);
+        
+        OTMainFrame mainFrame = new OTMainFrame(){
+
+			public OTFrame getFrame()
+            {
+				return resources.getFrame();
+            }
+
+			public boolean getShowLeftPanel()
+            {
+				return resources.getShowLeftPanel();
+            }        	
+        };
+        serviceContext.addService(OTMainFrame.class, mainFrame);
+    }
+
+    /* (non-Javadoc)
+     * @see org.concord.framework.otrunk.OTBundle#initializeBundle(org.concord.framework.otrunk.OTServiceContext)
+     */
+    public void initializeBundle(OTServiceContext serviceContext)
+    {
+    	// Don't need to do anything here
+    }
+
 }

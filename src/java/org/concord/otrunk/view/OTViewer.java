@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.57 $
- * $Date: 2007-05-01 17:08:49 $
+ * $Revision: 1.58 $
+ * $Date: 2007-05-08 18:55:30 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -75,6 +75,7 @@ import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewFactory;
+import org.concord.framework.text.UserMessageHandler;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTMLToXHTMLConverter;
 import org.concord.otrunk.OTObjectServiceImpl;
@@ -387,16 +388,17 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				return;
 			}
 			if (otrunk != null){
-				OTViewService viewService = (OTViewService) otrunk
-					.getService(OTViewService.class);
-				if(!viewService.getShowLeftPanel()){
+				OTMainFrame mainFrame = 
+					(OTMainFrame) otrunk.getService(OTMainFrame.class);
+				
+				if(!mainFrame.getShowLeftPanel()){
 					splitPane.getLeftComponent().setVisible(false);
 				}
-				if(viewService.getFrame() != null){
+				if(mainFrame.getFrame() != null){
 					int cornerX = 100;
 					int cornerY = 100;
-					int sizeX = viewService.getFrame().getWidth();
-					int sizeY = viewService.getFrame().getHeight();
+					int sizeX = mainFrame.getFrame().getWidth();
+					int sizeY = mainFrame.getFrame().getHeight();
 
 					setBounds(cornerX, cornerY, cornerX + sizeX, cornerY
 							+ sizeY);
@@ -455,15 +457,11 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		xmlDB = new XMLDatabase(url, System.err);
 
 		otrunk = new OTrunkImpl(xmlDB,
-				new Object[] { new SwingUserMessageHandler(this) });
+				new Object[] { new SwingUserMessageHandler(this) },
+				new Class[] {UserMessageHandler.class});
 
-		OTViewService viewService = (OTViewService) otrunk
-				.getService(OTViewService.class);
-
-		OTViewFactory myViewFactory = null;
-		if (viewService != null) {
-			myViewFactory = viewService.getViewFactory(otrunk);
-		}
+		OTViewFactory myViewFactory = 
+			(OTViewFactory) otrunk.getService(OTViewFactory.class);
 
 		if (myViewFactory != null) {
 			otViewFactory = myViewFactory;
@@ -477,7 +475,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		bodyPanel.setOTViewFactory(otViewFactory);
 
 		// set the current mode from the viewservice to the main bodyPanel
-		bodyPanel.setViewMode(viewService.getCurrentMode());
+		bodyPanel.setViewMode(otViewFactory.getDefaultMode());
 
 		// set the viewFactory of the frame manager
 		frameManager.setViewFactory(otViewFactory);

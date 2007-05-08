@@ -50,6 +50,7 @@ import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.view.OTViewerHelper;
 
 /**
  * @author scott
@@ -60,7 +61,7 @@ import org.concord.otrunk.datamodel.OTDataObject;
 public class OTResourceSchemaHandler extends OTInvocationHandler
 {
 	public final static boolean traceListeners =
-		Boolean.getBoolean("otrunk.trace.listeners");
+		Boolean.getBoolean(OTViewerHelper.TRACE_LISTENERS_PROP);
 	
 	Class schemaInterface = null;
     OTrunkImpl db;
@@ -386,6 +387,10 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
         for(int i=0;i<changeListeners.size(); i++){
             WeakReference ref = (WeakReference)changeListeners.get(i);
             Object listener = ref.get();
+            if(traceListeners){
+            	System.out.println("sending stateChanged " + changeEvent.getDescription() +
+            			" to " + listener);
+            }
             if(listener != null) {
                 ((OTChangeListener)listener).stateChanged(changeEvent);
             } else {
