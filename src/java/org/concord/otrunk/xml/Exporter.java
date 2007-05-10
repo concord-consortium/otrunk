@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2007-02-20 00:16:41 $
+ * $Revision: 1.18 $
+ * $Date: 2007-05-10 21:04:02 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -42,7 +42,7 @@ import java.io.Writer;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.otrunk.OTXMLString;
+import org.concord.framework.otrunk.OTXMLString;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataList;
