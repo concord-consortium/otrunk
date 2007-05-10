@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-01-27 23:46:22 $
+ * $Revision: 1.6 $
+ * $Date: 2007-05-10 21:04:02 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,7 +34,7 @@ package org.concord.otrunk.xml;
 
 import java.util.Properties;
 
-import org.concord.otrunk.OTXMLString;
+import org.concord.framework.otrunk.OTXMLString;
 
 /**
  * XMLStringTypeHandler

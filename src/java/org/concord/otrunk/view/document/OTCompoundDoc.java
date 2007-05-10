@@ -37,7 +37,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.otrunk.OTXMLString;
+import org.concord.framework.otrunk.OTXMLString;
 import org.concord.otrunk.view.OTFolderObject;
 
 /**

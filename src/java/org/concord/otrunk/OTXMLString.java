@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.4 $
+ * $Date: 2007-05-10 21:04:01 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -41,27 +41,10 @@ package org.concord.otrunk;
  * @author scott<p>
  *
  */
-public class OTXMLString
+public class OTXMLString extends org.concord.framework.otrunk.OTXMLString
 {
-    String content;
-    
     public OTXMLString(String content)
     {
-        this.content = content;
-    }
-    
-    public String getContent()
-    {
-        return content;
-    }
-    
-    public void setContent(String content)
-    {
-        this.content = content;
-    }
-    
-    public String toString()
-    {
-        return getContent();
-    }
+    	super(content);
+    }    
 }

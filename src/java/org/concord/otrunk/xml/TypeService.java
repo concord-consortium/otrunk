@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.24 $
- * $Date: 2007-04-12 17:58:56 $
+ * $Revision: 1.25 $
+ * $Date: 2007-05-10 21:04:02 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -42,7 +42,7 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
-import org.concord.otrunk.OTXMLString;
+import org.concord.framework.otrunk.OTXMLString;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
