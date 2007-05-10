@@ -53,11 +53,11 @@ public class OTViewFactoryImpl implements OTViewFactory
 {
     OTViewFactoryImpl parent;
     Vector viewMap = new Vector();
-    OTViewService viewService;
+    OTViewBundle viewService;
     Vector services = new Vector();
     OTViewServiceProvider serviceProvider;
     
-    public OTViewFactoryImpl(OTViewService viewService)
+    public OTViewFactoryImpl(OTViewBundle viewService)
     {
         this.viewService = viewService;
         
