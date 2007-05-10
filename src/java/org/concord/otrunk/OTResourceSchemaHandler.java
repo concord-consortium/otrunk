@@ -135,6 +135,18 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	            
 	            object = (OTObject)objectService.getOTObject(objId);
 	            
+	            if(object != null){
+	            	if(!returnType.isAssignableFrom(object.getClass())){
+	            		System.err.println("Error: Type Mismatch");
+	            		System.err.println("  value: " + object);
+	            		System.err.println("  parentObject: " + 
+	            				dataObject.getResource(OTrunkImpl.RES_CLASS_NAME));
+	            		System.err.println("  resourceName: " + resourceName);
+	        	        System.err.println("  expected type is: " + returnType);
+	            		return null;
+	            	}
+	            }
+	            
 	            return object;
 	        } catch (Exception e)
 	        {
