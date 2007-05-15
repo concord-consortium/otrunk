@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.58 $
- * $Date: 2007-05-08 18:55:30 $
- * $Author: scytacki $
+ * $Revision: 1.59 $
+ * $Date: 2007-05-15 16:28:42 $
+ * $Author: aunger $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -41,9 +41,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
@@ -163,6 +168,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	boolean justStarted = false;
 
 	boolean showTree = false;
+  
+  private URL publishURL;
 
 	private AbstractAction saveUserDataAsAction;
 
@@ -181,6 +188,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	private AbstractAction reloadAction;
 
 	private AbstractAction saveAction;
+  
+  private AbstractAction publishAction;
+  
+  private AbstractAction publishAsAction;
 
 	private AbstractAction exportImageAction;
 
@@ -692,6 +703,37 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		}
 	}
 
+  public void publishData() throws Exception {
+    URLConnection urlConn;
+    DataOutputStream urlDataOut;
+    BufferedReader urlDataIn;
+    
+    urlConn = publishURL.openConnection();
+    urlConn.setDoInput(true);
+    urlConn.setDoOutput(true);
+    urlConn.setUseCaches(false);
+    urlConn.setRequestProperty("Content-Type", "application/xml");
+    
+    // Send POST output.
+    urlDataOut = new DataOutputStream(urlConn.getOutputStream());
+    Exporter.export(urlDataOut, xmlDB.getRoot(),
+                    xmlDB);
+    urlDataOut.flush ();
+    urlDataOut.close ();
+    
+    // Get response data.
+    urlDataIn = new BufferedReader(new InputStreamReader(new DataInputStream(urlConn.getInputStream())));
+    String str;
+    String response = "";
+    while (null != ((str = urlDataIn.readLine())))
+    {
+      response.concat(str + "\n");
+    }
+    urlDataIn.close ();
+    // FIXME Need to trap non-HTTP200 responses and throw an exception (if an exception isn't thrown already) and capture the excpetions upstream
+    urlConn.getHeaderFieldInt("Response", 0);
+  }
+  
 	public void createActions() {
 		newUserDataAction = new AbstractAction() {
 
@@ -979,6 +1021,78 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			}
 		};
 		saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
+    
+    publishAction = new AbstractAction() {
+
+      /**
+       * nothing to serizile here
+       */
+      private static final long serialVersionUID = 1L;
+
+      /*
+       * (non-Javadoc)
+       * 
+       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+       */
+      public void actionPerformed(ActionEvent arg0) {
+        // If we have a publishing URL, then save
+        // otherwise do the publishAsAction
+        String publishUrlStr = System.getProperty(OTViewerHelper.PUBLISH_URL_PROP, null);
+        if (publishURL == null && publishUrlStr == null) {
+          publishAsAction.actionPerformed(arg0);
+          return;
+        }
+
+        try {
+          if (publishURL == null) {
+            publishURL = new URL(publishUrlStr);
+          }
+          publishData();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+
+    };
+    publishAction.putValue(Action.NAME, "Publish Authored Content...");
+
+    publishAsAction = new AbstractAction() {
+
+      /**
+       * nothing to serizile here
+       */
+      private static final long serialVersionUID = 1L;
+
+      /*
+       * (non-Javadoc)
+       * 
+       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+       */
+      public void actionPerformed(ActionEvent arg0) {
+        // Pop up a dialog asking for a URL
+        // Post the otml to the url
+        try {
+          String publishUrlStr = (String) JOptionPane.showInputDialog(
+             (Frame) SwingUtilities.getRoot(OTViewer.this),
+             "Please specify the publishing URL for this document:",
+             "Publishing URL",
+             JOptionPane.QUESTION_MESSAGE,
+             null,
+             null,
+             ((publishURL == null) ? "http://" : publishURL.toString())
+          );
+          
+          if (publishUrlStr != null) {
+            publishURL = new URL(publishUrlStr);
+            publishData();
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+
+      }
+    };
+    publishAsAction.putValue(Action.NAME, "Publish Authored Content As...");
 
 		exportImageAction = new AbstractAction() {
 
@@ -1118,6 +1232,16 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 			fileMenu.add(saveAsAction);
 		}
+    
+    if ((Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP) && System.getProperty(OTViewerHelper.PUBLISH_URL_PROP, null) != null) || 
+        Boolean.getBoolean(OTViewerHelper.DEBUG_PROP))
+    {
+      fileMenu.add(publishAction);
+    }
+    
+    if (Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
+      fileMenu.add(publishAsAction);
+    }
 
 		if (Boolean.getBoolean("otrunk.view.export_image")) {
 			fileMenu.add(exportImageAction);
