@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2007-03-09 05:26:13 $
+ * $Revision: 1.18 $
+ * $Date: 2007-05-17 16:05:44 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -78,9 +78,7 @@ public class OTInvocationHandler
 	    // Handle the globalId specially
 	    if(methodName.equals("getGlobalId")) {
 	        return dataObject.getGlobalId();
-	    } else if(methodName.equals("copyInto")) {
-            return copyInto(args[0]);
-        }
+	    } 
 	    
 	    return null;
 	}

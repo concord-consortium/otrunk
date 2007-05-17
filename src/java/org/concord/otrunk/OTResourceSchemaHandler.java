@@ -203,15 +203,20 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	    	} else if(returnType == URL.class){
 	    		return blob.getBlobURL();
 	    	}
-	    } else if(resourceValue == null && returnType.isPrimitive()) {
+	    } else if(resourceValue == null && 
+	    		(returnType == String.class || returnType.isPrimitive())) {
 	        try {
 	            Field defaultField = proxyClass.getField("DEFAULT_" + resourceName);
 	            if(defaultField != null) {
 	                return defaultField.get(null);
 	            }
 	        } catch (NoSuchFieldException e) {
-	            throw new RuntimeException("No default value set for \"" + resourceName + "\" " +
-		                "in class: " + schemaInterface);
+	        	// It is normal to have undefined strings so we shouldn't though an
+	        	// exception in that case.
+	        	if(returnType != String.class){
+	        		throw new RuntimeException("No default value set for \"" + resourceName + "\" " +
+	        				"in class: " + schemaInterface);
+	        	}
 	        }
 	    }
 	    
@@ -345,9 +350,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 			Object resourceValue = args[0];
 			
 			setResource(resourceName, resourceValue);
-		} else if(methodName.equals("copyInto")) {
-            return copyInto(args[0]);
-        } else {
+		} else {
 		    System.err.println("Unknown method \"" + methodName + "\" called on " + proxy.getClass());
 		}
 		return null;

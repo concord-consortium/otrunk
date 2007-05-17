@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-03-12 19:14:04 $
+ * $Revision: 1.10 $
+ * $Date: 2007-05-17 16:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -164,5 +164,16 @@ public class OTObjectListImpl extends OTCollectionImpl
 
 		// TODO this should be checked to see if this is the right thing here
 		notifyOTChange(OTChangeEvent.OP_REMOVE, id);		
+	}
+	
+	/**
+	 * This is package protected.  It should not be used outside of this package,
+	 * because it will be removed at some point.
+	 * 
+	 * @return
+	 */
+	OTDataList getDataList()
+	{
+		return list;
 	}
 }
