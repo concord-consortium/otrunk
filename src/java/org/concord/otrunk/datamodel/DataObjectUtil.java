@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2007-02-12 05:37:48 $
+ * $Revision: 1.4 $
+ * $Date: 2007-05-17 16:05:44 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -44,7 +44,7 @@ public class DataObjectUtil
     public static void copyInto(OTDataObject original, OTDataObject copy)
     {
     	try {
-			copyInto(original, copy, 0);
+			copyInto(original, copy, null, 0);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -52,19 +52,21 @@ public class DataObjectUtil
     }
      
     public static void copyInto(OTDataObject source, OTDataObject dest,
-    		int maxDepth) throws Exception
+                                OTDataList orphanDataList, int maxDepth) 
+    	throws Exception
     {
-    	Copier.copyInto(source, dest, maxDepth);
+    	Copier.copyInto(source, dest, orphanDataList, maxDepth);
     }
 
     
     
-    public static OTDataObject copy(OTDataObject original, OTDatabase otDb, int maxDepth) 
+    public static OTDataObject copy(OTDataObject original, OTDatabase otDb, 
+                                    OTDataList orphanDataList, int maxDepth) 
     	throws Exception
     {
     	OTDataObject copy = otDb.createDataObject();
 
-    	copyInto(original, copy, maxDepth);
+    	copyInto(original, copy, orphanDataList, maxDepth);
     	
     	return copy;
     }    

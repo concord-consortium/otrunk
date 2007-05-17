@@ -2,7 +2,7 @@
 <otrunk id="33754150-b594-11d9-9669-0800200c9a66" >
   <imports>
     <import class="org.concord.otrunk.OTSystem"/>
-    <import class="org.concord.otrunk.objects.OTImage"/>
+    <import class="org.concord.otrunk.ui.OTImage"/>
     <import class="org.concord.otrunk.view.OTFolderObject"/>
     <import class="org.concord.otrunk.view.OTViewEntry"/>
     <import class="org.concord.otrunk.view.OTViewService"/>
@@ -29,6 +29,7 @@
             <hr/>
             My TextBox <object editable="true" refid="${textbox1}"/><br/>
             My Image <object refid="${image1}" /><br/>
+            External TextBox <object refid="${external_text}"/><br/>
             More text below
           </bodyText>
           <documentRefs>
@@ -39,6 +40,13 @@
             	imageBytes="http://www.concord.org/images/logos/cc/cc-logo.gif"/>
           </documentRefs>
         </OTCompoundDoc>      
+        <OTFolderObject> 
+        <children>  
+          <OTTextObject local_id="external_text" name="external text">
+              <bodyText>External Textt</bodyText>
+          </OTTextObject>          
+        </children>
+        </OTFolderObject>
         </children>
         </OTFolderObject>
       </root>

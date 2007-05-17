@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.26 $
- * $Date: 2007-04-27 17:56:20 $
+ * $Revision: 1.27 $
+ * $Date: 2007-05-17 16:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -250,6 +250,9 @@ public class XMLDatabase
 	public OTDataObject getRoot()
 		throws Exception
 	{
+		if(rootId == null){
+			return null;
+		}
 		return (OTDataObject)dataObjects.get(rootId);
 	}
 

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-03-13 03:08:57 $
+ * $Revision: 1.11 $
+ * $Date: 2007-05-17 16:05:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -39,9 +39,11 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.otrunk.datamodel.DataObjectUtil;
+import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTRelativeID;
@@ -304,7 +306,9 @@ public class OTObjectServiceImpl
 
         OTDataObject childDataObject = mainDb.getOTDataObject(null, childID);
         /*
-         * FIXME: this is a bit a of a hack
+         * FIXME: this is a bit a o	public OTObject copyObject(OTObject original, OTObjectList orphanObjectList, 
+	                           int maxDepth) 
+f a hack
          * it is to solve the problem caused by reports.  The report creates a 
          * compound document with links to objects in each users database.  When
          * the compound document resolves these links it uses itself as the
@@ -331,7 +335,9 @@ public class OTObjectServiceImpl
             }
 
             childDataObject = parentDb.getOTDataObject(null, childID);
-        }
+        }	public OTObject copyObject(OTObject original, OTObjectList orphanObjectList, 
+	                           int maxDepth) 
+
         */
         return childDataObject;
     }
@@ -342,13 +348,31 @@ public class OTObjectServiceImpl
 	public OTObject copyObject(OTObject original, int maxDepth) 
 	throws Exception	
 	{
+		OTObjectList orphanObjectList = null;
+		OTObject root = otrunk.getRealRoot();
+		if(root instanceof OTSystem) {
+			orphanObjectList = ((OTSystem)root).getLibrary();
+		}
+
+		return copyObject(original, orphanObjectList, maxDepth);
+	}
+	
+	public OTObject copyObject(OTObject original, OTObjectList orphanObjectList, 
+	                           int maxDepth) 
+		throws Exception	
+		{
 		// make a copy of the original objects data object
 		// it is easy to copy data objects than the actual objects
 		OTDataObject originalDataObject = 
 			getOTDataObject(original.getGlobalId());
 		
+		// Assume the object list is our object list impl
+		OTDataList orphanDataList = 
+			((OTObjectListImpl)orphanObjectList).getDataList();
+		
 		OTDataObject copyDataObject = 
-			DataObjectUtil.copy(originalDataObject, creationDb, maxDepth);
+			DataObjectUtil.copy(originalDataObject, creationDb, 
+					orphanDataList, maxDepth);
 
 		return getOTObject(copyDataObject.getGlobalId());		
 	}
