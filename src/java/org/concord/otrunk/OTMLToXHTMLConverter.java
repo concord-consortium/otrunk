@@ -39,6 +39,7 @@ import javax.swing.SwingUtilities;
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTJComponentService;
+import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTPrintDimension;
 import org.concord.framework.otrunk.view.OTView;
@@ -51,13 +52,14 @@ import org.concord.swing.util.ComponentScreenshot;
 
 public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 	
-	private DefaultOTObject pfDocument;
+	private DefaultOTObject topLevelOTObject;
 	private OTViewContainer viewContainer;
 	private OTViewFactory viewFactory;
 	
     private int containerDisplayWidth;
     private int containerDisplayHeight;
     private File outputFile;
+	OTJComponentService jComponentService;    
     
 	public OTMLToXHTMLConverter() {
 		
@@ -73,7 +75,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 		this.viewContainer = viewContainer;
 		if(viewContainer.getCurrentObject() != null) {
 			if(viewContainer.getCurrentObject() instanceof DefaultOTObject)
-				this.pfDocument = (DefaultOTObject)viewContainer.getCurrentObject();
+				this.topLevelOTObject = (DefaultOTObject)viewContainer.getCurrentObject();
         }
 	}
 	
@@ -97,20 +99,16 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
     public void run() {
 		
         if(outputFile == null) return;
-        String fileSeparator = System.getProperty("file.separator");
-        File folder = new File(outputFile.getParent() + fileSeparator + "images");
-        if(!folder.exists()) folder.mkdir();
-        if(!folder.isDirectory()) return;
 
         String text = null;
-		if(pfDocument != null) {
-			OTJComponentView objView = getOTJComponentView(pfDocument);
+		if(topLevelOTObject != null) {
+			OTJComponentView objView = getOTJComponentView(topLevelOTObject);
 
             OTXHTMLView xhtmlView = null;
             String bodyText = "";
             if(objView instanceof OTXHTMLView) {
                 xhtmlView = (OTXHTMLView) objView;
-            	bodyText = xhtmlView.getXHTMLText(pfDocument);
+            	bodyText = xhtmlView.getXHTMLText(topLevelOTObject);
             }
             //System.out.println(bodyText);
 			
@@ -119,7 +117,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 			StringBuffer parsed = new StringBuffer();
 			while(m.find()) {
 				String id = m.group(1);
-				OTObject referencedObject = pfDocument.getReferencedObject(id);
+				OTObject referencedObject = topLevelOTObject.getReferencedObject(id);
 				
 				//System.out.println(referencedObject.getClass());
                 String url = embedOTObject(referencedObject);
@@ -134,7 +132,8 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 				}
 			}
 			m.appendTail(parsed);
-			text =  parsed.toString();			
+			text =  "<html><head></head><body>\n" +parsed.toString() +
+			"</body></html>";			
 		} else {
 			OTObject oto = (OTObject) viewContainer.getCurrentObject();
             text = embedOTObject(oto);
@@ -176,13 +175,16 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
         }
         
         comp.addNotify();
-        comp.validate();
+        comp.validate();    
 
-        String seperator = System.getProperty("file.separator");
-        File folder = new File(outputFile.getParent() + seperator + "images");
+        String outputFileNameWithoutExtension = 
+        	outputFile.getName().substring(0, outputFile.getName().lastIndexOf('.'));
+        File folder = new File(outputFile.getParent(), 
+        		outputFileNameWithoutExtension + "_files");
         if(!folder.exists()) folder.mkdir();
         if(!folder.isDirectory()) return null;
-        ImageSaver saver = new ImageSaver(comp, folder, otObject, scaleX, scaleY);
+        
+        ImageSaver saver = new ImageSaver(comp, folder, folder.getName(), otObject, scaleX, scaleY);
         
         try{
             SwingUtilities.invokeAndWait(saver);
@@ -197,11 +199,13 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 
     protected OTJComponentView getOTJComponentView(OTObject obj)
     {
-        OTViewServiceProvider serviceProvider = viewFactory.getViewServiceProvider();
-        OTJComponentService jComponentService = (OTJComponentService)
-        	serviceProvider.getViewService(OTJComponentService.class);
-        return 
-        	jComponentService.getObjectView(obj, viewContainer);    	
+    	if(jComponentService == null){
+            OTViewServiceProvider serviceProvider = viewFactory.getViewServiceProvider();
+            OTJComponentServiceFactory serviceFactory = (OTJComponentServiceFactory)
+            	serviceProvider.getViewService(OTJComponentServiceFactory.class);
+			jComponentService = serviceFactory.createOTJComponentService();
+    	}
+        return jComponentService.getObjectView(obj, viewContainer);    	
     }
     
     protected JComponent getJComponent(OTObject obj)
@@ -246,8 +250,9 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
         String text = null;
         float scaleX = 1;
         float scaleY = 1;
+		private String folderPath;
         
-        ImageSaver(JComponent comp, File folder, OTObject otObject,
+        ImageSaver(JComponent comp, File folder, String folderPath, OTObject otObject,
             float scaleX, float scaleY)
         {
             this.comp = comp;
@@ -255,14 +260,13 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
             this.otObject = otObject;
             this.scaleX = scaleX;
             this.scaleY = scaleY;
+            this.folderPath = folderPath;
         }
         
         public void run()
         {
             // TODO Auto-generated method stub
-            try{
-                String seperator = System.getProperty("file.separator");
-                            
+            try{                            
                 String id = otObject.getGlobalId().toString();
                 id = id.replaceAll("/", "_");
                 id = id.replaceAll("!", "") + ".png";
@@ -278,7 +282,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
                     ComponentScreenshot.makeComponentImageAlpha(comp, scaleX, scaleY);
                 ComponentScreenshot.saveImageAsFile(bim, newFile, "png");
                 
-                text = folder + seperator + id;
+                text = folderPath + "/" + id;
                 return;
                             
             }catch(Throwable t){
