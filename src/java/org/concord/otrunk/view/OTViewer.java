@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.59 $
- * $Date: 2007-05-15 16:28:42 $
+ * $Revision: 1.60 $
+ * $Date: 2007-05-18 13:44:32 $
  * $Author: aunger $
  *
  * Licence Information
@@ -47,8 +47,8 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
@@ -117,6 +117,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	public final static String TITLE_PROP = "otrunk.view.frame_title";
 
 	public final static String HIDE_TREE_PROP = "otrunk.view.hide_tree";
+  
+  public final static int HTTP_PUT = 0;
+  
+  public final static int HTTP_POST = 1;
 
 	private static OTrunkImpl otrunk;
 
@@ -169,7 +173,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 	boolean showTree = false;
   
-  private URL publishURL;
+  URL remoteURL;
 
 	private AbstractAction saveUserDataAsAction;
 
@@ -189,9 +193,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 	private AbstractAction saveAction;
   
-  private AbstractAction publishAction;
-  
-  private AbstractAction publishAsAction;
+  private AbstractAction saveRemoteAsAction;
 
 	private AbstractAction exportImageAction;
 
@@ -335,6 +337,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	}
 
 	public void init(String url) {
+    updateRemoteURL(url);
+    
 		createActions();
 
 		updateMenuBar();
@@ -702,16 +706,47 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			splitPane.setRightComponent(scrollPane);
 		}
 	}
+  
+  private void updateRemoteURL(String defaultURL) {
+    String remote = System.getProperty(OTViewerHelper.REMOTE_URL_PROP, null);
 
-  public void publishData() throws Exception {
-    URLConnection urlConn;
+    try {
+      if (remote == null) {
+        if (defaultURL.startsWith("http:")) {
+          remoteURL = new URL(defaultURL);
+        }
+      } else {
+          remoteURL = new URL(remote);
+      }
+    }
+    catch (Exception e) {
+      remoteURL = null;
+      System.err.println("Remote URL is invalid.");
+      e.printStackTrace();
+    }
+  }
+
+  public void remoteSaveData(int method) throws Exception {
+    HttpURLConnection urlConn;
     DataOutputStream urlDataOut;
     BufferedReader urlDataIn;
+    String methodStr = "POST";
     
-    urlConn = publishURL.openConnection();
+    if (method == OTViewer.HTTP_POST) {
+      methodStr = "POST";
+    }
+    else if (method == OTViewer.HTTP_PUT) {
+      methodStr = "PUT";
+    }
+    else {
+      throw new Exception("Invalid HTTP Request method for data saving");
+    }
+    
+    urlConn = (HttpURLConnection) remoteURL.openConnection();
     urlConn.setDoInput(true);
     urlConn.setDoOutput(true);
     urlConn.setUseCaches(false);
+    urlConn.setRequestMethod(methodStr);
     urlConn.setRequestProperty("Content-Type", "application/xml");
     
     // Send POST output.
@@ -727,11 +762,15 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
     String response = "";
     while (null != ((str = urlDataIn.readLine())))
     {
-      response.concat(str + "\n");
+      response += str + "\n";
     }
     urlDataIn.close ();
-    // FIXME Need to trap non-HTTP200 responses and throw an exception (if an exception isn't thrown already) and capture the excpetions upstream
-    urlConn.getHeaderFieldInt("Response", 0);
+    // Need to trap non-HTTP 200/300 responses and throw an exception (if an exception isn't thrown already) and capture the exceptions upstream
+    int code = urlConn.getResponseCode();
+    if (code >= 400) {
+      throw new Exception("HTTP Response: " + urlConn.getResponseMessage() + "\n\n" + response);
+    }
+    urlConn.disconnect();
   }
   
 	public void createActions() {
@@ -914,28 +953,6 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		};
 		loadAction.putValue(Action.NAME, "Open Authored Content...");
 
-		reloadAction = new AbstractAction() {
-
-			/**
-			 * nothing to serizile here
-			 */
-			private static final long serialVersionUID = 1L;
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					reload();
-				} catch (Exception exp) {
-					exp.printStackTrace();
-				}
-			}
-		};
-		reloadAction.putValue(Action.NAME, "Reload Authored Content...");
-
 		saveAction = new AbstractAction() {
 
 			/**
@@ -949,22 +966,40 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
 			public void actionPerformed(ActionEvent arg0) {
-				if (currentAuthoredFile == null) {
-					saveAsAction.actionPerformed(arg0);
-					return;
-				}
-
-				if (!currentAuthoredFile.exists()
-						|| checkForReplace(currentAuthoredFile)) {
-					try {
-						Exporter.export(currentAuthoredFile, xmlDB.getRoot(),
-								xmlDB);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
+        if (remoteURL != null) {
+          try {
+            if (Boolean.getBoolean(OTViewerHelper.REST_ENABLED_PROP)) {
+              try {
+                remoteSaveData(OTViewer.HTTP_PUT);
+              }
+              catch (Exception e) {
+                remoteSaveData(OTViewer.HTTP_POST);
+              }
+            }
+            else {
+              remoteSaveData(OTViewer.HTTP_POST);
+            }
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+        else {
+  				if (currentAuthoredFile == null) {
+  					saveAsAction.actionPerformed(arg0);
+  					return;
+  				}
+  
+  				if (!currentAuthoredFile.exists()
+  						|| checkForReplace(currentAuthoredFile)) {
+  					try {
+  						Exporter.export(currentAuthoredFile, xmlDB.getRoot(),
+  								xmlDB);
+  					} catch (Exception e) {
+  						e.printStackTrace();
+  					}
+  				}
+        } // end if (remoteUrl == null)
 			}
-
 		};
 		saveAction.putValue(Action.NAME, "Save Authored Content...");
 
@@ -1016,47 +1051,15 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 					}
 
 					frame.setTitle(fileName);
+          remoteURL = null;
+          updateMenuBar();
 
 				}
 			}
 		};
 		saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
-    
-    publishAction = new AbstractAction() {
 
-      /**
-       * nothing to serizile here
-       */
-      private static final long serialVersionUID = 1L;
-
-      /*
-       * (non-Javadoc)
-       * 
-       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-       */
-      public void actionPerformed(ActionEvent arg0) {
-        // If we have a publishing URL, then save
-        // otherwise do the publishAsAction
-        String publishUrlStr = System.getProperty(OTViewerHelper.PUBLISH_URL_PROP, null);
-        if (publishURL == null && publishUrlStr == null) {
-          publishAsAction.actionPerformed(arg0);
-          return;
-        }
-
-        try {
-          if (publishURL == null) {
-            publishURL = new URL(publishUrlStr);
-          }
-          publishData();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-
-    };
-    publishAction.putValue(Action.NAME, "Publish Authored Content...");
-
-    publishAsAction = new AbstractAction() {
+    saveRemoteAsAction = new AbstractAction() {
 
       /**
        * nothing to serizile here
@@ -1072,19 +1075,26 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
         // Pop up a dialog asking for a URL
         // Post the otml to the url
         try {
-          String publishUrlStr = (String) JOptionPane.showInputDialog(
+         String publishUrlStr = (String) JOptionPane.showInputDialog(
              (Frame) SwingUtilities.getRoot(OTViewer.this),
              "Please specify the publishing URL for this document:",
              "Publishing URL",
              JOptionPane.QUESTION_MESSAGE,
              null,
              null,
-             ((publishURL == null) ? "http://" : publishURL.toString())
-          );
+             ( (remoteURL == null) ? "http://" : remoteURL.toString() )
+          ); 
           
           if (publishUrlStr != null) {
-            publishURL = new URL(publishUrlStr);
-            publishData();
+            remoteURL = new URL(publishUrlStr);
+            remoteSaveData(OTViewer.HTTP_POST);
+            // FIXME: can we tell if a new location is REST-enabled?
+            // if, so we need to set the REST_ENABLED property appropriately
+            // for now, we'll just assume that it's not
+            System.setProperty(OTViewerHelper.REST_ENABLED_PROP, "false");
+            
+            // update the menu so that Save Authored... now links to saveRemoteAction
+            updateMenuBar();
           }
         } catch (Exception e) {
           e.printStackTrace();
@@ -1092,7 +1102,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
       }
     };
-    publishAsAction.putValue(Action.NAME, "Publish Authored Content As...");
+    saveRemoteAsAction.putValue(Action.NAME, "Save Remotely As...");
 
 		exportImageAction = new AbstractAction() {
 
@@ -1224,23 +1234,32 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		}
 
 		if (Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
-			fileMenu.add(loadAction);
-
-			fileMenu.add(reloadAction);
-
-			fileMenu.add(saveAction);
-
-			fileMenu.add(saveAsAction);
-		}
-    
-    if ((Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP) && System.getProperty(OTViewerHelper.PUBLISH_URL_PROP, null) != null) || 
-        Boolean.getBoolean(OTViewerHelper.DEBUG_PROP))
-    {
-      fileMenu.add(publishAction);
+      if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
+        loadAction.putValue(Action.NAME, "Open Authored Content...");
+        saveAction.putValue(Action.NAME, "Save Authored Content...");
+        saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
+        saveRemoteAsAction.putValue(Action.NAME, "Save Authored Content Remotely As...");
+      }
+      else {
+        loadAction.putValue(Action.NAME, "Open...");
+        saveAction.putValue(Action.NAME, "Save");
+        saveAsAction.putValue(Action.NAME, "Save As...");
+        saveRemoteAsAction.putValue(Action.NAME, "Save Remotely As...");
+      }
+      fileMenu.add(loadAction);
+      fileMenu.add(saveAction);
+      fileMenu.add(saveAsAction);
+      fileMenu.add(saveRemoteAsAction);
     }
     
-    if (Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
-      fileMenu.add(publishAsAction);
+    if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP) && ! Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
+      if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
+        saveAction.putValue(Action.NAME, "Save Authored Content...");
+        fileMenu.add(saveAction);
+      } else {
+        saveAction.putValue(Action.NAME, "Save");
+        fileMenu.add(saveAction);
+      }
     }
 
 		if (Boolean.getBoolean("otrunk.view.export_image")) {
@@ -1253,7 +1272,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 		fileMenu.add(showConsoleAction);
 		
-		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)) {
+		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP) || Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
 			fileMenu.add(reloadAction);
 		}
 

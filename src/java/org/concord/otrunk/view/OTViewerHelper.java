@@ -58,7 +58,8 @@ public class OTViewerHelper
 	public final static String TRACE_PROP = "otrunk.trace";
 	public final static String TRACE_LISTENERS_PROP = "otrunk.trace.listeners";
 	public final static String AUTHOR_PROP = "otrunk.view.author";
-  public final static String PUBLISH_URL_PROP = "otrunk.publishurl";
+  public final static String REMOTE_URL_PROP = "otrunk.remote_url";
+  public final static String REST_ENABLED_PROP = "otrunk.rest_enabled";
 	
 	private OTrunk otrunk;
 	private OTViewFactory viewFactory;
