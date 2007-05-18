@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-04-30 18:43:02 $
- * $Author: scytacki $
+ * $Revision: 1.12 $
+ * $Date: 2007-05-18 22:01:52 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -130,13 +130,19 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		//"Add" action is only for folders
 		if (selectedObject instanceof OTFolder){
 			menu.add(new OTFolderObjectAction("add"));
+			menu.addSeparator();
 		}
-		//Delete action only for objects with a parent folder
-		if (parentObject != null){
-			menu.add(new OTFolderObjectAction("delete"));
-		}
+		
 		//Edit action 
 		menu.add(new OTFolderObjectAction("rename"));
+		//These actions are only for objects with a parent folder
+		if (parentObject != null){
+			//Copy (duplicate)
+			menu.add(new OTFolderObjectAction("duplicate"));
+			//Delete
+			menu.add(new OTFolderObjectAction("delete"));
+		}
+		
 		menu.addSeparator();
 		//Move
 		menu.add(new OTFolderObjectAction("moveup"));
@@ -173,6 +179,9 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 			else if (actionCommand.equals("movedown")){
 				putValue(Action.NAME, "Move down");
 			}
+			else if (actionCommand.equals("duplicate")){
+				putValue(Action.NAME, "Duplicate");
+			}
 		}
 		
 		/**
@@ -200,6 +209,40 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 			else if (e.getActionCommand().equals("movedown")){
 				
 				moveDownSelectedObject();
+			}
+			else if (e.getActionCommand().equals("duplicate")){
+				
+				duplicateSelectedObject();
+			}
+		}
+
+		/**
+		 * 
+		 */
+		protected void duplicateSelectedObject()
+		{
+			if (selectedObject == null || parentObject == null){
+				System.err.println("Error: cannot duplicate if selected object or parent are null");
+				return;
+			}
+			
+			OTObject otObj;
+			try{
+				otObj = selectedObject.getOTObjectService().copyObject(selectedObject, -1);
+				otObj.setName(otObj.getName() + " (Copy)");
+			}
+			catch(Exception ex){
+				System.err.println("Warning: selected object could not be copied.");
+				ex.printStackTrace();
+				return;
+			}
+			
+			if (parentObject instanceof OTFolder){
+				((OTFolder)parentObject).addChild(otObj);
+				treeModel.fireTreeStructureChanged(selectedNode);
+			}
+			else{
+				System.err.println("Error: OT Objects can only be added to OT Folders.");
 			}
 		}
 
