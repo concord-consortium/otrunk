@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.27 $
- * $Date: 2007-05-17 16:05:43 $
+ * $Revision: 1.28 $
+ * $Date: 2007-05-21 22:09:07 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -57,6 +57,7 @@ import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
+import org.concord.otrunk.view.OTViewerHelper;
 import org.concord.otrunk.xml.jdom.JDOMDocument;
 
 
@@ -87,6 +88,10 @@ public class XMLDatabase
     private OTID databaseId;
 	
     PrintStream statusStream = null;
+
+	private Vector packageClasses = new Vector();
+
+	private Hashtable processedOTPackages = new Hashtable();
     
 	public XMLDatabase()
 	{
@@ -187,7 +192,17 @@ public class XMLDatabase
 		    OTXMLElement currentImport=(OTXMLElement)iterator.next();
 			String className = currentImport.getAttributeValue("class");
 			importedOTObjectClasses.add(className);
+
+			// TODO look for package classes based on thise imports and 
+			// save them.  The OTrunkImpl will then ask for these packages from the 
+			// the database when it loads it and then initialize the packages
+			
+			Class packageClass = findPackageClass(className);
+			if(packageClass != null && !packageClasses .contains(packageClass)){
+				packageClasses.add(packageClass);
+			}
 		}		
+		
 		
 		ReflectionTypeDefinitions.registerTypes(importedOTObjectClasses, typeService,
 				this);		
@@ -227,6 +242,102 @@ public class XMLDatabase
 		setRoot(rootDataObject.getGlobalId());
 		
 	}
+
+	public static class PackageNotFound{};
+	
+	/**
+	 * This will take a imported class name and figure out the 
+	 * name of the OT package class.  If for example the className is
+	 * org.concord.datagraph.state.OTDataCollector
+	 * It look for a class called:
+	 * org.concord.datagraph.state.OTDatagraphPackage
+	 * 
+	 * This is figured out by 
+	 * Taking of the classname
+	 *    org.concord.datagraph.state
+	 * striping off the .state (if there is one)
+	 *    org.concord.datagraph
+	 * taking the last element of the package name
+	 *    datagraph
+	 * capitalizing the first leter and adding OT to the front and package to back
+	 *    OTDatagraphPackage
+	 * using the original package of the imported class
+	 *    org.concord.datagraph.state.OTDatagraphPackage
+     * @param className
+     * @return
+     */
+    private Class findPackageClass(String className)
+    {
+    	int lastDot = className.lastIndexOf('.');
+    	String packageName = className.substring(0,lastDot);
+    	
+    	Class otPackageClass;
+    	otPackageClass = (Class)processedOTPackages .get(packageName);
+    	if(otPackageClass == PackageNotFound.class){
+    		// we looked for this package before but couldn't find it
+    		return null;
+    	} else if(otPackageClass != null){
+    		return otPackageClass;
+    	}
+
+    	String otPackageStr = packageName;
+    	if(packageName.endsWith(".state")){
+    		otPackageStr = 
+    			packageName.substring(0,packageName.length() - ".state".length());    		
+    	}
+    	
+    	String capitalizedOTPackageStr = null;
+    	// Special case org.concord packages    	
+    	if(otPackageStr.startsWith("org.concord.")){
+    		otPackageStr = otPackageStr.substring("org.concord.".length());
+    		
+    		String newOTPackageStr = "";
+    		int curIndex = 0;
+    		while(curIndex < otPackageStr.length()){
+    			int nextIndex = otPackageStr.indexOf('.', curIndex);
+    			if(nextIndex == -1){
+    				nextIndex = otPackageStr.length();
+    			}
+    			newOTPackageStr += otPackageStr.substring(curIndex,curIndex+1).toUpperCase() + 
+    				otPackageStr.substring(curIndex+1, nextIndex);
+    			curIndex = nextIndex + 1;
+    		}
+
+    		capitalizedOTPackageStr = newOTPackageStr;
+    		
+    	} else {    	
+    		lastDot = otPackageStr.lastIndexOf('.');
+    		otPackageStr = otPackageStr.substring(lastDot+1);
+
+    		capitalizedOTPackageStr = otPackageStr.substring(0,1).toUpperCase() +
+    			otPackageStr.substring(1);
+    	}
+    	
+    	String otPackageClassName = 
+    		"OT" + capitalizedOTPackageStr + "Package";
+    	
+    	String fullyQualifiedOTPackageClassName = 
+    		packageName + "." + otPackageClassName;
+    	
+        try {
+	        otPackageClass = getClass().getClassLoader().loadClass(fullyQualifiedOTPackageClassName);
+        	if(Boolean.getBoolean(OTViewerHelper.TRACE_PACKAGES_PROP)){
+        		System.err.println("loaded package: " + otPackageClass);
+        	}
+	        processedOTPackages.put(packageName, otPackageClass);
+	    	return otPackageClass;
+        } catch (ClassNotFoundException e) {
+        	if(Boolean.getBoolean(OTViewerHelper.TRACE_PACKAGES_PROP)){
+        		System.err.println("no OTPackage for: " + packageName);
+        		System.err.println("  the classname should be: " + 
+        				fullyQualifiedOTPackageClassName);
+        	}
+        	// add to a list of notfound otpackages so we don't look for it again
+	        processedOTPackages.put(packageName, PackageNotFound.class);
+        }
+
+        return null;
+    }
 
 	protected void printStatus(String message)
 	{
@@ -523,4 +634,11 @@ public class XMLDatabase
     	return new XMLBlobResource(url);
     }
 	
+    /* (non-Javadoc)
+     * @see org.concord.otrunk.datamodel.OTDatabase#getPackageClasses()
+     */
+    public Vector getPackageClasses()
+    {
+    	return (Vector)packageClasses.clone();
+    }
 }

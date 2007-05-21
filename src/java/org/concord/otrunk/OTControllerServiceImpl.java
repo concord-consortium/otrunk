@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.concord.framework.otrunk.OTController;
+import org.concord.framework.otrunk.OTControllerRegistry;
 import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
