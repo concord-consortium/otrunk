@@ -36,11 +36,13 @@ import java.util.Vector;
 import java.util.WeakHashMap;
 
 import org.concord.framework.otrunk.OTBundle;
+import org.concord.framework.otrunk.OTControllerRegistry;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTPackage;
 import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
@@ -80,6 +82,8 @@ public class OTrunkImpl implements OTrunk
 	Vector users = new Vector();
 	
     Vector objectServices = new Vector();
+
+	private Vector registeredPackageClasses = new Vector();;
     
     public final static String getClassName(OTDataObject dataObject)
     {
@@ -92,9 +96,10 @@ public class OTrunkImpl implements OTrunk
 	}
 
 	public OTrunkImpl(OTDatabase db, Object [] services, Class [] serviceClasses)
-	{		
-		this.rootDb = db;
-		databases.add(db);
+	{	
+		// Setup the services this has to be done before addDatabase
+		// because addDatabase initializes the OTPackages loaded by that
+		// database
 		if(services != null) {
 			for(int i=0; i<services.length; i++){
 				serviceContext.addService(serviceClasses[i], services[i]);
@@ -102,9 +107,12 @@ public class OTrunkImpl implements OTrunk
 		}
 		
 		serviceContext.addService(OTControllerRegistry.class, 
-				new OTControllerRegistry());
+				new OTControllerRegistryImpl());
 		
-        rootObjectService = new OTObjectServiceImpl(this);
+		this.rootDb = db;
+		addDatabase(db);
+
+		rootObjectService = new OTObjectServiceImpl(this);
         rootObjectService.setCreationDb(rootDb);
         rootObjectService.setMainDb(rootDb);
         
@@ -278,9 +286,7 @@ public class OTrunkImpl implements OTrunk
         throws Exception
     {
         // add this database as one of our databases
-        if(!databases.contains(userDataDb)) {
-            databases.add(userDataDb);
-        }
+    	addDatabase(userDataDb);
         
         OTObjectService objService = createObjectService(userDataDb);
         OTDataObject rootDO = userDataDb.getRoot();
@@ -305,7 +311,7 @@ public class OTrunkImpl implements OTrunk
         // and uses the refMap to store the links between the two
         OTTemplateDatabase db = new OTTemplateDatabase(rootDb, userDataDb, refMap);          
 
-        databases.add(db);
+        addDatabase(db);
         
         // save this data base so getUserRuntimeObject can track down
         // objects related to this user
@@ -375,7 +381,7 @@ public class OTrunkImpl implements OTrunk
             
             
             db = new OTTemplateDatabase(rootDb, objService.getCreationDb(), userStateMap);          
-            databases.add(db);
+            addDatabase(db);
             userObjService = createObjectService(db);
             userTemplateDatabases.put(userId, db);
             userObjectServices.put(userId,userObjService);
@@ -384,8 +390,46 @@ public class OTrunkImpl implements OTrunk
         return userObjService;
     }
     
+    protected void addDatabase(OTDatabase db)
+    {
+        if(!databases.contains(db)) {
+            databases.add(db);
+            
+            Vector packageClasses = db.getPackageClasses();
+            if(packageClasses != null){
+            	for(int i=0; i<packageClasses.size(); i++){
+            		registerPackageClass((Class)packageClasses.get(i));
+            	}
+            }
+        }
+    }
     
-    
+	/**
+     * @param class1
+     */
+    public void registerPackageClass(Class packageClass)
+    {
+    	// check to see if this package has already been registered
+    	if(registeredPackageClasses.contains(packageClass)){
+    		return;
+    	}
+    	
+    	registeredPackageClasses.add(packageClass);
+    	OTPackage otPackage;
+        try {
+	        otPackage = (OTPackage)packageClass.newInstance();
+	    	otPackage.initialize(this);
+        } catch (InstantiationException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        } catch (IllegalAccessException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+
+    	return;
+    }
+
 	public OTObject getUserRuntimeObject(OTObject authoredObject, OTUser user)
 		throws Exception
 	{

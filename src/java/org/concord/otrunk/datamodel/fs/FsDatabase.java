@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-04-27 17:56:20 $
+ * $Revision: 1.11 $
+ * $Date: 2007-05-21 22:09:08 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -43,6 +43,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.BlobResource;
@@ -315,6 +316,15 @@ public class FsDatabase implements OTDatabase
      * @see org.concord.otrunk.datamodel.OTDatabase#createBlobResource(java.net.URL)
      */
     public BlobResource createBlobResource(URL url)
+    {
+	    // TODO Auto-generated method stub
+	    return null;
+    }
+
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.datamodel.OTDatabase#getPackageClasses()
+     */
+    public Vector getPackageClasses()
     {
 	    // TODO Auto-generated method stub
 	    return null;

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2007-05-21 06:23:33 $
+ * $Revision: 1.13 $
+ * $Date: 2007-05-21 22:09:07 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -36,6 +36,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTControllerRegistry;
 import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
@@ -391,5 +392,13 @@ f a hack
 	{
 		listeners.remove(listener);
 	}
+
+	/* (non-Javadoc)
+     * @see org.concord.framework.otrunk.OTObjectService#registerPackageClass(java.lang.Class)
+     */
+    public void registerPackageClass(Class packageClass)
+    {
+    	otrunk.registerPackageClass(packageClass);	    
+    }
 
 }

@@ -6,8 +6,9 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTController;
+import org.concord.framework.otrunk.OTControllerRegistry;
 
-public class OTControllerRegistry
+public class OTControllerRegistryImpl implements OTControllerRegistry
 {
 	// This maps from the class that can be managed to 
 	// the OTController which can handle it.  This can be a one to
@@ -20,6 +21,9 @@ public class OTControllerRegistry
 
 	Vector controllerClasses = new Vector();
 
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.OTControllerRegistry#registerControllerClass(java.lang.Class)
+     */
 	public void registerControllerClass(Class viewClass) {
 		if(controllerClasses.contains(viewClass)){
 			return;
@@ -81,11 +85,17 @@ public class OTControllerRegistry
 		return null;
 	}
 
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.OTControllerRegistry#getControllerClassByOTObjectClass(java.lang.Class)
+     */
 	public Class getControllerClassByOTObjectClass(Class otObjectClass)
     {
 		return (Class)controllerClassesFromOTObject.get(otObjectClass);
     }
 
+	/* (non-Javadoc)
+     * @see org.concord.otrunk.OTControllerRegistry#getControllerClassByRealObjectClass(java.lang.Class)
+     */
 	public Class getControllerClassByRealObjectClass(Class realObjectClass)
     {
 		return (Class)controllerClassesFromRealObject.get(realObjectClass);
