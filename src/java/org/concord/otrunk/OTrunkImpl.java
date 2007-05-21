@@ -101,6 +101,9 @@ public class OTrunkImpl implements OTrunk
 			}
 		}
 		
+		serviceContext.addService(OTControllerRegistry.class, 
+				new OTControllerRegistry());
+		
         rootObjectService = new OTObjectServiceImpl(this);
         rootObjectService.setCreationDb(rootDb);
         rootObjectService.setMainDb(rootDb);

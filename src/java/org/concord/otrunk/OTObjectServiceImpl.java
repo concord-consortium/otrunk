@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-05-17 16:05:43 $
+ * $Revision: 1.12 $
+ * $Date: 2007-05-21 06:23:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -120,7 +120,9 @@ public class OTObjectServiceImpl
     }
 
     public OTControllerService createControllerService() {
-    	return new OTControllerServiceImpl(this);
+    	OTControllerRegistry registry = 
+    		(OTControllerRegistry) otrunk.getService(OTControllerRegistry.class);
+    	return new OTControllerServiceImpl(this, registry);
     }
     
     public OTObject loadOTObject(OTDataObject dataObject, Class otObjectClass)

@@ -29,13 +29,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 import java.util.WeakHashMap;
 
 import org.concord.framework.otrunk.OTController;
+import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.OTControllerService;
 
 public class OTControllerServiceImpl implements OTControllerService {
 	/**
@@ -58,17 +57,12 @@ public class OTControllerServiceImpl implements OTControllerService {
 	
 	OTObjectService objectService;
 
-	// This maps from the class that can be managed to 
-	// the OTController which can handle it.  This can be a one to
-	// many map.  So the values are Lists.
-	Map controllerClassesFromRealObject = new HashMap();
+	OTControllerRegistry registry;
 	
-	// This maps from the otObject class that can be manged to 
-	// the list of OTControllers which can handle it.
-	Map controllerClassesFromOTObject = new HashMap();
-	
-	public OTControllerServiceImpl(OTObjectService objectService){
+	public OTControllerServiceImpl(OTObjectService objectService, 
+		OTControllerRegistry registry){
 		this.objectService = objectService;
+		this.registry = registry;
 	}
 	
 	public Object getRealObject(OTObject otObject) {
@@ -122,7 +116,8 @@ public class OTControllerServiceImpl implements OTControllerService {
 	{
 		// need to find the OTController that can handle this OTObject
 		// need to go through all the parents of the otObjectClass
-		Class controllerClass = (Class)controllerClassesFromOTObject.get(otObjectClass);
+		Class controllerClass = 
+			registry.getControllerClassByOTObjectClass(otObjectClass);
 
 		// try the first level of interfaces if the class can't be found
 		// this should really go up the inheritance tree, both interfaces and
@@ -133,8 +128,9 @@ public class OTControllerServiceImpl implements OTControllerService {
 		if(controllerClass == null) {
 			// I believe this will return only the first level of interfaces
 			interfaces = otObjectClass.getInterfaces();
-			for(int i=0; i<interfaces.length; i++){
-				controllerClass = (Class)controllerClassesFromOTObject.get(interfaces[i]);
+			for(int i=0; i<interfaces.length; i++){				
+				controllerClass = 
+					registry.getControllerClassByOTObjectClass(interfaces[i]);
 				if(controllerClass != null){
 					break;
 				}
@@ -263,6 +259,12 @@ public class OTControllerServiceImpl implements OTControllerService {
 		return null;
 	}
 
+	/**
+	 * This should actually receive the class of the OTObject, that will help look up the correct
+	 * OTController.  There could be mutiple controllers which handle a particular real object class. 
+	 * 
+	 * @see org.concord.framework.otrunk.OTControllerService#getOTObject(java.lang.Object)
+	 */
 	public OTObject getOTObject(Object realObject) {		
 		
 		// check if we already have a controller, if so then return its otObject
@@ -275,8 +277,9 @@ public class OTControllerServiceImpl implements OTControllerService {
 		// Figure out which otObjectClass we should be using
 		// this comes from the controller class we found
 			// TODO this should look for matches up the inheritance tree.
-		Class controllerClass = (Class)controllerClassesFromRealObject.get(realObject.getClass());
-
+		Class controllerClass = 
+			registry.getControllerClassByRealObjectClass(realObject.getClass());
+		
 		if(controllerClass == null) {
 			System.err.println("can't find controller class for realObject: " 
 					+ realObject.getClass());
@@ -347,25 +350,10 @@ public class OTControllerServiceImpl implements OTControllerService {
 		controller.registerRealObject(realObject);		
 	}
 	
-	Vector controllerClasses = new Vector();
-	
 	public void registerControllerClass(Class viewClass) {
-		if(controllerClasses.contains(viewClass)){
-			return;
-		}
-
-		controllerClasses.add(viewClass);
-		
-		Class [] classes;
-		classes = getRealObjectClasses(viewClass);
-		for(int i=0; i<classes.length; i++) {
-			controllerClassesFromRealObject.put(classes[i], viewClass);
-		}
-
-		Class klass = getOTObjectClass(viewClass);
-		controllerClassesFromOTObject.put(klass, viewClass);		
+		registry.registerControllerClass(viewClass);
 	}
-
+	
 	/**
 	 * @see org.concord.framework.otrunk.OTControllerService#loadRealObject(org.concord.framework.otrunk.OTObject, java.lang.Object)
 	 */
