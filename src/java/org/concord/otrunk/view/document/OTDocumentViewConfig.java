@@ -19,4 +19,7 @@ public interface OTDocumentViewConfig
 	 */
 	public String getMode();
 	public void setMode(String mode);
+	
+	public String getCss();
+	public void setCss(String css);
 }
