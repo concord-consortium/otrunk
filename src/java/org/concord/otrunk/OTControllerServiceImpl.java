@@ -28,8 +28,12 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 import java.util.WeakHashMap;
+import java.util.Map.Entry;
 
 import org.concord.framework.otrunk.OTController;
 import org.concord.framework.otrunk.OTControllerRegistry;
@@ -364,5 +368,31 @@ public class OTControllerServiceImpl implements OTControllerService {
 		
 		controller.loadRealObject(realObject);
 	}
+
+	/* (non-Javadoc)
+     * @see org.concord.framework.otrunk.OTControllerService#dispose()
+     */
+    public void dispose()
+    {
+    	Vector disposedControllers = new Vector();
+
+    	// There are 2 maps that contain references to controllers.
+    	// They should be in sync.  
+		Set entries = controllerFromRealMap.entrySet();
+		Iterator iterator = entries.iterator();
+		while(iterator.hasNext()){
+			Entry entry = (Entry) iterator.next();
+			OTController controller = (OTController) entry.getValue();
+			if(disposedControllers.contains(controller)){
+				continue;
+			}
+			controller.dispose(entry.getKey());
+			disposedControllers.add(controller);
+		}    	    	
+    }
+    
+    protected void disposeValues(Map map, Vector disposedControllers)
+    {
+    }
 
 }
