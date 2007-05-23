@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2007-05-21 22:09:07 $
+ * $Revision: 1.14 $
+ * $Date: 2007-05-23 19:42:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -134,8 +134,14 @@ public class OTObjectServiceImpl
         if(otObjectClass.isInterface()) {
             OTBasicObjectHandler handler = new OTBasicObjectHandler(dataObject, otrunk, this, otObjectClass);
 
-            otObject = (OTObject)Proxy.newProxyInstance(otObjectClass.getClassLoader(),
-                    new Class[] { otObjectClass }, handler);            
+            try {
+            	otObject = (OTObject)Proxy.newProxyInstance(otObjectClass.getClassLoader(),
+            			new Class[] { otObjectClass }, handler);            
+            } catch (ClassCastException e){
+            	throw new RuntimeException("The OTClass: " + otObjectClass + 
+            			" does not extend OTObject or OTObjectInterface", e);
+            }
+            
         } else {                    
             otObject = setResourcesFromSchema(dataObject, otObjectClass);
         }
@@ -399,6 +405,14 @@ f a hack
     public void registerPackageClass(Class packageClass)
     {
     	otrunk.registerPackageClass(packageClass);	    
+    }
+
+	/* (non-Javadoc)
+     * @see org.concord.framework.otrunk.OTObjectService#getOTrunkService(java.lang.Class)
+     */
+    public Object getOTrunkService(Class serviceInterface)
+    {
+    	return otrunk.getService(serviceInterface);
     }
 
 }
