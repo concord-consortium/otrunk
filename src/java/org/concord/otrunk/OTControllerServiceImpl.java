@@ -70,7 +70,13 @@ public class OTControllerServiceImpl implements OTControllerService {
 		this.registry = registry;
 	}
 	
-	public Object getRealObject(OTObject otObject) {
+	public Object getRealObject(OTObject otObject) 
+	{
+		// Handle the trivial case.
+		if(otObject == null) {
+			return null;
+		}
+		
 		Object realObject = internalGetRealObject(otObject);
 
 		if(realObject != null){
@@ -270,7 +276,12 @@ public class OTControllerServiceImpl implements OTControllerService {
 	 * 
 	 * @see org.concord.framework.otrunk.OTControllerService#getOTObject(java.lang.Object)
 	 */
-	public OTObject getOTObject(Object realObject) {		
+	public OTObject getOTObject(Object realObject) 
+	{
+		// Handle the Trivial case
+		if(realObject == null){
+			return null;
+		}
 		
 		// check if we already have a controller, if so then return its otObject
 		OTController controller = (OTController)controllerFromRealMap.get(realObject);
