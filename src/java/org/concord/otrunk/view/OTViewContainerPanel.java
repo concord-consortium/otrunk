@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.45 $
- * $Date: 2007-05-01 20:29:23 $
- * $Author: scytacki $
+ * $Revision: 1.46 $
+ * $Date: 2007-05-29 14:49:36 $
+ * $Author: swang $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -368,7 +368,7 @@ public class OTViewContainerPanel extends JPanel
 		//		unwantedScrollingCount + " " + 
 		//		currentObject.getGlobalId().toString());
 
-		if(unwantedScrollingCount > 0){
+		if(unwantedScrollingCount < 0){
 			System.err.println("unwantedScrollingCount dropped below 0");
 		}
 	}
@@ -480,5 +480,9 @@ public class OTViewContainerPanel extends JPanel
 	{
 		BufferedImage image = ComponentScreenshot.getScreenshot(this);
 		return image;
+	}
+	
+	public boolean isCurrentObjectEditable() {
+		return currentObjectEditable;
 	}
 }
