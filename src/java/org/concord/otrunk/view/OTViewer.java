@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.61 $
- * $Date: 2007-05-21 15:52:43 $
+ * $Revision: 1.62 $
+ * $Date: 2007-05-31 14:23:33 $
  * $Author: aunger $
  *
  * Licence Information
@@ -563,6 +563,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			if (currentUserFile != null) {
 				frame.setTitle(baseFrameTitle + ": "
 						+ currentUserFile.toString());
+			} else if (System.getProperty(TITLE_PROP, null) != null) {
+				frame.setTitle(baseFrameTitle);
 			} else if (userDataDB != null) {
 				frame.setTitle(baseFrameTitle + ": Untitled");
 			} else {
