@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.62 $
- * $Date: 2007-05-31 14:23:33 $
- * $Author: aunger $
+ * $Revision: 1.63 $
+ * $Date: 2007-06-07 15:26:25 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -1462,6 +1462,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				return false;
 			}
 
+			bodyPanel.setCurrentObject(null);
+			
 			if (otrunk != null)
 				otrunk.close();
 		} catch (Exception exp) {
