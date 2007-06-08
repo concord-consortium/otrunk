@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.63 $
- * $Date: 2007-06-07 15:26:25 $
- * $Author: scytacki $
+ * $Revision: 1.64 $
+ * $Date: 2007-06-08 20:25:19 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -474,8 +474,17 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	}
 
 	private void loadURL(URL url) throws Exception {
-		xmlDB = new XMLDatabase(url, System.err);
-
+		try{
+			xmlDB = new XMLDatabase(url, System.err);
+		} catch (org.jdom.input.JDOMParseException e){
+			String xmlWarningTitle = "XML Decoding error";
+			String xmlWarningMessage = "There appears to a problem parsing the XML of this document. \n" +
+				"Please show this error message to one of the workshop leaders. \n\n" +
+				e.getMessage();
+			JOptionPane.showMessageDialog(null, xmlWarningMessage, xmlWarningTitle, JOptionPane.ERROR_MESSAGE);
+			throw e; 
+		}
+		
 		otrunk = new OTrunkImpl(xmlDB,
 				new Object[] { new SwingUserMessageHandler(this) },
 				new Class[] {UserMessageHandler.class});
