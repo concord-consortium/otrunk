@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-01-27 23:46:22 $
+ * $Revision: 1.10 $
+ * $Date: 2007-06-12 21:11:25 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -67,6 +67,10 @@ public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 			if(urlStr != null && urlStr.startsWith(GZIPPED_BASE64_PROTOCOL)) {
 				String b64 = urlStr.substring(GZIPPED_BASE64_PROTOCOL.length());
 				return new XMLBlobResource(b64);
+			}
+			
+			if(urlStr.length() == 0){
+				return null;
 			}
 			
 			URL url = new URL(contextURL, urlStr);
