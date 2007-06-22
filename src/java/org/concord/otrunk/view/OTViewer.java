@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.64 $
- * $Date: 2007-06-08 20:25:19 $
- * $Author: sfentress $
+ * $Revision: 1.65 $
+ * $Date: 2007-06-22 15:35:53 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -594,37 +594,15 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		return userDataDB;
 	}
 
-	public void setCurrentUser(OTUserObject userObject) {
-		OTUserObject oldUser = currentUser;
+	/**
+	 * You should call reloadWindow after calling this method to make sure 
+	 * the display reflects this change
+	 * 
+	 * @param userObject
+	 */
+	public void setCurrentUser(OTUserObject userObject) 
+	{
 		currentUser = userObject;
-		if (!currentUser.equals(oldUser)) {
-			try {
-				OTObject root = otrunk.getRoot();
-				if (currentUser != null) {
-					root = otrunk.getUserRuntimeObject(root, currentUser);
-				}
-
-				if (showTree) {
-					folderTreeModel.setRoot(new OTFolderNode(root));
-				}
-
-				bodyPanel.setCurrentObject(root);
-
-				if (showTree) {
-					folderTreeModel
-							.fireTreeStructureChanged((SimpleTreeNode) folderTreeModel
-									.getRoot());
-					dataTreeModel
-							.fireTreeStructureChanged((SimpleTreeNode) dataTreeModel
-									.getRoot());
-				}
-
-				userDataDB.setDirty(false);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
 	}
 
 	public static void main(String[] args) {
@@ -1439,7 +1417,6 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 					.createObject(OTStateRoot.class);
 			userDataDB.setRoot(stateRoot.getGlobalId());
 			stateRoot.setFormatVersionString("1.0");
-			userDataDB.setDirty(false);
 
 			OTUserObject userObject = OTViewerHelper.createUser(
 					"anon_single_user", objService);
@@ -1447,9 +1424,11 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			otrunk.initUserObjectService((OTObjectServiceImpl) objService,
 					userObject, stateRoot);
 
-			setCurrentUser(userObject);
+			userDataDB.setDirty(false);
 
 			currentUserFile = null;
+
+			setCurrentUser(userObject);
 
 			reloadWindow();
 
