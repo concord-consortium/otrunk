@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.46 $
- * $Date: 2007-05-29 14:49:36 $
- * $Author: swang $
+ * $Revision: 1.47 $
+ * $Date: 2007-06-22 15:35:52 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -196,7 +196,11 @@ public class OTViewContainerPanel extends JPanel
 		    currentView.viewClosed();
 		    currentView = null;
 		}
-			
+		
+		// FIXME There might already be an event queued to setup this current object
+		// We should compare the last queued event with this request and 
+		// have the option to not queue this event.
+		
 		currentObject = otObject;
 		currentObjectEditable = editable;
 		currentViewEntry = viewEntry;

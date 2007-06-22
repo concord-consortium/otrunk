@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.28 $
- * $Date: 2007-05-21 22:09:07 $
+ * $Revision: 1.29 $
+ * $Date: 2007-06-22 15:35:53 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -249,7 +249,7 @@ public class XMLDatabase
 	 * This will take a imported class name and figure out the 
 	 * name of the OT package class.  If for example the className is
 	 * org.concord.datagraph.state.OTDataCollector
-	 * It look for a class called:
+	 * It looks for a class called:
 	 * org.concord.datagraph.state.OTDatagraphPackage
 	 * 
 	 * This is figured out by 
