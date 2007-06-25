@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2005-10-06 18:00:13 $
+ * $Revision: 1.22 $
+ * $Date: 2007-06-25 22:38:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -78,11 +78,22 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		this.parentObjectName = parentObjectName;
 		this.resources = resources;
 		this.objectClassName = objectClassName;
+		
+		if(objectName == null){
+			throw new RuntimeException("Cannot have a null objectName");
+		}
 	}
 	
 	public String getObjectName()
 	{
 		return objectName;
+	}
+	
+	public boolean isObjectReferenceHandler()
+	{
+		// objectName should only be null if this is the objectReferenceHandler 
+		// this handler was created with the 2 arg constructor 
+		return objectName == null;
 	}
 	
 	/* (non-Javadoc)
@@ -138,6 +149,13 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			if(attribName.equals("id") ||
 					attribName.equals("refid") ||
 					attribName.equals("local_id")) {
+				continue;
+			}
+			
+			if(isObjectReferenceHandler()){
+				System.err.println("Invalid <object> attribute: " +						
+						TypeService.attributePath(attrib));
+				System.err.println("  Only viable <object> attribute is \"refid\"");
 				continue;
 			}
 			
