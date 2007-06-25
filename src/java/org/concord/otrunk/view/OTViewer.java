@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.65 $
- * $Date: 2007-06-22 15:35:53 $
+ * $Revision: 1.66 $
+ * $Date: 2007-06-25 16:08:07 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -208,6 +208,17 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 	private JDialog commDialog;
 
+	/**
+	 * This is true if the user was asked about saving user data after they initiated a 
+	 * close of the current view.
+	 */
+	private boolean askedAboutSavingUserData = false;
+	
+	/**
+	 * This is true if the user was asked about saving the user data, and said yes
+	 */
+	private boolean needToSaveUserData = false;
+	
 	public static void setOTViewFactory(OTViewFactory factory) {
 		otViewFactory = factory;
 	}
@@ -1340,6 +1351,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				// saved their work
 				// FIXME
 				String options[] = { "Don't Save", "Cancel", "Save" };
+				askedAboutSavingUserData = true;
 				int chosenOption = JOptionPane.showOptionDialog(this,
 						"Save Changes?", "Save Changes?",
 						JOptionPane.DEFAULT_OPTION,
@@ -1352,8 +1364,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 					System.err.println("Canceling close");
 					return false;
 				case 2:
-					System.err.println("Saving work");
-					saveUserDataAction.actionPerformed(null);
+					System.err.println("Set needToSaveUserData true");
+					needToSaveUserData = true;
 					break;
 				}
 			}
@@ -1450,7 +1462,15 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				return false;
 			}
 
+			// FIXME there is a problem with this logic.  If the user saved data just before closing
+			// checkForUnsavedUserData will not see any unsaved data.  But if some view creates
+			// data in the viewClosed method then that data will not get saved here.
+			// I think the key to solving this is to seperate the automatic/logging data from the 
+			// user visible data.  And then make a rule that saving data in the viewClosed method
+			// is not allowed.
 			bodyPanel.setCurrentObject(null);
+
+			conditionalSaveUserData();
 			
 			if (otrunk != null)
 				otrunk.close();
@@ -1462,6 +1482,25 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		return true;
 	}
 
+	protected void conditionalSaveUserData()
+	{
+		if(!askedAboutSavingUserData){
+			checkForUnsavedUserData();
+		}
+		
+		if(needToSaveUserData) {
+			saveUserDataAction.actionPerformed(null);
+			
+		} else {
+			System.err.println("Not saving work before closing.");
+		}
+
+		// Reset these back to false, so if the user is switching to a new 
+		// user or loading a new file we are in a clean state, for that file or user
+		askedAboutSavingUserData = false;
+		needToSaveUserData = false;
+	}
+	
 	public File getReportFile() {
 		Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
@@ -1498,6 +1537,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			return;
 		}
 
+		// This ensures viewClosed is called
+		bodyPanel.setCurrentObject(null);
+		conditionalSaveUserData();
+		
 		// call some new method for creating a new un-saved user state
 		// this should set the currentUserFile to null, so the save check
 		// prompts
@@ -1512,6 +1555,14 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			return;
 		}
 
+		// FIXME Calling the method below would insure the view is closed, and that any data that is 
+		//   is modified in that view closed operation will get saved, however if the user 
+		//   cancels the open dialog then we would be left in an unknown
+		//   state.  The current view would be closed which they would want to see again.		
+		// bodyPanel.setCurrentObject(null);
+		
+		conditionalSaveUserData();
+		
 		Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
 		MostRecentFileDialog mrfd = new MostRecentFileDialog(
