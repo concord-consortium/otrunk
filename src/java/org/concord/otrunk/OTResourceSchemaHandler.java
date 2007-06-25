@@ -296,8 +296,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 		}
 
 		if(methodName.equals("notifyOTChange")) {
-			// FIXME
-		    notifyOTChange(null, null, null);
+		    notifyOTChange((String)args[0], (String)args[1], args[2]);
 		    return null;
 		}
 
