@@ -72,4 +72,6 @@ public interface OTDataObject
 	public OTObjectRevision getCurrentRevision();
 	
 	public OTDatabase getDatabase();
+	
+	public OTDataObjectType getType();
 }

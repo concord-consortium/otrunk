@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.29 $
- * $Date: 2007-06-22 15:35:53 $
+ * $Revision: 1.30 $
+ * $Date: 2007-06-27 21:35:13 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -52,6 +52,7 @@ import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
@@ -435,19 +436,23 @@ public class XMLDatabase
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.datamodel.OTDatabase#createDataObject()
 	 */
-	public OTDataObject createDataObject()
+	public OTDataObject createDataObject(OTDataObjectType type)
 		throws Exception
 	{
-		return createDataObject(null, (OTID)null);
+		XMLDataObject xmlDataObject = createDataObject((OTXMLElement)null, (OTID)null);
+		xmlDataObject.setType(type);
+		return xmlDataObject;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.datamodel.OTDatabase#createDataObject(org.doomdark.uuid.UUID)
 	 */
-	public OTDataObject createDataObject(OTID id)
+	public OTDataObject createDataObject(OTDataObjectType type, OTID id)
 		throws Exception
 	{
-		return createDataObject(null, id);		
+		XMLDataObject xmlDataObject = createDataObject((OTXMLElement)null, id);
+		xmlDataObject.setType(type);
+		return xmlDataObject;
 	}
 
 	/* (non-Javadoc)

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2007-03-13 17:13:09 $
+ * $Revision: 1.15 $
+ * $Date: 2007-06-27 21:35:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -40,6 +40,7 @@ import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTObjectRevision;
@@ -57,11 +58,12 @@ import org.concord.otrunk.datamodel.OTObjectRevision;
 public class XMLDataObject
 	implements OTDataObject
 {
+	private OTDataObjectType type;
 	private OTID globalId;
 	private XMLDatabase database = null;
 	private OTXMLElement element;
 	private String localId = null;
-	
+		
 	Hashtable resources = new Hashtable();
 	
 	XMLDataObject(OTXMLElement element, OTID id, XMLDatabase db)
@@ -69,6 +71,11 @@ public class XMLDataObject
 		this.element = element;
 		globalId = id;
 		database = db;
+	}
+	
+	public void setType(OTDataObjectType type)
+	{
+		this.type = type;
 	}
 	
 	public OTXMLElement getElement()
@@ -208,4 +215,9 @@ public class XMLDataObject
 		}
 	    return collection;
 	}
+
+	public OTDataObjectType getType()
+    {
+		return type;
+    }
 }

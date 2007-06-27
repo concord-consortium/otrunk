@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2007-05-23 19:42:09 $
+ * $Revision: 1.15 $
+ * $Date: 2007-06-27 21:35:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -46,6 +46,7 @@ import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.otrunk.datamodel.DataObjectUtil;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTRelativeID;
 
@@ -80,10 +81,10 @@ public class OTObjectServiceImpl
     public OTObject createObject(Class objectClass) 
         throws Exception
     {
-        OTDataObject dataObject = createDataObject();
+    	OTDataObjectType type = new OTDataObjectType(objectClass.getName());
+        OTDataObject dataObject = createDataObject(type);
         
         OTObject newObject = loadOTObject(dataObject, objectClass);
-        dataObject.setResource(OTrunkImpl.RES_CLASS_NAME, objectClass.getName());
 
         // TODO this is actually called twice, once by loadOTObject and 
         // once here.  is that what should happen?
@@ -292,10 +293,10 @@ public class OTObjectServiceImpl
         return loadOTObject(childDataObject, otObjectClass);        
     }
     
-    private OTDataObject createDataObject()
+    private OTDataObject createDataObject(OTDataObjectType type)
         throws Exception
     {
-        return creationDb.createDataObject();
+        return creationDb.createDataObject(type);
     }
     
     /**

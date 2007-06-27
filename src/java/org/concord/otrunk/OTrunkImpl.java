@@ -47,6 +47,7 @@ import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTRelativeID;
@@ -64,8 +65,6 @@ import org.concord.otrunk.view.OTViewerHelper;
  */
 public class OTrunkImpl implements OTrunk
 {
-	public static final String RES_CLASS_NAME = "otObjectClass";
-
 	protected Hashtable loadedObjects = new Hashtable();
 	protected Hashtable userTemplateDatabases = new Hashtable();
     protected Hashtable userObjectServices = new Hashtable();
@@ -87,7 +86,8 @@ public class OTrunkImpl implements OTrunk
     
     public final static String getClassName(OTDataObject dataObject)
     {
-    	return (String)dataObject.getResource(OTrunkImpl.RES_CLASS_NAME);
+    	OTDataObjectType type = dataObject.getType();
+    	return type.getClassName();
     }
     
     public OTrunkImpl(OTDatabase db)

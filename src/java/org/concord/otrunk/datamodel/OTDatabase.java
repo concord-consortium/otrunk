@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2007-05-21 22:09:08 $
+ * $Revision: 1.14 $
+ * $Date: 2007-06-27 21:35:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -60,7 +60,7 @@ public interface OTDatabase
 	 * @return
 	 * @throws Exception
 	 */
-	public OTDataObject createDataObject() 
+	public OTDataObject createDataObject(OTDataObjectType type) 
 		throws Exception;
 	
 	/**
@@ -69,7 +69,7 @@ public interface OTDatabase
 	 * @return
 	 * @throws Exception
 	 */
-	public OTDataObject createDataObject(OTID id) 
+	public OTDataObject createDataObject(OTDataObjectType type, OTID id) 
 		throws Exception;
 
 	/**

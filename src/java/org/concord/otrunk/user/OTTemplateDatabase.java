@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2007-05-21 22:09:08 $
+ * $Revision: 1.13 $
+ * $Date: 2007-06-27 21:35:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -39,6 +39,7 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
@@ -107,11 +108,11 @@ public class OTTemplateDatabase
     /* (non-Javadoc)
      * @see org.concord.otrunk.datamodel.OTDatabase#createDataObject()
      */
-    public OTDataObject createDataObject() throws Exception
+    public OTDataObject createDataObject(OTDataObjectType type) throws Exception
     {        
         // in this case we need to create a new state object and wrap it
         OTUserDataObject userDataObject = new OTUserDataObject(null, this);
-        OTDataObject childObject = stateDb.createDataObject();
+        OTDataObject childObject = stateDb.createDataObject(type);
         userDataObject.setStateObject(childObject);
         //System.out.println("v3. " + userDataObject.getGlobalId());
         return userDataObject;
@@ -120,11 +121,11 @@ public class OTTemplateDatabase
     /* (non-Javadoc)
      * @see org.concord.otrunk.datamodel.OTDatabase#createDataObject(org.concord.framework.otrunk.OTID)
      */
-    public OTDataObject createDataObject(OTID id) throws Exception
+    public OTDataObject createDataObject(OTDataObjectType type, OTID id) throws Exception
     {
         // in this case we need to create a new state object and wrap it
         OTUserDataObject userDataObject = new OTUserDataObject(null, this);
-        OTDataObject childObject = stateDb.createDataObject(id);
+        OTDataObject childObject = stateDb.createDataObject(type, id);
         userDataObject.setStateObject(childObject);
         //System.out.println("v3. " + userDataObject.getGlobalId());
         return userDataObject;

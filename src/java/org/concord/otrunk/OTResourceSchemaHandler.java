@@ -140,7 +140,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 	            		System.err.println("Error: Type Mismatch");
 	            		System.err.println("  value: " + object);
 	            		System.err.println("  parentObject: " + 
-	            				dataObject.getResource(OTrunkImpl.RES_CLASS_NAME));
+	            				dataObject.getType().getClassName());
 	            		System.err.println("  resourceName: " + resourceName);
 	        	        System.err.println("  expected type is: " + returnType);
 	            		return null;

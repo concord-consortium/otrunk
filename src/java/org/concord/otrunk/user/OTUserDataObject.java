@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-03-13 17:13:09 $
+ * $Revision: 1.11 $
+ * $Date: 2007-06-27 21:35:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -39,6 +39,7 @@ import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTObjectRevision;
 import org.concord.otrunk.datamodel.OTRelativeID;
@@ -319,4 +320,20 @@ public class OTUserDataObject
 
 	    return collection;
 	}
+
+	public OTDataObjectType getType()
+    {
+		// first look in the userObject
+		// then look in the authoringObject
+		OTDataObject userObject = getExistingUserObject();
+		if (userObject != null) {
+			return userObject.getType();
+		}
+		
+		if(authoringObject == null) {
+			throw new IllegalStateException("Can't have a null userObject and null authoringObject");
+		}
+		
+		return authoringObject.getType();
+    }
 }
