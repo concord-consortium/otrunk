@@ -66,7 +66,7 @@ public class Copier
 				OTDataObject itemObj = 
 					otDb.getOTDataObject(root, (OTID)child);
 				OTDataObject itemCopy = 
-					otDb.createDataObject();
+					otDb.createDataObject(itemObj.getType());
 				int copyMaxDepth = -1;
 				if(maxDepth != -1){
 					copyMaxDepth = maxDepth-1; 
@@ -103,7 +103,7 @@ public class Copier
     		OTDataObject original = entry.original; 
     		OTDataObject copy = entry.copy;
     		if(copy == null) {
-    			copy = otDb.createDataObject();
+    			copy = otDb.createDataObject(original.getType());
     		}
     		
     		String [] keys = original.getResourceKeys();

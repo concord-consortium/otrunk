@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-05-21 22:09:08 $
+ * $Revision: 1.12 $
+ * $Date: 2007-06-27 21:35:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -51,6 +51,7 @@ import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTUUID;
@@ -183,21 +184,21 @@ public class FsDatabase implements OTDatabase
 	 * (non-Javadoc)
 	 * @see org.concord.otrunk.OTDatabase#createDataObject()
 	 */
-	public OTDataObject createDataObject()
+	public OTDataObject createDataObject(OTDataObjectType type)
 		throws Exception
 	{
 		OTID id = OTUUID.createOTUUID();
 		
-    	return createDataObject(id);
+    	return createDataObject(type, id);
 	}
 	
 	/** 
 	 * This should verify the id wasn't used before
 	 */
-	public OTDataObject createDataObject(OTID id)
+	public OTDataObject createDataObject(OTDataObjectType type, OTID id)
 		throws Exception
 	{
-    	OTDataObject dataObject = new FsDataObject((OTUUID)id, this);
+    	OTDataObject dataObject = new FsDataObject(type, (OTUUID)id, this);
     	((FsDataObject)dataObject).creationInit();
     	
     	Object oldValue = dbIndex.put(dataObject.getGlobalId(), dataObject);

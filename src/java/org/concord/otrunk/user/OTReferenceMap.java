@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-02-20 00:16:39 $
+ * $Revision: 1.5 $
+ * $Date: 2007-06-27 21:35:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -36,7 +36,6 @@ import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTResourceSchema;
-import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 
@@ -100,7 +99,7 @@ public class OTReferenceMap
             OTDatabase stateDb)
     {
         try {
-            OTDataObject stateObject = stateDb.createDataObject();
+            OTDataObject stateObject = stateDb.createDataObject(template.getType());
             OTResourceMap stateMap = resources.getMap();
             stateMap.put(template.getGlobalId().toString(), 
                     stateObject.getGlobalId());
@@ -111,9 +110,6 @@ public class OTReferenceMap
             // this object something like:
 			// stateObject.setResource("user-id", user.getUserId());
 			stateObject.setResource("template-id", template.getGlobalId());
-
-			stateObject.setResource(OTrunkImpl.RES_CLASS_NAME, 
-					OTrunkImpl.getClassName(template));
 			
             return stateObject;
         } catch (Exception e) {

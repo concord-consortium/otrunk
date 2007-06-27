@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-03-13 17:13:09 $
+ * $Revision: 1.11 $
+ * $Date: 2007-06-27 21:35:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -41,6 +41,7 @@ import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTObjectRevision;
 import org.concord.otrunk.datamodel.OTUUID;
@@ -65,11 +66,14 @@ public class FsDataObject
 	Date creationTime = null;
 	Date modifiedTime = null;
 	FsDatabase database = null;
+
+	protected OTDataObjectType type;
 	
 	public final static String CURRENT_REVISION = "currentRevision";
 	
-	FsDataObject(OTUUID id, FsDatabase db)
+	FsDataObject(OTDataObjectType type, OTUUID id, FsDatabase db)
 	{
+		this.type = type;
 		globalId = id;
 		database = db;
 	}
@@ -180,4 +184,9 @@ public class FsDataObject
 		
 		return null;
 	}
+
+	public OTDataObjectType getType()
+    {
+		return type;
+    }
 }

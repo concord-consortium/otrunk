@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-05-17 16:05:44 $
+ * $Revision: 1.5 $
+ * $Date: 2007-06-27 21:35:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -64,7 +64,7 @@ public class DataObjectUtil
                                     OTDataList orphanDataList, int maxDepth) 
     	throws Exception
     {
-    	OTDataObject copy = otDb.createDataObject();
+    	OTDataObject copy = otDb.createDataObject(original.getType());
 
     	copyInto(original, copy, orphanDataList, maxDepth);
     	

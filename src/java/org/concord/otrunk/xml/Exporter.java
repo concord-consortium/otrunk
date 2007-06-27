@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.18 $
- * $Date: 2007-05-10 21:04:02 $
+ * $Revision: 1.19 $
+ * $Date: 2007-06-27 21:35:13 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -239,8 +239,7 @@ public class Exporter
 		    
 		    // FIXME: we are ignoring special keys there should way
 		    // to identify special keys.
-			if(resourceKeys[i].equals(OTrunkImpl.RES_CLASS_NAME) ||
-					resourceKeys[i].equals("currentRevision") ||
+			if(		resourceKeys[i].equals("currentRevision") ||
 					resourceKeys[i].equals("localId")) {
 				continue;
 			}

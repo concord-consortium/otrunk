@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.22 $
- * $Date: 2007-06-25 22:38:09 $
+ * $Revision: 1.23 $
+ * $Date: 2007-06-27 21:35:13 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.concord.framework.otrunk.OTID;
-import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTIDFactory;
 
 /**
@@ -139,8 +139,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		if(idStr != null || localIdStr != null) {
 		    objRelativePath = objId.toString(); 
 		}
-		
-		obj.setResource(OTrunkImpl.RES_CLASS_NAME, getClassName());
+
+		OTDataObjectType type = new OTDataObjectType(getClassName());
+		obj.setType(type);
 		
 		List attributes = element.getAttributes();
 		for(Iterator attIter = attributes.iterator(); attIter.hasNext(); ) {
