@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentService;
+import org.concord.framework.otrunk.view.OTViewContainer;
 
 /**
  * @author scott
@@ -20,6 +21,7 @@ public class OTJComponentContainerHelper
 	private boolean useScrollPane = false;
 	private boolean autoRequestFocus = false;
 	private OTJComponentService jComponentService;
+	private OTViewContainer parentContainer;
 	
 	public OTJComponentContainerHelper(OTFrameManager frameManager,
 	                                   OTJComponentService jComponentService,
@@ -50,7 +52,7 @@ public class OTJComponentContainerHelper
         viewContainerPanel.setUseScrollPane(useScrollPane);
         viewContainerPanel.setOpaque(false);
         viewContainerPanel.setViewMode(viewMode);
-        
+        viewContainerPanel.setParentContainer(this.parentContainer); 
         viewContainerPanels.add(viewContainerPanel);
         return viewContainerPanel;
 	}
@@ -89,6 +91,18 @@ public class OTJComponentContainerHelper
 	public void setViewMode(String viewMode)
     {
     	this.viewMode = viewMode;
+    }
+
+
+	public void setParentContainer(OTViewContainer parentContainer)
+    {
+	    this.parentContainer = parentContainer;
+    }
+
+
+	public OTViewContainer getParentContainer()
+    {
+	    return parentContainer;
     }
 
 	
