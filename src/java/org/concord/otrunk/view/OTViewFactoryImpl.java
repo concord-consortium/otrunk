@@ -53,17 +53,17 @@ public class OTViewFactoryImpl implements OTViewFactory
 {
     OTViewFactoryImpl parent;
     Vector viewMap = new Vector();
-    OTViewBundle viewService;
+    OTViewBundle viewBundle;
     Vector services = new Vector();
     OTViewServiceProvider serviceProvider;
     
-    public OTViewFactoryImpl(OTViewBundle viewService)
+    public OTViewFactoryImpl(OTViewBundle viewBundle)
     {
-        this.viewService = viewService;
+        this.viewBundle = viewBundle;
         
         // read in all the viewEntries and create a vector 
         // of class entries.
-        OTObjectList viewEntries = viewService.getViewEntries();
+        OTObjectList viewEntries = viewBundle.getViewEntries();
         
         for(int i=0; i<viewEntries.size(); i++) {
             OTViewEntry entry = (OTViewEntry)viewEntries.get(i);
@@ -249,7 +249,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 		}
 		
 		OTViewMode mode = null;
-		OTObjectList modes = viewService.getModes();
+		OTObjectList modes = viewBundle.getModes();
 		for(int i=0; i<modes.size(); i++){
 			OTViewMode curMode = (OTViewMode)modes.get(i);
 			if(curMode.getName().equals(modeStr)){
@@ -327,7 +327,7 @@ public class OTViewFactoryImpl implements OTViewFactory
      */
     public String getDefaultMode()
     {
-    	return viewService.getCurrentMode();
+    	return viewBundle.getCurrentMode();
     }
 	
 }
