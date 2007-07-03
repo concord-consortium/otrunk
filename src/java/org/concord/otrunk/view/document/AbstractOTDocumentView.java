@@ -20,6 +20,7 @@ public class AbstractOTDocumentView extends OTTextObjectView
 	public void setViewContainer(OTViewContainer container) 
 	{
 		viewContainer = container;
+		viewContainer.setUpdateable(true);
 	}
 
 	public OTViewContainer getViewContainer()
@@ -49,6 +50,7 @@ public class AbstractOTDocumentView extends OTTextObjectView
 		if(containerHelper == null){
 			containerHelper = new OTJComponentContainerHelper(getFrameManager(),
 					getJComponentService(), getViewMode());
+			containerHelper.setParentContainer(viewContainer);
 		}
 			
 	    return containerHelper.createtViewContainerPanel();

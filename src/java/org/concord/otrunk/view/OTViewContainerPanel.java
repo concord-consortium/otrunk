@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.47 $
- * $Date: 2007-06-22 15:35:52 $
- * $Author: scytacki $
+ * $Revision: 1.48 $
+ * $Date: 2007-07-03 18:43:02 $
+ * $Author: aunger $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -88,6 +88,8 @@ public class OTViewContainerPanel extends JPanel
 
 	private boolean useScrollPane = true;
 	private boolean autoRequestFocus = true;
+	private boolean updateable = false;
+	private OTViewContainer parentContainer;
 	
 	Vector containerListeners = new Vector();
 	
@@ -422,12 +424,39 @@ public class OTViewContainerPanel extends JPanel
 		public void setCurrentObject(OTObject pfObject) {
 			OTViewContainerPanel.this.setCurrentObject(pfObject);
 		}
+		
+		public boolean isUpdateable() {
+	        return OTViewContainerPanel.this.isUpdateable();
+        }
+		public void setUpdateable(boolean b) {
+			OTViewContainerPanel.this.setUpdateable(b);
+        }
+		
+		public void setParentContainer(OTViewContainer c) {
+			OTViewContainerPanel.this.setParentContainer(c);
+		}
+		public OTViewContainer getParentContainer() {
+			return OTViewContainerPanel.this.getParentContainer();
+		}
+		
+		public OTViewContainer getUpdateableContainer() {
+			return OTViewContainerPanel.this.getUpdateableContainer();
+		}
 	}
 
 	public OTViewContainer getViewContainer() {
-		return viewContainer;
+		return viewContainer.getUpdateableContainer();
 	}
 	
+	public OTViewContainer getUpdateableContainer()
+    {
+	    if (this.isUpdateable()) {
+	    	return this.viewContainer;
+	    } else {
+	    	return parentContainer.getUpdateableContainer();
+	    }
+    }
+
 	public OTJComponentView getView() {
 		return currentView;
 	}
@@ -448,6 +477,13 @@ public class OTViewContainerPanel extends JPanel
 		this.autoRequestFocus = autoRequestFocus;
 	}
 
+	public boolean isUpdateable() {
+		return updateable;
+	}
+	
+	public void setUpdateable(boolean b) {
+		this.updateable = b;
+	}
 	/**
 	 * @param viewMode
 	 */
@@ -489,4 +525,14 @@ public class OTViewContainerPanel extends JPanel
 	public boolean isCurrentObjectEditable() {
 		return currentObjectEditable;
 	}
+
+	public void setParentContainer(OTViewContainer parentContainer)
+    {
+	    this.parentContainer = parentContainer;
+    }
+
+	public OTViewContainer getParentContainer()
+    {
+	    return parentContainer;
+    }
 }
