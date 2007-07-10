@@ -524,8 +524,12 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			throw new IllegalArgumentException("otObject can't be null");
 		}
 		pfObject = (OTDocument) otObject;
-
-		return updateFormatedView();
+		
+		// this strips out CSS before passing back the text. It could be that we
+		// might later prefer to return getBodyText() or something, if there is a
+		// lot of stuff to strip out.
+		
+		return updateFormatedView().replace(viewEntry.getCss(), "");
 	}
 
 	/*
