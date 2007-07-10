@@ -525,11 +525,12 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		}
 		pfObject = (OTDocument) otObject;
 		
-		// this strips out CSS before passing back the text. It could be that we
-		// might later prefer to return getBodyText() or something, if there is a
-		// lot of stuff to strip out.
+	//	return updateFormatedView().replace(viewEntry.getCss(), "");
 		
-		return updateFormatedView().replace(viewEntry.getCss(), "");
+		String bodyText = pfObject.getDocumentText();
+		bodyText = substituteIncludables(bodyText);
+		
+		return bodyText;
 	}
 
 	/*
