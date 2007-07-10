@@ -8,81 +8,83 @@ import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.otrunk.view.OTJComponentContainerHelper;
 import org.concord.otrunk.view.OTViewContainerPanel;
 
-public class AbstractOTDocumentView extends OTTextObjectView 
-	implements OTViewContainerAware
+public class AbstractOTDocumentView extends OTTextObjectView
+    implements OTViewContainerAware
 {
 	private OTViewContainer viewContainer;
 
 	private String viewMode = null;
-	
+
 	private OTJComponentContainerHelper containerHelper;
-	
-	public void setViewContainer(OTViewContainer container) 
+
+	public void setViewContainer(OTViewContainer container)
 	{
 		viewContainer = container;
-		viewContainer.setUpdateable(true);
+		if (viewContainer != null) {
+			viewContainer.setUpdateable(true);
+		}
 	}
 
 	public OTViewContainer getViewContainer()
 	{
 		return viewContainer;
 	}
-	
-	public String getViewMode() 
+
+	public String getViewMode()
 	{
 		return viewMode;
 	}
 
-	public void setViewMode(String viewMode) 
+	public void setViewMode(String viewMode)
 	{
 		this.viewMode = viewMode;
 	}
-	
+
 	public void removeAllSubViews()
-    {
-		if(containerHelper != null){
+	{
+		if (containerHelper != null) {
 			containerHelper.removeAllSubViews();
 		}
-    }
+	}
 
 	public OTViewContainerPanel createtViewContainerPanel()
-    {
-		if(containerHelper == null){
-			containerHelper = new OTJComponentContainerHelper(getFrameManager(),
-					getJComponentService(), getViewMode());
+	{
+		if (containerHelper == null) {
+			containerHelper = new OTJComponentContainerHelper(
+			        getFrameManager(), getJComponentService(), getViewMode());
 			containerHelper.setParentContainer(viewContainer);
 		}
-			
-	    return containerHelper.createtViewContainerPanel();
-    }
+
+		return containerHelper.createtViewContainerPanel();
+	}
 
 	public void viewClosed()
 	{
 		super.viewClosed();
-		
-		if(containerHelper != null){
+
+		if (containerHelper != null) {
 			containerHelper.removeAllSubViews();
 		}
 	}
-	
+
 	public OTObject getReferencedObject(OTID id)
-	{	
-    	try {
-            OTObjectService objService = pfObject.getOTObjectService();
-    		return objService.getOTObject(id);
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    		return null;
-    	}
+	{
+		try {
+			OTObjectService objService = pfObject.getOTObjectService();
+			return objService.getOTObject(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
-	
+
 	public OTObject getReferencedObject(String id)
 	{
-        OTObjectService objService = pfObject.getOTObjectService();
-	    OTID linkId = objService.getOTID(id);
-	    if(linkId == null) {
-	        return null;
-	    }
-	    return getReferencedObject(linkId);
+		OTObjectService objService = pfObject.getOTObjectService();
+		OTID linkId = objService.getOTID(id);
+		if (linkId == null) {
+			return null;
+		}
+		return getReferencedObject(linkId);
 	}
 }
