@@ -3,6 +3,9 @@
  */
 package org.concord.otrunk.view;
 
+import javax.swing.JComponent;
+
+import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.AbstractOTJComponentView;
 
 /**
@@ -26,6 +29,13 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 	    return getContainerHelper().createtViewContainerPanel();
     }
 
+	protected JComponent createSubViewComponent(OTObject otObject)
+	{
+		OTViewContainerPanel otObjectPanel = createtViewContainerPanel();
+		otObjectPanel.setCurrentObject(otObject);
+		return otObjectPanel;
+	}
+	
 	protected void removeAllSubViews()
     {
 		if(containerHelper != null){
