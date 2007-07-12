@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.48 $
- * $Date: 2007-07-03 18:43:02 $
- * $Author: aunger $
+ * $Revision: 1.49 $
+ * $Date: 2007-07-12 18:07:50 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -48,7 +48,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
+import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.OTControllerServiceFactory;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentService;
 import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
@@ -58,6 +60,7 @@ import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTViewServiceProvider;
+import org.concord.otrunk.OTControllerServiceImpl;
 import org.concord.swing.util.ComponentScreenshot;
 
 
@@ -117,6 +120,9 @@ public class OTViewContainerPanel extends JPanel
 	private int unwantedScrollingCount = 0;
 
 	private String viewMode = null;
+
+	private boolean topLevelContainer = false;
+	private OTControllerService controllerService;
 	
 	/**
 	 * 
@@ -147,14 +153,34 @@ public class OTViewContainerPanel extends JPanel
 	 */
 	public void setOTViewFactory(OTViewFactory factory)
 	{
+		// add our own controller service if we have been setup to do so.
+		if(isTopLevelContainer()){			
+			OTControllerServiceFactory controllerServiceFactory = new OTControllerServiceFactory(){
+
+				public OTControllerService createControllerService()
+                {
+					OTControllerService subControllerService = 
+						((OTControllerServiceImpl) controllerService).createSubControllerService();						
+					return subControllerService;
+                }
+				
+			};
+			factory.addViewService(controllerServiceFactory);
+		} 
+
 		// get the OTJComponentService so we can create the OTJComponentView
 		OTViewServiceProvider viewServiceProvider = 
 			factory.getViewServiceProvider();
 		OTJComponentServiceFactory componentServiceFactory =
 			(OTJComponentServiceFactory) viewServiceProvider.getViewService(OTJComponentServiceFactory.class);
-		jComponentService = componentServiceFactory.createOTJComponentService();
+		jComponentService = componentServiceFactory.createOTJComponentService(factory);		
 	}
 		
+	public boolean isTopLevelContainer()
+    {
+		return topLevelContainer ;
+    }
+
 	/**
 	 * This is the preferred method for giving this object the ability to create new views
 	 * Using this method will allow this object to share the jComponentService with
@@ -199,6 +225,10 @@ public class OTViewContainerPanel extends JPanel
 		    currentView = null;
 		}
 		
+		if(controllerService != null){
+			controllerService.dispose();
+		}
+		
 		// FIXME There might already be an event queued to setup this current object
 		// We should compare the last queued event with this request and 
 		// have the option to not queue this event.
@@ -211,6 +241,10 @@ public class OTViewContainerPanel extends JPanel
 		
 		if(otObject == null){
 			return;
+		}
+		
+		if(isTopLevelContainer()){
+			controllerService = otObject.getOTObjectService().createControllerService();
 		}
 		
 		disableScrolling();
@@ -534,5 +568,10 @@ public class OTViewContainerPanel extends JPanel
 	public OTViewContainer getParentContainer()
     {
 	    return parentContainer;
+    }
+
+	public void setTopLevelContainer(boolean topLevelContainer)
+    {
+    	this.topLevelContainer = topLevelContainer;
     }
 }

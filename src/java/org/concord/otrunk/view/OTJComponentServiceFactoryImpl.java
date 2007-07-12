@@ -13,20 +13,10 @@ import org.concord.framework.otrunk.view.OTViewFactory;
 public class OTJComponentServiceFactoryImpl
     implements org.concord.framework.otrunk.view.OTJComponentServiceFactory
 {
-
-	private OTViewFactory viewFactory;
-
-
-	public OTJComponentServiceFactoryImpl(OTViewFactory viewFactory)
-	{
-		this.viewFactory = viewFactory;
-	}
-	
-
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.view.OTJComponentServiceFactory#createOTJComponentService()
 	 */
-	public OTJComponentService createOTJComponentService()
+	public OTJComponentService createOTJComponentService(OTViewFactory viewFactory)
 	{
 		return new OTJComponentServiceImpl(viewFactory);
 	}
