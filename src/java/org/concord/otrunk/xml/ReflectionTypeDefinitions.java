@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.19 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.20 $
+ * $Date: 2007-07-12 18:07:51 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,6 +34,7 @@ package org.concord.otrunk.xml;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTResourceSchema;
@@ -110,7 +111,7 @@ public class ReflectionTypeDefinitions
 			}
 			
 			Vector resourceDefs = new Vector();
-			addResources(resourceDefs, resourceSchemaClass, typeClasses);
+			addResources(resourceDefs, resourceSchemaClass, typeClasses, true);
 			ResourceDefinition [] resourceDefsArray = new ResourceDefinition[resourceDefs.size()];
 			for(int j=0; j<resourceDefsArray.length; j++) {
 				resourceDefsArray[j] = (ResourceDefinition)resourceDefs.get(j);
@@ -134,11 +135,16 @@ public class ReflectionTypeDefinitions
 		}
 	}
 	
-	public static void addResources(Vector resources, Class resourceSchemaClass,
-	        Vector typeClasses)
+	public static void addResources(List resources, Class resourceSchemaClass,
+	        List typeClasses, boolean processParents)
 	{
 		// Then look for all the getters and their types
-		Method [] methods = resourceSchemaClass.getMethods();
+		Method [] methods;
+		if(processParents){
+			methods = resourceSchemaClass.getMethods();
+		} else {
+			methods = resourceSchemaClass.getDeclaredMethods();
+		}
 		for(int j=0; j<methods.length; j++) {
 			String methodName = methods[j].getName();
 			if(methodName.equals("getGlobalId") ||
@@ -176,36 +182,8 @@ public class ReflectionTypeDefinitions
 			}
 			
 			ResourceDefinition resourceDef = new ResourceDefinition(resourceName,
-					resourceType, null);
+					resourceType, resourceClass, null);
 			resources.add(resourceDef);
-		}
-		// and look for the parent classes.  We probably can 
-		// skip the dynamic extension and just follow the extension
-		// tree right now.  But how do we know which interfaces to 
-		// follow and which ones to skip...
-		// It looks like we can just follow ones that extend
-		// OTObject or OTResourceSchema
-		// This has been changed we now follow all interfaces.
-		Class [] interfaces = resourceSchemaClass.getInterfaces();
-		for(int i=0; i<interfaces.length; i++) {
-			/*
-			 * FIXME: this should be re-enabled.  We need to figure out
-			 * what this was breaking before.
-			 * 
-			if(OTObject.class.isAssignableFrom(interfaces[i]) ||
-					OTResourceSchema.class.isAssignableFrom(interfaces[i])) {
-				addResources(resources, interfaces[i]);
-			} else {
-				System.err.println("resource class implements invalid interface: " +
-						interfaces[i].getName());
-			}
-			*/
-			addResources(resources, interfaces[i], typeClasses);
-		}
-		
-		// we will keep the parameters for now but just leave them
-		// as null until we decide what to do.
-		
-		return;
+		}		
 	}	
 }

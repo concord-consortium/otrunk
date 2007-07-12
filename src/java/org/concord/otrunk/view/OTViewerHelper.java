@@ -109,8 +109,7 @@ public class OTViewerHelper
 		
 		viewFactory.addViewService(otrunk);
 		viewFactory.addViewService(frameManager);
-		viewFactory.addViewService(new OTJComponentServiceFactoryImpl(viewFactory));
-
+		viewFactory.addViewService(new OTJComponentServiceFactoryImpl());
 	}
 
 	public OTDatabase loadOTDatabase(URL url)
@@ -217,7 +216,8 @@ public class OTViewerHelper
 	public OTViewContainerPanel createViewContainerPanel()
 	{
 		OTViewContainerPanel otContainer = new OTViewContainerPanel(frameManager);
-
+		otContainer.setTopLevelContainer(true);
+		
 		otContainer.setOTViewFactory(getViewFactory());
 
 		return otContainer;

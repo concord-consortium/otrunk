@@ -41,7 +41,8 @@ import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 
-public class OTControllerServiceImpl implements OTControllerService {
+public class OTControllerServiceImpl implements OTControllerService 
+{
 	/**
 	 * key is a OTObject
 	 * value is a realObject
@@ -61,11 +62,13 @@ public class OTControllerServiceImpl implements OTControllerService {
 	Map controllerFromOTMap = new WeakHashMap();
 	
 	OTObjectService objectService;
-
 	OTControllerRegistry registry;
 	
+	OTControllerServiceImpl sharedService;
+	
 	public OTControllerServiceImpl(OTObjectService objectService, 
-		OTControllerRegistry registry){
+		OTControllerRegistry registry)
+	{
 		this.objectService = objectService;
 		this.registry = registry;
 	}
@@ -76,33 +79,57 @@ public class OTControllerServiceImpl implements OTControllerService {
 		if(otObject == null) {
 			return null;
 		}
-		
-		Object realObject = internalGetRealObject(otObject);
+				
+		Object realObject = getExistingRealObjectFromOTObject(otObject);
 
 		if(realObject != null){
 			return realObject;
-		}
+		}		
 
-		OTController view = getControllerInternal(otObject, null);
-		
-		// The view might be null if there was an error so this 
-		// will throw a NPE
-		realObject = view.createRealObject();
+		realObject = setupRealObject(otObject, realObject);
 			
-		setupRealObject(view, otObject, realObject);
-
 		return realObject;		
 	}
 
-
-	private final OTController getControllerInternal(OTObject otObject, Object realObject)
+	private OTController getExistingControllerFromOTObject(OTObject otObject)
 	{
-		// check to see if we already have a view for this otObject
+		// check to see if we already have a controller for this otObject
 		OTController controller = (OTController)controllerFromOTMap.get(otObject);
 		if (controller != null) {
-			// we already have a view for this otObject
-			// TODO there might be multiple views for a single object
-			// but there should be only one realObject per view
+			return controller;
+		}
+		
+		// check to see if there is already shared controller for this otObject
+		if(sharedService != null){
+			return sharedService.getExistingControllerFromOTObject(otObject);
+		}
+
+		return null;
+	}
+
+	private OTController getExistingControllerFromRealObject(Object realObject)
+	{
+		// check if we already have a controller, if so then return its otObject
+		OTController controller = (OTController)controllerFromRealMap.get(realObject);
+		
+		if(controller != null) {
+			return controller;
+		}
+
+		// check to see if there is already shared controller for this otObject
+		if(sharedService != null){
+			return sharedService.getExistingControllerFromRealObject(realObject);
+		}
+
+		return null;		
+	}
+	
+	private final OTController getControllerInternal(OTObject otObject, Object realObject)
+	{
+		// check to see if we already have a controller for this otObject
+		OTController controller = getExistingControllerFromOTObject(otObject);
+		if (controller != null) {
+			// we already have a controller for this otObject
 			return controller;
 		}
 		
@@ -117,11 +144,23 @@ public class OTControllerServiceImpl implements OTControllerService {
 		}
 		
 		controller =  createControllerInternal(otObjectClass, realObjectClass);
-		controller.initialize(otObject, this);
-
+		
 		return controller;
 	}
 
+	private OTController getAndInitializeController(OTObject otObject, Object realObject)
+	{
+		OTController controller = getControllerInternal(otObject, realObject);
+
+		if(sharedService != null && controller.isRealObjectSharable(otObject, realObject)){
+			controller.initialize(otObject, sharedService);
+		} else {
+			controller.initialize(otObject, this);
+		}
+		
+		return controller;		
+	}
+	
 	
 	private final OTController createControllerInternal(Class otObjectClass, Class realObjectClass)
 	{
@@ -175,31 +214,54 @@ public class OTControllerServiceImpl implements OTControllerService {
 		return null;
 	}
 		
-	private final Object internalGetRealObject(OTObject otObject) {
+	private Object getExistingRealObjectFromOTObject(OTObject otObject) 
+	{
 		Reference ref = (Reference)realObjectFromOTMap.get(otObject);
-		if(ref == null){
-			return null;			
+		if(ref != null){
+			return ref.get();	
+		}
+
+		if(sharedService != null){
+			return sharedService.getExistingRealObjectFromOTObject(otObject);
 		}
 		
-		return ref.get();	
+		return null;	
 	}
 	
-	private final void setupRealObject(OTController view, 
-			OTObject otObject, Object realObject){
-		// Save this object now to prevent infinite loops if
-		// there is a circular reference
-		realObjectFromOTMap.put(otObject, new WeakReference(realObject));
-		controllerFromRealMap.put(realObject, view);
-		controllerFromOTMap.put(otObject, view);
-		
-		view.loadRealObject(realObject);
+	/**
+	 * 
+	 * @param controller
+	 * @param otObject
+	 * @param realObject
+	 */
+	private final Object setupRealObject(OTObject otObject, Object realObject)
+	{
+		OTController controller = getControllerInternal(otObject, realObject);
 
-		view.registerRealObject(realObject);
+		/*
+		 * The relationships between the controller, ot and real object should be stored
+		 * before calling this method, to prevent infinite loops.  These loops will happen
+		 * if a controller calls methods on the controller service in loadRealObject or 
+		 * registerRealObject and there are circular references.  Having circular references 
+		 * and calling methods on the controller service is allowed and should be supported.
+		 */
+		if(sharedService != null && controller.isRealObjectSharable(otObject, realObject)){
+			realObject = sharedService.initializeAndStoreRelationships(controller, otObject, realObject);
+		} else {
+			realObject = initializeAndStoreRelationships(controller, otObject, realObject);
+			
+		}				
+		
+		controller.loadRealObject(realObject);
+		controller.registerRealObject(realObject);
+		
+		return realObject;
 	}
 	
 	
-	public Object getRealObject(OTObject otObject, Object realObject) {
-		Object oldRealObject = internalGetRealObject(otObject);
+	public Object getRealObject(OTObject otObject, Object realObject) 
+	{
+		Object oldRealObject = getExistingRealObjectFromOTObject(otObject);
 
 		if(oldRealObject != null){
 			// TODO what should we do here?
@@ -209,7 +271,7 @@ public class OTControllerServiceImpl implements OTControllerService {
 				System.err.println("otObject already had a different object");				
 			}
 		}
-
+		
 		if(otObject == null){
 			String realObjectDesc = "null";
 			if(realObject != null){
@@ -219,9 +281,7 @@ public class OTControllerServiceImpl implements OTControllerService {
 					realObjectDesc);
 		}
 		
-		OTController view = getControllerInternal(otObject, realObject);
-		
-		setupRealObject(view, otObject, realObject);
+		realObject = setupRealObject(otObject, realObject);
 		
 		return realObject;
 	}
@@ -284,7 +344,7 @@ public class OTControllerServiceImpl implements OTControllerService {
 		}
 		
 		// check if we already have a controller, if so then return its otObject
-		OTController controller = (OTController)controllerFromRealMap.get(realObject);
+		OTController controller = getExistingControllerFromRealObject(realObject);
 		
 		if(controller != null) {
 			return controller.getOTObject();
@@ -334,15 +394,11 @@ public class OTControllerServiceImpl implements OTControllerService {
 			return null;
 		}
 
-		// initialize it
-		controller.initialize(otObject, this);
-						
-		// store the relationship in the proper places
-		// this should be done before methods on the controller are called
-		// this should prevent infinite loops if there is a circular reference
-		controllerFromRealMap.put(realObject, controller);
-		controllerFromOTMap.put(otObject, controller);
-		realObjectFromOTMap.put(otObject, new WeakReference(realObject));
+		if(sharedService != null && controller.isRealObjectSharable(otObject, realObject)){
+			sharedService.initializeAndStoreRelationships(controller, otObject, realObject);
+		} else {
+			initializeAndStoreRelationships(controller, otObject, realObject);
+		}
 		
 		// save the object so the otObject will pickup all the properties
 		// from the real object
@@ -353,20 +409,42 @@ public class OTControllerServiceImpl implements OTControllerService {
 		
 		return otObject;
 	}
-	
-	public void saveRealObject(Object realObject, OTObject otObject) {
-		OTController controller = getControllerInternal(otObject, realObject);
+
+	private Object initializeAndStoreRelationships(OTController controller, OTObject otObject, Object realObject)
+	{
+		// initialize it
+		controller.initialize(otObject, this);
+					
+		// check if the real object is null if it is then we need to create one
+		// using the initizlied controller
+		if(realObject == null){
+			realObject = controller.createRealObject();
+		}
 		
+		// store the relationship in the proper places
+		// this should be done before methods on the controller are called
+		// this should prevent infinite loops if there is a circular reference
+		realObjectFromOTMap.put(otObject, new WeakReference(realObject));
+		controllerFromRealMap.put(realObject, controller);
+		controllerFromOTMap.put(otObject, controller);
+		
+		return realObject;
+	}
+	
+	public void saveRealObject(Object realObject, OTObject otObject) 
+	{
+		OTController controller = getAndInitializeController(otObject, realObject);		
 		controller.saveRealObject(realObject);
 	}
 	
-	public void registerRealObject(Object realObject, OTObject otObject) {
-		OTController controller = getControllerInternal(otObject, realObject);
-		
+	public void registerRealObject(Object realObject, OTObject otObject) 
+	{
+		OTController controller = getAndInitializeController(otObject, realObject);		
 		controller.registerRealObject(realObject);		
 	}
 	
-	public void registerControllerClass(Class viewClass) {
+	public void registerControllerClass(Class viewClass) 
+	{		
 		registry.registerControllerClass(viewClass);
 	}
 	
@@ -375,8 +453,7 @@ public class OTControllerServiceImpl implements OTControllerService {
 	 */
 	public void loadRealObject(OTObject otObject, Object realObject)
 	{
-		OTController controller = getControllerInternal(otObject, realObject);
-		
+		OTController controller = getAndInitializeController(otObject, realObject);		
 		controller.loadRealObject(realObject);
 	}
 
@@ -388,7 +465,8 @@ public class OTControllerServiceImpl implements OTControllerService {
     	Vector disposedControllers = new Vector();
 
     	// There are 2 maps that contain references to controllers.
-    	// They should be in sync.  
+    	// They should be in sync so we only have to search one
+    	// we won't dispose controllers in our shared service that is its job not ours
 		Set entries = controllerFromRealMap.entrySet();
 		Iterator iterator = entries.iterator();
 		while(iterator.hasNext()){
@@ -406,4 +484,21 @@ public class OTControllerServiceImpl implements OTControllerService {
     {
     }
 
+	public OTControllerServiceImpl getSharedService()
+    {
+    	return sharedService;
+    }
+
+	public void setSharedService(OTControllerServiceImpl sharedService)
+    {
+    	this.sharedService = sharedService;
+    }
+
+	public OTControllerService createSubControllerService()
+	{
+		OTControllerServiceImpl subService = 
+			new OTControllerServiceImpl(objectService, registry);
+		subService.setSharedService(this);
+		return subService;
+	}
 }

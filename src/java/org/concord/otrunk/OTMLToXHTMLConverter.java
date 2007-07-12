@@ -203,7 +203,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
             OTViewServiceProvider serviceProvider = viewFactory.getViewServiceProvider();
             OTJComponentServiceFactory serviceFactory = (OTJComponentServiceFactory)
             	serviceProvider.getViewService(OTJComponentServiceFactory.class);
-			jComponentService = serviceFactory.createOTJComponentService();
+			jComponentService = serviceFactory.createOTJComponentService(viewFactory);
     	}
         return jComponentService.getObjectView(obj, viewContainer);    	
     }

@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.67 $
- * $Date: 2007-07-03 18:43:02 $
- * $Author: aunger $
+ * $Revision: 1.68 $
+ * $Date: 2007-07-12 18:07:50 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -509,9 +509,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 		otViewFactory.addViewService(otrunk);
 		otViewFactory.addViewService(frameManager);
-		otViewFactory
-				.addViewService(new OTJComponentServiceFactoryImpl(otViewFactory));
-
+		otViewFactory.addViewService(new OTJComponentServiceFactoryImpl());
+		
+		bodyPanel.setTopLevelContainer(true);		
+				
 		bodyPanel.setOTViewFactory(otViewFactory);
 
 		// set the current mode from the viewservice to the main bodyPanel

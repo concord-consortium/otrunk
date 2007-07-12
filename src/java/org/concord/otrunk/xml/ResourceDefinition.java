@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.4 $
+ * $Date: 2007-07-12 18:07:51 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -57,13 +57,15 @@ public class ResourceDefinition
 	
 	protected String name;
 	protected String type;
+	protected Class typeClass;
 	protected Parameter [] parameters;
 	
 	public ResourceDefinition(String name, String type,
-			Parameter [] parameters)
+			Class typeClass, Parameter [] parameters)
 	{
 		this.name = name;
 		this.type = type;
+		this.typeClass = typeClass;
 		this.parameters = parameters;
 	}
 	
@@ -89,5 +91,10 @@ public class ResourceDefinition
 	public Parameter[] getParameters()
 	{
 		return parameters;
-	}	
+	}
+
+	public Class getTypeClass()
+    {
+    	return typeClass;
+    }	
 }
