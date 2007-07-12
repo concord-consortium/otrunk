@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-06-27 21:35:14 $
+ * $Revision: 1.12 $
+ * $Date: 2007-07-12 17:52:07 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -55,7 +55,7 @@ import org.concord.otrunk.datamodel.OTRelativeID;
  *
  */
 public class OTUserDataObject
-	implements OTDataObject, OTID
+	implements OTDataObject
 {
 	private OTDataObject authoringObject;
 	private OTDataObject stateObject = null;
