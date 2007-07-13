@@ -73,7 +73,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 	JTabbedPane tabbedPane = null;
 
-	JComponent previewComponent = null;
+	protected JComponent previewComponent = null;
 
 	JEditorPane editorPane = null;
 
@@ -508,7 +508,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 					} else if (modeStr == null) {
 						modeStr = getViewMode();
 					}
-
+					
 					getFrameManager().putObjectInFrame(linkObj, viewEntry,
 							targetFrame, modeStr);
 				}
