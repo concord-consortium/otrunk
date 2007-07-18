@@ -36,6 +36,9 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
+import org.concord.framework.otrunk.view.OTFrameManager;
+import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
+import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.text.UserMessageHandler;
 import org.concord.otrunk.OTObjectServiceImpl;
@@ -107,9 +110,11 @@ public class OTViewerHelper
 		frameManager = new OTFrameManagerImpl();
 		frameManager.setViewFactory(viewFactory);
 		
-		viewFactory.addViewService(otrunk);
-		viewFactory.addViewService(frameManager);
-		viewFactory.addViewService(new OTJComponentServiceFactoryImpl());
+		OTViewContext factoryContext = viewFactory.getViewContext();
+
+		factoryContext.addViewService(OTrunk.class, otrunk);
+		factoryContext.addViewService(OTFrameManager.class, frameManager);
+		factoryContext.addViewService(OTJComponentServiceFactory.class, new OTJComponentServiceFactoryImpl());
 	}
 
 	public OTDatabase loadOTDatabase(URL url)

@@ -39,8 +39,8 @@ import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
-import org.concord.framework.otrunk.view.OTViewServiceProvider;
-import org.concord.framework.otrunk.view.OTViewServiceProviderAware;
+import org.concord.framework.otrunk.view.OTViewContext;
+import org.concord.framework.otrunk.view.OTViewContextAware;
 import org.concord.otrunk.OTrunkUtil;
 
 /**
@@ -54,8 +54,7 @@ public class OTViewFactoryImpl implements OTViewFactory
     OTViewFactoryImpl parent;
     Vector viewMap = new Vector();
     OTViewBundle viewBundle;
-    Vector services = new Vector();
-    OTViewServiceProvider serviceProvider;
+    OTViewContext viewContext;
     
     public OTViewFactoryImpl(OTViewBundle viewBundle)
     {
@@ -82,8 +81,11 @@ public class OTViewFactoryImpl implements OTViewFactory
     
     protected void initServices()
     {    	
-        serviceProvider = new OTViewServiceProviderImpl();        
-        services.add(this);
+    	OTViewContext viewContextParent = null;
+    	if(parent != null){
+    		viewContextParent = parent.getViewContext();
+    	}
+        viewContext = new OTViewContextImpl(this, viewContextParent);  
     }
     
     class InternalViewEntry {
@@ -141,8 +143,8 @@ public class OTViewFactoryImpl implements OTViewFactory
     protected void initView(OTView view, OTViewEntry viewEntry)
     {
         if(view != null) { 
-        	if(view instanceof OTViewServiceProviderAware) {
-        		((OTViewServiceProviderAware)view).setViewServiceProvider(serviceProvider);
+        	if(view instanceof OTViewContextAware) {
+        		((OTViewContextAware)view).setViewContext(viewContext);
         	}
         	
             if(view instanceof OTViewEntryAware) {
@@ -283,43 +285,12 @@ public class OTViewFactoryImpl implements OTViewFactory
 		return view;
 	}
 
-	class OTViewServiceProviderImpl implements OTViewServiceProvider
-	{
-
-		/* (non-Javadoc)
-		 * @see org.concord.framework.otrunk.view.OTViewServiceProvider#getViewService(java.lang.Class)
-		 */
-		public Object getViewService(Class serviceClass) 
-		{			
-			for(int i=0; i<services.size(); i++){
-				if(serviceClass.isAssignableFrom(services.get(i).getClass())){
-					return services.get(i);
-				}
-			}
-			
-			// We now look in the parent factory
-			if(parent != null){
-				return parent.serviceProvider.getViewService(serviceClass);
-			}
-			
-			return null;
-		}		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.concord.framework.otrunk.view.OTViewFactory#addService(java.lang.Object)
-	 */
-	public void addViewService(Object service) 
-	{
-		services.add(service);
-	}
-
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.view.OTViewFactory#getViewServiceProvider()
 	 */
-	public OTViewServiceProvider getViewServiceProvider() 
+	public OTViewContext getViewContext() 
 	{
-		return serviceProvider;
+		return viewContext;
 	}
 
 	/* (non-Javadoc)

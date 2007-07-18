@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.49 $
- * $Date: 2007-07-12 18:07:50 $
+ * $Revision: 1.50 $
+ * $Date: 2007-07-18 17:03:48 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -59,7 +59,7 @@ import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
-import org.concord.framework.otrunk.view.OTViewServiceProvider;
+import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.otrunk.OTControllerServiceImpl;
 import org.concord.swing.util.ComponentScreenshot;
 
@@ -165,14 +165,14 @@ public class OTViewContainerPanel extends JPanel
                 }
 				
 			};
-			factory.addViewService(controllerServiceFactory);
+			OTViewContext factoryContext = factory.getViewContext();
+			factoryContext.addViewService(OTControllerServiceFactory.class, controllerServiceFactory);
 		} 
 
 		// get the OTJComponentService so we can create the OTJComponentView
-		OTViewServiceProvider viewServiceProvider = 
-			factory.getViewServiceProvider();
+		OTViewContext viewContext = factory.getViewContext();
 		OTJComponentServiceFactory componentServiceFactory =
-			(OTJComponentServiceFactory) viewServiceProvider.getViewService(OTJComponentServiceFactory.class);
+			(OTJComponentServiceFactory) viewContext.getViewService(OTJComponentServiceFactory.class);
 		jComponentService = componentServiceFactory.createOTJComponentService(factory);		
 	}
 		
