@@ -45,7 +45,7 @@ import org.concord.framework.otrunk.view.OTPrintDimension;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewFactory;
-import org.concord.framework.otrunk.view.OTViewServiceProvider;
+import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTXHTMLHelper;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.swing.util.ComponentScreenshot;
@@ -200,9 +200,9 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
     protected OTJComponentView getOTJComponentView(OTObject obj)
     {
     	if(jComponentService == null){
-            OTViewServiceProvider serviceProvider = viewFactory.getViewServiceProvider();
+            OTViewContext viewContext = viewFactory.getViewContext();
             OTJComponentServiceFactory serviceFactory = (OTJComponentServiceFactory)
-            	serviceProvider.getViewService(OTJComponentServiceFactory.class);
+            	viewContext.getViewService(OTJComponentServiceFactory.class);
 			jComponentService = serviceFactory.createOTJComponentService(viewFactory);
     	}
         return jComponentService.getObjectView(obj, viewContainer);    	

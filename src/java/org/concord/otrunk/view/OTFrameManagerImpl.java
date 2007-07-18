@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTFrameManager;
+import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 
@@ -69,8 +70,9 @@ public class OTFrameManagerImpl implements OTFrameManager
 			OTViewContainerPanel otContainer = new OTViewContainerPanel(this);
 			otContainer.setTopLevelContainer(true);
 			
-			frameContainer.container = otContainer;			
-			frameContainer.container.setOTViewFactory(viewFactory.createChildViewFactory());
+			frameContainer.container = otContainer;	
+			OTViewContext factoryContext = viewFactory.getViewContext();
+			frameContainer.container.setOTViewFactory(factoryContext.createChildViewFactory());
 
 			jFrame.getContentPane().setLayout(new BorderLayout());
 	

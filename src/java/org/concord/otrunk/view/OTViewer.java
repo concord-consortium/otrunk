@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.68 $
- * $Date: 2007-07-12 18:07:50 $
+ * $Revision: 1.69 $
+ * $Date: 2007-07-18 17:03:48 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -81,8 +81,12 @@ import org.concord.applesupport.AppleApplicationAdapter;
 import org.concord.applesupport.AppleApplicationUtil;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTrunk;
+import org.concord.framework.otrunk.view.OTFrameManager;
+import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
+import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.text.UserMessageHandler;
 import org.concord.framework.util.SimpleTreeNode;
@@ -507,9 +511,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			otViewFactory = myViewFactory;
 		}
 
-		otViewFactory.addViewService(otrunk);
-		otViewFactory.addViewService(frameManager);
-		otViewFactory.addViewService(new OTJComponentServiceFactoryImpl());
+		OTViewContext factoryContext = otViewFactory.getViewContext();
+		factoryContext.addViewService(OTrunk.class, otrunk);
+		factoryContext.addViewService(OTFrameManager.class, frameManager);
+		factoryContext.addViewService(OTJComponentServiceFactory.class, new OTJComponentServiceFactoryImpl());
 		
 		bodyPanel.setTopLevelContainer(true);		
 				

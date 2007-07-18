@@ -122,8 +122,8 @@ public class OTJComponentServiceImpl implements OTJComponentService
 
     			// Because we are making this view ourselves we need to do the
     			// initialization normally done by the viewFactory
-    			((OTXHTMLWrapperView)view).setViewServiceProvider(
-    					viewFactory.getViewServiceProvider());					
+    			((OTXHTMLWrapperView)view).setViewContext(
+    					viewFactory.getViewContext());					
     			
     		}
 
