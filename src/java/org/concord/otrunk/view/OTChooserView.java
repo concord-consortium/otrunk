@@ -2,8 +2,6 @@ package org.concord.otrunk.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -11,17 +9,11 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.concord.framework.otrunk.OTChangeListener;
-import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectInterface;
-import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.AbstractOTJComponentView;
-import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.otrunk.OTrunkUtil;
-import org.concord.otrunk.view.document.OTCompoundDocEditView;
 
 public class OTChooserView extends AbstractOTJComponentView implements OTViewEntryAware, ActionListener{
 	

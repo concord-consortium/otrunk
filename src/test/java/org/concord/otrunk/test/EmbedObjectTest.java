@@ -15,8 +15,10 @@ import org.concord.otrunk.view.OTViewContainerPanel;
 import org.concord.otrunk.view.OTViewerHelper;
 import org.concord.otrunk.xml.XMLDatabase;
 
-public class EmbedObjectTest extends JFrame {
-	
+public class EmbedObjectTest extends JFrame 
+{	
+    private static final long serialVersionUID = 1L;
+    
 	private OTViewContainerPanel otContainer;
 	private OTViewerHelper viewerHelper;
 	

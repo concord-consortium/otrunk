@@ -46,11 +46,10 @@ public interface OTSystem extends OTObject
 	public OTObjectList getBundles();	
 
 	/**
-	 * This list is deprecated because these objects are really bundles
+	 * This list should be deprecated because these objects are really bundles
 	 * not services.  The bundles provide services.  For backwards compatibility
 	 * this list is processed first and then the bundles list. 
 	 * 
-	 * @deprecated
 	 * @return
 	 */
 	public OTObjectList getServices();	
