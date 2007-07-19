@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-04-05 02:10:58 $
- * $Author: imoncada $
+ * $Revision: 1.8 $
+ * $Date: 2007-07-19 12:12:26 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -47,6 +47,9 @@ import org.concord.view.SimpleTreeModel;
 public class OTObjectListViewer extends JPanel 
 	implements TreeSelectionListener
 {
+	
+    private static final long serialVersionUID = 1L;
+    
 	protected OTFrameManager frameManager;
 	protected OTViewFactory oTViewFactory;
 	

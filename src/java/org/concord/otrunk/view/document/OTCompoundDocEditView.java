@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2007-05-01 17:36:29 $
- * $Author: sfentress $
+ * $Revision: 1.14 $
+ * $Date: 2007-07-19 12:12:26 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -21,8 +21,6 @@ import javax.swing.JSplitPane;
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectList;
-import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.otrunk.view.OTObjectEditViewConfig;

@@ -128,8 +128,7 @@ public class OTrunkImpl implements OTrunk
 			}
 			
 			// This is deprecated but we use it anyhow for backward compatibility
-			// if we switch to the 1.5 compiler we could turn off this warning.
-			OTObjectList serviceList = ((OTSystem)root).getServices();
+			OTObjectList serviceList = ((OTSystem)root).getServices(); 
 			
 			OTObjectList bundleList = ((OTSystem)root).getBundles();
 			
