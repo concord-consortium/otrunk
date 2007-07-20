@@ -120,7 +120,9 @@ public class OTViewerHelper
 	public OTDatabase loadOTDatabase(URL url)
 	throws Exception
 	{
-		return new XMLDatabase(url, System.err);
+		XMLDatabase xmlDB = new XMLDatabase(url, System.err);
+		xmlDB.loadObjects();
+		return xmlDB;
 	}
 
 	public OTDatabase loadOTDatabaseXML(URL url)
@@ -137,13 +139,17 @@ public class OTViewerHelper
 	public OTDatabase loadOTDatabase(InputStream input, URL url)
 		throws Exception
 	{
-		return new XMLDatabase(input, url, System.err);
+		XMLDatabase xmlDB = new XMLDatabase(input, url, System.err);
+		xmlDB.loadObjects();
+		return xmlDB;
 	}
 
 	public OTDatabase loadOTDatabase(Reader reader, URL url)
 	throws Exception
 	{
-		return new XMLDatabase(reader, url, System.err);
+		XMLDatabase xmlDB = new XMLDatabase(reader, url, System.err);
+		xmlDB.loadObjects();
+		return  xmlDB;
 	}
 	
 	public void saveOTDatabase(OTDatabase otDB, OutputStream output)

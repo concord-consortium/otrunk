@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.23 $
- * $Date: 2007-06-27 21:35:13 $
+ * $Revision: 1.24 $
+ * $Date: 2007-07-20 19:54:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -163,8 +163,17 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			try {
 			    
 				Object resValue = handleChildResource(element, attribName, 
-				        attrib.getValue(), objRelativePath, obj);
+				        attrib.getValue(), objRelativePath, obj, XMLResourceInfo.ATTRIBUTE);
 				obj.setResource(attribName, resValue);
+				
+				if(xmlDB.isTrackResourceInfo()){
+					XMLResourceInfo info = obj.getResourceInfo(attribName);
+					if(info == null){
+						info = new XMLResourceInfo();
+						obj.setResourceInfo(attribName, info);
+					}
+					info.type = XMLResourceInfo.ATTRIBUTE;				
+				}
 			} catch (HandleElementException e) {
 				System.err.println(e.getMessage() + " in attribute: " +
 						TypeService.attributePath(attrib));
@@ -177,12 +186,21 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 
 			try {
 				Object resValue = handleChildResource(element, child.getName(), 
-				        child, objRelativePath, obj);
+				        child, objRelativePath, obj, XMLResourceInfo.ELEMENT);
 				if(resValue == null) {
                     // this should be an option debug or log message
 					// System.out.println("null resource: " + TypeService.elementPath(child));
 				}
+				String childName = child.getName();
 				obj.setResource(child.getName(),resValue);
+				if(xmlDB.isTrackResourceInfo()){
+					XMLResourceInfo info = obj.getResourceInfo(childName);
+					if(info == null){
+						info = new XMLResourceInfo();
+						obj.setResourceInfo(childName, info);
+					}
+					info.type = XMLResourceInfo.ELEMENT;									
+				}
 			} catch (HandleElementException e) {
 				System.err.println("error in element: " +
 						TypeService.elementPath(child));
@@ -212,7 +230,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	 * @return
 	 */
 	public Object handleChildResource(OTXMLElement parentElement, String childName, 
-	        Object childObj, String relativeParentPath, XMLDataObject parent)
+	        Object childObj, String relativeParentPath, XMLDataObject parent, 
+	        int xmlType)
 		throws HandleElementException
 	{
 		Properties elementProps;
@@ -227,6 +246,16 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		elementProps = getResourceProperties(resourceDef);
 		String resPrimitiveType = resourceDef.getType();	
 
+		XMLResourceInfo resInfo = null;
+		if(xmlDB.isTrackResourceInfo()){
+			resInfo = parent.getResourceInfo(childName);
+			if(resInfo == null){
+				resInfo = new XMLResourceInfo();
+				parent.setResourceInfo(childName, resInfo);
+			}
+			resInfo.type = xmlType;				
+		}
+		
 		String resourceType = resPrimitiveType;
 		if(resPrimitiveType.equals("object") &&
 		        childObj instanceof String){
@@ -269,6 +298,11 @@ public class ObjectTypeHandler extends ResourceTypeHandler
                             TypeService.elementPath(child));
                 }
 				resourceType = ((OTXMLElement)childObj).getName();
+
+				if(!"object".equals(resourceType) && resInfo != null){
+					// This isn't a reference it is a containment					
+					resInfo.containment = true;
+				}
 			}			
 		}
 		
@@ -291,7 +325,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		    String childRelativePath = relativeParentPath + "/" + childName;
 			return resHandler.handleElement((OTXMLElement)childObj, elementProps,
 			        childRelativePath, parent);
-		}
+		}		
 	}
 	
 	public ObjectTypeHandler getParentType()

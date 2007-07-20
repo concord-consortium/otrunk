@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.19 $
- * $Date: 2007-06-27 21:35:13 $
+ * $Revision: 1.20 $
+ * $Date: 2007-07-20 19:54:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -244,10 +244,11 @@ public class Exporter
 				continue;
 			}
 
-			Object resource = dataObj.getResource(resourceKeys[i]);
+			String resourceName = resourceKeys[i];
+			Object resource = dataObj.getResource(resourceName);
 			
 			printIndent(resourceIndent, output);
-			output.print("<" + resourceKeys[i] + ">");
+			output.print("<" + resourceName + ">");
 			if(resource instanceof OTID) {
 				// this is an object reference
 				// recurse

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.30 $
- * $Date: 2007-06-27 21:35:13 $
+ * $Revision: 1.31 $
+ * $Date: 2007-07-20 19:54:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -77,7 +77,6 @@ public class XMLDatabase
 	OTID rootId = null;
 	
 	Hashtable dataObjects = new Hashtable();
-	Vector objectReferences = new Vector();
 	
 	// a map of xml file ids to UUIDs
 	Hashtable localIdMap = new Hashtable();
@@ -94,6 +93,11 @@ public class XMLDatabase
 
 	private Hashtable processedOTPackages = new Hashtable();
     
+	private boolean trackResourceInfo = false;
+	
+	private JDOMDocument document;
+	private URL contextURL;
+	
 	public XMLDatabase()
 	{
 	    // create an empty database with no root
@@ -125,11 +129,11 @@ public class XMLDatabase
 		// parse the xml file...
 		printStatus("Started Loading File...");
 		
-		JDOMDocument document = new JDOMDocument(xmlStream);
+		document = new JDOMDocument(xmlStream);
 		
 		printStatus("Finished Loading File...");
 
-		loadDatabase(document, contextURL);
+		this.contextURL = contextURL;
 	}	
 	
 	public XMLDatabase(Reader xmlReader, URL contextURL, PrintStream statusStream)
@@ -140,17 +144,14 @@ public class XMLDatabase
 		// parse the xml file...
 		printStatus("Started Loading File...");
 		
-		JDOMDocument document = new JDOMDocument(xmlReader);
+		document = new JDOMDocument(xmlReader);
 		
 		printStatus("Finished Loading File...");
 
-		loadDatabase(document, contextURL);
+		this.contextURL = contextURL;
 	}	
 	
-	/**
-	 * 
-	 */
-	protected void loadDatabase(JDOMDocument document, URL contextURL)
+	public void loadObjects()
 		throws Exception
 	{
 		OTXMLElement rootElement = document.getRootElement();
@@ -520,7 +521,12 @@ public class XMLDatabase
 				Object newResourceValue = null;
 				String resourceKey = (String)resourceEntry.getKey();
 				if(resourceValue instanceof XMLDataObject) {
-					newResourceValue = getOTID((XMLDataObject)resourceValue);
+					XMLDataObject resourceValueObj = (XMLDataObject) resourceValue;
+					if(!(resourceValueObj instanceof XMLDataObjectRef)){
+						resourceValueObj.setContainer(xmlDObj);
+						resourceValueObj.setContainerResourceKey(resourceKey);
+					}
+					newResourceValue = getOTID(resourceValueObj);
 					if(newResourceValue == null) {
 					    removedKeys.add(resourceKey);
 					} else {
@@ -531,6 +537,12 @@ public class XMLDatabase
 					for(int j=0; j<list.size(); j++) {
 						Object oldElement = list.get(j);
 						if(oldElement instanceof XMLDataObject) {
+							XMLDataObject oldElementObj = (XMLDataObject) oldElement;
+							if(!(oldElementObj instanceof XMLDataObjectRef)){
+								oldElementObj.setContainer(xmlDObj);
+								oldElementObj.setContainerResourceKey(resourceKey);
+							}
+
 							OTID newElement = getOTID((XMLDataObject)oldElement);
 							list.set(j, newElement);
 						}
@@ -559,6 +571,12 @@ public class XMLDatabase
 						}
 
 						if(oldElement instanceof XMLDataObject) {
+							XMLDataObject oldElementObj = (XMLDataObject) oldElement;
+							if(!(oldElementObj instanceof XMLDataObjectRef)){
+								oldElementObj.setContainer(xmlDObj);
+								oldElementObj.setContainerResourceKey(resourceKey);
+							}
+
 							OTID newElement = getOTID((XMLDataObject)oldElement);
 							map.put(keys[j], newElement);
 						}
@@ -645,5 +663,15 @@ public class XMLDatabase
     public Vector getPackageClasses()
     {
     	return (Vector)packageClasses.clone();
+    }
+
+	public boolean isTrackResourceInfo()
+    {
+    	return trackResourceInfo;
+    }
+
+	public void setTrackResourceInfo(boolean trackResourceInfo)
+    {
+    	this.trackResourceInfo = trackResourceInfo;
     }
 }

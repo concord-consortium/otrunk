@@ -29,6 +29,7 @@ public class EmbedObjectTest extends JFrame
 		try {
 			ByteArrayInputStream bais = new ByteArrayInputStream(xmlString.getBytes());
 			XMLDatabase otDatabase = new XMLDatabase(bais, null, null);
+			otDatabase.loadObjects();
 			viewerHelper.loadOTrunk(otDatabase, this);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
