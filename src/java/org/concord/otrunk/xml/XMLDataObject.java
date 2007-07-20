@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2007-06-27 21:35:14 $
+ * $Revision: 1.16 $
+ * $Date: 2007-07-20 19:54:20 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -33,7 +33,8 @@
 package org.concord.otrunk.xml;
 
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataCollection;
@@ -63,8 +64,11 @@ public class XMLDataObject
 	private XMLDatabase database = null;
 	private OTXMLElement element;
 	private String localId = null;
-		
-	Hashtable resources = new Hashtable();
+			
+	HashMap resources = new LinkedHashMap();
+	HashMap resourceInfos = new HashMap();
+	XMLDataObject container = null;
+	String containerResourceKey = null;
 	
 	XMLDataObject(OTXMLElement element, OTID id, XMLDatabase db)
 	{
@@ -148,6 +152,16 @@ public class XMLDataObject
 		return resources.get(key);
 	}
 
+	public void setResourceInfo(String key, XMLResourceInfo info)
+	{
+		resourceInfos.put(key, info);
+	}
+	
+	public XMLResourceInfo getResourceInfo(String key)
+	{
+		return (XMLResourceInfo) resourceInfos.get(key);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#getResourceKeys()
 	 */
@@ -219,5 +233,25 @@ public class XMLDataObject
 	public OTDataObjectType getType()
     {
 		return type;
+    }
+
+	public XMLDataObject getContainer()
+    {
+    	return container;
+    }
+
+	public void setContainer(XMLDataObject container)
+    {
+    	this.container = container;
+    }
+
+	public String getContainerResourceKey()
+    {
+    	return containerResourceKey;
+    }
+
+	public void setContainerResourceKey(String containerResourceKey)
+    {
+    	this.containerResourceKey = containerResourceKey;
     }
 }

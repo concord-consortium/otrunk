@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.69 $
- * $Date: 2007-07-18 17:03:48 $
+ * $Revision: 1.70 $
+ * $Date: 2007-07-20 19:54:21 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -98,6 +98,7 @@ import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.Exporter;
+import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.swing.CustomDialog;
 import org.concord.swing.MostRecentFileDialog;
@@ -469,6 +470,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 	public void loadUserDataURL(URL url, String name) throws Exception {
 		XMLDatabase db = new XMLDatabase(url);
+		db.loadObjects();
 		loadUserDataDb(db, name);
 	}
 
@@ -491,6 +493,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	private void loadURL(URL url) throws Exception {
 		try{
 			xmlDB = new XMLDatabase(url, System.err);
+			if(Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)){
+				xmlDB.setTrackResourceInfo(true);
+			}
+			xmlDB.loadObjects();
 		} catch (org.jdom.input.JDOMParseException e){
 			String xmlWarningTitle = "XML Decoding error";
 			String xmlWarningMessage = "There appears to a problem parsing the XML of this document. \n" +
@@ -1009,7 +1015,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
   
 					if (checkForReplace(currentAuthoredFile)) {
 						try {
-							Exporter.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
+							ExporterJDOM.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
 							xmlDB.setDirty(false);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -1060,7 +1066,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 					if (checkForReplace(file)) {
 						try {
-							Exporter.export(file, xmlDB.getRoot(), xmlDB);
+							ExporterJDOM.export(file, xmlDB.getRoot(), xmlDB);
 							currentAuthoredFile = file;
 							xmlDB.setDirty(false);
 						} catch (Exception e) {
