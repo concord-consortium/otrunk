@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-07-20 19:54:20 $
+ * $Revision: 1.2 $
+ * $Date: 2007-07-20 20:12:45 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -267,7 +267,7 @@ public class ExporterJDOM
 								writtenClasses.get(i) + " and " +
 								objectFullClassName);
 						System.err.println("This database needs to be saved with useFullClassNames turned on");
-						throw new RuntimeException("Duplicate Class names found");
+						return null;
 					}
 				}
 			}
@@ -416,6 +416,9 @@ public class ExporterJDOM
 	public static void writeResourceElement(Element objectEl, 
 		String resourceName, Object content)
 	{
+		if(content == null){
+			return;
+		}
 		Element resourceEl = new Element(resourceName);
 		objectEl.addContent(resourceEl);
 		if(content instanceof Element){
