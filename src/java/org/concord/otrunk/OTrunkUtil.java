@@ -355,4 +355,34 @@ public class OTrunkUtil
         BlobResource blobRes = db.createBlobResource(url);
         dataObject.setResource(propertyName, blobRes);        
 	}
+
+	public static String escapeReplacement(String replacement) {
+    	if (replacement == null) {
+    		return null;
+    	}
+    
+    	// escape $ and \ incase these are used in the text
+    	// we need 8 backslashes here because
+    	// first java compiler strips off half so it is now
+    	// "\\\\"
+    	// then regex replacer strips off half so it is now
+    	// "\\"
+    	// and that is what we want in the replacement so the
+    	// the next replacer turns it into a "\" again. :)
+    	replacement = replacement.replaceAll("\\\\", "\\\\\\\\");
+    
+    	// We need 6 backslashes because
+    	// first the java compiler strips off half of them so the sting
+    	// becomes: \\\$
+    	// then the replacer uses the backslash as a quote, and the $
+    	// character is used to reference groups of characters, so it
+    	// must be escaped. So the 1st two are turned into one, and the
+    	// 3rd one escapes the $. So the end result is:
+    	// \$
+    	// We need this \$ because the replacement below is going to
+    	// parse the $ otherwise
+    	replacement = replacement.replaceAll("\\$", "\\\\\\$");
+    
+    	return replacement;
+    }
 }

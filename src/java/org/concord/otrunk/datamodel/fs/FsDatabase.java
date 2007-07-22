@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2007-06-27 21:35:14 $
+ * $Revision: 1.13 $
+ * $Date: 2007-07-22 04:49:00 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -326,6 +326,12 @@ public class FsDatabase implements OTDatabase
      * @see org.concord.otrunk.datamodel.OTDatabase#getPackageClasses()
      */
     public Vector getPackageClasses()
+    {
+	    // TODO Auto-generated method stub
+	    return null;
+    }
+
+	public OTID getDatabaseId()
     {
 	    // TODO Auto-generated method stub
 	    return null;
