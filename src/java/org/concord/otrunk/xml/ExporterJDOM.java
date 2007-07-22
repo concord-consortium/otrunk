@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-07-20 20:12:45 $
+ * $Revision: 1.3 $
+ * $Date: 2007-07-22 04:49:00 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -43,15 +43,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTXMLString;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.OTrunkUtil;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.datamodel.OTIDFactory;
+import org.concord.otrunk.datamodel.OTPathID;
+import org.concord.otrunk.datamodel.OTRelativeID;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.JDOMParseException;
@@ -72,12 +78,14 @@ import org.jdom.output.XMLOutputter;
 public class ExporterJDOM
 {
 	static OTDatabase otDb;
-	static Vector writtenIds = null;
-	static Vector writtenClasses = null;
-	static HashMap containers = new HashMap();
-	private static OTDataObject root;
+	static Vector writtenIds;
+	static Vector processedClasses;
+	static HashMap containers;
 	
 	public static boolean useFullClassNames = false;
+	private static ArrayList processedIds;
+	private static ArrayList duplicateClasses;
+	private static HashMap incomingReferenceMap;
 	
 	public static void export(File outputFile, OTDataObject rootObject, OTDatabase db)
 	throws Exception
@@ -98,23 +106,34 @@ public class ExporterJDOM
 	throws Exception
 	{	
 		writtenIds = new Vector();
-		writtenClasses = new Vector();
-		root = rootObject;
+		processedClasses = new Vector();
+		duplicateClasses = new ArrayList();
+		containers = new HashMap();
+		processedIds = new ArrayList();
+		incomingReferenceMap = new HashMap();
+		
 		PrintWriter printStream = new PrintWriter(writer);
 	
 		otDb = db;
+
+		// Make a first pass through the objects reachable from the rootObject
+		// for each one track its incoming references
+		// and the classnames.  Flag duplicate classnames.
+		processObject(rootObject);
 		
 		Element rootObjectElement = exportObject(rootObject, null, null);
 
-		Element otrunkEl = new Element("otrunk");		
+		Element otrunkEl = new Element("otrunk");
+		otrunkEl.setAttribute("id", otDb.getDatabaseId().toString());
+		
 		Element importsEl = new Element("imports");
 		otrunkEl.addContent(importsEl);
 		
-		for(int i=0; i<writtenClasses.size(); i++) {
+		for(int i=0; i<processedClasses.size(); i++) {
 			Element importEl = new Element("import");
 			importsEl.addContent(importEl);
 
-			importEl.setAttribute("class", (String)writtenClasses.get(i));
+			importEl.setAttribute("class", (String)processedClasses.get(i));
 		}
 		
 		Element objectsEl = new Element("objects"); 
@@ -131,6 +150,166 @@ public class ExporterJDOM
 		
 	}
 	
+	private static void processObject(OTDataObject dataObject) 
+		throws Exception
+    {
+		OTID id = dataObject.getGlobalId();
+		
+		// Check if we have processed this object already
+		if(processedIds.contains(id)) {
+			// we've seen this object before just skip it
+			return;
+		}
+
+		// If we are here then the object hasn't been written out before
+		// and if it has a valid container then we are inside of that container
+		processedIds.add(id);
+		
+		// System.err.println("writting object: " + id);		
+		
+		String objectFullClassName = OTrunkImpl.getClassName(dataObject);
+		
+		// If this is the first time we've seen this class then check it
+		if(!processedClasses.contains(objectFullClassName)) {
+			// If not using full class names check for duplicates
+			if(!useFullClassNames){
+				String objectClassName = getClassName(objectFullClassName);
+				for(int i=0; i<processedClasses.size(); i++){
+					String processedFullClassName = (String) processedClasses.get(i);
+					String processedClassName = getClassName(processedFullClassName);
+					if(processedClassName.equals(objectClassName)){
+						// This is very bad
+						System.err.println("Duplicate Class names found: " +
+								processedClasses.get(i) + " and " +
+								objectFullClassName);
+						System.err.println("This database needs to be saved with useFullClassNames turned on");
+						if(!duplicateClasses.contains(processedFullClassName)){
+							duplicateClasses.add(processedFullClassName);							
+						}
+						duplicateClasses.add(objectFullClassName);
+					}
+				}
+			}
+			
+			processedClasses.add(objectFullClassName);
+		}
+				
+		String resourceKeys [] = dataObject.getResourceKeys();
+				
+		for(int i=0; i<resourceKeys.length; i++) {
+		    
+		    // FIXME: we are ignoring special keys there should way
+		    // to identify special keys.
+			String resourceName = resourceKeys[i];
+
+			if(		resourceName.equals("currentRevision") ||
+					resourceName.equals("localId")) {
+				continue;
+			}
+
+			Object resource = dataObject.getResource(resourceName);			
+			
+			if(resource instanceof OTID) {
+				// this is an object reference
+				// recurse
+				
+				// handle the ID, check to see if it is in our database or not
+				// if it is in our database then we should recurse
+				processReference(dataObject, (OTID)resource);
+			} else if(resource instanceof OTDataList) {
+			    OTDataList list = (OTDataList)resource;
+				for(int j=0;j<list.size(); j++) {
+					Object listElement = list.get(j);
+					if(listElement == null) {
+						System.err.println("null list item (allowed??)");
+						continue;
+					}
+		
+					processCollectionItem(dataObject, listElement);
+				}
+			} else if(resource instanceof OTDataMap) {
+			    OTDataMap map = (OTDataMap)resource;
+			    String [] mapKeys = map.getKeys();
+			    for(int j=0; j<mapKeys.length; j++) {			    	
+			        Object mapValue = map.get(mapKeys[j]);
+			        if(mapValue != null) {
+			        	processCollectionItem(dataObject, mapValue);
+			        }
+			    }
+			} else if(resource instanceof OTXMLString) {
+				// handle xml strings because they might have references to 
+				// objects in them.
+				// first search for any id pattern after find it
+				// record the reference, and possibly substitute it
+				// if it is a local_id reference
+				Pattern pattern = Pattern.compile("(refid=\")([^\"]*)(\")");
+				parseXMLString(pattern, dataObject, (OTXMLString) resource);
+
+				// don't match hrefs with colons those are external links				
+				pattern = Pattern.compile("(href=\")([^:\"]*)(\")");
+				parseXMLString(pattern, dataObject, (OTXMLString) resource);
+			}
+		}
+    }
+
+
+	private static void parseXMLString(Pattern pattern, OTDataObject dataObject, 
+		OTXMLString xmlString) 
+		throws Exception
+	{
+		Matcher m = pattern.matcher(xmlString.getContent());
+		StringBuffer parsed = new StringBuffer();
+		while(m.find()) {
+			String otidStr = m.group(2);
+			OTID otid = OTIDFactory.createOTID(otidStr);
+			processReference(dataObject, otid);
+			
+			String convertedId = convertId(otid);
+			String escapedConvertedId = OTrunkUtil.escapeReplacement(convertedId);
+			m.appendReplacement(parsed, "$1" + escapedConvertedId + "$3");
+		}
+		m.appendTail(parsed);
+		
+		xmlString.setContent(parsed.toString());		
+	}
+	
+	private static void processCollectionItem(OTDataObject parent, Object listElement) 
+		throws Exception
+	{
+		if(listElement instanceof OTID) {
+			// this is an object reference, recurse
+			processReference(parent, (OTID)listElement);
+		} else if(listElement instanceof OTDataList  ||
+				listElement instanceof OTDataMap) {
+			System.err.println("nested collections are illegal");
+		}		
+	}
+		
+	private static void processReference(OTDataObject parent, OTID id) 
+		throws Exception
+    {
+        OTDataObject childObject = otDb.getOTDataObject(parent, id);
+        if(childObject == null) {
+            // our db doesn't contain this object, so we don't need
+        	// to do anything with it.
+
+        	// FIXME: This should be a little more careful.  The list of
+            // databases we require should be saved.  So then we can check
+            // if this external object will be resolvable on loading.
+        	return;
+        } else {
+        	// record that this parent object is referencing this object.
+    		ArrayList refList = (ArrayList) incomingReferenceMap.get(id);
+    		if(refList == null){
+    			refList = new ArrayList();
+    			incomingReferenceMap.put(id, refList);
+    		}
+    		
+    		refList.add(parent);
+    		processObject(childObject);
+        }
+    }
+
 	public static Element exportCollectionItem(OTDataObject parentDataObj, 
 			Object item, String parentResourceName)
 	throws Exception
@@ -183,12 +362,40 @@ public class ExporterJDOM
             // FIXME: This should be a little more careful.  The list of
             // databases we require should be saved.  So then we can check
             // if this external object will be resolvable on loading.
-        	Element objectEl = new Element("object");
-        	objectEl.setAttribute("refid", id.toString());
-        	return objectEl;
+        	return exportObjectReference(id);
         } else {
             return exportObject(childObject, parent, parentResourceName);
         }
+    }
+    
+    public static Element exportObjectReference(OTID id)
+    {
+		Element objectEl = new Element("object");
+		String convertedId = convertId(id);
+		objectEl.setAttribute("refid", convertedId);
+		return objectEl;    	
+    }
+
+    /**
+     * Check if this id is actually a local id reference.  If it is then
+     * return the ${xxx} notation used in the otml files.
+     * @param id
+     * @return
+     */
+    public static String convertId(OTID id)
+    {
+		if(id instanceof OTRelativeID){
+			OTRelativeID relId = (OTRelativeID) id;
+			OTID relRelId = relId.getRelativeId();			
+			if(relId.getRootId().equals(otDb.getDatabaseId()) && 
+					relRelId instanceof OTPathID &&
+					relRelId.toString().startsWith("/")){
+				// this id is relative to our database
+				// or at least it should be
+				return "${" + relRelId.toString().substring(1) + "}";
+			}
+		}
+		return id.toString();
     }
     
 	public static Element exportObject(OTDataObject dataObj, OTDataObject parent, String parentResourceName)
@@ -199,10 +406,7 @@ public class ExporterJDOM
 		// Check if we have written out this object already
 		// if so then just write a reference and continue
 		if(writtenIds.contains(id)) {
-			// we've seen this object for so just write a reference
-			Element objectEl = new Element("object");
-			objectEl.setAttribute("refid", id.toString());
-			return objectEl;
+			return exportObjectReference(id);
 		}
 		
 		XMLDataObject xmlDO = null;
@@ -211,42 +415,17 @@ public class ExporterJDOM
 		if(dataObj instanceof XMLDataObject){
 			xmlDO = (XMLDataObject) dataObj;
 			
-			
-			XMLDataObject currObj = xmlDO;
-			
-			while(currObj != null && currObj != root){
-				// shortcut this if this object has already been recorded as having
-				// a valid container
-				XMLDataObject validContainer = (XMLDataObject) containers.get(currObj);
-				if(validContainer != null){
-					currObj = (XMLDataObject)root;
-					break;
+			XMLDataObject container = xmlDO.getContainer();
+			if(container != null && processedIds.contains(container.getGlobalId())){
+				// this is a valid container
+				if(parent != container || 
+						!parentResourceName.equals(xmlDO.getContainerResourceKey())){
+					// this isn't the parent, or it isn't the right resource in the parent
+					// so just write a reference
+					return exportObjectReference(id);
 				}
-				currObj = currObj.getContainer();
-			}
-
-			if(currObj == root && xmlDO != root){
-				// This object has a valid container
-				// record the container and then only write the object inside of that
-				// container
-				containers.put(xmlDO, xmlDO.getContainer());
-			}
+			}			
 		}
-		
-		XMLDataObject validContainer = (XMLDataObject) containers.get(dataObj);
-		if(validContainer != null){
-			// This object has a valid container so only write it out if the
-			// parent is its container
-			
-			if(parent != validContainer || xmlDO == null || 
-					!parentResourceName.equals(xmlDO.getContainerResourceKey())){
-				// this isn't the parent, or it isn't the right resource in the parent
-				// so just write a reference
-				Element objectEl = new Element("object");
-				objectEl.setAttribute("refid", id.toString());
-				return objectEl;				
-			}
-		} 
 		
 		// If we are here then the object hasn't been written out before
 		// and if it has a valid container then we are inside of that container
@@ -255,32 +434,31 @@ public class ExporterJDOM
 		// System.err.println("writting object: " + id);		
 		
 		String objectFullClassName = OTrunkImpl.getClassName(dataObj);
-		if(!writtenClasses.contains(objectFullClassName)) {
-			// If not using full class names check for duplicates
-			if(!useFullClassNames){
-				String objectClassName = getClassName(objectFullClassName);
-				for(int i=0; i<writtenClasses.size(); i++){
-					String writtenClassName = getClassName((String)writtenClasses.get(i));
-					if(writtenClassName.equals(objectClassName)){
-						// This is very bad
-						System.err.println("Duplicate Class names found: " +
-								writtenClasses.get(i) + " and " +
-								objectFullClassName);
-						System.err.println("This database needs to be saved with useFullClassNames turned on");
-						return null;
-					}
-				}
-			}
-			
-			writtenClasses.add(objectFullClassName);
-		}
-		
-		
 		String objectElementName =  getObjectElementName(objectFullClassName);
 		
 		Element objectEl = new Element(objectElementName);
-		objectEl.setAttribute("id", id.toString());
-
+		
+		if(xmlDO != null && xmlDO.getLocalId() != null){
+			// FIXME this is dangerous if the object is being copied from one db 
+			// to another,  the references in this export should be checked to see
+			// if they use the local_id or its global as a reference.
+			objectEl.setAttribute("local_id", xmlDO.getLocalId());
+		} else {
+			// check to see if this object has any references that 
+			// are not containment references.
+			// there is only one containment reference and every object
+			// should have one (with the exception of the root object)
+			// so if there is more than one incoming reference than this object
+			// needs an id.  
+			// We should also check to see if the objects id has been explicitly set
+			// in that case it should be written out anyhow.  I'm not sure how to 
+			// do that yet.
+			ArrayList incomingReferences = (ArrayList) incomingReferenceMap.get(id);
+			if(incomingReferences != null && incomingReferences.size() > 1){
+				objectEl.setAttribute("id", id.toString());
+			}
+		}
+		
 		String resourceKeys [] = dataObj.getResourceKeys();
 				
 		for(int i=0; i<resourceKeys.length; i++) {
@@ -359,12 +537,12 @@ public class ExporterJDOM
 				writeResource(dataObj, objectEl, resourceName, primitiveString, 
 						XMLResourceInfo.ATTRIBUTE);				
 			} else if(resource instanceof OTXMLString) {
-				// FIXME
-				// We need to handle this correctly in JDOM
-				// probably the best is to try loading the content in as a JDOM document
-				// and if it doesn't fail then add the root element
-				// if it does fail then write it out as CDATA
-				
+				// The xml string is wrapped with a fake root element
+				// and loaded as a JDOM document
+				// and if it doesn't fail then clone the contents of the fake root
+				// element and add it to the resourceElement 
+				// FIXME if it does fail then write it out as CDATA
+				// FIXME we should process any references				
 				SAXBuilder builder = new SAXBuilder();
 				String xmlString = "<root>" + ((OTXMLString)resource).getContent().trim() + "</root>";
 				StringReader reader = new StringReader(xmlString);
@@ -402,6 +580,9 @@ public class ExporterJDOM
 		}
 		
 		if(!useFullClassNames){
+			if(duplicateClasses.contains(objectClass)){
+				return objectClass;
+			}
 			return getClassName(objectClass);
 		}
 		

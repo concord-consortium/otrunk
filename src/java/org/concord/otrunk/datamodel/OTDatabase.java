@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2007-06-27 21:35:14 $
+ * $Revision: 1.15 $
+ * $Date: 2007-07-22 04:49:00 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -49,6 +49,8 @@ import org.concord.framework.otrunk.OTID;
  */
 public interface OTDatabase
 {
+	public OTID getDatabaseId();
+	
 	public void setRoot(OTID rootId) 
 		throws Exception;
 	

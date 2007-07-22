@@ -57,6 +57,7 @@ import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTXHTMLView;
+import org.concord.otrunk.OTrunkUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -208,36 +209,6 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		return bodyText;
 	}
 
-	public String escapeReplacement(String replacement) {
-		if (replacement == null) {
-			return null;
-		}
-
-		// escape $ and \ incase these are used in the text
-		// we need 8 backslashes here because
-		// first java compiler strips off half so it is now
-		// "\\\\"
-		// then regex replacer strips off half so it is now
-		// "\\"
-		// and that is what we want in the replacement so the
-		// the next replacer turns it into a "\" again. :)
-		replacement = replacement.replaceAll("\\\\", "\\\\\\\\");
-
-		// We need 6 backslashes because
-		// first the java compiler strips off half of them so the sting
-		// becomes: \\\$
-		// then the replacer uses the backslash as a quote, and the $
-		// character is used to reference groups of characters, so it
-		// must be escaped. So the 1st two are turned into one, and the
-		// 3rd one escapes the $. So the end result is:
-		// \$
-		// We need this \$ because the replacement below is going to
-		// parse the $ otherwise
-		replacement = replacement.replaceAll("\\$", "\\\\\\$");
-
-		return replacement;
-	}
-
 	/**
 	 * This method gets the object with idStr and tries to get the view entry
 	 * with the viewIdStr. If the viewIdStr is not null then it gets the view
@@ -250,11 +221,11 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	 * The text returned is intended for use by the Matcher.appendReplacement
 	 * method. So $0 means to just leave the text as is. Because of this any
 	 * text needs to be escaped, specifically $ and \ needs to be escaped.
-	 * {@link #escapeReplacement(String)}
+	 * {@link OTrunkUtil#escapeReplacement(String)}
 	 * 
 	 * So far this is only used by the substitueIncludables method
 	 * 
-	 * @see #escapeReplacement(String)
+	 * @see OTrunkUtil#escapeReplacement(String)
 	 * @see #substituteIncludables(String)
 	 * 
 	 */
@@ -318,7 +289,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 					System.err.println("empty embedd obj: " + idStr);
 					return "";
 				}
-				return escapeReplacement(replacement);
+				return OTrunkUtil.escapeReplacement(replacement);
 			} catch (Exception e) {
 				System.err
 						.println("Failed to generate xhtml version of embedded object");

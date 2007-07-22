@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.31 $
- * $Date: 2007-07-20 19:54:20 $
+ * $Revision: 1.32 $
+ * $Date: 2007-07-22 04:49:00 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -221,7 +221,7 @@ public class XMLDatabase
 
 		OTXMLElement rootObjectNode = (OTXMLElement)xmlObjects.get(0);		
 		
-		// Recusively load all the data objects
+		// Recursively load all the data objects
 		
 		// If the database does not have an id then use a path of anon_root
 		// Due to an error before, anon_root was being used even when the database had an
@@ -229,7 +229,7 @@ public class XMLDatabase
 		// so in that case the correct database id is used.
 		String relativePath = "anon_root";
 		if(databaseId != null) {
-		    relativePath = databaseId.toString();
+		    relativePath = databaseId.toString() + "/";
 		}
 		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode, relativePath);
 		
