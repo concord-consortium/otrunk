@@ -60,8 +60,8 @@ import org.concord.otrunk.view.OTViewerHelper;
  */
 public class OTResourceSchemaHandler extends OTInvocationHandler
 {
-	public final static boolean traceListeners =
-		Boolean.getBoolean(OTViewerHelper.TRACE_LISTENERS_PROP);
+	public final static boolean traceListeners = 
+		OTViewerHelper.getBooleanProp(OTViewerHelper.TRACE_LISTENERS_PROP, false);
 	
 	Class schemaInterface = null;
     OTrunkImpl db;
@@ -71,7 +71,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 
     /**
      * This is for debugging purposes it contains a mapping from
-     * the weakreference object to the toString of the listener it
+     * the weak reference object to the toString of the listener it
      * referenced.  This way when the listener is gc'd we can printout
      * its "label" (toString value).
      */
