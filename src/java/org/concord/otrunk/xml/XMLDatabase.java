@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.32 $
- * $Date: 2007-07-22 04:49:00 $
+ * $Revision: 1.33 $
+ * $Date: 2007-07-24 10:34:13 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -74,6 +74,9 @@ import org.concord.otrunk.xml.jdom.JDOMDocument;
 public class XMLDatabase
 	implements OTDatabase
 {
+	public static boolean TRACE_PACKAGES = 
+		OTViewerHelper.getBooleanProp(OTViewerHelper.TRACE_PACKAGES_PROP, false);
+	
 	OTID rootId = null;
 	
 	Hashtable dataObjects = new Hashtable();
@@ -97,6 +100,8 @@ public class XMLDatabase
 	
 	private JDOMDocument document;
 	private URL contextURL;
+	
+	
 	
 	public XMLDatabase()
 	{
@@ -323,13 +328,13 @@ public class XMLDatabase
     	
         try {
 	        otPackageClass = getClass().getClassLoader().loadClass(fullyQualifiedOTPackageClassName);
-        	if(Boolean.getBoolean(OTViewerHelper.TRACE_PACKAGES_PROP)){
+        	if(TRACE_PACKAGES){
         		System.err.println("loaded package: " + otPackageClass);
         	}
 	        processedOTPackages.put(packageName, otPackageClass);
 	    	return otPackageClass;
         } catch (ClassNotFoundException e) {
-        	if(Boolean.getBoolean(OTViewerHelper.TRACE_PACKAGES_PROP)){
+        	if(TRACE_PACKAGES){
         		System.err.println("no OTPackage for: " + packageName);
         		System.err.println("  the classname should be: " + 
         				fullyQualifiedOTPackageClassName);

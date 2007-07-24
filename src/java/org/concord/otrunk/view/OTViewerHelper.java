@@ -31,6 +31,7 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessControlException;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
@@ -65,6 +66,8 @@ public class OTViewerHelper
   public final static String REMOTE_URL_PROP = "otrunk.remote_url";
   public final static String REST_ENABLED_PROP = "otrunk.rest_enabled";
 	
+  	protected static boolean cannotReadProperties = false;
+  
 	private OTrunk otrunk;
 	private OTViewFactory viewFactory;
 	private OTDatabase otDB;
@@ -72,14 +75,31 @@ public class OTViewerHelper
 	private OTUser currentUser;
 	OTFrameManagerImpl frameManager; 
 	
+	
+	public static boolean getBooleanProp(String property, boolean defaultValue)
+	{
+		if(cannotReadProperties){
+			return defaultValue;
+		}
+		
+		try {
+			return Boolean.getBoolean(property);
+		} catch (AccessControlException e){			
+			System.err.println(e);
+			System.err.println("Cannot read system properties, defaults will be used");
+			cannotReadProperties = true;
+			return defaultValue;
+		}		
+	}
+	
 	public static boolean isDebug()
 	{
-		return Boolean.getBoolean(DEBUG_PROP);
+		return getBooleanProp(DEBUG_PROP, false);
 	}
 
 	public static boolean isTrace()
 	{
-		return Boolean.getBoolean(TRACE_PROP);
+		return getBooleanProp(TRACE_PROP, false);
 	}
 	
 	public static OTUserObject createUser(String name, OTObjectService objService)
