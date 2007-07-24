@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.50 $
- * $Date: 2007-07-18 17:03:48 $
- * $Author: scytacki $
+ * $Revision: 1.51 $
+ * $Date: 2007-07-24 19:56:17 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -469,6 +469,7 @@ public class OTViewContainerPanel extends JPanel
 		public void setParentContainer(OTViewContainer c) {
 			OTViewContainerPanel.this.setParentContainer(c);
 		}
+		
 		public OTViewContainer getParentContainer() {
 			return OTViewContainerPanel.this.getParentContainer();
 		}
@@ -476,12 +477,21 @@ public class OTViewContainerPanel extends JPanel
 		public OTViewContainer getUpdateableContainer() {
 			return OTViewContainerPanel.this.getUpdateableContainer();
 		}
+		
+		public void reloadView(){
+			OTViewContainerPanel.this.reloadView();
+		}
 	}
 
 	public OTViewContainer getViewContainer() {
 		return viewContainer.getUpdateableContainer();
 	}
 	
+	public void reloadView()
+    {
+		setCurrentObject(currentObject, currentViewEntry,currentObjectEditable);
+    }
+
 	public OTViewContainer getUpdateableContainer()
     {
 	    if (this.isUpdateable()) {

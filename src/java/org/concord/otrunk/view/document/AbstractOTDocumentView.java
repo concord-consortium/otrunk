@@ -19,6 +19,7 @@ public class AbstractOTDocumentView extends OTTextObjectView
 
 	public void setViewContainer(OTViewContainer container)
 	{
+		super.setViewContainer(container);
 		viewContainer = container;
 		if (viewContainer != null) {
 			viewContainer.setUpdateable(true);

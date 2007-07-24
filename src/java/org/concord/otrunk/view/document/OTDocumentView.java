@@ -114,6 +114,8 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		// need to use the PfCDEditorKit
 		updateFormatedView();
 
+		setReloadOnViewEntryChange(true);
+
 		if (!editable) {
 			return previewComponent;
 		}
@@ -244,8 +246,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			if (viewEntryTmp instanceof OTViewEntry) {
 				viewEntry = (OTViewEntry) viewEntryTmp;
 			} else {
-				System.err
-						.println("viewid reference to a non viewEntry object");
+				System.err.println("viewid reference to a non viewEntry object");
 				System.err.println("  doc: " + pfObject.getGlobalId());
 				System.err.println("  refid: " + idStr);
 				System.err.println("  viewid: " + viewIdStr);
@@ -510,6 +511,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	 * @see org.concord.framework.otrunk.view.OTViewConfigAware#setViewConfig(org.concord.framework.otrunk.OTObject)
 	 */
 	public void setViewEntry(OTViewEntry viewEntry) {
+		super.setViewEntry(viewEntry);
 		if (viewEntry instanceof OTDocumentViewConfig) {
 			this.viewEntry = (OTDocumentViewConfig) viewEntry;
 			setViewMode(this.viewEntry.getMode());
