@@ -31,16 +31,18 @@ package org.concord.otrunk.view;
 
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTRequestedViewEntryAware;
 import org.concord.framework.otrunk.view.OTView;
+import org.concord.framework.otrunk.view.OTViewContext;
+import org.concord.framework.otrunk.view.OTViewContextAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
-import org.concord.framework.otrunk.view.OTViewContext;
-import org.concord.framework.otrunk.view.OTViewContextAware;
 import org.concord.otrunk.OTrunkUtil;
 
 /**
@@ -91,7 +93,21 @@ public class OTViewFactoryImpl implements OTViewFactory
     class InternalViewEntry {
         Class objectClass;
         Class viewClass;
-        OTViewEntry otEntry;
+        OTID otEntryID;
+        
+        OTViewEntry getOTViewEntry(OTObject requestingObject)
+        {
+        	OTObjectService objService = requestingObject.getOTObjectService();
+        	OTViewEntry otViewEntry;
+            try {
+	            otViewEntry = (OTViewEntry) objService.getOTObject(otEntryID);
+            } catch (Exception e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	            return null;
+            }
+        	return otViewEntry;
+        }
     }
 
     public OTViewFactory createChildViewFactory()
@@ -118,7 +134,8 @@ public class OTViewFactoryImpl implements OTViewFactory
             e.printStackTrace();
         }
 
-        initView(view, entry.otEntry);
+        OTViewEntry otEntry = entry.getOTViewEntry(otObject);
+        initView(view, otEntry);
         
         return view;
     }
@@ -136,7 +153,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 		if(entry == null) {
 			return null;
 		}
-		OTViewEntry viewEntry = entry.otEntry;
+		OTViewEntry viewEntry = entry.getOTViewEntry(otObject);
 		return getView(otObject, viewEntry, modeStr);
 	}
     
@@ -230,7 +247,7 @@ public class OTViewFactoryImpl implements OTViewFactory
             	internalEntry.viewClass = loader.loadClass(viewClassStr);
             }
 
-            internalEntry.otEntry = entry;
+            internalEntry.otEntryID = entry.getGlobalId();
             viewMap.add(internalEntry);
             
         } catch (ClassNotFoundException e) {

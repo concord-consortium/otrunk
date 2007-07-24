@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.70 $
- * $Date: 2007-07-20 19:54:21 $
+ * $Revision: 1.71 $
+ * $Date: 2007-07-24 20:45:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -1284,7 +1284,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		if (Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
 			if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
 				loadAction.putValue(Action.NAME, "Open Authored Content...");
-				saveAction.putValue(Action.NAME, "Save Authored Content...");
+				saveAction.putValue(Action.NAME, "Save Authored Content");
 				saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
 				saveRemoteAsAction.putValue(Action.NAME, "Save Authored Content Remotely As...");
 			} else {
@@ -1302,12 +1302,17 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)
 		        && !Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
 			if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
-				saveAction.putValue(Action.NAME, "Save Authored Content...");
-				fileMenu.add(saveAction);
+				loadAction.putValue(Action.NAME, "Open Authored Content...");
+				saveAction.putValue(Action.NAME, "Save Authored Content");
+				saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
 			} else {
+				loadAction.putValue(Action.NAME, "Open...");
 				saveAction.putValue(Action.NAME, "Save");
-				fileMenu.add(saveAction);
+				saveAsAction.putValue(Action.NAME, "Save As...");
 			}
+			fileMenu.add(loadAction);
+			fileMenu.add(saveAction);
+			fileMenu.add(saveAsAction);
 		}
 
 		if (Boolean.getBoolean("otrunk.view.export_image")) {
