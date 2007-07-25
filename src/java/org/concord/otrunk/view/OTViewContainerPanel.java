@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.51 $
- * $Date: 2007-07-24 19:56:17 $
+ * $Revision: 1.52 $
+ * $Date: 2007-07-25 20:56:40 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -276,6 +276,9 @@ public class OTViewContainerPanel extends JPanel
 
 				if(isUseScrollPane()) {
 					JScrollPane scrollPane = new JScrollPane();
+					
+					//This doesn't seem to show up for inner panels
+					scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 					scrollPane.setViewport(new JViewport(){
 						/**
 						 * Not intended to be serialized, just added remove compile warning

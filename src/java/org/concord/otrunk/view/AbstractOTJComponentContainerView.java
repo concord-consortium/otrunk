@@ -31,6 +31,9 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 
 	protected JComponent createSubViewComponent(OTObject otObject)
 	{
+		if (otObject instanceof OTViewChild){
+			return createSubViewComponent(((OTViewChild)otObject).getObject(), ((OTViewChild)otObject).getUseScrollPane());
+		}
 		return createSubViewComponent(otObject, false);
 	}
 	

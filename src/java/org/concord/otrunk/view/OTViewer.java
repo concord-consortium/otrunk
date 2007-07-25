@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.71 $
- * $Date: 2007-07-24 20:45:43 $
- * $Author: scytacki $
+ * $Revision: 1.72 $
+ * $Date: 2007-07-25 20:56:41 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -223,6 +223,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	 * This is true if the user was asked about saving the user data, and said yes
 	 */
 	private boolean needToSaveUserData = false;
+	
+	private boolean useScrollPane;
 	
 	public static void setOTViewFactory(OTViewFactory factory) {
 		otViewFactory = factory;
@@ -430,16 +432,24 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				if(!mainFrame.getShowLeftPanel()){
 					splitPane.getLeftComponent().setVisible(false);
 				}
+				
+				useScrollPane = true;
 				if(mainFrame.getFrame() != null){
-					int cornerX = 100;
-					int cornerY = 100;
-					int sizeX = mainFrame.getFrame().getWidth();
-					int sizeY = mainFrame.getFrame().getHeight();
-
-					setBounds(cornerX, cornerY, cornerX + sizeX, cornerY
-							+ sizeY);
-					repaint();
+					if (mainFrame.getFrame().isResourceSet("width") &&
+							mainFrame.getFrame().isResourceSet("height")){
+						int cornerX = 100;
+						int cornerY = 100;
+						int sizeX = mainFrame.getFrame().getWidth();
+						int sizeY = mainFrame.getFrame().getHeight();
+	
+						setBounds(cornerX, cornerY, cornerX + sizeX, cornerY
+								+ sizeY);
+						repaint();
+					}
+					useScrollPane = mainFrame.getFrame().getUseScrollPane();
 				}
+				
+				bodyPanel.setUseScrollPane(useScrollPane);
 			}
 		}
 		
@@ -522,7 +532,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		factoryContext.addViewService(OTFrameManager.class, frameManager);
 		factoryContext.addViewService(OTJComponentServiceFactory.class, new OTJComponentServiceFactoryImpl());
 		
-		bodyPanel.setTopLevelContainer(true);		
+		bodyPanel.setTopLevelContainer(true);
 				
 		bodyPanel.setOTViewFactory(otViewFactory);
 
