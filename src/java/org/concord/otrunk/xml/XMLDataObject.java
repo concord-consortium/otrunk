@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.16 $
- * $Date: 2007-07-20 19:54:20 $
+ * $Revision: 1.17 $
+ * $Date: 2007-07-25 20:25:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -66,7 +66,7 @@ public class XMLDataObject
 	private String localId = null;
 			
 	HashMap resources = new LinkedHashMap();
-	HashMap resourceInfos = new HashMap();
+	HashMap referenceInfoMap = new HashMap();
 	XMLDataObject container = null;
 	String containerResourceKey = null;
 	
@@ -152,14 +152,14 @@ public class XMLDataObject
 		return resources.get(key);
 	}
 
-	public void setResourceInfo(String key, XMLResourceInfo info)
+	public void setResourceInfo(String key, XMLReferenceInfo info)
 	{
-		resourceInfos.put(key, info);
+		referenceInfoMap.put(key, info);
 	}
 	
-	public XMLResourceInfo getResourceInfo(String key)
+	public XMLReferenceInfo getReferenceInfo(String key)
 	{
-		return (XMLResourceInfo) resourceInfos.get(key);
+		return (XMLReferenceInfo) referenceInfoMap.get(key);
 	}
 	
 	/* (non-Javadoc)

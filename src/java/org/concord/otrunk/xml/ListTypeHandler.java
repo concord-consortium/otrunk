@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.11 $
+ * $Date: 2007-07-25 20:25:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -35,6 +35,8 @@ package org.concord.otrunk.xml;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+
+import org.concord.otrunk.datamodel.OTDatabase;
 
 /**
  * ListTypeHandler
@@ -63,11 +65,39 @@ public class ListTypeHandler extends ResourceTypeHandler
 	{
 		XMLDataList list = new XMLDataList(parent);
 		
-		List children = element.getChildren();
+		List content = element.getContent();
+		String previousComment = null;
+
+		OTDatabase otDB = parent.getDatabase();
+		XMLDatabase xmlDB = null;
+		if(otDB instanceof XMLDatabase){
+			xmlDB = (XMLDatabase) otDB;
+		}
+		
 		int index = 0;
-		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			
-		    OTXMLElement child = (OTXMLElement)childIter.next();
-		    String childRelativePath = null;
+		for(Iterator childIter = content.iterator(); childIter.hasNext(); ) {			
+		    OTXMLContent childContent = (OTXMLContent)childIter.next();
+		    if(childContent instanceof OTXMLComment){
+		    	previousComment = ((OTXMLComment) childContent).getText();
+		    }
+		    
+		    if(!(childContent instanceof OTXMLElement)){
+		    	continue;
+		    }
+		    
+		    OTXMLElement child = (OTXMLElement) childContent;
+
+			if(previousComment != null && xmlDB.isTrackResourceInfo()){
+				XMLReferenceInfo info = list.getReferenceInfo(index);
+				if(info == null){
+					info = new XMLReferenceInfo();
+					list.setResourceInfo(index, info);
+				}
+				
+				info.comment = previousComment;
+			}
+
+			String childRelativePath = null;
 		    if(relativePath != null) {
 		        childRelativePath = relativePath + "[" + index + "]";		        
 		    }
@@ -76,6 +106,8 @@ public class ListTypeHandler extends ResourceTypeHandler
 			    list.add(resValue);
 			}
 			index++;
+			
+			previousComment = null;
 		}
 
 		return list;

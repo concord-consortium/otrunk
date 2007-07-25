@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-07-25 17:06:35 $
+ * $Revision: 1.5 $
+ * $Date: 2007-07-25 20:25:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -57,6 +57,7 @@ import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
+import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.JDOMParseException;
@@ -485,7 +486,7 @@ public class ExporterJDOM
 				// this is an object reference
 				// recurse
                 Element objectIDEl = exportID(dataObj, (OTID)resource, resourceName);
-			    writeResourceElement(objectEl, resourceName, objectIDEl);
+			    writeResourceElement(dataObj, objectEl, resourceName, objectIDEl);
 			} else if(resource instanceof OTDataList) {
 			    OTDataList list = (OTDataList)resource;
 			    ArrayList content = new ArrayList();
@@ -495,12 +496,18 @@ public class ExporterJDOM
 						System.err.println("null list item (allowed??)");
 						continue;
 					}
+					if(list instanceof XMLDataList){
+						XMLReferenceInfo info = ((XMLDataList)list).getReferenceInfo(j);
+						if(info != null && info.comment != null){
+							content.add(new Comment(info.comment));
+						}
+					}
 					Element collectionEl = exportCollectionItem(dataObj, listElement, resourceName);
 					if(collectionEl != null){
 						content.add(collectionEl);
 					}
 				}
-			    writeResourceElement(objectEl, resourceName, content);				
+			    writeResourceElement(dataObj, objectEl, resourceName, content);				
 			} else if(resource instanceof OTDataMap) {
 			    OTDataMap map = (OTDataMap)resource;
 			    String [] mapKeys = map.getKeys();
@@ -516,15 +523,15 @@ public class ExporterJDOM
 			            entryEl.addContent(collectionEl);
 			        }
 			    }
-			    writeResourceElement(objectEl, resourceName, content);
+			    writeResourceElement(dataObj, objectEl, resourceName, content);
 			} else if(resource instanceof BlobResource){
 				BlobResource blob = (BlobResource) resource;
 				Object blobUrl = blob.getBlobURL();
 				String blobString = null;
-				int defaultType = XMLResourceInfo.ELEMENT;
+				int defaultType = XMLReferenceInfo.ELEMENT;
 				if(blobUrl != null){
 					blobString = blobUrl.toString();
-					defaultType = XMLResourceInfo.ATTRIBUTE;
+					defaultType = XMLReferenceInfo.ATTRIBUTE;
 				} else {
 					blobString = BlobTypeHandler.base64(blob.getBytes());
 				}
@@ -542,7 +549,7 @@ public class ExporterJDOM
 
 				String primitiveString = resource.toString();
 				writeResource(dataObj, objectEl, resourceName, primitiveString, 
-						XMLResourceInfo.ATTRIBUTE);				
+						XMLReferenceInfo.ATTRIBUTE);				
 			} else if(resource instanceof OTXMLString) {
 				// The xml string is wrapped with a fake root element
 				// and loaded as a JDOM document
@@ -557,7 +564,7 @@ public class ExporterJDOM
 					Document xmlStringDoc = builder.build(reader, resourceName);
 					Element rootXMLStringEl = xmlStringDoc.getRootElement();
 
-					writeResourceElement(objectEl, resourceName, rootXMLStringEl.cloneContent());
+					writeResourceElement(dataObj, objectEl, resourceName, rootXMLStringEl.cloneContent());
 				
 				} catch(JDOMParseException e){
 					System.err.println("Invalid xmlString");
@@ -570,7 +577,7 @@ public class ExporterJDOM
 				String primitiveString = resource.toString();
 
 				writeResource(dataObj, objectEl, resourceName, primitiveString, 
-						XMLResourceInfo.ATTRIBUTE);				
+						XMLReferenceInfo.ATTRIBUTE);				
 			}
 		}
 		
@@ -601,12 +608,27 @@ public class ExporterJDOM
 		return fullClassName.substring(fullClassName.lastIndexOf('.')+1);
 	}
 	
-	public static void writeResourceElement(Element objectEl, 
+	public static void writeResourceElement(OTDataObject dataObj, Element objectEl, 
 		String resourceName, Object content)
 	{
 		if(content == null){
 			return;
 		}
+
+		XMLReferenceInfo resInfo = null;
+		if(dataObj instanceof XMLDataObject){
+			XMLDataObject xmlObj = (XMLDataObject)dataObj;
+			resInfo = xmlObj.getReferenceInfo(resourceName);
+		}
+
+		if(resInfo != null){
+			if(resInfo.comment != null){
+				Comment comment = new Comment(resInfo.comment);
+				objectEl.addContent(comment);
+			}
+		}
+		
+
 		Element resourceEl = new Element(resourceName);
 		objectEl.addContent(resourceEl);
 		if(content instanceof Element){
@@ -620,16 +642,20 @@ public class ExporterJDOM
 		String resourceName, String resourceValue, 
 			int defaultType)
 	{
-		XMLResourceInfo resInfo = null;
+		XMLReferenceInfo resInfo = null;
 		if(dataObj instanceof XMLDataObject){
 			XMLDataObject xmlObj = (XMLDataObject)dataObj;
-			resInfo = xmlObj.getResourceInfo(resourceName);
+			resInfo = xmlObj.getReferenceInfo(resourceName);
 		}
 		
-		boolean writeElement = defaultType == XMLResourceInfo.ELEMENT;
+		boolean writeElement = defaultType == XMLReferenceInfo.ELEMENT;
 
 		if(resInfo != null){
-			writeElement = resInfo.type == XMLResourceInfo.ELEMENT;					
+			writeElement = resInfo.type == XMLReferenceInfo.ELEMENT;
+			if(resInfo.comment != null){
+				Comment comment = new Comment(resInfo.comment);
+				objectEl.addContent(comment);
+			}
 		}
 		
 		if(writeElement){

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.2 $
+ * $Date: 2007-07-25 20:25:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,6 +32,7 @@
 */
 package org.concord.otrunk.xml;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 
 import org.concord.otrunk.datamodel.OTDataMap;
@@ -51,6 +52,8 @@ public class XMLDataMap
 {
 	Hashtable hTable = new Hashtable();
 	XMLDataObject dataObject;
+	
+	HashMap referenceInfoMap = new HashMap();
 	
 	public XMLDataMap(XMLDataObject parent)
 	{

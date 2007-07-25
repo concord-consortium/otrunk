@@ -37,7 +37,10 @@ import java.util.Vector;
 
 import org.concord.otrunk.xml.OTXMLElement;
 import org.jdom.Attribute;
+import org.jdom.Comment;
+import org.jdom.Content;
 import org.jdom.Element;
+import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 
 /**
@@ -46,7 +49,7 @@ import org.jdom.output.XMLOutputter;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class JDOMElement
+public class JDOMElement extends JDOMContent
     implements OTXMLElement
 {
     Element element;
@@ -71,6 +74,7 @@ public class JDOMElement
     {
         Vector wrappedChildren = new Vector();
         List children = element.getChildren();
+//        element.getCo
 		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			
 			Element child = (Element)childIter.next();
 			JDOMElement wrappedChild = new JDOMElement(child);
@@ -80,6 +84,30 @@ public class JDOMElement
         return wrappedChildren; 
     }
 
+    public List getContent()
+    {
+        Vector wrappedContent = new Vector();
+        List content = element.getContent();
+//        element.getCo
+		for(Iterator childIter = content.iterator(); childIter.hasNext(); ) {			
+			Content child = (Content)childIter.next();
+			JDOMContent wrappedChild = null;
+			if(child instanceof Element){
+				wrappedChild = new JDOMElement((Element)child);
+			} else if(child instanceof Comment){
+				wrappedChild = new JDOMComment((Comment)child);
+			} else if(child instanceof Text){
+				wrappedChild = new JDOMText((Text)child);
+			}
+
+			if(wrappedChild != null){
+				wrappedContent.add(wrappedChild);
+			}
+		}
+       
+        return wrappedContent;     	
+    }
+    
     /* (non-Javadoc)
      * @see org.concord.otrunk.xml.OTXMLElement#getChild(java.lang.String)
      */

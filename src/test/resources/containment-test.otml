@@ -14,11 +14,15 @@
 			</services>
 			<root>
 				<OTCompoundDoc name="root folder">
+				    <!--  These is a test to see if the serializer preserves comments on 
+				    	list references.  -->
 					<children>
 						<OTFolderObject>
 						  <!--  this tests to see if serializer preserves the type of resource -->
 						  <name>local folder</name>
 						</OTFolderObject>
+						<!--  this is a test to see if the serializer preserves comments on
+						   list elements -->
 						<object refid="${doc_refs_folder}"/>
 						<object refid="${library_folder}"/>
 					</children>
