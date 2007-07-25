@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-07-25 20:25:33 $
+ * $Revision: 1.6 $
+ * $Date: 2007-07-25 20:35:53 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -489,6 +489,11 @@ public class ExporterJDOM
 			    writeResourceElement(dataObj, objectEl, resourceName, objectIDEl);
 			} else if(resource instanceof OTDataList) {
 			    OTDataList list = (OTDataList)resource;
+			    
+			    if(list.size() == 0){
+			    	continue;
+			    }
+			    
 			    ArrayList content = new ArrayList();
 				for(int j=0;j<list.size(); j++) {
 					Object listElement = list.get(j);
