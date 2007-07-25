@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.20 $
- * $Date: 2007-07-12 18:07:51 $
+ * $Revision: 1.21 $
+ * $Date: 2007-07-25 17:06:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -52,22 +52,22 @@ import org.concord.otrunk.OTInvocationHandler;
  */
 public class ReflectionTypeDefinitions
 {
-	public static void registerTypes(Vector classNames, TypeService typeService,
+	public static void registerTypes(List importedOTObjectClasses, TypeService typeService,
 			XMLDatabase xmlDB)
 	throws Exception
 	{
-	    registerTypes(classNames, typeService, xmlDB, true);
+	    registerTypes(importedOTObjectClasses, typeService, xmlDB, true);
 	}
     
-	public static void registerTypes(Vector classNames, TypeService typeService,
+	public static void registerTypes(List importedOTObjectClasses, TypeService typeService,
 			XMLDatabase xmlDB, boolean addShortcuts)
 		throws Exception 
 	{
 		ClassLoader classloader = ReflectionTypeDefinitions.class.getClassLoader();
 		Vector typeClasses = new Vector();
 		
-		for(int i=0; i<classNames.size(); i++) {
-	        String className = (String)classNames.get(i);			
+		for(int i=0; i<importedOTObjectClasses.size(); i++) {
+	        String className = (String)importedOTObjectClasses.get(i);			
 		    try {
 		        Class typeClass = classloader.loadClass(className);
 		        typeClasses.add(typeClass);

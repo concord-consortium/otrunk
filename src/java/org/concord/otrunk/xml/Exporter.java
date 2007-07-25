@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.20 $
- * $Date: 2007-07-20 19:54:20 $
+ * $Revision: 1.21 $
+ * $Date: 2007-07-25 17:06:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -39,6 +39,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
@@ -64,7 +65,7 @@ public class Exporter
 {
 	static OTDatabase otDb;
 	static Vector writtenIds = null;
-	static Vector writtenClasses = null;
+	static ArrayList writtenClasses = null;
 	
 	public static void export(File outputFile, OTDataObject rootObject, OTDatabase db)
 	throws Exception
@@ -85,7 +86,16 @@ public class Exporter
 	throws Exception
 	{	
 		writtenIds = new Vector();
-		writtenClasses = new Vector();
+		writtenClasses = new ArrayList();
+		
+		// If this is a XMLDatabase pre-populate the written classes with the databases existing classes.
+		// This preserves any imported classes that might not have been actually used in the otml file
+		// these imported classes are currently the only way to load in packages, so they need to be preserved.
+		if(db instanceof XMLDatabase){
+			ArrayList importedClasses = ((XMLDatabase)db).getImportedOTObjectClasses();
+			writtenClasses.addAll(importedClasses);
+		}
+		
 		PrintWriter printStream = new PrintWriter(writer);
 	
 		otDb = db;
@@ -95,7 +105,7 @@ public class Exporter
 		exportObject(objectPrintWriter, rootObject, 2);
 
 		String objectString = objectWriter.toString();
-		
+				
 		printStream.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		printStream.println("<otrunk>");
 		indentPrint(1, "<imports>", printStream);

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2007-07-22 04:49:00 $
+ * $Revision: 1.4 $
+ * $Date: 2007-07-25 17:06:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -42,7 +42,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,8 +77,8 @@ import org.jdom.output.XMLOutputter;
 public class ExporterJDOM
 {
 	static OTDatabase otDb;
-	static Vector writtenIds;
-	static Vector processedClasses;
+	static ArrayList writtenIds;
+	static ArrayList processedClasses;
 	static HashMap containers;
 	
 	public static boolean useFullClassNames = false;
@@ -105,13 +104,21 @@ public class ExporterJDOM
 	public static void export(Writer writer, OTDataObject rootObject, OTDatabase db)
 	throws Exception
 	{	
-		writtenIds = new Vector();
-		processedClasses = new Vector();
+		writtenIds = new ArrayList();
+		processedClasses = new ArrayList();
 		duplicateClasses = new ArrayList();
 		containers = new HashMap();
 		processedIds = new ArrayList();
 		incomingReferenceMap = new HashMap();
 		
+		// If this is a XMLDatabase pre-populate the written classes with the databases existing classes.
+		// This preserves any imported classes that might not have been actually used in the otml file
+		// these imported classes are currently the only way to load in packages, so they need to be preserved.
+		if(db instanceof XMLDatabase){
+			ArrayList importedClasses = ((XMLDatabase)db).getImportedOTObjectClasses();
+			processedClasses.addAll(importedClasses);
+		}
+				
 		PrintWriter printStream = new PrintWriter(writer);
 	
 		otDb = db;
