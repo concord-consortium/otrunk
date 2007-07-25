@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.24 $
- * $Date: 2007-07-20 19:54:20 $
+ * $Revision: 1.25 $
+ * $Date: 2007-07-25 20:25:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -163,30 +163,41 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			try {
 			    
 				Object resValue = handleChildResource(element, attribName, 
-				        attrib.getValue(), objRelativePath, obj, XMLResourceInfo.ATTRIBUTE);
+				        attrib.getValue(), objRelativePath, obj, XMLReferenceInfo.ATTRIBUTE,
+				        null);
 				obj.setResource(attribName, resValue);
 				
 				if(xmlDB.isTrackResourceInfo()){
-					XMLResourceInfo info = obj.getResourceInfo(attribName);
+					XMLReferenceInfo info = obj.getReferenceInfo(attribName);
 					if(info == null){
-						info = new XMLResourceInfo();
+						info = new XMLReferenceInfo();
 						obj.setResourceInfo(attribName, info);
 					}
-					info.type = XMLResourceInfo.ATTRIBUTE;				
+					info.type = XMLReferenceInfo.ATTRIBUTE;				
 				}
 			} catch (HandleElementException e) {
 				System.err.println(e.getMessage() + " in attribute: " +
 						TypeService.attributePath(attrib));
 			}
 		}
-		
-		List children = element.getChildren();		
-		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {
-		    OTXMLElement child = (OTXMLElement)childIter.next();
 
+		List content = element.getContent();
+		String previousComment = null;
+		
+		for(Iterator childIter = content.iterator(); childIter.hasNext(); ) {
+		    OTXMLContent childContent = (OTXMLContent)childIter.next();
+		    if(childContent instanceof OTXMLComment){
+		    	previousComment = ((OTXMLComment) childContent).getText();
+		    }
+		    
+		    if(!(childContent instanceof OTXMLElement)){
+		    	continue;
+		    }
+		    
+		    OTXMLElement child = (OTXMLElement) childContent;
 			try {
 				Object resValue = handleChildResource(element, child.getName(), 
-				        child, objRelativePath, obj, XMLResourceInfo.ELEMENT);
+				        child, objRelativePath, obj, XMLReferenceInfo.ELEMENT, previousComment);
 				if(resValue == null) {
                     // this should be an option debug or log message
 					// System.out.println("null resource: " + TypeService.elementPath(child));
@@ -194,18 +205,21 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				String childName = child.getName();
 				obj.setResource(child.getName(),resValue);
 				if(xmlDB.isTrackResourceInfo()){
-					XMLResourceInfo info = obj.getResourceInfo(childName);
+					XMLReferenceInfo info = obj.getReferenceInfo(childName);
 					if(info == null){
-						info = new XMLResourceInfo();
+						info = new XMLReferenceInfo();
 						obj.setResourceInfo(childName, info);
 					}
-					info.type = XMLResourceInfo.ELEMENT;									
+					info.type = XMLReferenceInfo.ELEMENT;									
 				}
 			} catch (HandleElementException e) {
 				System.err.println("error in element: " +
 						TypeService.elementPath(child));
 				e.printStackTrace();				
 			}
+			
+			// Clear the previous comment so it isn't picked up by the next element
+			previousComment = null;
 		}
 		
 		return obj;
@@ -231,7 +245,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	 */
 	public Object handleChildResource(OTXMLElement parentElement, String childName, 
 	        Object childObj, String relativeParentPath, XMLDataObject parent, 
-	        int xmlType)
+	        int xmlType, String comment)
 		throws HandleElementException
 	{
 		Properties elementProps;
@@ -246,14 +260,16 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		elementProps = getResourceProperties(resourceDef);
 		String resPrimitiveType = resourceDef.getType();	
 
-		XMLResourceInfo resInfo = null;
+		XMLReferenceInfo resInfo = null;
 		if(xmlDB.isTrackResourceInfo()){
-			resInfo = parent.getResourceInfo(childName);
+			resInfo = parent.getReferenceInfo(childName);
 			if(resInfo == null){
-				resInfo = new XMLResourceInfo();
+				resInfo = new XMLReferenceInfo();
 				parent.setResourceInfo(childName, resInfo);
 			}
-			resInfo.type = xmlType;				
+			resInfo.type = xmlType;
+			
+			resInfo.comment = comment;
 		}
 		
 		String resourceType = resPrimitiveType;
@@ -298,11 +314,6 @@ public class ObjectTypeHandler extends ResourceTypeHandler
                             TypeService.elementPath(child));
                 }
 				resourceType = ((OTXMLElement)childObj).getName();
-
-				if(!"object".equals(resourceType) && resInfo != null){
-					// This isn't a reference it is a containment					
-					resInfo.containment = true;
-				}
 			}			
 		}
 		

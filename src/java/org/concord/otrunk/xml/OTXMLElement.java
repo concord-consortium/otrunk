@@ -37,16 +37,25 @@ import java.util.List;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public interface OTXMLElement
+public interface OTXMLElement extends OTXMLContent
 {
     public String getName();
     
     /**
+     * Returns a list of the children of this element this does not include
+     * text nodes or comments.
+     * 
      * Should return an empty list if there are no children
      * @return
      */
     public List getChildren();
    
+    /**
+     * Returns a list of the content of the element including the comments.
+     * @return
+     */
+    public List getContent();
+    
     public OTXMLElement getChild(String name);
     
     public String getAttributeValue(String attribute);

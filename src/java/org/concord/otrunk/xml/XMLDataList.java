@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.2 $
+ * $Date: 2007-07-25 20:25:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,6 +32,7 @@
 */
 package org.concord.otrunk.xml;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import org.concord.otrunk.datamodel.OTDataList;
@@ -51,6 +52,8 @@ public class XMLDataList
 {
 	Vector list = new Vector();
 	XMLDataObject dataObject;
+	
+	HashMap referenceInfoMap = new HashMap();
 	
 	public XMLDataList(XMLDataObject parent)
 	{
@@ -131,5 +134,16 @@ public class XMLDataList
 		list.remove(obj);
 		updateModifiedTime();
 	}
+
+	public void setResourceInfo(int index, XMLReferenceInfo info)
+	{
+		referenceInfoMap.put(new Integer(index), info);
+	}
+	
+	public XMLReferenceInfo getReferenceInfo(int index)
+	{
+		return (XMLReferenceInfo) referenceInfoMap.get(new Integer(index));
+	}
+	
 
 }
