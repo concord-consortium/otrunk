@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.5 $
+ * $Date: 2007-07-25 17:06:36 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -35,6 +35,7 @@ package org.concord.otrunk.xml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -77,7 +78,7 @@ public class SchemaGenerator
 		Element rootElement = document.getRootElement();
 
 		
-		Vector importedOTObjectClasses = new Vector();
+		ArrayList importedOTObjectClasses = new ArrayList();
 				
 		Element importsElement = rootElement;
 		List imports = importsElement.getChildren();		

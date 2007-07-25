@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.33 $
- * $Date: 2007-07-24 10:34:13 $
+ * $Revision: 1.34 $
+ * $Date: 2007-07-25 17:06:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -39,6 +39,7 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -78,6 +79,8 @@ public class XMLDatabase
 		OTViewerHelper.getBooleanProp(OTViewerHelper.TRACE_PACKAGES_PROP, false);
 	
 	OTID rootId = null;
+	
+	ArrayList importedOTObjectClasses = new ArrayList();
 	
 	Hashtable dataObjects = new Hashtable();
 	
@@ -190,9 +193,7 @@ public class XMLDatabase
 		if(dbId != null && dbId.length() > 0) {
 		    databaseId = OTIDFactory.createOTID(dbId);
 		}
-       
-		Vector importedOTObjectClasses = new Vector();
-		
+       		
 		OTXMLElement importsElement = rootElement.getChild("imports");
 		List imports = importsElement.getChildren();		
 		for(Iterator iterator=imports.iterator();iterator.hasNext();) {
@@ -678,5 +679,10 @@ public class XMLDatabase
 	public void setTrackResourceInfo(boolean trackResourceInfo)
     {
     	this.trackResourceInfo = trackResourceInfo;
+    }
+
+	public ArrayList getImportedOTObjectClasses()
+    {
+    	return importedOTObjectClasses;
     }
 }
