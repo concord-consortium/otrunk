@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2007-06-27 21:35:14 $
+ * $Revision: 1.16 $
+ * $Date: 2007-07-26 17:20:07 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -315,40 +315,7 @@ public class OTObjectServiceImpl
         }
 
         OTDataObject childDataObject = mainDb.getOTDataObject(null, childID);
-        /*
-         * FIXME: this is a bit a o	public OTObject copyObject(OTObject original, OTObjectList orphanObjectList, 
-	                           int maxDepth) 
-f a hack
-         * it is to solve the problem caused by reports.  The report creates a 
-         * compound document with links to objects in each users database.  When
-         * the compound document resolves these links it uses itself as the
-         * dataParent.   But the compound documents database is the authored
-         * database, so it won't find the user objects. 
-         * In this case the childID will be relative.  And the rootId will 
-         * the id of the users template database.  
-         * In this case the OTObjectService returned should be the object service
-         * of that users template database not the current object service.  This 
-         * could be resolved by having this ask the otrunk for the object service
-         * that should handle this object.  And then letting that object service
-         * create the object.
-         * 
-         */ 
-        /*
-         * We don't actually want to do this here because then the object will have
-         * the wrong object service.  Instead this case is handled higher up.
-         * 
-        if(childDataObject == null && childID instanceof OTRelativeID) {
-            OTDatabase parentDb = mainDb;            
-            OTID rootRelativeId = ((OTRelativeID)childID).getRootId();
-            if(rootRelativeId != null) {
-                parentDb = otrunk.getOTDatabase(rootRelativeId);
-            }
 
-            childDataObject = parentDb.getOTDataObject(null, childID);
-        }	public OTObject copyObject(OTObject original, OTObjectList orphanObjectList, 
-	                           int maxDepth) 
-
-        */
         return childDataObject;
     }
 
@@ -372,7 +339,8 @@ f a hack
 		throws Exception	
 		{
 		// make a copy of the original objects data object
-		// it is easy to copy data objects than the actual objects
+		// it is easier to copy data objects than the actual objects
+		
 		OTDataObject originalDataObject = 
 			getOTDataObject(original.getGlobalId());
 		
