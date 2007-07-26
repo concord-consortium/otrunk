@@ -250,6 +250,9 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 		    
 		    // should check to see if this listener is already
 		    // added
+			if (args[0] == null) {
+				throw new RuntimeException("Can't add a null listener");
+			}
 		    WeakReference listenerRef = new WeakReference(args[0]);
 		    changeListeners.add(listenerRef);
 		    
