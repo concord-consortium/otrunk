@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2007-07-25 17:06:35 $
+ * $Revision: 1.22 $
+ * $Date: 2007-07-26 17:20:07 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -77,8 +77,8 @@ public class Exporter
 
 	public static void export(OutputStream outputStream, OTDataObject rootObject, OTDatabase db)
 	throws Exception
-	{
-		OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+	{		
+		OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
 		export(writer, rootObject, db);
 	}
 	

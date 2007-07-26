@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2007-07-25 20:35:53 $
+ * $Revision: 1.7 $
+ * $Date: 2007-07-26 17:20:07 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -36,7 +36,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -95,16 +94,17 @@ public class ExporterJDOM
 		export(outputStream, rootObject, db);
 	}
 
+	
 	public static void export(OutputStream outputStream, OTDataObject rootObject, OTDatabase db)
 	throws Exception
-	{
-		OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+	{		
+		OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
 		export(writer, rootObject, db);
 	}
 	
 	public static void export(Writer writer, OTDataObject rootObject, OTDatabase db)
 	throws Exception
-	{	
+	{
 		writtenIds = new ArrayList();
 		processedClasses = new ArrayList();
 		duplicateClasses = new ArrayList();
@@ -119,8 +119,6 @@ public class ExporterJDOM
 			ArrayList importedClasses = ((XMLDatabase)db).getImportedOTObjectClasses();
 			processedClasses.addAll(importedClasses);
 		}
-				
-		PrintWriter printStream = new PrintWriter(writer);
 	
 		otDb = db;
 
@@ -152,10 +150,9 @@ public class ExporterJDOM
 		Document doc = new Document(otrunkEl);
 		Format format = Format.getPrettyFormat();
 		XMLOutputter outputter = new XMLOutputter(format);
-		outputter.output(doc, printStream);
+		outputter.output(doc, writer);
 				
-		printStream.close();
-		
+		writer.close();
 	}
 	
 	private static void processObject(OTDataObject dataObject) 
