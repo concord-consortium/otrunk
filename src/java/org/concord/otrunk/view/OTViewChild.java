@@ -2,12 +2,13 @@ package org.concord.otrunk.view;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectInterface;
+import org.concord.framework.otrunk.view.OTViewEntry;
 
 public interface OTViewChild extends OTObjectInterface {
 	
 	public OTObject getObject();
 	
-	public OTObject getViewid();
+	public OTViewEntry getViewid();
 	
 	public boolean getUseScrollPane();
 	
