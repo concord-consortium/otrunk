@@ -54,7 +54,7 @@ import org.concord.framework.otrunk.view.AbstractOTJComponentView;
 public class OTTextObjectView extends AbstractOTJComponentView
 	implements DocumentListener, OTChangeListener
 {
-	OTDocument pfObject;
+	protected OTDocument pfObject;
 	
 	protected PlainDocument textAreaModel = null;
 	protected JTextArea textArea;

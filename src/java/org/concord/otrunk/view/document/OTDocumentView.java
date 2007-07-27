@@ -82,9 +82,11 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 	DocumentBuilder xmlDocumentBuilder = null;
 
-	JTextArea parsedTextArea = null;
+	protected JTextArea parsedTextArea = null;
 
-	private OTDocumentViewConfig viewEntry;
+	protected OTDocumentViewConfig viewEntry;
+
+	protected OTObject otObject;
 
 	public final static String XHTML_PREFIX_START =
 	// "<?xml version='1.0' encoding='UTF-8'?>\n" +
@@ -104,9 +106,10 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	}
 
 	public JComponent getComponent(OTObject otObject, boolean editable) {
+		this.otObject = otObject;
 		setup(otObject);
 		initTextAreaModel();
-
+		
 		if (tabbedPane != null) {
 			tabbedPane.removeChangeListener(this);
 		}
@@ -207,7 +210,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			parsedTextArea = new JTextArea();
 		}
 		parsedTextArea.setText(bodyText);
-
+		
 		return bodyText;
 	}
 
