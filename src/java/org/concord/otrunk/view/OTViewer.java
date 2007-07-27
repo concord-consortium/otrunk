@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.72 $
- * $Date: 2007-07-25 20:56:41 $
+ * $Revision: 1.73 $
+ * $Date: 2007-07-27 16:07:35 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -451,6 +451,14 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				
 				bodyPanel.setUseScrollPane(useScrollPane);
 			}
+			
+			//method that was refactored out of loadURL
+			try {
+	            setupBodyPanel();
+            } catch (Exception e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+            }
 		}
 		
 	}
@@ -532,8 +540,13 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		factoryContext.addViewService(OTFrameManager.class, frameManager);
 		factoryContext.addViewService(OTJComponentServiceFactory.class, new OTJComponentServiceFactoryImpl());
 		
+		currentURL = url;
+	}
+	
+	//This method was refactored out of loadURL
+	private void setupBodyPanel() throws Exception{
 		bodyPanel.setTopLevelContainer(true);
-				
+		
 		bodyPanel.setOTViewFactory(otViewFactory);
 
 		// set the current mode from the viewservice to the main bodyPanel
@@ -542,12 +555,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		// set the viewFactory of the frame manager
 		frameManager.setViewFactory(otViewFactory);
 
-		currentURL = url;
 		xmlDB.setDirty(false);
 
 		reloadWindow();
 	}
-
 	private void reloadWindow() throws Exception {
 		OTObject root = null;
 		boolean overrideShowTree = false;
