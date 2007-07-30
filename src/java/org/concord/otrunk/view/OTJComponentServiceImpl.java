@@ -167,4 +167,9 @@ public class OTJComponentServiceImpl implements OTJComponentService
     	
     };
 
+	public OTJComponentViewContext getJComponentViewContext()
+    {
+	    return viewContext;
+    }
+
 }
