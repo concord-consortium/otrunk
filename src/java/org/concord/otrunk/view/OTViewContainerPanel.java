@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.53 $
- * $Date: 2007-07-26 02:47:41 $
+ * $Revision: 1.54 $
+ * $Date: 2007-07-30 16:54:56 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -123,6 +123,8 @@ public class OTViewContainerPanel extends JPanel
 
 	private boolean topLevelContainer = false;
 	private OTControllerService controllerService;
+
+	private boolean scrollPanelHasBorder = true;
 	
 	/**
 	 * 
@@ -276,8 +278,8 @@ public class OTViewContainerPanel extends JPanel
 
 				if(isUseScrollPane()) {
 					JScrollPane scrollPane = new JScrollPane();
+					scrollPane.setOpaque(false);
 					
-					//This doesn't seem to show up for inner panels
 					scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 					
 					scrollPane.setViewport(new JViewport(){
@@ -299,6 +301,11 @@ public class OTViewContainerPanel extends JPanel
 					scrollPane.setViewportView(myComponent);
 					
 					scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+					
+					if (!scrollPanelHasBorder){
+						scrollPane.setBorder(BorderFactory.createEmptyBorder());
+					}
+					
 					myComponent = scrollPane;
 				}
 				removeAll();
@@ -351,6 +358,10 @@ public class OTViewContainerPanel extends JPanel
 		*/
 		
 		SwingUtilities.invokeLater(createComponentTask);
+	}
+	
+	public void setScrollPanelHasBorder(boolean scrollPanelHasBorder){
+		this.scrollPanelHasBorder  = scrollPanelHasBorder;
 	}
 
 	/**

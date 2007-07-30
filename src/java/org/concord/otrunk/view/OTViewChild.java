@@ -13,4 +13,8 @@ public interface OTViewChild extends OTObjectInterface {
 	public boolean getUseScrollPane();
 	
 	public static boolean DEFAULT_useScrollPane = false;
+	
+	public boolean getScrollPanelHasBorder();
+	
+	public static boolean DEFAULT_scrollPanelHasBorder = true;
 }

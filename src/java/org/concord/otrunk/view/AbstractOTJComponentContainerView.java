@@ -42,11 +42,13 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 		OTViewContainerPanel otObjectPanel = createtViewContainerPanel();
 		otObjectPanel.setUseScrollPane(useScrollPane);
 		
-		if (otObject instanceof OTViewChild && ((OTViewChild)otObject).getViewid() != null){
-			((OTViewChild)otObject).getObject();
-			otObjectPanel.setCurrentObject(((OTViewChild)otObject).getObject(), ((OTViewChild)otObject).getViewid(), true);
-		} else if (otObject instanceof OTViewChild){
+		if (otObject instanceof OTViewChild){
+			otObjectPanel.setScrollPanelHasBorder(((OTViewChild)otObject).getScrollPanelHasBorder());
+			if (((OTViewChild)otObject).getViewid() != null){
+				otObjectPanel.setCurrentObject(((OTViewChild)otObject).getObject(), ((OTViewChild)otObject).getViewid(), true);
+			} else{
 			otObjectPanel.setCurrentObject(((OTViewChild)otObject).getObject());
+			}
 		} else {
 			otObjectPanel.setCurrentObject(otObject);
 		}
