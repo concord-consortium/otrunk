@@ -260,8 +260,10 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
 		    // ignore instances of the tracelistener
 		    if(traceListeners &&
 		    		!(args[0] instanceof TraceListener)){
-		    	System.out.println("addOTChangeListener(obj:" + proxy + 
-		    			", listener:" + args[0]);
+		    	System.out.print("addOTChangeListener(obj:" + proxy + 
+		    			" (" + System.identityHashCode(proxy) + ")");
+		    	System.out.println(", listener:" + args[0] + 
+		    			" (" + System.identityHashCode(args[0]) +") )");
 		    	
 		    	if(changeListenerLabels == null){
 		    		changeListenerLabels = new HashMap();
@@ -406,6 +408,7 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
             Object listener = ref.get();
             if(traceListeners){
             	System.out.println("sending stateChanged " + changeEvent.getDescription() +
+            			" (" + System.identityHashCode(changeEvent.getSource()) + ") " +
             			" to " + listener);
             }
             if(listener != null) {
