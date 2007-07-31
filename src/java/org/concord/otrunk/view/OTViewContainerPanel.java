@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.54 $
- * $Date: 2007-07-30 16:54:56 $
- * $Author: sfentress $
+ * $Revision: 1.55 $
+ * $Date: 2007-07-31 14:36:20 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -498,8 +498,14 @@ public class OTViewContainerPanel extends JPanel
 		}
 	}
 
-	public OTViewContainer getViewContainer() {
-		return viewContainer.getUpdateableContainer();
+	/**
+	 * Return the viewContainer of this bodyPanel, if you plan on changing
+	 * the currentObject of this container you should call getUpdateableContainer.
+	 * @return
+	 */
+	public OTViewContainer getViewContainer() 
+	{
+		return viewContainer;
 	}
 	
 	public void reloadView()
@@ -512,6 +518,10 @@ public class OTViewContainerPanel extends JPanel
 	    if (this.isUpdateable()) {
 	    	return this.viewContainer;
 	    } else {
+	    	if(parentContainer == null){
+	    		System.err.println("No updatable parent container was found returning the root container");
+	    		return this.viewContainer;
+	    	}
 	    	return parentContainer.getUpdateableContainer();
 	    }
     }
