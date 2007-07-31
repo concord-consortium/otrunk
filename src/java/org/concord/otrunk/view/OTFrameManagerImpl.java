@@ -41,6 +41,12 @@ public class OTFrameManagerImpl implements OTFrameManager
 	}
 	
 	public void putObjectInFrame(OTObject otObject, 
+		OTFrame otFrame, int positionX, int positionY) 
+	{
+		putObjectInFrame(otObject, null, otFrame, null, positionX, positionY);
+	}
+	
+	public void putObjectInFrame(OTObject otObject, 
 			org.concord.framework.otrunk.view.OTViewEntry viewEntry,
 			OTFrame otFrame) 
 	{
