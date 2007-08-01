@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-07-25 20:25:34 $
+ * $Revision: 1.3 $
+ * $Date: 2007-08-01 14:00:38 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -131,8 +131,9 @@ public class XMLDataList
 	 */
 	public void remove(Object obj)
 	{
-		list.remove(obj);
-		updateModifiedTime();
+		if(list.remove(obj)){
+			updateModifiedTime();
+		}
 	}
 
 	public void setResourceInfo(int index, XMLReferenceInfo info)
