@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2007-03-12 20:59:31 $
+ * $Revision: 1.13 $
+ * $Date: 2007-08-01 14:08:54 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -35,9 +35,6 @@ package org.concord.otrunk;
 import java.lang.reflect.Method;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectService;
-import org.concord.otrunk.datamodel.OTDataObject;
-
 
 /**
  * OTBasicObjectHandler
@@ -48,14 +45,19 @@ import org.concord.otrunk.datamodel.OTDataObject;
  * @author scott<p>
  *
  */
-public class OTBasicObjectHandler extends OTResourceSchemaHandler
+public class OTBasicObjectHandler extends OTInvocationHandler
 {
     OTObject otObject;
     
-	public OTBasicObjectHandler(OTDataObject dataObject, OTrunkImpl db, 
-            OTObjectService objectService, Class objectInterface)
+	public OTBasicObjectHandler(OTObjectInternal otObjectImpl, OTrunkImpl db, Class objectInterface)
 	{
-		super(dataObject, db, objectService, objectInterface);
+		super(otObjectImpl, db, objectInterface);
+	}
+	
+	public void setOTObject(OTObject otObject)
+	{
+		this.otObject = otObject;
+		setEventSource(otObject);
 	}
 	
 	/* (non-Javadoc)
@@ -64,21 +66,12 @@ public class OTBasicObjectHandler extends OTResourceSchemaHandler
 	public Object invoke(Object proxy, Method method, Object[] args)
 		throws Throwable
 	{
-	    if(otObject == null) {
-	        otObject = (OTObject)proxy;
-	        setEventSource(otObject);
-	    }
-	    
 	    if(otObject != proxy) {
 	        throw new RuntimeException("Trying to use the same handler for 2 proxy objects");
 	    }
 	    
 	    String methodName = method.getName();
-		
-		if(methodName.equals("setOTDatabase")) {
-			throw new RuntimeException("shouldn't be calling setDataObject");
-		}
-		
+				
 		// skip the init call if this is a basic object that is being proxied
 		if(methodName.equals("init")) {
 			return null;

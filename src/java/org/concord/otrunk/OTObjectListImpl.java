@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-05-17 16:05:43 $
+ * $Revision: 1.11 $
+ * $Date: 2007-08-01 14:08:55 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -38,7 +38,6 @@ import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
-import org.concord.framework.otrunk.OTObjectService;
 import org.concord.otrunk.datamodel.OTDataList;
 
 /**
@@ -53,14 +52,11 @@ import org.concord.otrunk.datamodel.OTDataList;
 public class OTObjectListImpl extends OTCollectionImpl 
 	implements OTObjectList
 {
-	OTObjectService objService;
-	OTDataList list;
+	protected OTDataList list;
 	
-	public OTObjectListImpl(String property, OTDataList resList, 
-			OTResourceSchemaHandler handler, OTObjectService objectService)
+	public OTObjectListImpl(String property, OTDataList resList, OTObjectInternal objectInternal)
 	{
-		super(property, handler);
-		this.objService = objectService;
+		super(property, objectInternal);
 		this.list = resList;
 	}
 	
@@ -72,7 +68,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 				System.err.println("Null item in object list index: " + index);
 				return null;
 			}
-			return objService.getOTObject(id);
+			return objectInternal.getOTObject(id);
 		} catch (Exception e) {
 			e.printStackTrace();			
 		}
@@ -86,7 +82,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 		for(int i=0; i<list.size(); i++) {
 			try {	
 				OTID childID = (OTID)list.get(i);
-				childVector.add(objService.getOTObject(childID));
+				childVector.add(objectInternal.getOTObject(childID));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -175,5 +171,5 @@ public class OTObjectListImpl extends OTCollectionImpl
 	OTDataList getDataList()
 	{
 		return list;
-	}
+	}	
 }
