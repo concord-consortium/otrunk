@@ -14,14 +14,14 @@ import org.concord.otrunk.datamodel.OTDataList;
 public class OTResourceListImpl extends OTResourceCollectionImpl
 	implements OTResourceList 
 {
-	OTDataList list;
+	protected OTDataList list;
 	
 	/**
 	 * @param handler 
 	 * 
 	 */
 	public OTResourceListImpl(String property, OTDataList list, 
-			OTResourceSchemaHandler handler) 
+		OTObjectInternal handler) 
 	{
 		super(property, handler);
 		this.list = list;
@@ -30,30 +30,38 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceList#add(java.lang.Object)
 	 */
-	public void add(Object object) {
-		list.add(translateToData(object));
+	public void add(Object object) 
+	{
+		Object toBeStored = translateExternalToStored(object);
+		list.add(toBeStored);
 		notifyOTChange(OTChangeEvent.OP_ADD, object);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceList#add(int, java.lang.Object)
 	 */
-	public void add(int index, Object object) {
-		list.add(index, translateToData(object));
+	public void add(int index, Object object) 
+	{
+		Object toBeStored = translateExternalToStored(object);
+
+		list.add(index, toBeStored);
 		notifyOTChange(OTChangeEvent.OP_ADD, object);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceList#get(int)
 	 */
-	public Object get(int index) {
-		return translateToResource(list.get(index));
+	public Object get(int index) 
+	{
+		Object stored =  list.get(index);
+		return translateStoredToExternal(stored);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceList#remove(int)
 	 */
-	public void remove(int index) {
+	public void remove(int index) 
+	{
 		Object obj = list.get(index);
 		list.remove(index);
 		notifyOTChange(OTChangeEvent.OP_REMOVE, obj);
@@ -61,26 +69,30 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceList#remove(java.lang.Object)
+	 * FIXME if this fails we need to search for the byte[] in 
+	 * BlobResources
 	 */
-	public void remove(Object obj) {
+	public void remove(Object obj) 
+	{
 		list.remove(obj);
 		notifyOTChange(OTChangeEvent.OP_REMOVE, obj);
 		
-		// FIXME if this fails we need to search for the byte[] in 
-		// BlobResources
 	}
 
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceList#set(int, java.lang.Object)
 	 */
-	public void set(int index, Object object) {
-		list.set(index, translateToData(object));
+	public void set(int index, Object object) 
+	{
+		Object toBeStored = translateExternalToStored(object);
+		list.set(index, toBeStored);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceCollection#removeAll()
 	 */
-	public void removeAll() {
+	public void removeAll() 
+	{
 		list.removeAll();
 		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null);
 	}
@@ -88,8 +100,8 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceCollection#size()
 	 */
-	public int size() {
+	public int size() 
+	{
 		return list.size();
 	}
-
 }

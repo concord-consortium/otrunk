@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-03-12 19:14:04 $
+ * $Revision: 1.9 $
+ * $Date: 2007-08-01 14:08:55 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -38,7 +38,6 @@ import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectMap;
-import org.concord.framework.otrunk.OTObjectService;
 import org.concord.otrunk.datamodel.OTDataMap;
 
 /**
@@ -53,14 +52,12 @@ import org.concord.otrunk.datamodel.OTDataMap;
 public class OTObjectMapImpl extends OTCollectionImpl 
 	implements OTObjectMap
 {
-    OTObjectService objService;
-    OTDataMap map;
+    protected OTDataMap map;
     
     
-	public OTObjectMapImpl(String resourceName, OTDataMap map, OTResourceSchemaHandler handler, OTObjectService objectService)
+	public OTObjectMapImpl(String resourceName, OTDataMap map, OTObjectInternal handler)
 	{
 		super(resourceName, handler);
-        this.objService = objectService;
 		this.map = map;
 	}
 
@@ -77,7 +74,7 @@ public class OTObjectMapImpl extends OTCollectionImpl
 		}
 		
 		try {
-			OTObject pfObj = objService.getOTObject(objId);
+			OTObject pfObj = objectInternal.getOTObject(objId);
 			return pfObj;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -106,6 +103,7 @@ public class OTObjectMapImpl extends OTCollectionImpl
 		// TODO need to check for existing user
 		try {
 			OTID objId = pfObj.getGlobalId();			
+		
 			map.put(key, objId);
 			notifyOTChange(OTChangeEvent.OP_PUT, key);
 		} catch (Exception e) {

@@ -14,37 +14,43 @@ import org.concord.otrunk.datamodel.OTDataMap;
 public class OTResourceMapImpl extends OTResourceCollectionImpl
 	implements OTResourceMap 
 {
-	OTDataMap map;
+	protected OTDataMap map;
 
 	/**
 	 * 
 	 */
 	public OTResourceMapImpl(String property, OTDataMap map, 
-			OTResourceSchemaHandler handler) 
+		OTObjectInternal handler) 
 	{
 		super(property, handler);
 		this.map = map;
 	}
 	
-	public Object get(String key) {
-		return translateToResource(map.get(key));
+	public Object get(String key) 
+	{
+		return translateStoredToExternal(map.get(key));
 	}
 
-	public String[] getKeys() {
+	public String[] getKeys() 
+	{
 		return map.getKeys();
 	}
 
-	public void put(String key, Object resource) {
-		map.put(key, translateToData(resource));
+	public void put(String key, Object resource) 
+	{
+		Object toBeStored = translateExternalToStored(resource);
+		map.put(key, toBeStored);
 		notifyOTChange(OTChangeEvent.OP_PUT, key);
 	}
 
-	public void removeAll() {
+	public void removeAll() 
+	{
 		map.removeAll();
 		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null);
 	}
 
-	public int size() {
+	public int size() 
+	{
 		return map.size();
-	}	
+	}		
 }

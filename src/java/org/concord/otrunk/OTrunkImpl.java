@@ -51,6 +51,7 @@ import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTRelativeID;
+import org.concord.otrunk.overlay.CompositeDatabase;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTTemplateDatabase;
 import org.concord.otrunk.user.OTUserDataObject;
@@ -84,6 +85,8 @@ public class OTrunkImpl implements OTrunk
 
 	private Vector registeredPackageClasses = new Vector();;
     
+	public final static boolean useCompositeDatabase = true;
+	
     public final static String getClassName(OTDataObject dataObject)
     {
     	OTDataObjectType type = dataObject.getType();
@@ -181,7 +184,7 @@ public class OTrunkImpl implements OTrunk
 		if(rootDO == null) {
 			return null;
 		}
-		return rootObjectService.getOTObject(rootDO);
+		return rootObjectService.getOTObject(rootDO.getGlobalId());
 	}
 	
 	public OTObject getRoot() throws Exception
@@ -202,7 +205,7 @@ public class OTrunkImpl implements OTrunk
 	 * @param id
 	 * @return
 	 */
-	protected OTDatabase getOTDatabase(OTID id)
+	public OTDatabase getOTDatabase(OTID id)
 	{
 	    // look for the database that contains this id
 	    if(id == null) {
@@ -237,38 +240,29 @@ public class OTrunkImpl implements OTrunk
 		return rootObjectService.getOTObject(childID); 
 	}
 	
-	/**
-	 * This method is only used internally. Once a data object has
-	 * been tracked down then method is used to get the OTObject
-	 * it checks the cache of loadedObjects before making a new one
-	 * @param childDataObject
-	 * @return
-	 * @throws Exception
-	 */
-	private OTObject getOTObject(OTDataObject childDataObject)
-		throws Exception
-	{
-        return rootObjectService.getOTObject(childDataObject);
-	}
-	
 	public Object getService(Class serviceInterface)
 	{
 		return serviceContext.getService(serviceInterface);
 	}
 	
-    public OTObjectService createObjectService(OTDatabase db)
+    public OTObjectServiceImpl createObjectService(OTDatabase db)
     {
         OTObjectServiceImpl objService = new OTObjectServiceImpl(this);
         objService.setCreationDb(db);
         objService.setMainDb(db);
+     
+        registerObjectService(objService, "" + db);
         
+        return objService;
+    }
+
+    public void registerObjectService(OTObjectServiceImpl objService, String label)
+    {
         objectServices.add(objService);
 
         if(OTViewerHelper.isTrace()){
-        	objService.addObjectServiceListener(new TraceListener("" + db));
-        }
-        
-        return objService;
+        	objService.addObjectServiceListener(new TraceListener(label));
+        }    	
     }
     
     /**
@@ -306,20 +300,30 @@ public class OTrunkImpl implements OTrunk
         }
         users.add(aUser);
 
-        // create a template database that links this userDataDb with the rootDb
-        // and uses the refMap to store the links between the two
-        OTTemplateDatabase db = new OTTemplateDatabase(rootDb, userDataDb, refMap);          
+        setupUserDatabase(userDataDb, user.getUserId(), refMap);
 
-        addDatabase(db);
-        
-        // save this data base so getUserRuntimeObject can track down
-        // objects related to this user
-        userTemplateDatabases.put(user.getUserId(), db);        
-        
-        OTObjectService userObjService = createObjectService(db);
-        userObjectServices.put(user.getUserId(), userObjService);
-        
         return aUser;
+    }
+    
+    protected OTObjectService setupUserDatabase(OTDatabase creationDb, OTID userId,
+    	OTReferenceMap userStateMap)
+    {
+    	OTObjectServiceImpl userObjService;
+    	
+        OTDatabase userDb;
+        if(!useCompositeDatabase){
+        	userDb = 
+        		new OTTemplateDatabase(rootDb, creationDb, userStateMap);          
+        } else {
+        	userDb = new CompositeDatabase(rootDb, userStateMap);
+        }
+
+        addDatabase(userDb);
+        userObjService = createObjectService(userDb);
+        userTemplateDatabases.put(userId, userDb);	
+        userObjectServices.put(userId, userObjService);
+
+        return userObjService;
     }
     
     public Hashtable getUserTemplateDatabases() {
@@ -361,32 +365,29 @@ public class OTrunkImpl implements OTrunk
         
         // this should probably look for the user object service instead
         // of the template database
-        OTTemplateDatabase db = (OTTemplateDatabase)userTemplateDatabases.get(userId);
         OTObjectService userObjService = 
             (OTObjectService)userObjectServices.get(userId);
         
-        if(userObjService == null) {            
-            OTObjectMap userStateMapMap = stateRoot.getUserMap();
-            
-            OTReferenceMap userStateMap = (OTReferenceMap)userStateMapMap.getObject(userId.toString());
-            if(userStateMap == null) {
-                // this is inferring that the createObject method will
-                // create the object in the correct database.  
-                userStateMap = 
-                    (OTReferenceMap)objService.createObject(OTReferenceMap.class);
-                userStateMapMap.putObject(userId.toString(), userStateMap);
-                userStateMap.setUser((OTUserObject)user);
-            }
-            
-            
-            db = new OTTemplateDatabase(rootDb, objService.getCreationDb(), userStateMap);          
-            addDatabase(db);
-            userObjService = createObjectService(db);
-            userTemplateDatabases.put(userId, db);
-            userObjectServices.put(userId,userObjService);
+        if(userObjService != null){
+        	return userObjService;
         }
+                
+        OTObjectMap userStateMapMap = stateRoot.getUserMap();
+
+        OTReferenceMap userStateMap = (OTReferenceMap)userStateMapMap.getObject(userId.toString());
+        if(userStateMap == null) {
+        	// this is inferring that the createObject method will
+        	// create the object in the correct database.  
+        	userStateMap = 
+        		(OTReferenceMap)objService.createObject(OTReferenceMap.class);
+        	userStateMapMap.putObject(userId.toString(), userStateMap);
+        	userStateMap.setUser((OTUserObject)user);
+        }
+
+        userObjService =
+        	setupUserDatabase(objService.getCreationDb(), userId, userStateMap);
+    	return userObjService;
         
-        return userObjService;
     }
     
     protected void addDatabase(OTDatabase db)
@@ -444,35 +445,6 @@ public class OTrunkImpl implements OTrunk
         // exception
         return objService.getOTObject(authoredId);
 
-        /*
-		OTTemplateDatabase db = (OTTemplateDatabase)userTemplateDatabases.get(userId);
-		
-		if(db == null) {
-		    OTDataObject stateRootDO = creationDb.getRoot();
-            if(stateRootDO == null) {
-                throw new RuntimeException("user database root is null");
-            }
-		    OTStateRoot stateRoot = (OTStateRoot)getOTObject(stateRootDO);
-		    OTObjectMap userStateMapMap = stateRoot.getUserMap();
-
-		    OTReferenceMap userStateMap = (OTReferenceMap)userStateMapMap.getObject(userId.toString());
-		    if(userStateMap == null) {
-		        // this is inferring that the createObject method will
-		        // create the object in the correct database.  
-		        userStateMap = (OTReferenceMap)createObject(OTReferenceMap.class);
-		        userStateMapMap.putObject(userId.toString(), userStateMap);
-		        userStateMap.setUser((OTUserObject)user);
-		    }
-		    
-		    
-		    db = new OTTemplateDatabase(rootDb, creationDb, userStateMap);		    
-		    databases.add(db);
-		}
-				
-		OTDataObject userDataObject = db.getOTDataObject(null, authoredId);
-		
-		return getOTObject(userDataObject);
-        */		
 	}
 	
 	public OTObject getRuntimeAuthoredObject(OTObject userObject, OTUser user)
@@ -501,7 +473,7 @@ public class OTrunkImpl implements OTrunk
 		throws Exception
 	{
 	    OTDataObject rootDO = db.getRoot();
-	    OTObject rootObject = getOTObject(rootDO);
+	    OTObject rootObject = rootObjectService.getOTObject(rootDO.getGlobalId());
 
 	    return rootObject;
 	}
@@ -529,22 +501,22 @@ public class OTrunkImpl implements OTrunk
 		return ((OTSystem)root).getFirstObjectNoUserData();
     }
     
-    void putLoadedObject(OTObject otObject, OTDataObject dataObject)
+    void putLoadedObject(OTObject otObject, OTID otId)
     {
         WeakReference objRef = new WeakReference(otObject);
-        loadedObjects.put(dataObject, objRef);
+        loadedObjects.put(otId, objRef);
     }
     
-    OTObject getLoadedObject(OTDataObject dataObject)
+    OTObject getLoadedObject(OTID otId)
     {
-        Reference otObjectRef = (Reference)loadedObjects.get(dataObject);
+        Reference otObjectRef = (Reference)loadedObjects.get(otId);
         if(otObjectRef != null) {
             OTObject otObject = (OTObject)otObjectRef.get();
             if(otObject != null) {
                 return otObject;
             }
             
-            loadedObjects.remove(dataObject);
+            loadedObjects.remove(otId);
         }
 
         return null;

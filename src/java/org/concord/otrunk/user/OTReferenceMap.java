@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-06-27 21:35:14 $
+ * $Revision: 1.6 $
+ * $Date: 2007-08-01 14:08:55 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -36,8 +36,10 @@ import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTResourceSchema;
+import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.overlay.Overlay;
 
 /**
  * OTTemplateStateMap
@@ -48,8 +50,8 @@ import org.concord.otrunk.datamodel.OTDatabase;
  * @author scott<p>
  *
  */
-public class OTReferenceMap
-    extends DefaultOTObject
+public class OTReferenceMap extends DefaultOTObject
+	implements Overlay
 {
     private ResourceSchema resources; 
     public interface ResourceSchema extends OTResourceSchema
@@ -59,11 +61,19 @@ public class OTReferenceMap
 
         public OTResourceMap getMap();        
     }
+
+    private OTDatabase stateDb;
     
     public OTReferenceMap(ResourceSchema resources)
     {
         super(resources);
         this.resources = resources;
+        
+        
+		OTObjectServiceImpl objServiceImpl = 
+			(OTObjectServiceImpl)resources.getOTObjectService();
+
+		stateDb = objServiceImpl.getCreationDb();
     }
 
     public void setUser(OTUserObject user)
@@ -116,6 +126,26 @@ public class OTReferenceMap
             e.printStackTrace();
             return null;
         }
+    }
+
+	public boolean contains(OTID id)
+    {
+		return stateDb.contains(id);
+    }
+
+	public OTDataObject getDeltaObject(OTDataObject baseObject)
+    {
+		return getStateObject(baseObject, stateDb);
+    }
+
+	public OTDataObject createDeltaObject(OTDataObject baseObject)
+    {
+		return createStateObject(baseObject, stateDb);
+    }
+
+	public OTDatabase getOverlayDatabase()
+    {
+		return stateDb;
     }
 
 

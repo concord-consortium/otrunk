@@ -11,12 +11,12 @@ import org.concord.otrunk.datamodel.BlobResource;
  */
 public class OTResourceCollectionImpl extends OTCollectionImpl
 {
-	public OTResourceCollectionImpl(String property, OTResourceSchemaHandler handler)
+	public OTResourceCollectionImpl(String property, OTObjectInternal handler)
 	{
 		super(property, handler);
 	}
 
-	protected final static Object translateToData(Object resource)
+	protected Object translateExternalToStored(Object resource)
 	{
 		if(resource instanceof byte[]){
 			// make a BlobResource
@@ -25,7 +25,7 @@ public class OTResourceCollectionImpl extends OTCollectionImpl
 		return resource;
 	}
 	
-	protected final static Object translateToResource(Object data)
+	protected Object translateStoredToExternal(Object data)
 	{
 		if(data instanceof BlobResource){
 			return ((BlobResource)data).getBytes();

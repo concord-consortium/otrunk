@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.73 $
- * $Date: 2007-07-27 16:07:35 $
- * $Author: sfentress $
+ * $Revision: 1.74 $
+ * $Date: 2007-08-01 14:08:55 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -118,7 +118,8 @@ import org.concord.view.SwingUserMessageHandler;
  * 
  */
 public class OTViewer extends JFrame implements TreeSelectionListener,
-		OTViewContainerListener, AppleApplicationAdapter {
+		OTViewContainerListener, AppleApplicationAdapter 
+{
 	/**
 	 * first version of this class
 	 */
@@ -539,6 +540,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		factoryContext.addViewService(OTrunk.class, otrunk);
 		factoryContext.addViewService(OTFrameManager.class, frameManager);
 		factoryContext.addViewService(OTJComponentServiceFactory.class, new OTJComponentServiceFactoryImpl());
+		
+		
 		
 		currentURL = url;
 	}

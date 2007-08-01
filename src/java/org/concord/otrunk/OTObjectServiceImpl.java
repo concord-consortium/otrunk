@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.16 $
- * $Date: 2007-07-26 17:20:07 $
+ * $Revision: 1.17 $
+ * $Date: 2007-08-01 14:08:55 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -53,7 +53,7 @@ import org.concord.otrunk.datamodel.OTRelativeID;
 public class OTObjectServiceImpl
     implements OTObjectService
 {
-    OTrunkImpl otrunk;
+    protected OTrunkImpl otrunk;
     protected OTDatabase creationDb;
     protected OTDatabase mainDb;
     protected Vector listeners = new Vector();
@@ -81,10 +81,8 @@ public class OTObjectServiceImpl
     public OTObject createObject(Class objectClass) 
         throws Exception
     {
-    	OTDataObjectType type = new OTDataObjectType(objectClass.getName());
-        OTDataObject dataObject = createDataObject(type);
-        
-        OTObject newObject = loadOTObject(dataObject, objectClass);
+    	OTObjectInternal otObjectImpl = createOTObjectInternal(objectClass);
+        OTObject newObject = loadOTObject(otObjectImpl, objectClass);
 
         // TODO this is actually called twice, once by loadOTObject and 
         // once here.  is that what should happen?
@@ -93,6 +91,15 @@ public class OTObjectServiceImpl
         return newObject;
     }
 
+    protected OTObjectInternal createOTObjectInternal(Class objectClass)
+    	throws Exception
+    {
+    	OTDataObjectType type = new OTDataObjectType(objectClass.getName());
+        OTDataObject dataObject = createDataObject(type);        
+    	OTObjectInternal otObjectImpl = new OTObjectInternal(dataObject, this);
+    	return otObjectImpl;
+    }
+    
     public OTObject getOTObject(OTID childID) throws Exception
     {
         // sanity check
@@ -100,22 +107,56 @@ public class OTObjectServiceImpl
             throw new Exception("Null child id");
         }
         
+        // Some database translate ids  so before we lookup the object in the otrunk
+        // loaded objects database we should check if our database handles it.
+        
+        OTObjectInternal otObjectInternal = getOTObjectInternal(childID);
+        if(otObjectInternal == null) {
+            // we have a null internal object that means the child doesn't 
+            // exist in our database/databases.
+            // 
+            // This will happen with the aggregate views which display different overlays
+        	// of the same object.  Each overlay is going to come from a different objectService
+        	// So if we can't find this object then we go out to OTrunk to see if it can find
+        	// the object.  The way that this happens needs to be more clear so the ramifcations
+        	// are clear.
+        	return otrunk.getOrphanOTObject(childID, this);
+        }
+
+        // Look for our object to see it is already setup in the otrunk list of loaded objects
+        // it might be better to have each object service maintain its own list of loaded objects
+        // then the translation method above would not be needed.
+        OTObject otObject = otrunk.getLoadedObject(otObjectInternal.getGlobalId());
+        if(otObject != null) {
+            return otObject;
+        }
+
+    	String otObjectClassStr = otObjectInternal.getOTClassName();
+        if(otObjectClassStr == null) {
+            return null;
+        }
+            
+        Class otObjectClass = Class.forName(otObjectClassStr);
+    
+        return loadOTObject(otObjectInternal, otObjectClass);        
+    }
+
+    protected OTObjectInternal getOTObjectInternal(OTID childID) throws Exception
+    {
         OTDataObject childDataObject = getOTDataObject(childID);
         if(childDataObject == null) {
             // we have a null data object that means the child doesn't 
             // exist in our database.
-            // 
-            // in the case of reporting it is possible that an object managed 
-            // by one object service (reporting obj service) will want to 
-            // access an object managed by another object service.
-            // so in this case we delegate to the otrunk so it can find the 
-            // appropriated object service.
-        	return otrunk.getOrphanOTObject(childID, this);
+            
+        	// return null so the calling code can ask for the object from the OTrunk
+        	// object.
+        	return null;
         }
 
-        return getOTObject(childDataObject);
+    	OTObjectInternal otObjectImpl = new OTObjectInternal(childDataObject, this);
+    	return otObjectImpl;
     }
-
+    
     public OTID getOTID(String otidStr)
     {
         return otrunk.getOTID(otidStr);
@@ -127,31 +168,32 @@ public class OTObjectServiceImpl
     	return new OTControllerServiceImpl(this, registry);
     }
     
-    public OTObject loadOTObject(OTDataObject dataObject, Class otObjectClass)
+    public OTObject loadOTObject(OTObjectInternal otObjectImpl, Class otObjectClass)
     throws  Exception
     {
         OTObject otObject = null;
         
         if(otObjectClass.isInterface()) {
-            OTBasicObjectHandler handler = new OTBasicObjectHandler(dataObject, otrunk, this, otObjectClass);
+            OTBasicObjectHandler handler = new OTBasicObjectHandler(otObjectImpl, otrunk, otObjectClass);
 
             try {
             	otObject = (OTObject)Proxy.newProxyInstance(otObjectClass.getClassLoader(),
-            			new Class[] { otObjectClass }, handler);            
+            			new Class[] { otObjectClass }, handler);
+            	handler.setOTObject(otObject);
             } catch (ClassCastException e){
             	throw new RuntimeException("The OTClass: " + otObjectClass + 
             			" does not extend OTObject or OTObjectInterface", e);
             }
             
         } else {                    
-            otObject = setResourcesFromSchema(dataObject, otObjectClass);
+            otObject = setResourcesFromSchema(otObjectImpl, otObjectClass);
         }
         
         notifyLoaded(otObject);
         
         otObject.init();
         
-        otrunk.putLoadedObject(otObject, dataObject);
+        otrunk.putLoadedObject(otObject, otObjectImpl.getGlobalId());
          
         return otObject;        
     }
@@ -173,7 +215,7 @@ public class OTObjectServiceImpl
      * @param dataObject
      * @param otObject
      */
-    public OTObject setResourcesFromSchema(OTDataObject dataObject, Class otObjectClass)
+    public OTObject setResourcesFromSchema(OTObjectInternal otObjectImpl, Class otObjectClass)
     {
         Constructor [] memberConstructors = otObjectClass.getConstructors();
         Constructor resourceConstructor = memberConstructors[0]; 
@@ -201,8 +243,7 @@ public class OTObjectServiceImpl
                 OTResourceSchema.class.isAssignableFrom(params[0])){
             Class schemaClass = params[0];
                 
-            handler = 
-                new OTResourceSchemaHandler(dataObject, otrunk, this, schemaClass);
+            handler = new OTResourceSchemaHandler(otObjectImpl, otrunk, schemaClass);
 
             Class [] interfaceList = new Class[] { schemaClass };
             
@@ -256,43 +297,6 @@ public class OTObjectServiceImpl
         return false;
     }
     
-    /**
-     * This method is only used internally. Once a data object has
-     * been tracked down then method is used to get the OTObject
-     * it checks the cache of loadedObjects before making a new one
-     * 
-     * FIXME: this seems a little unclear and maybe dangerous
-     * there is an assumption that there will only be one OTObject for each 
-     * id.  And the the getLoadedObject helps with this.  However there could
-     * be two OTObjectServices what are both asked for the the object.
-     * And depending who gets it first that will determine which Object service
-     * is used.  This breaks the idea of the object service as being a context
-     * 
-     * @param childDataObject
-     * @return
-     * @throws Exception
-     */
-    OTObject getOTObject(OTDataObject childDataObject)
-        throws Exception
-    {
-        OTObject otObject = null;
-        
-        otObject = otrunk.getLoadedObject(childDataObject);
-        if(otObject != null) {
-            return otObject;
-        }
-        
-        String otObjectClassStr = 
-        	OTrunkImpl.getClassName(childDataObject);
-        if(otObjectClassStr == null) {
-            return null;
-        }
-            
-        Class otObjectClass = Class.forName(otObjectClassStr);
-    
-        return loadOTObject(childDataObject, otObjectClass);        
-    }
-    
     private OTDataObject createDataObject(OTDataObjectType type)
         throws Exception
     {
@@ -326,7 +330,9 @@ public class OTObjectServiceImpl
 	throws Exception	
 	{
 		OTObjectList orphanObjectList = null;
-		OTObject root = otrunk.getRealRoot();
+		
+		OTDataObject rootDO = otrunk.getRootDataObject();		
+		OTObject root = getOTObject(rootDO.getGlobalId());
 		if(root instanceof OTSystem) {
 			orphanObjectList = ((OTSystem)root).getLibrary();
 		}
