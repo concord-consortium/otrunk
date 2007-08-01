@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.19 $
- * $Date: 2007-08-01 14:08:55 $
+ * $Revision: 1.20 $
+ * $Date: 2007-08-01 14:20:02 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -245,30 +245,30 @@ public class OTInvocationHandler
 	public Object invoke(Object proxy, Method method, Object[] args)
 		throws Throwable
 	{
-		String methodName = method.getName();
+		String methodName = method.getName().intern();
 
-		if(methodName.equals("addOTChangeListener")) {
+		if(methodName == "addOTChangeListener") {
 			otObjectImpl.addOTChangeListener((OTChangeListener)args[0]);
 		    return null;
 		}
 		
-		if(methodName.equals("removeOTChangeListener")) {
+		if(methodName == "removeOTChangeListener") {
 			otObjectImpl.removeOTChangeListener((OTChangeListener)args[0]);
 		    return null;
 		}
 		
-		if(methodName.equals("setDoNotifyChangeListeners")) {
+		if(methodName == "setDoNotifyChangeListeners") {
 			otObjectImpl.setDoNotifyListeners(((Boolean)args[0]).booleanValue());
 		    return null;
 		}
 
-		if(methodName.equals("notifyOTChange")) {
+		if(methodName == "notifyOTChange") {
 		    otObjectImpl.notifyOTChange((String)args[0], (String)args[1], args[2]);
 		    return null;
 		}
 
 
-		if(methodName.equals("isResourceSet")) {
+		if(methodName == "isResourceSet") {
 		    String resourceName = (String)args[0];
 		    boolean resourceSet = otObjectImpl.isResourceSet(resourceName);
 		    return Boolean.valueOf(resourceSet);
@@ -282,6 +282,11 @@ public class OTInvocationHandler
 			Class returnType = method.getReturnType();
 			Class proxyClass = proxy.getClass();
 			return getResource(resourceName, returnType, proxyClass);
+		} else if(methodName.startsWith("set")){
+			String resourceName = getResourceName(3, methodName); 
+			Object resourceValue = args[0];
+			
+			otObjectImpl.setResource(resourceName, resourceValue);
 		} else if(methodName.startsWith("add")) {
 			// String resourceName = getResourceName(3, methodName);
             (new Exception("Don't handle add yet")).printStackTrace();
@@ -289,13 +294,13 @@ public class OTInvocationHandler
 		} else if(methodName.startsWith("removeAll")) {
             (new Exception("Don't handle removeAll yet")).printStackTrace();
             return null;
-		} else if(methodName.equals("toString")) {
+		} else if(methodName == "toString") {
 			return otObjectImpl.getOTClassName();
-		} else if(methodName.equals("hashCode")) {
+		} else if(methodName == "hashCode") {
 			String str = otObjectImpl.getOTClassName() + "@" +  otObjectImpl.getGlobalId();
 			Integer integer = new Integer(str.hashCode()); 
 			return integer;
-		} else if(methodName.equals("equals")) {
+		} else if(methodName == "equals") {
 			Object other = args[0];
 			if(!(other instanceof OTObject)){
 				return Boolean.FALSE;
@@ -311,11 +316,6 @@ public class OTInvocationHandler
 			}
 			return Boolean.FALSE;
 
-		} else if(methodName.startsWith("set")){
-			String resourceName = getResourceName(3, methodName); 
-			Object resourceValue = args[0];
-			
-			otObjectImpl.setResource(resourceName, resourceValue);
 		} else {
 		    System.err.println("Unknown method \"" + methodName + "\" called on " + proxy.getClass());
 		}
