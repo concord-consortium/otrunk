@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.34 $
- * $Date: 2007-07-25 17:06:35 $
+ * $Revision: 1.35 $
+ * $Date: 2007-08-02 17:14:53 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -164,7 +164,7 @@ public class XMLDatabase
 	{
 		OTXMLElement rootElement = document.getRootElement();
 
-		String dbBase = rootElement.getAttributeValue("base");
+		String dbBase = rootElement.getAttributeValue("codebase");
 		if(dbBase != null && dbBase.length() > 0) {
 		    // this document has a specific base address
 		    
