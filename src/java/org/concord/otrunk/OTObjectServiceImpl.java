@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2007-08-01 14:08:55 $
+ * $Revision: 1.18 $
+ * $Date: 2007-08-03 19:53:53 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -48,7 +48,7 @@ import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
-import org.concord.otrunk.datamodel.OTRelativeID;
+import org.concord.otrunk.datamodel.OTTransientMapID;
 
 public class OTObjectServiceImpl
     implements OTObjectService
@@ -285,13 +285,10 @@ public class OTObjectServiceImpl
     }
 
     boolean managesObject(OTID id)
-    {
-        if(id instanceof OTRelativeID) {
-            OTID rootRelativeId = ((OTRelativeID)id).getRootId();
-            if(rootRelativeId != null) {
-                OTDatabase rootDb = otrunk.getOTDatabase(rootRelativeId);
-                return rootDb == mainDb;
-            }
+    {    	
+        if(id instanceof OTTransientMapID) {
+            Object mapToken = ((OTTransientMapID)id).getMapToken();
+            return mapToken == creationDb.getDatabaseId();            
         }
         
         return false;
