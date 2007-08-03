@@ -50,11 +50,10 @@ import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
-import org.concord.otrunk.datamodel.OTRelativeID;
+import org.concord.otrunk.datamodel.OTTransientMapID;
+import org.concord.otrunk.overlay.CompositeDataObject;
 import org.concord.otrunk.overlay.CompositeDatabase;
 import org.concord.otrunk.user.OTReferenceMap;
-import org.concord.otrunk.user.OTTemplateDatabase;
-import org.concord.otrunk.user.OTUserDataObject;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.OTViewerHelper;
 
@@ -67,7 +66,7 @@ import org.concord.otrunk.view.OTViewerHelper;
 public class OTrunkImpl implements OTrunk
 {
 	protected Hashtable loadedObjects = new Hashtable();
-	protected Hashtable userTemplateDatabases = new Hashtable();
+	protected Hashtable compositeDatabases = new Hashtable();
     protected Hashtable userObjectServices = new Hashtable();
 	protected Hashtable userDataObjects = new Hashtable();
 	protected WeakHashMap objectWrappers = new WeakHashMap();
@@ -85,8 +84,6 @@ public class OTrunkImpl implements OTrunk
 
 	private Vector registeredPackageClasses = new Vector();;
     
-	public final static boolean useCompositeDatabase = true;
-	
     public final static String getClassName(OTDataObject dataObject)
     {
     	OTDataObjectType type = dataObject.getType();
@@ -310,24 +307,18 @@ public class OTrunkImpl implements OTrunk
     {
     	OTObjectServiceImpl userObjService;
     	
-        OTDatabase userDb;
-        if(!useCompositeDatabase){
-        	userDb = 
-        		new OTTemplateDatabase(rootDb, creationDb, userStateMap);          
-        } else {
-        	userDb = new CompositeDatabase(rootDb, userStateMap);
-        }
+        OTDatabase userDb = new CompositeDatabase(rootDb, userStateMap);
 
         addDatabase(userDb);
         userObjService = createObjectService(userDb);
-        userTemplateDatabases.put(userId, userDb);	
+        compositeDatabases.put(userId, userDb);	
         userObjectServices.put(userId, userObjService);
 
         return userObjService;
     }
     
-    public Hashtable getUserTemplateDatabases() {
-    	return userTemplateDatabases;
+    public Hashtable getCompositeDatabases() {
+    	return compositeDatabases;
     }
     
     public Vector getUsers() {
@@ -338,7 +329,7 @@ public class OTrunkImpl implements OTrunk
     {
         OTID authoredId = authoredObject.getGlobalId();
         OTID userId = user.getUserId();
-        OTTemplateDatabase db = (OTTemplateDatabase)userTemplateDatabases.get(userId);
+        CompositeDatabase db = (CompositeDatabase)compositeDatabases.get(userId);
         
         if(db == null) {
             // FIXME this should throw an exception
@@ -347,15 +338,12 @@ public class OTrunkImpl implements OTrunk
 
         OTDataObject userDataObject = db.getOTDataObject(null, authoredId);
 
-        boolean modified = false;
-        if(userDataObject instanceof OTUserDataObject) {
-            OTDataObject userModifications = ((OTUserDataObject)userDataObject).getExistingUserObject();
-            modified = (userModifications != null);
-            //return  userModifications != null;
+        if(userDataObject instanceof CompositeDataObject) {
+            OTDataObject userModifications = ((CompositeDataObject)userDataObject).getActiveDeltaObject();
+            return userModifications != null;
         }
-        //if(modified) System.out.println(userDataObject.getGlobalId().toString() + " is modified: " + modified);
-        //return false;
-        return modified;
+
+        return false;
     }
 
     public OTObjectService initUserObjectService(OTObjectServiceImpl objService, OTUser user, OTStateRoot stateRoot)
@@ -447,25 +435,38 @@ public class OTrunkImpl implements OTrunk
 
 	}
 	
+	/**
+	 * This method is a legacy method.  It should be generalized now that "user objects" and 
+	 * "author objects" are just specific versions of "overlay delta objects" and "base objects"
+	 * 
+	 * @param userObject
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
 	public OTObject getRuntimeAuthoredObject(OTObject userObject, OTUser user)
 	    throws Exception 
     {
 		OTID objectId = userObject.getGlobalId();
 		OTID userId = user.getUserId();
-		OTTemplateDatabase db = (OTTemplateDatabase)userTemplateDatabases.get(userId);
+		
+		if(!(objectId instanceof OTTransientMapID)){
+			return userObject;
+		}
 				
-	    if(objectId instanceof OTRelativeID) {
-	    	//System.out.println("is relative");
-    		OTID childRootId = ((OTRelativeID)objectId).getRootId();
-    		if(childRootId != null && childRootId.equals(db.getDatabaseId())) {
-    			//System.out.print("   equals to databaseid");
-    			objectId = ((OTRelativeID)objectId).getRelativeId();
-    			//System.out.println(": " + objectId.toString());
+		CompositeDatabase db = (CompositeDatabase)compositeDatabases.get(userId);
+				
+		//System.out.println("is relative");
+		Object objectMapToken = ((OTTransientMapID) objectId).getMapToken();
+		if(objectMapToken != null && objectMapToken == db.getDatabaseId()) {
+			//System.out.print("   equals to databaseid");
+			objectId = ((OTTransientMapID) objectId).getMappedId();
+			//System.out.println(": " + objectId.toString());
 
-    			return getOTObject(objectId);		    			
-    		}
-    	}
-
+			return getOTObject(objectId);		    			
+		}
+		
+		
 	    return userObject;
 	}
 
