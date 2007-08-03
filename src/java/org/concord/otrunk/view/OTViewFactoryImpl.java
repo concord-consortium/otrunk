@@ -267,10 +267,11 @@ public class OTViewFactoryImpl implements OTViewFactory
 			return getView(otObject, viewEntry);			
 		}
 		
+		OTViewBundle viewBundle = getViewBundle();
 		OTViewMode mode = null;
 		OTObjectList modes = viewBundle.getModes();
-		for(int i=0; i<modes.size(); i++){
-			OTViewMode curMode = (OTViewMode)modes.get(i);
+		for(int i=0; i<viewBundle.getModes().size(); i++){
+			OTViewMode curMode = (OTViewMode)viewBundle.getModes().get(i);
 			if(curMode.getName().equals(modeStr)){
 				mode = curMode;
 				break;
@@ -301,7 +302,16 @@ public class OTViewFactoryImpl implements OTViewFactory
 		
 		return view;
 	}
-
+	
+	public OTViewBundle getViewBundle()
+	{
+		if (!(viewBundle == null)){
+			return viewBundle;
+		} else if (!(parent == null)){
+			return parent.getViewBundle();
+		}
+		else return null;
+	}
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.view.OTViewFactory#getViewServiceProvider()
 	 */

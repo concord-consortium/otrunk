@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-05-10 19:33:06 $
- * $Author: scytacki $
+ * $Revision: 1.2 $
+ * $Date: 2007-08-03 20:40:54 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -60,6 +60,7 @@ public class OTViewBundle extends DefaultOTObject
         public OTObjectList getModes();
         
         public String getCurrentMode();
+        public void setCurrentMode(String mode);
         
         public OTFrame getFrame();
         
@@ -93,6 +94,11 @@ public class OTViewBundle extends DefaultOTObject
     {
     	return resources.getCurrentMode();
     }
+    
+    public void setCurrentMode(String mode)
+    	{
+    		resources.setCurrentMode(mode);
+    	}
 
 	/* (non-Javadoc)
      * @see org.concord.framework.otrunk.OTBundle#registerServices(org.concord.framework.otrunk.OTServiceContext)
