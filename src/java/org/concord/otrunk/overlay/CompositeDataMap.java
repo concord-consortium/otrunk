@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-08-01 14:08:55 $
+ * $Revision: 1.2 $
+ * $Date: 2007-08-06 19:02:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -97,7 +97,7 @@ final class CompositeDataMap extends CompositeDataCollection
     public void put(String key, Object resource)
     {
     	OTDataMap userMap = getUserMap();
-    	
+    	resource = resolveIDResource(resource);
     	userMap.put(key, resource);
     }    
 }
