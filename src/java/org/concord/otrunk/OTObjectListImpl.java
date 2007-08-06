@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-08-01 14:08:55 $
+ * $Revision: 1.12 $
+ * $Date: 2007-08-06 18:57:32 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -125,6 +125,18 @@ public class OTObjectListImpl extends OTCollectionImpl
 		notifyOTChange(OTChangeEvent.OP_ADD, id);
 	}
 	
+	public void set(int index, OTObject obj)
+	{
+		OTID id = obj.getGlobalId();
+		if(id == null) {
+			throw new RuntimeException("adding null id object list");
+		}
+
+		
+		list.set(index, id);
+		notifyOTChange(OTChangeEvent.OP_SET, obj);
+	}
+
 	public int size()
 	{
 		return list.size();
