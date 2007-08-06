@@ -34,9 +34,22 @@ public class OTPrototypeEventController extends DefaultOTObject implements
 		 * properties that are not mapped to the model object those properties
 		 * will still be saved.    
 		 * 
+		 * The problem with this is that some of the objects referenced by the prototype
+		 * might be large.  And should not changed from view instance to view instance.  Perhaps
+		 * an option is to move these objects outside and map them into the view.  But this means
+		 * properties have to be added to the model object to store these objects.
+		 * 
+		 * The boolean below turns off copying to help with this situation a little
+		 * 
 		 * @return
 		 */
 		public OTObjectMap getPrototypeCopies();			
+		
+		/**
+		 * Turn off the copying of the prototype, see above for information about this copying.
+		 * @return
+		 */
+		public boolean getCopyPrototype();
 	}
 	private ResourceSchema resources;
 	
@@ -58,29 +71,36 @@ public class OTPrototypeEventController extends DefaultOTObject implements
 	{
 		// check if there already is a copy of this prototype for this otObject
 		String modelId = model.getGlobalId().toString();
-		OTObject prototypeCopy = resources.getPrototypeCopies().getObject(modelId);
 		
-		// make one if there isn't
-		if(prototypeCopy == null) {			
-			try {
-				prototypeCopy =
-					getOTObjectService().copyObject(config.getPrototype(), -1);
-				resources.getPrototypeCopies().putObject(modelId, prototypeCopy);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
+		OTObject objectToView = null;
+		if(resources.getCopyPrototype()){
+			OTObject prototypeCopy = resources.getPrototypeCopies().getObject(modelId);
+
+			// make one if there isn't
+			if(prototypeCopy == null) {			
+				try {
+					prototypeCopy =
+						getOTObjectService().copyObject(config.getPrototype(), -1);
+					resources.getPrototypeCopies().putObject(modelId, prototypeCopy);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}			
+			}
+			objectToView = prototypeCopy;
+		} else {
+			objectToView = config.getPrototype();
 		}
 		
 		helper = 
-			new OTPrototypeEventMappingHelper(model, prototypeCopy, 
+			new OTPrototypeEventMappingHelper(model, objectToView, 
 					resources);
 		
 		// return the component for the view 
 		OTJComponentView view = (OTJComponentView)
-			otViewFactory.getView(prototypeCopy, config.getViewEntry());
+			otViewFactory.getView(objectToView, config.getViewEntry());
 		
-		JComponent component = view.getComponent(prototypeCopy, false);
+		JComponent component = view.getComponent(objectToView, false);
 
 		
 		// we have a problem with this helper.  It isn't going to be 
