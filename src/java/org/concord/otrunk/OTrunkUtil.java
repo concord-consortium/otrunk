@@ -170,10 +170,7 @@ public class OTrunkUtil
 				
 				if(list instanceof OTObjectList){
 					OTObjectList objList = (OTObjectList) list;
-					if(objList.size() >= (index+1)){
-						objList.remove(index);
-					}					
-					objList.add(index, (OTObject)value);
+					objList.set(index, (OTObject)value);
 				} else if(list instanceof OTResourceList){
 					OTObjectList objList = (OTObjectList) list;
 					if(objList.size() >= (index+1)){

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-08-01 14:08:55 $
+ * $Revision: 1.2 $
+ * $Date: 2007-08-06 19:04:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -59,6 +59,7 @@ public class CompositeDataObject
 {
 	private OTDataObject baseObject;
 	private OTDataObject activeDeltaObject = null;
+	private OTDataObject [] middleDeltas;
 	private CompositeDatabase database;
 	
 	
@@ -71,10 +72,11 @@ public class CompositeDataObject
 	private Hashtable resourceCollections = new Hashtable();
 	
 	public CompositeDataObject(OTDataObject baseObject, 
-	        CompositeDatabase db, boolean composite)
+	        CompositeDatabase db, OTDataObject[] middleDeltas, boolean composite)
 	{
 		this.baseObject = baseObject;
 		database = db;
+		this.middleDeltas = middleDeltas;
 		this.composite = composite;
 	}
 	
@@ -88,11 +90,6 @@ public class CompositeDataObject
 		return baseObject;
 	}
 
-	public void setActiveDeltaObject(OTDataObject stateObject)
-	{
-	    this.activeDeltaObject = stateObject;
-	}
-	
 	public OTDataObject getActiveDeltaObject()
 	{
 	    if(activeDeltaObject != null) {
@@ -136,7 +133,9 @@ public class CompositeDataObject
 		}
 		
 		// first look in the userObject
+		// then look in the middle deltas
 		// then look in the authoringObject
+
 		Object value = null;
 		OTDataObject localActiveDelta = getActiveDeltaObject();
 		if (localActiveDelta != null) {
@@ -145,10 +144,29 @@ public class CompositeDataObject
 				return value;
 			}
 		}
-		
-		return baseObject.getResource(key);
+
+		return getNonActiveDeltaResource(key);
 	}
 
+	protected Object getNonActiveDeltaResource(String key)
+	{
+		Object value = null;
+		if(middleDeltas != null){
+			for(int i=0; i<middleDeltas.length; i++){
+				OTDataObject delta = middleDeltas[i];
+				if (delta != null) {
+					value = delta.getResource(key);
+					if(value != null) {
+						return value;
+					}
+				}
+				
+			}
+		}
+		
+		return baseObject.getResource(key);		
+	}
+	
 	/**
 	 * This will return the union of all the keys set between the base object and the overlay objects.
 	 * 
@@ -168,7 +186,15 @@ public class CompositeDataObject
             }
         }
         
-        // FIXME this should also go through the middle overlay keys 
+		if(middleDeltas != null){
+			for(int i=0; i<middleDeltas.length; i++){
+				OTDataObject delta = middleDeltas[i];
+	            String [] userKeys = delta.getResourceKeys();
+	            for(int j=0; j<userKeys.length; j++){
+	                keyTable.put(userKeys[j], delta);
+	            }				
+			}
+		}
         
         if(baseObject != null) {
             String [] authorKeys = baseObject.getResourceKeys();
@@ -260,24 +286,16 @@ public class CompositeDataObject
 	public OTDataCollection getResourceCollection(String key, 
 			Class collectionClass)
 	{
-		OTDataCollection collection = 
-	        (OTDataCollection)resourceCollections.get(key);
+		OTDataCollection collection = (OTDataCollection)resourceCollections.get(key);
 	    if(collection != null) {
 	        return collection;
 	    }
-	    
-	    // This might need to be getResourceCollection instead of 
-	    // getResource.  But I wanted to know if the list has been
-	    // set yet.
-	    
-		Object resourceObj = null;
-		if(baseObject != null) {
-		    resourceObj = baseObject.getResource(key);
-		}
 
-		// Here is the tricky part.  We want to make a pseudo
-		// list so that the real list isn't created unless it is really
-		// used.
+	    // Get the base list that a delta will be built against
+		Object resourceObj = getNonActiveDeltaResource(key);
+
+		// Create a wrapper list so changes to the list will create a new list resource in
+		// the active delta object.
 		if(collectionClass.equals(OTDataList.class)) {
 			collection =  
 				new CompositeDataList(this, (OTDataList)resourceObj, key, composite);
@@ -291,19 +309,12 @@ public class CompositeDataObject
 	    return collection;
 	}
 
+	/**
+	 * We do not allow switching the type of the object on the fly, so the type of the object
+	 * will always be the type of the base object
+	 */
 	public OTDataObjectType getType()
     {
-		if(!composite){
-			return baseObject.getType();
-		}
-				
-		// first look in the userObject
-		// then look in the authoringObject
-		OTDataObject localActiveDeltaObject = getActiveDeltaObject();
-		if (localActiveDeltaObject != null) {
-			return localActiveDeltaObject.getType();
-		}
-		
 		return baseObject.getType();
     }
 }

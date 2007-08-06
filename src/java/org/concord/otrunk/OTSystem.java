@@ -30,6 +30,7 @@
 package org.concord.otrunk;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectInterface;
 import org.concord.framework.otrunk.OTObjectList;
 
 /**
@@ -38,7 +39,7 @@ import org.concord.framework.otrunk.OTObjectList;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public interface OTSystem extends OTObject 
+public interface OTSystem extends OTObjectInterface 
 {
 	public OTObject getRoot();
 	public void setRoot(OTObject root);
@@ -55,6 +56,15 @@ public interface OTSystem extends OTObject
 	public OTObjectList getServices();	
 
 	public OTObjectList getLibrary();
+
+	/**
+	 * This is a list of the active global overlays in the system.  In the future there might
+	 * be the concept of scoped overlays.  In that case they will have to be defined in another
+	 * manner.
+	 *  
+	 * @return
+	 */
+	public OTObjectList getOverlays();
 	
 	public OTObject getFirstObject();
 	

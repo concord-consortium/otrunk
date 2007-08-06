@@ -45,4 +45,13 @@ public interface Overlay
 	public boolean contains(OTID id);
 	
 	public OTDatabase getOverlayDatabase();
+	
+	/**
+	 * This method is used by the CompositeDatabase to register objects that were created 
+	 * by the database.  If the ids of one of these registered objects is passed to the 
+	 * contains method it should return true
+	 * 
+	 * @param childObject
+	 */
+	public void registerNonDeltaObject(OTDataObject childObject);
 }
