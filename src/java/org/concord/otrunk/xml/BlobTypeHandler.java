@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-06-12 21:11:25 $
+ * $Revision: 1.11 $
+ * $Date: 2007-08-06 19:01:01 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,6 +34,8 @@ package org.concord.otrunk.xml;
 
 import java.net.URL;
 import java.util.Properties;
+
+import org.concord.otrunk.datamodel.BlobResource;
 
 /**
  * BlobTypeHandler
@@ -66,7 +68,7 @@ public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 			// gzb64:
 			if(urlStr != null && urlStr.startsWith(GZIPPED_BASE64_PROTOCOL)) {
 				String b64 = urlStr.substring(GZIPPED_BASE64_PROTOCOL.length());
-				return new XMLBlobResource(b64);
+				return new BlobResource(b64);
 			}
 			
 			if(urlStr.length() == 0){
@@ -74,7 +76,7 @@ public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 			}
 			
 			URL url = new URL(contextURL, urlStr);
-			return new XMLBlobResource(url);			
+			return new BlobResource(url);			
 		} catch(Exception e) {
 			throw new HandleElementException("malformed url for blob");
 		} 		

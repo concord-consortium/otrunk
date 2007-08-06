@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 
 import org.concord.loader.util.Transfer;
+import org.concord.otrunk.xml.Base64;
 
 /**
  * @author scott
@@ -22,6 +23,7 @@ public class BlobResource
 {
 	protected URL blobURL;
 	protected byte [] bytes;
+	protected String gzb64;
 
 	protected BlobResource()
 	{		
@@ -36,18 +38,27 @@ public class BlobResource
 	{
 		this.bytes = bytes;
 	}
+
+	public BlobResource(String gzippedBase64Str)
+	{
+		this.gzb64 = gzippedBase64Str;
+	}	
 	
 	public byte [] getBytes()
-	{
-	    if(bytes != null) return bytes;
+    {
+        if(bytes != null) return bytes;
+    
+        if(blobURL != null) {
+        	return getURLBytes();
+        } else if(gzb64 != null) {
+        	// just decode on the fly instead of saving the bytes, 
+        	// this should save memory
+        	return Base64.decode(gzb64);
+        }
+    
+    	return null;
+    }
 
-	    if(blobURL != null) {
-	    	return getURLBytes();
-	    }
-	    
-	    return null;
-	}
-	
 	public URL getBlobURL()
 	{
 		return blobURL;
@@ -97,4 +108,5 @@ public class BlobResource
     	
     	return null;
 	}
+
 }

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.35 $
- * $Date: 2007-08-02 17:14:53 $
+ * $Revision: 1.36 $
+ * $Date: 2007-08-06 19:01:01 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -660,7 +660,7 @@ public class XMLDatabase
      */
     public BlobResource createBlobResource(URL url)
     {
-    	return new XMLBlobResource(url);
+    	return new BlobResource(url);
     }
 	
     /* (non-Javadoc)
