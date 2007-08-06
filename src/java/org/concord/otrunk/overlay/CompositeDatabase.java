@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-08-01 14:08:55 $
+ * $Revision: 1.2 $
+ * $Date: 2007-08-06 19:04:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -33,6 +33,7 @@
 package org.concord.otrunk.overlay;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -64,18 +65,25 @@ public class CompositeDatabase
 	protected Hashtable dataObjectMap = new Hashtable();
     
 	OTDatabase rootDb;
-	OTDatabase overlayDb;
-	Overlay overlay;
+	OTDatabase activeOverlayDb;
+	Overlay activeOverlay;
+	ArrayList middleOverlays;
 	OTID databaseId;
 	
-	public CompositeDatabase(OTDatabase rootDb, Overlay overlay)
+	public CompositeDatabase(OTDatabase rootDb, Overlay activeOverlay)
 	{
 	    this.rootDb = rootDb;
-	    this.overlayDb = overlay.getOverlayDatabase();
-	    this.overlay = overlay;
+	    this.activeOverlayDb = activeOverlay.getOverlayDatabase();
+	    this.activeOverlay = activeOverlay;
 	    
 	    databaseId = OTUUID.createOTUUID();
 	}
+	
+	public void setOverlays(ArrayList overlays)
+	{
+	    this.middleOverlays = overlays;		
+	}
+			
 	
 	public OTID getDatabaseId()
 	{
@@ -105,9 +113,10 @@ public class CompositeDatabase
     public OTDataObject createDataObject(OTDataObjectType type) throws Exception
     {        
         // in this case we need to create a new state object and wrap it
-        OTDataObject childObject = overlayDb.createDataObject(type);
+        OTDataObject childObject = activeOverlayDb.createDataObject(type);
         CompositeDataObject compositeDataObject = 
-        	new CompositeDataObject(childObject, this, false);
+        	new CompositeDataObject(childObject, this, null, false);
+        activeOverlay.registerNonDeltaObject(childObject);
         //System.out.println("v3. " + userDataObject.getGlobalId());
         return compositeDataObject;
     }
@@ -118,21 +127,22 @@ public class CompositeDatabase
     public OTDataObject createDataObject(OTDataObjectType type, OTID id) throws Exception
     {
         // in this case we need to create a new state object and wrap it
-        OTDataObject childObject = overlayDb.createDataObject(type, id);
+        OTDataObject childObject = activeOverlayDb.createDataObject(type, id);
         CompositeDataObject userDataObject = 
-        	new CompositeDataObject(childObject, this, false);
+        	new CompositeDataObject(childObject, this, null, false);
+        activeOverlay.registerNonDeltaObject(childObject);
         //System.out.println("v3. " + userDataObject.getGlobalId());
         return userDataObject;
     }
 
     public OTDataObject getActiveDeltaObject(OTDataObject baseObject)
     {
-    	return overlay.getDeltaObject(baseObject);
+    	return activeOverlay.getDeltaObject(baseObject);
     }
     
     public OTDataObject createActiveDeltaObject(OTDataObject baseObject)
     {
-    	return overlay.createDeltaObject(baseObject);
+    	return activeOverlay.createDeltaObject(baseObject);
     }
     
     /**
@@ -159,13 +169,13 @@ public class CompositeDatabase
             return userDataObject;
         }
         
-        if(overlay.contains(childId)) {
+        if(activeOverlay.contains(childId)) {
             // the requested object is part of the overlay.
             // this object might have references. so we need to 
             // wrap it so the returned data object has us as
             // the database
-            OTDataObject childObject = overlayDb.getOTDataObject(null, childId);
-            userDataObject = new CompositeDataObject(childObject, this, false);
+            OTDataObject childObject = activeOverlayDb.getOTDataObject(null, childId);
+            userDataObject = new CompositeDataObject(childObject, this, null, false);
         	//System.out.println("v3. " + userDataObject.getGlobalId());
             
             // save this object so if it is referenced again the same
@@ -185,7 +195,27 @@ public class CompositeDatabase
         	return null;
             //throw new RuntimeException("can't find user object: " + childId);
         }
-         userDataObject = new CompositeDataObject(baseObject, this, true);
+        
+        OTDataObject middleDeltas [] = null;
+        if(middleOverlays != null){
+        	ArrayList middleDeltasList = new ArrayList();
+        	// if we have middle overlays then we need to see if any of them have a delta for this
+        	// object
+        	for(int i=0; i<middleOverlays.size(); i++){
+        		Overlay middleOverlay = (Overlay)middleOverlays.get(i);
+        		OTDataObject middleDelta = middleOverlay.getDeltaObject(baseObject);
+        		if(middleDelta != null){
+        			middleDeltasList.add(middleDelta);
+        		}
+        	}
+        	
+        	if(middleDeltasList.size() > 0){
+        		middleDeltas = new OTDataObject[middleDeltasList.size()];
+        		middleDeltasList.toArray(middleDeltas);
+        	}
+        }
+        
+        userDataObject = new CompositeDataObject(baseObject, this, middleDeltas, true);
 
         dataObjectMap.put(childId, userDataObject);
         
@@ -240,7 +270,7 @@ public class CompositeDatabase
      */
     public BlobResource createBlobResource(URL url)
     {
-    	return overlayDb.createBlobResource(url);
+    	return new BlobResource(url);
     }
 
 	/* (non-Javadoc)

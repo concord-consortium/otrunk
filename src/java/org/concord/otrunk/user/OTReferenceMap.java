@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2007-08-01 14:08:55 $
+ * $Revision: 1.7 $
+ * $Date: 2007-08-06 19:04:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -146,6 +146,16 @@ public class OTReferenceMap extends DefaultOTObject
 	public OTDatabase getOverlayDatabase()
     {
 		return stateDb;
+    }
+
+	/**
+	 * We don't need to do anything here because in this design there is a seperate database
+	 * for storing all the delta and non delta objects of the overlay.  This is the database
+	 * returned by the getOverlayDatabase call.  So the objects are "registered" when the are
+	 * added or created in the stateDb.
+	 */
+	public void registerNonDeltaObject(OTDataObject childObject)
+    {
     }
 
 

@@ -31,6 +31,7 @@ package org.concord.otrunk;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.WeakHashMap;
@@ -53,6 +54,9 @@ import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.overlay.CompositeDataObject;
 import org.concord.otrunk.overlay.CompositeDatabase;
+import org.concord.otrunk.overlay.OTOverlay;
+import org.concord.otrunk.overlay.Overlay;
+import org.concord.otrunk.overlay.OverlayImpl;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.OTViewerHelper;
@@ -175,7 +179,7 @@ public class OTrunkImpl implements OTrunk
 		rootDb.setRoot(id);
 	}
 		
-	protected OTObject getRealRoot() throws Exception
+	public OTObject getRealRoot() throws Exception
 	{
 		OTDataObject rootDO = getRootDataObject();
 		if(rootDO == null) {
@@ -278,7 +282,25 @@ public class OTrunkImpl implements OTrunk
         // add this database as one of our databases
     	addDatabase(userDataDb);
         
+    	OTReferenceMap refMap = getReferenceMapFromUserDb(userDataDb);
+
+    	OTUser user = refMap.getUser();
+        OTUserObject aUser = (OTUserObject)user;
+        if(name != null){
+        	aUser.setName(name);
+        }
+        users.add(aUser);
+
+        setupUserDatabase(user, refMap);
+
+        return aUser;
+    }
+
+    protected OTReferenceMap getReferenceMapFromUserDb(OTDatabase userDataDb) 
+    	throws Exception
+    {
         OTObjectService objService = createObjectService(userDataDb);
+
         OTDataObject rootDO = userDataDb.getRoot();
         
         OTStateRoot stateRoot = 
@@ -290,29 +312,58 @@ public class OTrunkImpl implements OTrunk
         // this currently is the first user in the userMap
         Vector keys = userMap.getObjectKeys();
         OTReferenceMap refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));        
-        OTUser user = refMap.getUser();
-        OTUserObject aUser = (OTUserObject)user;
-        if(name != null){
-        	aUser.setName(name);
-        }
-        users.add(aUser);
-
-        setupUserDatabase(userDataDb, user.getUserId(), refMap);
-
-        return aUser;
+    	
+        return refMap;
     }
     
-    protected OTObjectService setupUserDatabase(OTDatabase creationDb, OTID userId,
-    	OTReferenceMap userStateMap)
+    public void reloadOverlays(OTUserObject user, OTDatabase userDataDb) 
+    	throws Exception
+    {
+    	OTID userId = user.getUserId();
+    	
+    	OTReferenceMap refMap = getReferenceMapFromUserDb(userDataDb);
+    		
+    	// need to make a new composite database.
+    	// the user database should remain the same.
+        OTDatabase oldCompositeDB = (OTDatabase) compositeDatabases.remove(userId);	
+        userObjectServices.remove(userId);
+        
+        databases.remove(oldCompositeDB);
+
+        setupUserDatabase(user, refMap);
+    }
+    
+    protected OTObjectService setupUserDatabase(OTUser user, OTReferenceMap userStateMap)
     {
     	OTObjectServiceImpl userObjService;
+    	OTID userId = user.getUserId();
     	
-        OTDatabase userDb = new CompositeDatabase(rootDb, userStateMap);
+        CompositeDatabase userDb = new CompositeDatabase(rootDb, userStateMap);
 
         addDatabase(userDb);
         userObjService = createObjectService(userDb);
         compositeDatabases.put(userId, userDb);	
         userObjectServices.put(userId, userObjService);
+
+        // After the user database is complete setup, now we get the overlays.  This way 
+        // the user can change the overlays list.
+    	try {
+        	ArrayList overlays = null;
+	        OTObjectList otOverlays = getSystemOverlays(user);
+	        if(otOverlays != null && otOverlays.size() > 0){
+	        	overlays = new ArrayList();
+	        	for(int i=0; i<otOverlays.size(); i++){
+	        		OTOverlay otOverlay = (OTOverlay) otOverlays.get(i);
+	        		Overlay overlay = new OverlayImpl(otOverlay);
+	        		overlays.add(overlay);
+	        	}
+	        }
+	        userDb.setOverlays(overlays);
+        } catch (Exception e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }    	
+    	
 
         return userObjService;
     }
@@ -372,8 +423,7 @@ public class OTrunkImpl implements OTrunk
         	userStateMap.setUser((OTUserObject)user);
         }
 
-        userObjService =
-        	setupUserDatabase(objService.getCreationDb(), userId, userStateMap);
+        userObjService = setupUserDatabase(user, userStateMap);
     	return userObjService;
         
     }
@@ -488,6 +538,19 @@ public class OTrunkImpl implements OTrunk
 		return rootDb.getRoot();
 	}
 
+	public OTObjectList getSystemOverlays(OTUser user)
+		throws Exception
+	{
+		OTObject root = getRealRoot();
+		if(!(root instanceof OTSystem)) {
+			return null;
+		}
+		
+		OTSystem userRoot = (OTSystem) getUserRuntimeObject(root, user);
+		
+		return userRoot.getOverlays();		
+	}
+	
     /**
      * @return
      */

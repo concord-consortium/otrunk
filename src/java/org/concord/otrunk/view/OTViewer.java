@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.74 $
- * $Date: 2007-08-01 14:08:55 $
+ * $Revision: 1.75 $
+ * $Date: 2007-08-06 19:04:14 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -79,6 +79,8 @@ import javax.swing.event.TreeSelectionListener;
 
 import org.concord.applesupport.AppleApplicationAdapter;
 import org.concord.applesupport.AppleApplicationUtil;
+import org.concord.framework.otrunk.OTChangeEvent;
+import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTrunk;
@@ -93,6 +95,7 @@ import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTMLToXHTMLConverter;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTStateRoot;
+import org.concord.otrunk.OTSystem;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -226,6 +229,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	private boolean needToSaveUserData = false;
 	
 	private boolean useScrollPane;
+
+	private OTChangeListener systemChangeListener;
+
+	private OTSystem userSystem;
 	
 	public static void setOTViewFactory(OTViewFactory factory) {
 		otViewFactory = factory;
@@ -500,6 +507,17 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		reloadWindow();
 	}
 
+	public void reloadOverlays() 
+	{
+		try {
+	        otrunk.reloadOverlays(currentUser, userDataDB);
+	        reloadWindow();
+        } catch (Exception e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }		
+	}
+	
 	private void loadFile(File file) {
 		currentAuthoredFile = file;
 		try {
@@ -583,6 +601,31 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			} else {
 				OTObject otRoot = otrunk.getRoot();
 				root = otrunk.getUserRuntimeObject(otRoot, currentUser);
+				
+				OTObject realRoot = otrunk.getRealRoot();
+				if(realRoot instanceof OTSystem){
+					
+					OTSystem localUserSystem = 
+						(OTSystem) otrunk.getUserRuntimeObject(realRoot, currentUser);
+
+					// FIXME there should be a better way than this because we have to handle
+					// multiple users.
+					if(localUserSystem != userSystem){
+						userSystem = localUserSystem;
+
+						systemChangeListener = new OTChangeListener(){
+
+							public void stateChanged(OTChangeEvent e)
+							{
+								if("overlays".equals(e.getProperty())){
+									reloadOverlays();
+								}	                        
+							}						
+						};
+
+						userSystem.addOTChangeListener(systemChangeListener);						
+					}
+				}
 			}
 		}
 
