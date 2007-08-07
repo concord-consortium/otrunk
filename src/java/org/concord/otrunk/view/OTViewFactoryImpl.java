@@ -271,7 +271,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 		OTViewMode mode = null;
 		OTObjectList modes = viewBundle.getModes();
 		for(int i=0; i<viewBundle.getModes().size(); i++){
-			OTViewMode curMode = (OTViewMode)viewBundle.getModes().get(i);
+			OTViewMode curMode = (OTViewMode)modes.get(i);
 			if(curMode.getName().equals(modeStr)){
 				mode = curMode;
 				break;
