@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.25 $
- * $Date: 2007-07-25 20:25:34 $
+ * $Revision: 1.26 $
+ * $Date: 2007-08-07 12:54:15 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -102,11 +102,13 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	public Object handleElement(OTXMLElement element, Properties elementProps,
 	        String relativePath, XMLDataObject parent)
 	{
-		String refid = element.getAttributeValue("refid");
-		if(refid != null && refid.length() > 0){
-			return new XMLDataObjectRef(refid, element);
+		if(isObjectReferenceHandler()){
+			String refid = element.getAttributeValue("refid");
+			if(refid != null && refid.length() > 0){
+				return new XMLDataObjectRef(refid, element);
+			}
 		}
-				
+		
 		String idStr = element.getAttributeValue("id");
 		if(idStr != null && idStr.length() <= 0) {
 			idStr = null;
@@ -148,7 +150,6 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			OTXMLAttribute attrib = (OTXMLAttribute)attIter.next();
 			String attribName = attrib.getName();
 			if(attribName.equals("id") ||
-					attribName.equals("refid") ||
 					attribName.equals("local_id")) {
 				continue;
 			}
