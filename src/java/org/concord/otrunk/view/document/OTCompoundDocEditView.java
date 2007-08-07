@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2007-07-19 12:12:26 $
+ * $Revision: 1.15 $
+ * $Date: 2007-08-07 19:18:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -21,6 +21,7 @@ import javax.swing.JSplitPane;
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.otrunk.view.OTObjectEditViewConfig;
@@ -137,8 +138,9 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 				//No object to insert. Either we couldn't find one, or the user changed his mind
 				return;
 			}
-									
-			String strObjID = objToInsert.getGlobalId().toString();
+			
+			OTObjectService objectService = document.getOTObjectService();
+			String strObjID = objectService.getExternalID(objToInsert);
 			
 			String strObjText = "<object refid=\"" + strObjID + "\" />";
 			

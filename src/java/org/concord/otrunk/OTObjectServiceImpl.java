@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.18 $
- * $Date: 2007-08-03 19:53:53 $
+ * $Revision: 1.19 $
+ * $Date: 2007-08-07 19:18:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -49,6 +49,7 @@ import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTTransientMapID;
+import org.concord.otrunk.overlay.CompositeDatabase;
 
 public class OTObjectServiceImpl
     implements OTObjectService
@@ -385,6 +386,16 @@ public class OTObjectServiceImpl
     public Object getOTrunkService(Class serviceInterface)
     {
     	return otrunk.getService(serviceInterface);
+    }
+
+	public String getExternalID(OTObject object)
+    {
+		OTID globalId = object.getGlobalId();
+		if(mainDb instanceof CompositeDatabase){
+			return ((CompositeDatabase)mainDb).resolveID(globalId).toString();
+		}
+		
+		return globalId.toString();
     }
 
 }
