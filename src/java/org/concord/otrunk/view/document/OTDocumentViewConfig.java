@@ -3,6 +3,7 @@
  */
 package org.concord.otrunk.view.document;
 
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.view.OTViewEntry;
 
 /**
@@ -22,4 +23,6 @@ public interface OTDocumentViewConfig
 	
 	public String getCss();
 	public void setCss(String css);
+	
+	public OTObjectList getCssBlocks();
 }
