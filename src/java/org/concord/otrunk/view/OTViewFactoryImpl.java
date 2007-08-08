@@ -174,6 +174,48 @@ public class OTViewFactoryImpl implements OTViewFactory
 	{
 		// because we have the view entry we don't need to actually
 		// look up this view.
+		if (getViewBundle() != null && getViewBundle().getCurrentMode() != null &&
+				getViewBundle().getCurrentMode().length() > 1){
+			return getView(otObject, viewEntry, getViewBundle().getCurrentMode());
+		} else {
+        String viewClassStr = viewEntry.getViewClass();
+        String objClassStr = viewEntry.getObjectClass();        
+        
+        ClassLoader loader = getClass().getClassLoader();
+		
+        try {
+            Class objectClass = loader.loadClass(objClassStr);
+
+            if(!objectClass.isInstance(otObject)){
+        		throw new RuntimeException("viewEntry: " + viewEntry + 
+        				" cannot handle otObject: " + otObject);
+        	}
+            
+            OTView view = null;
+            Class viewClass = loader.loadClass(viewClassStr);
+            view = (OTView)viewClass.newInstance();
+
+            initView(view, viewEntry);
+        	return view;                       
+        } catch (ClassNotFoundException e) {
+            System.err.println("Can't find view: " + viewClassStr + 
+                    " for object: " + objClassStr);
+            System.err.println("  error: " + e.toString());
+        } catch (InstantiationException e) {
+        	e.printStackTrace();
+        } catch (IllegalAccessException e) {
+        	e.printStackTrace();
+        }
+		
+		return null;
+		}
+	}
+	
+	private OTView getView(OTObject otObject, OTViewEntry viewEntry, boolean dontUseMode) 
+	{
+		// because we have the view entry we don't need to actually
+		// look up this view.
+		
         String viewClassStr = viewEntry.getViewClass();
         String objClassStr = viewEntry.getObjectClass();        
         
@@ -264,7 +306,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 	public OTView getView(OTObject otObject, OTViewEntry viewEntry, String modeStr) 
 	{
 		if(modeStr == null){
-			return getView(otObject, viewEntry);			
+			return getView(otObject, viewEntry, true);			
 		}
 		
 		OTViewBundle viewBundle = getViewBundle();
@@ -287,7 +329,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 			modeViewEntry = mode.getDefault();
 		}
 		if(modeViewEntry == null){
-			return getView(otObject, viewEntry);			
+			return getView(otObject, viewEntry, true);			
 		}
 
 		// pass the viewEntry was requested to the newly created view
@@ -295,7 +337,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 		// the original view entry.
 		// this entry might have been specified by the user, or it could have 
 		// been determined by looking up an interface and object type.
-		OTView view = getView(otObject, modeViewEntry);
+		OTView view = getView(otObject, modeViewEntry, true);
 		if(view instanceof OTRequestedViewEntryAware) {
 			((OTRequestedViewEntryAware)view).setRequestedViewEntry(viewEntry);
 		}
