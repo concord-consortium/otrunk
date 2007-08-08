@@ -32,6 +32,7 @@ package org.concord.otrunk.view.document;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -183,7 +184,20 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			bodyText = htmlizeText(bodyText);
 
 			if (viewEntry instanceof OTDocumentViewConfig) {
-				String css = viewEntry.getCss();
+				
+				String css = "";
+				if (viewEntry.getCss() != null && viewEntry.getCss().length() > 0){
+					css = css + viewEntry.getCss();
+				}
+				
+				if (viewEntry.getCssBlocks() != null && viewEntry.getCssBlocks().getVector().size() > 0){
+					Vector cssBlocks =  viewEntry.getCssBlocks().getVector(); 
+					for (int i = 0; i < cssBlocks.size(); i++) {
+		                OTCssText cssText = (OTCssText) cssBlocks.get(i);
+		                css = css + " " + cssText.getCssText();
+	                }
+				}
+				
 				String XHTML_PREFIX = XHTML_PREFIX_START + css
 						+ XHTML_PREFIX_END;
 				bodyText = XHTML_PREFIX + bodyText + XHTML_SUFFIX;
@@ -236,7 +250,6 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	 */
 	public String getIncludableReplacement(String idStr, String viewIdStr,
 			String modeStr) {
-
 		// lookup the object at this id
 		OTObject referencedObject = getReferencedObject(idStr);
 		if (referencedObject == null) {
@@ -369,7 +382,8 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		 * return parsed.toString();
 		 */
 	}
-
+	
+	// FIXME: Does this do anything anymore? Nothing seems to call it. -SF
 	public Document parseString(String text, String systemId) {
 		try {
 			if (xmlDocumentFactory == null) {
@@ -380,10 +394,8 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 				// TODO Fix this
 				xmlDocumentBuilder.setErrorHandler(new DefaultHandler());
 			}
-
+			
 			String css = viewEntry.getCss();
-			String XHTML_PREFIX = XHTML_PREFIX_START + css + XHTML_PREFIX_END;
-			text = XHTML_PREFIX + text + XHTML_SUFFIX;
 
 			StringReader stringReader = new StringReader(text);
 			InputSource inputSource = new InputSource(stringReader);
