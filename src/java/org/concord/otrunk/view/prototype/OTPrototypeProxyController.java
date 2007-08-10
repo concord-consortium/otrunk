@@ -28,8 +28,9 @@ public class OTPrototypeProxyController extends DefaultOTObject implements
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.view.OTPrototypeViewController#getComponent(org.concord.otrunk.view.OTPrototypeViewConfig, org.concord.framework.otrunk.view.OTViewFactory)
 	 */
-	public JComponent getComponent(OTObject otObject, OTPrototypeViewEntry config,
-			OTViewFactory otViewFactory) {
+	public JComponent getComponent(OTObject otObject, String prototypeCopyKey, 
+		String defaultModelProperty, 
+		OTPrototypeViewEntry config, OTViewFactory otViewFactory) {
 		OTPrototypeProxyInvocationHandler invokeHandler =
 			new OTPrototypeProxyInvocationHandler(config.getPrototype(), 
 					otObject, this);

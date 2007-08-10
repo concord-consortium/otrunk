@@ -37,7 +37,7 @@ public class OTPrototypeView extends AbstractOTView
 		controller = viewEntry.getController();		
 		JComponent component = null;
 		if(controller != null) {
-			component = controller.getComponent(otObject, viewEntry, otViewFactory);
+			component = getControllerComponent(otObject, otViewFactory);
 		} else {
 			// there is no controller, so we can't create a live view but
 			// we can display a view of the prototype
@@ -54,6 +54,14 @@ public class OTPrototypeView extends AbstractOTView
 		}		
 	}
 
+	protected JComponent getControllerComponent(OTObject otObject, 
+		OTViewFactory otViewFactory)	
+	{
+		String copyKey = otObject.getGlobalId().toString();
+		return controller.getComponent(otObject, copyKey, null, viewEntry, otViewFactory);
+	}
+	
+	
 	public void viewClosed() {
 		// TODO Auto-generated method stub
 		controller.close();
