@@ -395,8 +395,6 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 				xmlDocumentBuilder.setErrorHandler(new DefaultHandler());
 			}
 			
-			String css = viewEntry.getCss();
-
 			StringReader stringReader = new StringReader(text);
 			InputSource inputSource = new InputSource(stringReader);
 			inputSource.setSystemId(systemId);

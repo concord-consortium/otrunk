@@ -20,6 +20,7 @@ import org.concord.otrunk.datamodel.DataObjectUtil;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.view.OTViewerHelper;
 
 public class OTObjectInternal
 {
@@ -284,4 +285,17 @@ public class OTObjectInternal
         // copy the dataObject
         DataObjectUtil.copyInto(dataObject, ((OTObjectInternal)targetObject).dataObject);        
     }
+	
+	public String internalToString()
+	{
+		return getOTClassName() + "@" +  getGlobalId();
+	}
+	
+	protected void finalize()
+	    throws Throwable
+	{
+	    if(OTViewerHelper.isTrace()){
+	    	System.out.println("finalizing object: " + internalToString());
+	    }
+	}
 }
