@@ -11,10 +11,21 @@ import org.concord.framework.otrunk.view.AbstractOTJComponentView;
 
 public class OTMainClassLauncherView extends AbstractOTJComponentView
 {
+	public static boolean alreadyLaunched = false;
+	
 	OTMainClassLauncher launcher;
 	
 	public JComponent getComponent(OTObject otObject, boolean editable)
 	{
+		/**
+		 * This is a hack because getComponent is getting called twice in some cases.
+		 */
+		if(alreadyLaunched){
+			return null;
+		}
+		
+		alreadyLaunched = true;		
+		
 		launcher = (OTMainClassLauncher) otObject;
 		
 		SwingUtilities.invokeLater(new Runnable(){
