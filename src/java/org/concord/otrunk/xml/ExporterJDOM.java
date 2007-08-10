@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-07-26 17:20:07 $
+ * $Revision: 1.8 $
+ * $Date: 2007-08-10 19:10:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -516,7 +516,7 @@ public class ExporterJDOM
 			    ArrayList content = new ArrayList();
 			    for(int j=0; j<mapKeys.length; j++) {
 			    	Element entryEl = new Element("entry");
-			    	content.add(content);
+			    	content.add(entryEl);
 			    	entryEl.setAttribute("key", mapKeys[j]);
 			    	
 			        Object mapValue = map.get(mapKeys[j]);
