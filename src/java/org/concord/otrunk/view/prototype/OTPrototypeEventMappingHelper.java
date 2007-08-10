@@ -21,13 +21,16 @@ public class OTPrototypeEventMappingHelper
 	OTPrototypeEventController.ResourceSchema resources;
 	OTChangeListener prototypeCopyListener;
 	OTChangeListener modelListener;
+	String defaultModelProperty;
 	
-	public OTPrototypeEventMappingHelper(OTObject model, OTObject prototypeCopy,
+	public OTPrototypeEventMappingHelper(OTObject model, String defaultModelProperty, 
+			OTObject prototypeCopy,
 			OTPrototypeEventController.ResourceSchema resources)
 	{
 		this.model = model;
 		this.prototypeCopy = prototypeCopy;
 		this.resources = resources;
+		this.defaultModelProperty = defaultModelProperty;
 		
 		OTObjectList mapping = resources.getMapping();
 		
@@ -35,7 +38,12 @@ public class OTPrototypeEventMappingHelper
 		for(int i=0; i<mapping.size(); i++){
 			OTPrototypeMapEntry entry = (OTPrototypeMapEntry) mapping.get(i);
 			
-			updateValue(model, entry.getModelProperty(), prototypeCopy,
+			String modelProperty = entry.getModelProperty();
+			if(modelProperty == null){
+				modelProperty = defaultModelProperty;
+			}
+			
+			updateValue(model, modelProperty, prototypeCopy,
 					entry.getPrototypeProperty(),null);
 		}
 		
@@ -56,8 +64,13 @@ public class OTPrototypeEventMappingHelper
 					OTPrototypeMapEntry entry = 
 						(OTPrototypeMapEntry) mapping.get(i);
 					
+					String modelProperty = entry.getModelProperty();
+					if(modelProperty == null){
+						modelProperty = defaultModelProperty;
+					}
+					
 					updateValue(prototypeCopy, entry.getPrototypeProperty(),
-							model, entry.getModelProperty(),
+							model, modelProperty,
 							modelListener);					
 				}
 				
@@ -76,7 +89,12 @@ public class OTPrototypeEventMappingHelper
 					OTPrototypeMapEntry entry = 
 						(OTPrototypeMapEntry) mapping.get(i);
 					
-					updateValue(model, entry.getModelProperty(),
+					String modelProperty = entry.getModelProperty();
+					if(modelProperty == null){
+						modelProperty = defaultModelProperty;
+					}
+					
+					updateValue(model, modelProperty,
 							prototypeCopy, entry.getPrototypeProperty(),
 							prototypeCopyListener);					
 				}

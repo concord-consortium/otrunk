@@ -17,4 +17,6 @@ public interface OTPrototypeViewEntry
 
 	public OTPrototypeController getController();
 	public void setController(OTPrototypeController controller);
+	
+	public static String DEFAULT_viewClass="org.concord.otrunk.view.prototype.OTPrototypeView";
 }

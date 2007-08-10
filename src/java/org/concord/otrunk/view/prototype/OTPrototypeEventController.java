@@ -48,8 +48,9 @@ public class OTPrototypeEventController extends DefaultOTObject implements
 		/**
 		 * Turn off the copying of the prototype, see above for information about this copying.
 		 * @return
-		 */
+		 */		
 		public boolean getCopyPrototype();
+		public final static boolean DEFAULT_copyPrototype = true;
 	}
 	private ResourceSchema resources;
 	
@@ -66,22 +67,20 @@ public class OTPrototypeEventController extends DefaultOTObject implements
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.view.OTPrototypeViewController#getComponent(org.concord.otrunk.view.OTPrototypeViewConfig, org.concord.framework.otrunk.view.OTViewFactory)
 	 */
-	public JComponent getComponent(OTObject model, OTPrototypeViewEntry config,
-			OTViewFactory otViewFactory) 
+	public JComponent getComponent(OTObject model, String prototypeCopyKey, 
+		String defaultModelProperty, 
+			OTPrototypeViewEntry config, OTViewFactory otViewFactory) 
 	{
-		// check if there already is a copy of this prototype for this otObject
-		String modelId = model.getGlobalId().toString();
-		
 		OTObject objectToView = null;
 		if(resources.getCopyPrototype()){
-			OTObject prototypeCopy = resources.getPrototypeCopies().getObject(modelId);
+			OTObject prototypeCopy = resources.getPrototypeCopies().getObject(prototypeCopyKey);
 
 			// make one if there isn't
 			if(prototypeCopy == null) {			
 				try {
 					prototypeCopy =
 						getOTObjectService().copyObject(config.getPrototype(), -1);
-					resources.getPrototypeCopies().putObject(modelId, prototypeCopy);
+					resources.getPrototypeCopies().putObject(prototypeCopyKey, prototypeCopy);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -93,7 +92,7 @@ public class OTPrototypeEventController extends DefaultOTObject implements
 		}
 		
 		helper = 
-			new OTPrototypeEventMappingHelper(model, objectToView, 
+			new OTPrototypeEventMappingHelper(model, defaultModelProperty, objectToView, 
 					resources);
 		
 		// return the component for the view 
