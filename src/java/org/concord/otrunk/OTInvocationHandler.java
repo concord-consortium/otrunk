@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2007-08-10 19:08:51 $
+ * $Revision: 1.22 $
+ * $Date: 2007-08-10 23:33:13 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -295,7 +295,7 @@ public class OTInvocationHandler
             (new Exception("Don't handle removeAll yet")).printStackTrace();
             return null;
 		} else if(methodName == "toString") {
-			return otObjectImpl.getOTClassName() + "@" +  otObjectImpl.getGlobalId();
+			return otObjectImpl.internalToString();
 		} else if(methodName == "hashCode") {
 			String str = otObjectImpl.getOTClassName() + "@" +  otObjectImpl.getGlobalId();
 			Integer integer = new Integer(str.hashCode()); 
