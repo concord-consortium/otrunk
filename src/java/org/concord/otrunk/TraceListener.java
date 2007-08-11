@@ -40,7 +40,7 @@ public class TraceListener implements OTObjectServiceListener, OTChangeListener
 	 */
 	public void stateChanged(OTChangeEvent e) 
 	{
-		System.out.println("otchange(" + label + "): " + 
-				e.getDescription());
+		System.out.println("otchange(" + label + ")"); 
+		System.out.println("   " + e.getDescription());
 	}
 }
