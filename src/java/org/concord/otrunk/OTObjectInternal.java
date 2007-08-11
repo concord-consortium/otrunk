@@ -51,6 +51,8 @@ public class OTObjectInternal
 
 	protected OTDataObject dataObject;
 
+	private String changeEventSourceInstanceID;
+
 	public OTObjectInternal(OTDataObject dataObject, OTObjectServiceImpl objectService)
     {
 		this.objectService = objectService;
@@ -71,6 +73,7 @@ public class OTObjectInternal
     public void setEventSource(OTObject src)
     {
     	changeEventSource = src;
+    	changeEventSourceInstanceID = Integer.toHexString(System.identityHashCode(changeEventSource));
     }
 
 	/* (non-Javadoc)
@@ -104,7 +107,7 @@ public class OTObjectInternal
     	for(int i=0;i<changeListeners.size(); i++){
     		WeakReference ref = (WeakReference)changeListeners.get(i);
     		Object listener = ref.get();
-    		if(OTInvocationHandler.traceListeners){
+    		if(OTInvocationHandler.traceListeners && !(listener instanceof TraceListener)){
     			System.out.println("sending stateChanged " + changeEvent.getDescription() +
     					" to " + listener);
     		}
@@ -153,10 +156,8 @@ public class OTObjectInternal
 	    // ignore instances of the tracelistener
 	    if(OTInvocationHandler.traceListeners &&
 	    		!(changeListener instanceof TraceListener)){
-	    	System.out.print("addOTChangeListener(obj:" + changeEventSource + 
-	    			" (" + System.identityHashCode(changeEventSource) + ")");
-	    	System.out.println(", listener:" + changeListener + 
-	    			" (" + System.identityHashCode(changeListener) +") )");
+	    	System.out.println("addOTChangeListener(obj:" + changeEventSource + ","); 
+	    	System.out.println("   listener:" + changeListener+")");
 
 	    	if(changeListenerLabels == null){
 	    		changeListenerLabels = new HashMap();
@@ -172,8 +173,8 @@ public class OTObjectInternal
 	public void removeOTChangeListener(OTChangeListener changeListener)
 	{
 	    if(OTInvocationHandler.traceListeners){
-	    	System.out.println("removeOTChangeListener(obj:" + changeEventSource + 
-	    			", listener:" + changeListener);
+	    	System.out.println("removeOTChangeListener(obj:" + changeEventSource + ",");
+	    	System.out.println("   listener:" + changeListener);
 	    }
 
 	    // param OTChangeListener listener		    
@@ -288,7 +289,11 @@ public class OTObjectInternal
 	
 	public String internalToString()
 	{
-		return getOTClassName() + "@" +  getGlobalId();
+		String otObjectIDStr = "";
+		if(changeEventSourceInstanceID != null){
+			otObjectIDStr = "@" + changeEventSourceInstanceID;
+		}
+		return getOTClassName() + "#" +  getGlobalId() + otObjectIDStr;
 	}
 	
 	protected void finalize()
@@ -296,6 +301,30 @@ public class OTObjectInternal
 	{
 	    if(OTViewerHelper.isTrace()){
 	    	System.out.println("finalizing object: " + internalToString());
+	    }
+	    if(OTInvocationHandler.traceListeners){
+	    	if(changeListeners.size() != 0){
+	    		// Check for the case where there is just the TraceListener
+	    		if(changeListeners.size() == 1){
+	        		WeakReference ref = (WeakReference)changeListeners.get(0);
+	        		Object listener = ref.get();
+	        		if(listener instanceof TraceListener){
+		    			// don't print anything here
+		    			return;
+	        		}
+	    		}
+	    		
+	    		System.out.println("listeners on finalized object: " + internalToString());
+	    		for(int i=0; i<changeListeners.size(); i++){
+	        		WeakReference ref = (WeakReference)changeListeners.get(i);
+	        		Object listener = ref.get();
+	        		if(listener instanceof TraceListener){
+	        			// skip the trace listener
+	        			continue;
+	        		}
+	        		System.out.println("  " + listener);
+	    		}
+	    	} 
 	    }
 	}
 }

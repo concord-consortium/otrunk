@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.19 $
- * $Date: 2007-08-07 19:18:33 $
+ * $Revision: 1.20 $
+ * $Date: 2007-08-11 05:38:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -85,10 +85,6 @@ public class OTObjectServiceImpl
     	OTObjectInternal otObjectImpl = createOTObjectInternal(objectClass);
         OTObject newObject = loadOTObject(otObjectImpl, objectClass);
 
-        // TODO this is actually called twice, once by loadOTObject and 
-        // once here.  is that what should happen?
-        newObject.init();
-        
         return newObject;
     }
 
@@ -108,11 +104,9 @@ public class OTObjectServiceImpl
             throw new Exception("Null child id");
         }
         
-        // Some database translate ids  so before we lookup the object in the otrunk
-        // loaded objects database we should check if our database handles it.
-        
-        OTObjectInternal otObjectInternal = getOTObjectInternal(childID);
-        if(otObjectInternal == null) {
+        OTDataObject childDataObject = getOTDataObject(childID);
+ 
+        if(childDataObject == null) {
             // we have a null internal object that means the child doesn't 
             // exist in our database/databases.
             // 
@@ -126,12 +120,12 @@ public class OTObjectServiceImpl
 
         // Look for our object to see it is already setup in the otrunk list of loaded objects
         // it might be better to have each object service maintain its own list of loaded objects
-        // then the translation method above would not be needed.
-        OTObject otObject = otrunk.getLoadedObject(otObjectInternal.getGlobalId());
+        OTObject otObject = otrunk.getLoadedObject(childDataObject.getGlobalId());
         if(otObject != null) {
             return otObject;
         }
 
+    	OTObjectInternal otObjectInternal = new OTObjectInternal(childDataObject, this);
     	String otObjectClassStr = otObjectInternal.getOTClassName();
         if(otObjectClassStr == null) {
             return null;
@@ -142,22 +136,6 @@ public class OTObjectServiceImpl
         return loadOTObject(otObjectInternal, otObjectClass);        
     }
 
-    protected OTObjectInternal getOTObjectInternal(OTID childID) throws Exception
-    {
-        OTDataObject childDataObject = getOTDataObject(childID);
-        if(childDataObject == null) {
-            // we have a null data object that means the child doesn't 
-            // exist in our database.
-            
-        	// return null so the calling code can ask for the object from the OTrunk
-        	// object.
-        	return null;
-        }
-
-    	OTObjectInternal otObjectImpl = new OTObjectInternal(childDataObject, this);
-    	return otObjectImpl;
-    }
-    
     public OTID getOTID(String otidStr)
     {
         return otrunk.getOTID(otidStr);
@@ -185,10 +163,11 @@ public class OTObjectServiceImpl
             	throw new RuntimeException("The OTClass: " + otObjectClass + 
             			" does not extend OTObject or OTObjectInterface", e);
             }
-            
+
         } else {                    
             otObject = setResourcesFromSchema(otObjectImpl, otObjectClass);
         }
+
         
         notifyLoaded(otObject);
         
