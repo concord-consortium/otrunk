@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.75 $
- * $Date: 2007-08-06 19:04:14 $
+ * $Revision: 1.76 $
+ * $Date: 2007-08-14 17:57:03 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -120,8 +120,9 @@ import org.concord.view.SwingUserMessageHandler;
  *         <p>
  * 
  */
-public class OTViewer extends JFrame implements TreeSelectionListener,
-		OTViewContainerListener, AppleApplicationAdapter 
+public class OTViewer extends JFrame
+    implements TreeSelectionListener, OTViewContainerListener,
+    AppleApplicationAdapter
 {
 	/**
 	 * first version of this class
@@ -131,9 +132,9 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	public final static String TITLE_PROP = "otrunk.view.frame_title";
 
 	public final static String HIDE_TREE_PROP = "otrunk.view.hide_tree";
-  
+
 	public final static String HTTP_PUT = "PUT";
-  
+
 	public final static String HTTP_POST = "POST";
 
 	private static OTrunkImpl otrunk;
@@ -186,7 +187,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	boolean justStarted = false;
 
 	boolean showTree = false;
-  
+
 	URL remoteURL;
 
 	private AbstractAction saveUserDataAsAction;
@@ -206,7 +207,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	private AbstractAction reloadAction;
 
 	private AbstractAction saveAction;
-  
+
 	private AbstractAction saveRemoteAsAction;
 
 	private AbstractAction exportImageAction;
@@ -218,27 +219,30 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	private JDialog commDialog;
 
 	/**
-	 * This is true if the user was asked about saving user data after they initiated a 
-	 * close of the current view.
+	 * This is true if the user was asked about saving user data after they
+	 * initiated a close of the current view.
 	 */
 	private boolean askedAboutSavingUserData = false;
-	
+
 	/**
-	 * This is true if the user was asked about saving the user data, and said yes
+	 * This is true if the user was asked about saving the user data, and said
+	 * yes
 	 */
 	private boolean needToSaveUserData = false;
-	
+
 	private boolean useScrollPane;
 
 	private OTChangeListener systemChangeListener;
 
 	private OTSystem userSystem;
-	
-	public static void setOTViewFactory(OTViewFactory factory) {
+
+	public static void setOTViewFactory(OTViewFactory factory)
+	{
 		otViewFactory = factory;
 	}
 
-	public OTViewer(boolean showTree) {
+	public OTViewer(boolean showTree)
+	{
 		super();
 
 		this.showTree = true;
@@ -260,7 +264,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
 		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
+			public void windowClosing(WindowEvent e)
+			{
 				exitAction.actionPerformed(null);
 			}
 		});
@@ -270,10 +275,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		StreamRecordView view = new StreamRecordView(record);
 		consoleFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		System
-				.setOut((PrintStream) view.addOutputStream(System.out,
-						"Console"));
+		        .setOut((PrintStream) view.addOutputStream(System.out,
+		                "Console"));
 		System.setErr((PrintStream) view
-				.addOutputStream(System.err, System.out));
+		        .addOutputStream(System.err, System.out));
 
 		consoleFrame.getContentPane().add(view);
 		consoleFrame.setSize(800, 600);
@@ -281,11 +286,13 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		commDialog = new JDialog(this, true);
 	}
 
-	public void setUserMode(int mode) {
+	public void setUserMode(int mode)
+	{
 		userMode = mode;
 	}
 
-	public void updateTreePane() {
+	public void updateTreePane()
+	{
 		Dimension minimumSize = new Dimension(100, 50);
 		folderTreeArea = new JTree(folderTreeModel);
 
@@ -324,7 +331,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 		if (splitPane == null) {
 			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-					leftComponent, bodyPanel);
+			        leftComponent, bodyPanel);
 		} else {
 			splitPane.setLeftComponent(leftComponent);
 		}
@@ -334,7 +341,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 	}
 
-	public void initArgs(String[] args) {
+	public void initArgs(String[] args)
+	{
 		if (args.length > 0) {
 			String urlStr = null;
 
@@ -367,9 +375,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 	}
 
-	public void init(String url) {
+	public void init(String url)
+	{
 		updateRemoteURL(url);
-    
+
 		createActions();
 
 		updateMenuBar();
@@ -395,10 +404,11 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
+			public void run()
+			{
 
 				Dimension screenSize = Toolkit.getDefaultToolkit()
-						.getScreenSize();
+				        .getScreenSize();
 				if (screenSize.width < 1000 || screenSize.height < 700) {
 					setVisible(true);
 					int state = getExtendedState();
@@ -414,10 +424,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 					int sizeX = 725;
 					int sizeY = 500;
 
-				//	OTViewService viewService = otViewFactory.
+					// OTViewService viewService = otViewFactory.
 
 					setBounds(cornerX, cornerY, cornerX + sizeX, cornerY
-							+ sizeY);
+					        + sizeY);
 					setVisible(true);
 				}
 
@@ -433,59 +443,62 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				e.printStackTrace();
 				return;
 			}
-			if (otrunk != null){
-				OTMainFrame mainFrame = 
-					(OTMainFrame) otrunk.getService(OTMainFrame.class);
-				
-				if(!mainFrame.getShowLeftPanel()){
+			if (otrunk != null) {
+				OTMainFrame mainFrame = (OTMainFrame) otrunk
+				        .getService(OTMainFrame.class);
+
+				if (!mainFrame.getShowLeftPanel()) {
 					splitPane.getLeftComponent().setVisible(false);
 				}
-				
+
 				useScrollPane = true;
-				if(mainFrame.getFrame() != null){
-					if (mainFrame.getFrame().isResourceSet("width") &&
-							mainFrame.getFrame().isResourceSet("height")){
+				if (mainFrame.getFrame() != null) {
+					if (mainFrame.getFrame().isResourceSet("width")
+					        && mainFrame.getFrame().isResourceSet("height")) {
 						int cornerX = 100;
 						int cornerY = 100;
 						int sizeX = mainFrame.getFrame().getWidth();
 						int sizeY = mainFrame.getFrame().getHeight();
-	
+
 						setBounds(cornerX, cornerY, cornerX + sizeX, cornerY
-								+ sizeY);
+						        + sizeY);
 						repaint();
 					}
 					useScrollPane = mainFrame.getFrame().getUseScrollPane();
 				}
-				
+
 				bodyPanel.setUseScrollPane(useScrollPane);
 			}
-			
-			//method that was refactored out of loadURL
+
+			// method that was refactored out of loadURL
 			try {
-	            setupBodyPanel();
-            } catch (Exception e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
-            }
+				setupBodyPanel();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		
+
 	}
 
-	public void initWithWizard(String url) {
+	public void initWithWizard(String url)
+	{
 		justStarted = true;
 
 		init(url);
 
 		if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
 			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
+				public void run()
+				{
 					instructionPanel();
 				}
 			});
 		}
 	}
 
-	public void loadUserDataFile(File file) {
+	public void loadUserDataFile(File file)
+	{
 		currentUserFile = file;
 		try {
 			loadUserDataURL(file.toURL(), file.getName());
@@ -494,31 +507,36 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		}
 	}
 
-	public void loadUserDataURL(URL url, String name) throws Exception {
+	public void loadUserDataURL(URL url, String name)
+	    throws Exception
+	{
 		XMLDatabase db = new XMLDatabase(url);
 		db.loadObjects();
 		loadUserDataDb(db, name);
 	}
 
-	public void loadUserDataDb(XMLDatabase db, String name) throws Exception {
+	public void loadUserDataDb(XMLDatabase db, String name)
+	    throws Exception
+	{
 		userDataDB = db;
 		currentUser = otrunk.registerUserDataDatabase(userDataDB, name);
 
 		reloadWindow();
 	}
 
-	public void reloadOverlays() 
+	public void reloadOverlays()
 	{
 		try {
-	        otrunk.reloadOverlays(currentUser, userDataDB);
-	        reloadWindow();
-        } catch (Exception e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-        }		
+			otrunk.reloadOverlays(currentUser, userDataDB);
+			reloadWindow();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-	
-	private void loadFile(File file) {
+
+	private void loadFile(File file)
+	{
 		currentAuthoredFile = file;
 		try {
 			loadURL(currentAuthoredFile.toURL());
@@ -527,28 +545,31 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		}
 	}
 
-	private void loadURL(URL url) throws Exception {
-		try{
+	private void loadURL(URL url)
+	    throws Exception
+	{
+		try {
 			xmlDB = new XMLDatabase(url, System.err);
-			if(Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)){
+			if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)) {
 				xmlDB.setTrackResourceInfo(true);
 			}
 			xmlDB.loadObjects();
-		} catch (org.jdom.input.JDOMParseException e){
+		} catch (org.jdom.input.JDOMParseException e) {
 			String xmlWarningTitle = "XML Decoding error";
-			String xmlWarningMessage = "There appears to a problem parsing the XML of this document. \n" +
-				"Please show this error message to one of the workshop leaders. \n\n" +
-				e.getMessage();
-			JOptionPane.showMessageDialog(null, xmlWarningMessage, xmlWarningTitle, JOptionPane.ERROR_MESSAGE);
-			throw e; 
+			String xmlWarningMessage = "There appears to a problem parsing the XML of this document. \n"
+			        + "Please show this error message to one of the workshop leaders. \n\n"
+			        + e.getMessage();
+			JOptionPane.showMessageDialog(null, xmlWarningMessage,
+			        xmlWarningTitle, JOptionPane.ERROR_MESSAGE);
+			throw e;
 		}
-		
-		otrunk = new OTrunkImpl(xmlDB,
-				new Object[] { new SwingUserMessageHandler(this) },
-				new Class[] {UserMessageHandler.class});
 
-		OTViewFactory myViewFactory = 
-			(OTViewFactory) otrunk.getService(OTViewFactory.class);
+		otrunk = new OTrunkImpl(xmlDB,
+		        new Object[] { new SwingUserMessageHandler(this) },
+		        new Class[] { UserMessageHandler.class });
+
+		OTViewFactory myViewFactory = (OTViewFactory) otrunk
+		        .getService(OTViewFactory.class);
 
 		if (myViewFactory != null) {
 			otViewFactory = myViewFactory;
@@ -557,17 +578,18 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		OTViewContext factoryContext = otViewFactory.getViewContext();
 		factoryContext.addViewService(OTrunk.class, otrunk);
 		factoryContext.addViewService(OTFrameManager.class, frameManager);
-		factoryContext.addViewService(OTJComponentServiceFactory.class, new OTJComponentServiceFactoryImpl());
-		
-		
-		
+		factoryContext.addViewService(OTJComponentServiceFactory.class,
+		        new OTJComponentServiceFactoryImpl());
+
 		currentURL = url;
 	}
-	
-	//This method was refactored out of loadURL
-	private void setupBodyPanel() throws Exception{
+
+	// This method was refactored out of loadURL
+	private void setupBodyPanel()
+	    throws Exception
+	{
 		bodyPanel.setTopLevelContainer(true);
-		
+
 		bodyPanel.setOTViewFactory(otViewFactory);
 
 		// set the current mode from the viewservice to the main bodyPanel
@@ -580,7 +602,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 		reloadWindow();
 	}
-	private void reloadWindow() throws Exception {
+
+	private void reloadWindow()
+	    throws Exception
+	{
 		OTObject root = null;
 		boolean overrideShowTree = false;
 
@@ -601,29 +626,30 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			} else {
 				OTObject otRoot = otrunk.getRoot();
 				root = otrunk.getUserRuntimeObject(otRoot, currentUser);
-				
-				OTObject realRoot = otrunk.getRealRoot();
-				if(realRoot instanceof OTSystem){
-					
-					OTSystem localUserSystem = 
-						(OTSystem) otrunk.getUserRuntimeObject(realRoot, currentUser);
 
-					// FIXME there should be a better way than this because we have to handle
+				OTObject realRoot = otrunk.getRealRoot();
+				if (realRoot instanceof OTSystem) {
+
+					OTSystem localUserSystem = (OTSystem) otrunk
+					        .getUserRuntimeObject(realRoot, currentUser);
+
+					// FIXME there should be a better way than this because we
+					// have to handle
 					// multiple users.
-					if(localUserSystem != userSystem){
+					if (localUserSystem != userSystem) {
 						userSystem = localUserSystem;
 
-						systemChangeListener = new OTChangeListener(){
+						systemChangeListener = new OTChangeListener() {
 
 							public void stateChanged(OTChangeEvent e)
 							{
-								if("overlays".equals(e.getProperty())){
+								if ("overlays".equals(e.getProperty())) {
 									reloadOverlays();
-								}	                        
-							}						
+								}
+							}
 						};
 
-						userSystem.addOTChangeListener(systemChangeListener);						
+						userSystem.addOTChangeListener(systemChangeListener);
 					}
 				}
 			}
@@ -632,7 +658,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		if (showTree && !overrideShowTree) {
 			OTDataObject rootDataObject = xmlDB.getRoot();
 			dataTreeModel.setRoot(new OTDataObjectNode("root", rootDataObject,
-					otrunk));
+			        otrunk));
 
 			folderTreeModel.setRoot(new OTFolderNode(root));
 		}
@@ -641,11 +667,11 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 		if (showTree && !overrideShowTree) {
 			folderTreeModel
-					.fireTreeStructureChanged((SimpleTreeNode) folderTreeModel
-							.getRoot());
+			        .fireTreeStructureChanged((SimpleTreeNode) folderTreeModel
+			                .getRoot());
 			dataTreeModel
-					.fireTreeStructureChanged((SimpleTreeNode) dataTreeModel
-							.getRoot());
+			        .fireTreeStructureChanged((SimpleTreeNode) dataTreeModel
+			                .getRoot());
 		}
 
 		Frame frame = (Frame) SwingUtilities.getRoot(this);
@@ -661,7 +687,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		case OTViewerHelper.SINGLE_USER_MODE:
 			if (currentUserFile != null) {
 				frame.setTitle(baseFrameTitle + ": "
-						+ currentUserFile.toString());
+				        + currentUserFile.toString());
 			} else if (System.getProperty(TITLE_PROP, null) != null) {
 				frame.setTitle(baseFrameTitle);
 			} else if (userDataDB != null) {
@@ -676,26 +702,30 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		saveUserDataAsAction.setEnabled(userDataDB != null);
 	}
 
-	public void reload() throws Exception {
+	public void reload()
+	    throws Exception
+	{
 		loadURL(currentURL);
 	}
 
-	public OTDatabase getUserDataDb() {
+	public OTDatabase getUserDataDb()
+	{
 		return userDataDB;
 	}
 
 	/**
-	 * You should call reloadWindow after calling this method to make sure 
-	 * the display reflects this change
+	 * You should call reloadWindow after calling this method to make sure the
+	 * display reflects this change
 	 * 
 	 * @param userObject
 	 */
-	public void setCurrentUser(OTUserObject userObject) 
+	public void setCurrentUser(OTUserObject userObject)
 	{
 		currentUser = userObject;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 
 		OTViewer viewer = new OTViewer(!Boolean.getBoolean(HIDE_TREE_PROP));
@@ -709,17 +739,20 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		viewer.initArgs(args);
 	}
 
-	class ExitAction extends AbstractAction {
+	class ExitAction extends AbstractAction
+	{
 		/**
 		 * nothing to serialize here.
 		 */
 		private static final long serialVersionUID = 1L;
 
-		public ExitAction() {
+		public ExitAction()
+		{
 			super("Exit");
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)
+		{
 			// If this suceeds then the VM will exit so
 			// the window will get disposed
 			exit();
@@ -731,16 +764,18 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	 * 
 	 * @see org.concord.otrunk.view.OTViewContainerListener#currentObjectChanged(org.concord.framework.otrunk.view.OTViewContainer)
 	 */
-	public void currentObjectChanged(OTViewContainer container) {
+	public void currentObjectChanged(OTViewContainer container)
+	{
 		final OTViewContainer myContainer = container;
 
 		// TODO Auto-generated method stub
 		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
+			public void run()
+			{
 				OTObject currentObject = myContainer.getCurrentObject();
 				if (folderTreeArea != null) {
 					OTFolderNode node = (OTFolderNode) folderTreeArea
-							.getLastSelectedPathComponent();
+					        .getLastSelectedPathComponent();
 					if (node == null)
 						return;
 					if (node.getPfObject() != currentObject) {
@@ -756,10 +791,11 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	 * 
 	 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
 	 */
-	public void valueChanged(TreeSelectionEvent event) {
+	public void valueChanged(TreeSelectionEvent event)
+	{
 		if (event.getSource() == folderTreeArea) {
 			OTFolderNode node = (OTFolderNode) folderTreeArea
-					.getLastSelectedPathComponent();
+			        .getLastSelectedPathComponent();
 
 			if (node == null)
 				return;
@@ -773,7 +809,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			}
 		} else if (event.getSource() == dataTreeArea) {
 			SimpleTreeNode node = (SimpleTreeNode) dataTreeArea
-					.getLastSelectedPathComponent();
+			        .getLastSelectedPathComponent();
 			Object resourceValue = null;
 			if (node != null) {
 				resourceValue = node.getObject();
@@ -795,27 +831,28 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			splitPane.setRightComponent(scrollPane);
 		}
 	}
-  
-  private void updateRemoteURL(String defaultURL) {
-    String remote = System.getProperty(OTViewerHelper.REMOTE_URL_PROP, null);
 
-    try {
-      if (remote == null) {
-        if (defaultURL.startsWith("http:")) {
-          remoteURL = new URL(defaultURL);
-        }
-      } else {
-          remoteURL = new URL(remote);
-      }
-    }
-    catch (Exception e) {
-      remoteURL = null;
-      System.err.println("Remote URL is invalid.");
-      e.printStackTrace();
-    }
-  }
+	private void updateRemoteURL(String defaultURL)
+	{
+		String remote = System
+		        .getProperty(OTViewerHelper.REMOTE_URL_PROP, null);
 
-  public void remoteSaveData(String method)
+		try {
+			if (remote == null) {
+				if (defaultURL.startsWith("http:")) {
+					remoteURL = new URL(defaultURL);
+				}
+			} else {
+				remoteURL = new URL(remote);
+			}
+		} catch (Exception e) {
+			remoteURL = null;
+			System.err.println("Remote URL is invalid.");
+			e.printStackTrace();
+		}
+	}
+
+	public void remoteSaveData(String method)
 	    throws Exception
 	{
 		HttpURLConnection urlConn;
@@ -823,8 +860,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		BufferedReader urlDataIn;
 
 		// If method isn't "POST" or "PUT", throw an exception
-		if (!(method.compareTo(OTViewer.HTTP_POST) == 0 ||
-		        method.compareTo(OTViewer.HTTP_PUT) == 0)) {
+		if (!(method.compareTo(OTViewer.HTTP_POST) == 0 || method
+		        .compareTo(OTViewer.HTTP_PUT) == 0)) {
 			throw new Exception("Invalid HTTP Request method for data saving");
 		}
 
@@ -851,7 +888,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		}
 		urlDataIn.close();
 		// Need to trap non-HTTP 200/300 responses and throw an exception (if an
-        // exception isn't thrown already) and capture the exceptions upstream
+		// exception isn't thrown already) and capture the exceptions upstream
 		int code = urlConn.getResponseCode();
 		if (code >= 400) {
 			throw new Exception("HTTP Response: "
@@ -861,8 +898,9 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		xmlDB.setDirty(false);
 		setTitle(remoteURL.toString());
 	}
-  
-	public void createActions() {
+
+	public void createActions()
+	{
 		newUserDataAction = new AbstractAction() {
 
 			/**
@@ -875,7 +913,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 * 
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0)
+			{
 				createNewUser();
 			}
 
@@ -893,7 +932,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 * 
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0)
+			{
 				openUserData();
 			}
 
@@ -906,10 +946,11 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 */
 			private static final long serialVersionUID = 1L;
 
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0)
+			{
 				File fileToSave = getReportFile();
 				OTMLToXHTMLConverter otxc = new OTMLToXHTMLConverter(
-						otViewFactory, bodyPanel.getViewContainer());
+				        otViewFactory, bodyPanel.getViewContainer());
 				otxc.setXHTMLParams(fileToSave, 800, 600);
 
 				(new Thread(otxc)).start();
@@ -930,7 +971,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 * 
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0)
+			{
 				if (currentUserFile == null || !currentUserFile.exists()) {
 					saveUserDataAsAction.actionPerformed(arg0);
 					return;
@@ -939,7 +981,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				if (currentUserFile.exists()) {
 					try {
 						Exporter.export(currentUserFile, userDataDB.getRoot(),
-								userDataDB);
+						        userDataDB);
 						userDataDB.setDirty(false);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -961,11 +1003,12 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 * 
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0)
+			{
 				Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
 				MostRecentFileDialog mrfd = new MostRecentFileDialog(
-						"org.concord.otviewer.saveotml");
+				        "org.concord.otviewer.saveotml");
 				mrfd.setFilenameFilter("otml");
 
 				if (currentUserFile != null) {
@@ -984,16 +1027,16 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 					if (!fileName.toLowerCase().endsWith(".otml")) {
 						currentUserFile = new File(currentUserFile
-								.getAbsolutePath()
-								+ ".otml");
+						        .getAbsolutePath()
+						        + ".otml");
 					}
 
 					try {
 						Exporter.export(currentUserFile, userDataDB.getRoot(),
-								userDataDB);
+						        userDataDB);
 						userDataDB.setDirty(false);
 						setTitle(baseFrameTitle + ": "
-								+ currentUserFile.toString());
+						        + currentUserFile.toString());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -1018,11 +1061,12 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 * 
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0)
+			{
 				Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
 				MostRecentFileDialog mrfd = new MostRecentFileDialog(
-						"org.concord.otviewer.openotml");
+				        "org.concord.otviewer.openotml");
 				mrfd.setFilenameFilter("otml");
 
 				int retval = mrfd.showOpenDialog(frame);
@@ -1054,7 +1098,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 * 
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0)
+			{
 				if (remoteURL != null) {
 					try {
 						if (Boolean
@@ -1068,10 +1113,13 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 							remoteSaveData(OTViewer.HTTP_POST);
 						}
 					} catch (Exception e) {
-			            JOptionPane.showMessageDialog((Frame) SwingUtilities.getRoot(OTViewer.this),
-			            		"There was an error saving. Check your URL and try again.",
-			            		"Error Saving",
-			            		JOptionPane.ERROR_MESSAGE);
+						JOptionPane
+						        .showMessageDialog(
+						                (Frame) SwingUtilities
+						                        .getRoot(OTViewer.this),
+						                "There was an error saving. Check your URL and try again.",
+						                "Error Saving",
+						                JOptionPane.ERROR_MESSAGE);
 						e.printStackTrace();
 					}
 				} else {
@@ -1079,10 +1127,11 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 						saveAsAction.actionPerformed(arg0);
 						return;
 					}
-  
+
 					if (checkForReplace(currentAuthoredFile)) {
 						try {
-							ExporterJDOM.export(currentAuthoredFile, xmlDB.getRoot(), xmlDB);
+							ExporterJDOM.export(currentAuthoredFile, xmlDB
+							        .getRoot(), xmlDB);
 							xmlDB.setDirty(false);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -1105,16 +1154,17 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 * 
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0)
+			{
 				Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
 				MostRecentFileDialog mrfd = new MostRecentFileDialog(
-						"org.concord.otviewer.saveotml");
+				        "org.concord.otviewer.saveotml");
 				mrfd.setFilenameFilter("otml");
 
 				if (currentAuthoredFile != null) {
 					mrfd.setCurrentDirectory(currentAuthoredFile
-							.getParentFile());
+					        .getParentFile());
 					mrfd.setSelectedFile(currentAuthoredFile);
 				}
 
@@ -1127,8 +1177,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 					String fileName = file.getPath();
 
 					if (!fileName.toLowerCase().endsWith(".otml")) {
-						file = new File(file.getAbsolutePath()
-								+ ".otml");
+						file = new File(file.getAbsolutePath() + ".otml");
 					}
 
 					if (checkForReplace(file)) {
@@ -1150,74 +1199,79 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		};
 		saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
 
-    saveRemoteAsAction = new AbstractAction() {
+		saveRemoteAsAction = new AbstractAction() {
 
-      /**
-       * nothing to serizile here
-       */
-      private static final long serialVersionUID = 1L;
+			/**
+			 * nothing to serizile here
+			 */
+			private static final long serialVersionUID = 1L;
 
-      /*
-       * (non-Javadoc)
-       * 
-       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-       */
-      public void actionPerformed(ActionEvent arg0) {
-        // Pop up a dialog asking for a URL
-        // Post the otml to the url
-        JPanel panel = new JPanel();
-        panel.setBorder(new EmptyBorder(10,10,10,10));
-        panel.setLayout(new BorderLayout());
-        
-        JLabel prompt = new JLabel("Please enter the URL to which you would like to save:");
-        prompt.setBorder(new EmptyBorder(0,0,10,0));
-        JTextField textField = new JTextField();
-        if (remoteURL == null) {
-        	textField.setText("http://");
-        } else {
-        	textField.setText(remoteURL.toString());
-        }
-        
-        JPanel checkboxPanel = new JPanel();
-        JCheckBox restCheckbox = new JCheckBox("REST Enabled?");
-        restCheckbox.setSelected(Boolean.getBoolean(OTViewerHelper.REST_ENABLED_PROP));
-        checkboxPanel.setBorder(new EmptyBorder(5,5,0,0));
-        checkboxPanel.add(restCheckbox);
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0)
+			{
+				// Pop up a dialog asking for a URL
+				// Post the otml to the url
+				JPanel panel = new JPanel();
+				panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+				panel.setLayout(new BorderLayout());
 
-        panel.add(prompt, BorderLayout.NORTH);
-        panel.add(textField, BorderLayout.CENTER);
-        panel.add(checkboxPanel, BorderLayout.SOUTH);
-        
-        int returnVal = 
-          CustomDialog.showOKCancelDialog(
-              (Frame) SwingUtilities.getRoot(OTViewer.this),  // parent
-              panel,                                          // custom content
-              "Save URL",                                     // title
-              false,                                           // resizeable
-              true                                            // modal
-            );
+				JLabel prompt = new JLabel(
+				        "Please enter the URL to which you would like to save:");
+				prompt.setBorder(new EmptyBorder(0, 0, 10, 0));
+				JTextField textField = new JTextField();
+				if (remoteURL == null) {
+					textField.setText("http://");
+				} else {
+					textField.setText(remoteURL.toString());
+				}
 
-        if (returnVal == 0) {
-          try {
-            remoteURL = new URL(textField.getText());
-            System.setProperty(OTViewerHelper.REST_ENABLED_PROP, Boolean.toString(restCheckbox.isSelected()));
-            remoteSaveData(OTViewer.HTTP_POST);
-            updateMenuBar();
-          } catch (Exception e) {
-            System.err.println("Bad URL. Not saving.");
-            JOptionPane.showMessageDialog((Frame) SwingUtilities.getRoot(OTViewer.this),
-            		"There was an error saving. Check your URL and try again.",
-            		"Error Saving",
-            		JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-          }
-        }
-        else {
-          // CANCELLED
-        }
-      }
-    };
-    saveRemoteAsAction.putValue(Action.NAME, "Save Remotely As...");
+				JPanel checkboxPanel = new JPanel();
+				JCheckBox restCheckbox = new JCheckBox("REST Enabled?");
+				restCheckbox.setSelected(Boolean
+				        .getBoolean(OTViewerHelper.REST_ENABLED_PROP));
+				checkboxPanel.setBorder(new EmptyBorder(5, 5, 0, 0));
+				checkboxPanel.add(restCheckbox);
+
+				panel.add(prompt, BorderLayout.NORTH);
+				panel.add(textField, BorderLayout.CENTER);
+				panel.add(checkboxPanel, BorderLayout.SOUTH);
+
+				int returnVal = CustomDialog.showOKCancelDialog(
+				        (Frame) SwingUtilities.getRoot(OTViewer.this), // parent
+				        panel, // custom content
+				        "Save URL", // title
+				        false, // resizeable
+				        true // modal
+				        );
+
+				if (returnVal == 0) {
+					try {
+						remoteURL = new URL(textField.getText());
+						System.setProperty(OTViewerHelper.REST_ENABLED_PROP,
+						        Boolean.toString(restCheckbox.isSelected()));
+						remoteSaveData(OTViewer.HTTP_POST);
+						updateMenuBar();
+					} catch (Exception e) {
+						System.err.println("Bad URL. Not saving.");
+						JOptionPane
+						        .showMessageDialog(
+						                (Frame) SwingUtilities
+						                        .getRoot(OTViewer.this),
+						                "There was an error saving. Check your URL and try again.",
+						                "Error Saving",
+						                JOptionPane.ERROR_MESSAGE);
+						e.printStackTrace();
+					}
+				} else {
+					// CANCELLED
+				}
+			}
+		};
+		saveRemoteAsAction.putValue(Action.NAME, "Save Remotely As...");
 
 		exportImageAction = new AbstractAction() {
 
@@ -1226,7 +1280,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 */
 			private static final long serialVersionUID = 1L;
 
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				// this introduces a dependency on concord Swing project
 				// instead there needs to be a way to added these actions
 				// through
@@ -1243,7 +1298,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 */
 			private static final long serialVersionUID = 1L;
 
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				Component currentComp = bodyPanel.getCurrentComponent();
 				Util.makeScreenShot(currentComp, 2, 2);
 			}
@@ -1257,7 +1313,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 */
 			private static final long serialVersionUID = 1L;
 
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				Object source = e.getSource();
 				if (((JCheckBoxMenuItem) source).isSelected()) {
 					System.setProperty(OTViewerHelper.DEBUG_PROP, "true");
@@ -1272,7 +1329,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				}
 
 				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
+					public void run()
+					{
 						updateMenuBar();
 					}
 				});
@@ -1288,22 +1346,24 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			 */
 			private static final long serialVersionUID = 1L;
 
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				if (consoleFrame != null) {
 					consoleFrame.setVisible(true);
 				}
 			}
 		};
 		showConsoleAction.putValue(Action.NAME, "Show Console");
-		
+
 		reloadAction = new AbstractAction() {
 
 			/**
-			 * nothing to serizile here
+			 * nothing to serialize here
 			 */
 			private static final long serialVersionUID = 1L;
 
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				try {
 					reload();
 				} catch (Exception e1) {
@@ -1320,7 +1380,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	/**
 	 * @return Returns the menuBar.
 	 */
-	public JMenuBar updateMenuBar() {
+	public JMenuBar updateMenuBar()
+	{
 		// ///////////////////////////////////////////////
 		JMenu fileMenu = null;
 		if (menuBar == null) {
@@ -1331,8 +1392,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			fileMenu = menuBar.getMenu(0);
 			fileMenu.removeAll();
 		}
-		
-		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)){
+
+		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)) {
 			userMode = OTViewerHelper.NO_USER_MODE;
 		}
 
@@ -1352,8 +1413,10 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
 				loadAction.putValue(Action.NAME, "Open Authored Content...");
 				saveAction.putValue(Action.NAME, "Save Authored Content");
-				saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
-				saveRemoteAsAction.putValue(Action.NAME, "Save Authored Content Remotely As...");
+				saveAsAction.putValue(Action.NAME,
+				        "Save Authored Content As...");
+				saveRemoteAsAction.putValue(Action.NAME,
+				        "Save Authored Content Remotely As...");
 			} else {
 				loadAction.putValue(Action.NAME, "Open...");
 				saveAction.putValue(Action.NAME, "Save");
@@ -1371,7 +1434,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
 				loadAction.putValue(Action.NAME, "Open Authored Content...");
 				saveAction.putValue(Action.NAME, "Save Authored Content");
-				saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
+				saveAsAction.putValue(Action.NAME,
+				        "Save Authored Content As...");
 			} else {
 				loadAction.putValue(Action.NAME, "Open...");
 				saveAction.putValue(Action.NAME, "Save");
@@ -1391,8 +1455,9 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		fileMenu.add(exportToHtmlAction);
 
 		fileMenu.add(showConsoleAction);
-		
-		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP) || Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
+
+		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)
+		        || Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
 			fileMenu.add(reloadAction);
 		}
 
@@ -1405,20 +1470,22 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		return menuBar;
 	}
 
-	boolean checkForReplace(File file) {
+	boolean checkForReplace(File file)
+	{
 		if (file == null)
 			return false;
 		if (!file.exists())
-			return true;  // File doesn't exist, so go ahead and save
+			return true; // File doesn't exist, so go ahead and save
 		if (file.compareTo(currentAuthoredFile) == 0)
-			return true;  // we're already authoring this file, so no need to prompt
+			return true; // we're already authoring this file, so no need to
+							// prompt
 		final Object[] options = { "Yes", "No" };
 		return javax.swing.JOptionPane.showOptionDialog(null, "The file '"
-				+ file.getName() + "' already exists.  "
-				+ "Replace existing file?", "Warning",
-				javax.swing.JOptionPane.YES_NO_OPTION,
-				javax.swing.JOptionPane.WARNING_MESSAGE, null, options,
-				options[1]) == javax.swing.JOptionPane.YES_OPTION;
+		        + file.getName() + "' already exists.  "
+		        + "Replace existing file?", "Warning",
+		        javax.swing.JOptionPane.YES_NO_OPTION,
+		        javax.swing.JOptionPane.WARNING_MESSAGE, null, options,
+		        options[1]) == javax.swing.JOptionPane.YES_OPTION;
 
 	}
 
@@ -1428,7 +1495,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	 * 
 	 * @return
 	 */
-	public boolean checkForUnsavedUserData() {
+	public boolean checkForUnsavedUserData()
+	{
 		if (currentUser != null && userDataDB != null) {
 			if (userDataDB.isDirty()) {
 				// show dialog message telling them they haven't
@@ -1437,9 +1505,9 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				String options[] = { "Don't Save", "Cancel", "Save" };
 				askedAboutSavingUserData = true;
 				int chosenOption = JOptionPane.showOptionDialog(this,
-						"Save Changes?", "Save Changes?",
-						JOptionPane.DEFAULT_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+				        "Save Changes?", "Save Changes?",
+				        JOptionPane.DEFAULT_OPTION,
+				        JOptionPane.WARNING_MESSAGE, null, options, options[2]);
 				switch (chosenOption) {
 				case 0:
 					System.err.println("Not saving work");
@@ -1457,14 +1525,16 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 		return true;
 	}
-	
+
 	/**
-	 * Checks if the user has unsaved authored data. If they do then it prompts them to
-	 * confirm what they are doing. If they cancel then it returns false.
+	 * Checks if the user has unsaved authored data. If they do then it prompts
+	 * them to confirm what they are doing. If they cancel then it returns
+	 * false.
 	 * 
 	 * @return
 	 */
-	public boolean checkForUnsavedAuthorData() {
+	public boolean checkForUnsavedAuthorData()
+	{
 		if (xmlDB != null) {
 			if (xmlDB.isDirty()) {
 				// show dialog message telling them they haven't
@@ -1472,9 +1542,9 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 				// FIXME
 				String options[] = { "Don't Save", "Cancel", "Save" };
 				int chosenOption = JOptionPane.showOptionDialog(this,
-						"Save Changes?", "Save Changes?",
-						JOptionPane.DEFAULT_OPTION,
-						JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+				        "Save Changes?", "Save Changes?",
+				        JOptionPane.DEFAULT_OPTION,
+				        JOptionPane.WARNING_MESSAGE, null, options, options[2]);
 				switch (chosenOption) {
 				case 0:
 					System.err.println("Not saving authored data");
@@ -1497,7 +1567,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	 * This does not check for unsaved user data
 	 * 
 	 */
-	public void newAnonUserData() {
+	public void newAnonUserData()
+	{
 		// call some new method for creating a new un-saved user state
 		// this should set the currentUserFile to null, so the save check
 		// prompts
@@ -1510,15 +1581,15 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 			OTObjectService objService = otrunk.createObjectService(userDataDB);
 
 			OTStateRoot stateRoot = (OTStateRoot) objService
-					.createObject(OTStateRoot.class);
+			        .createObject(OTStateRoot.class);
 			userDataDB.setRoot(stateRoot.getGlobalId());
 			stateRoot.setFormatVersionString("1.0");
 
 			OTUserObject userObject = OTViewerHelper.createUser(
-					"anon_single_user", objService);
+			        "anon_single_user", objService);
 
 			otrunk.initUserObjectService((OTObjectServiceImpl) objService,
-					userObject, stateRoot);
+			        userObject, stateRoot);
 
 			userDataDB.setDirty(false);
 
@@ -1534,28 +1605,35 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 	}
 
-	public boolean exit() {
+	public boolean exit()
+	{
 		try {
 			if (!checkForUnsavedUserData()) {
 				// the user canceled the operation
 				return false;
 			}
-			
-			if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP) && ! checkForUnsavedAuthorData()) {
+
+			if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)
+			        && !checkForUnsavedAuthorData()) {
 				// the user canceled the operation
 				return false;
 			}
 
-			// FIXME there is a problem with this logic.  If the user saved data just before closing
-			// checkForUnsavedUserData will not see any unsaved data.  But if some view creates
-			// data in the viewClosed method then that data will not get saved here.
-			// I think the key to solving this is to seperate the automatic/logging data from the 
-			// user visible data.  And then make a rule that saving data in the viewClosed method
+			// FIXME there is a problem with this logic. If the user saved data
+			// just before closing
+			// checkForUnsavedUserData will not see any unsaved data. But if
+			// some view creates
+			// data in the viewClosed method then that data will not get saved
+			// here.
+			// I think the key to solving this is to seperate the
+			// automatic/logging data from the
+			// user visible data. And then make a rule that saving data in the
+			// viewClosed method
 			// is not allowed.
 			bodyPanel.setCurrentObject(null);
 
 			conditionalSaveUserData();
-			
+
 			if (otrunk != null)
 				otrunk.close();
 		} catch (Exception exp) {
@@ -1568,28 +1646,30 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 
 	protected void conditionalSaveUserData()
 	{
-		if(!askedAboutSavingUserData){
+		if (!askedAboutSavingUserData) {
 			checkForUnsavedUserData();
 		}
-		
-		if(needToSaveUserData) {
+
+		if (needToSaveUserData) {
 			saveUserDataAction.actionPerformed(null);
-			
+
 		} else {
 			System.err.println("Not saving work before closing.");
 		}
 
-		// Reset these back to false, so if the user is switching to a new 
-		// user or loading a new file we are in a clean state, for that file or user
+		// Reset these back to false, so if the user is switching to a new
+		// user or loading a new file we are in a clean state, for that file or
+		// user
 		askedAboutSavingUserData = false;
 		needToSaveUserData = false;
 	}
-	
-	public File getReportFile() {
+
+	public File getReportFile()
+	{
 		Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
 		MostRecentFileDialog mrfd = new MostRecentFileDialog(
-				"org.concord.otviewer.saveotml");
+		        "org.concord.otviewer.saveotml");
 		mrfd.setFilenameFilter("html");
 
 		if (currentUserFile != null) {
@@ -1615,7 +1695,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		return null;
 	}
 
-	public void createNewUser() {
+	public void createNewUser()
+	{
 		if (!checkForUnsavedUserData()) {
 			// the user canceled the operation
 			return;
@@ -1624,7 +1705,7 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		// This ensures viewClosed is called
 		bodyPanel.setCurrentObject(null);
 		conditionalSaveUserData();
-		
+
 		// call some new method for creating a new un-saved user state
 		// this should set the currentUserFile to null, so the save check
 		// prompts
@@ -1633,24 +1714,28 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		exportToHtmlAction.setEnabled(true);
 	}
 
-	public void openUserData() {
+	public void openUserData()
+	{
 		if (!checkForUnsavedUserData()) {
 			// the user canceled the operation
 			return;
 		}
 
-		// FIXME Calling the method below would insure the view is closed, and that any data that is 
-		//   is modified in that view closed operation will get saved, however if the user 
-		//   cancels the open dialog then we would be left in an unknown
-		//   state.  The current view would be closed which they would want to see again.		
+		// FIXME Calling the method below would insure the view is closed, and
+		// that any data that is
+		// is modified in that view closed operation will get saved, however if
+		// the user
+		// cancels the open dialog then we would be left in an unknown
+		// state. The current view would be closed which they would want to see
+		// again.
 		// bodyPanel.setCurrentObject(null);
-		
+
 		conditionalSaveUserData();
-		
+
 		Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
 		MostRecentFileDialog mrfd = new MostRecentFileDialog(
-				"org.concord.otviewer.openotml");
+		        "org.concord.otviewer.openotml");
 		mrfd.setFilenameFilter("otml");
 
 		int retval = mrfd.showOpenDialog(frame);
@@ -1666,7 +1751,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		}
 	}
 
-	public void instructionPanel() {
+	public void instructionPanel()
+	{
 		commDialog.setResizable(false);
 
 		JPanel panel = new JPanel();
@@ -1674,9 +1760,9 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		panel.setLayout(null);
 
 		JLabel lNew = new JLabel(
-				"Click the \"New\" button to create a new portfolio:");
+		        "Click the \"New\" button to create a new portfolio:");
 		JLabel lOpen = new JLabel(
-				"Click the \"Open\" button to open a saved portfolio:");
+		        "Click the \"Open\" button to open a saved portfolio:");
 		JButton bNew = new JButton("New");
 		JButton bOpen = new JButton("Open");
 
@@ -1699,14 +1785,16 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		bOpen.setOpaque(false);
 
 		bNew.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				commDialog.setVisible(false);
 				createNewUser();
 			}
 		});
 
 		bOpen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)
+			{
 				commDialog.setVisible(false);
 				openUserData();
 			}
@@ -1715,19 +1803,22 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 		commDialog.getContentPane().add(panel);
 		commDialog.setBounds(200, 200, 500, 300);
 		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
+			public void run()
+			{
 				commDialog.setVisible(true);
 				justStarted = false;
 				updateMenuBar();
 			}
 		});
 	}
-	
-	public OTViewContainerPanel getViewContainerPanel() {
-		return  this.bodyPanel;
+
+	public OTViewContainerPanel getViewContainerPanel()
+	{
+		return this.bodyPanel;
 	}
 
-	public void setExitAction(AbstractAction exitAction) {
+	public void setExitAction(AbstractAction exitAction)
+	{
 		this.exitAction = exitAction;
 	}
 
@@ -1736,7 +1827,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	 * 
 	 * @see org.concord.applesupport.AppleApplicationAdapter#about()
 	 */
-	public void about() {
+	public void about()
+	{
 		// TODO Auto-generated method stub
 
 	}
@@ -1746,7 +1838,8 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	 * 
 	 * @see org.concord.applesupport.AppleApplicationAdapter#preferences()
 	 */
-	public void preferences() {
+	public void preferences()
+	{
 		// TODO Auto-generated method stub
 
 	}
@@ -1756,13 +1849,16 @@ public class OTViewer extends JFrame implements TreeSelectionListener,
 	 * 
 	 * @see org.concord.applesupport.AppleApplicationAdapter#quit()
 	 */
-	public void quit() {
+	public void quit()
+	{
 		exitAction.actionPerformed(null);
 	}
 } // @jve:decl-index=0:visual-constraint="10,10"
 
-class HtmlFileFilter extends javax.swing.filechooser.FileFilter {
-	public boolean accept(File f) {
+class HtmlFileFilter extends javax.swing.filechooser.FileFilter
+{
+	public boolean accept(File f)
+	{
 		if (f == null)
 			return false;
 		if (f.isDirectory())
@@ -1771,7 +1867,8 @@ class HtmlFileFilter extends javax.swing.filechooser.FileFilter {
 		return (f.getName().toLowerCase().endsWith(".html"));
 	}
 
-	public String getDescription() {
+	public String getDescription()
+	{
 		return "HTML files";
 	}
 
