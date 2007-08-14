@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-08-10 19:10:39 $
+ * $Revision: 1.9 $
+ * $Date: 2007-08-14 18:27:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -85,6 +85,12 @@ public class ExporterJDOM
 	private static ArrayList processedIds;
 	private static ArrayList duplicateClasses;
 	private static HashMap incomingReferenceMap;
+	
+	private static Pattern refidPattern = Pattern.compile("(refid=\")([^\"]*)(\")");
+
+	// don't match hrefs with colons those are external links				
+	private static Pattern hrefPattern = Pattern.compile("(href=\")([^:\"]*)(\")");
+
 	
 	public static void export(File outputFile, OTDataObject rootObject, OTDatabase db)
 	throws Exception
@@ -247,35 +253,40 @@ public class ExporterJDOM
 				// first search for any id pattern after find it
 				// record the reference, and possibly substitute it
 				// if it is a local_id reference
-				Pattern pattern = Pattern.compile("(refid=\")([^\"]*)(\")");
-				parseXMLString(pattern, dataObject, (OTXMLString) resource);
-
-				// don't match hrefs with colons those are external links				
-				pattern = Pattern.compile("(href=\")([^:\"]*)(\")");
-				parseXMLString(pattern, dataObject, (OTXMLString) resource);
+				processXMLString(refidPattern, dataObject, (OTXMLString) resource);
+				processXMLString(hrefPattern, dataObject, (OTXMLString) resource);
 			}
 		}
     }
 
 
-	private static void parseXMLString(Pattern pattern, OTDataObject dataObject, 
+	private static void processXMLString(Pattern pattern, OTDataObject dataObject, 
 		OTXMLString xmlString) 
 		throws Exception
 	{
 		Matcher m = pattern.matcher(xmlString.getContent());
+		while(m.find()) {
+			String otidStr = m.group(2);
+			OTID otid = OTIDFactory.createOTID(otidStr);
+			processReference(dataObject, otid);			
+		}
+	}
+	
+	private static String exportXMLString(Pattern pattern, String xmlString)
+	{
+		Matcher m = pattern.matcher(xmlString);
 		StringBuffer parsed = new StringBuffer();
 		while(m.find()) {
 			String otidStr = m.group(2);
 			OTID otid = OTIDFactory.createOTID(otidStr);
-			processReference(dataObject, otid);
 			
 			String convertedId = convertId(otid);
 			String escapedConvertedId = OTrunkUtil.escapeReplacement(convertedId);
 			m.appendReplacement(parsed, "$1" + escapedConvertedId + "$3");
 		}
 		m.appendTail(parsed);
-		
-		xmlString.setContent(parsed.toString());		
+
+		return parsed.toString();
 	}
 	
 	private static void processCollectionItem(OTDataObject parent, Object listElement) 
@@ -558,9 +569,14 @@ public class ExporterJDOM
 				// and if it doesn't fail then clone the contents of the fake root
 				// element and add it to the resourceElement 
 				// FIXME if it does fail then write it out as CDATA
-				// FIXME we should process any references				
+				// FIXME we should process any references
+				
+				String xmlString = ((OTXMLString)resource).getContent();
+				xmlString = exportXMLString(refidPattern, xmlString);
+				xmlString = exportXMLString(hrefPattern, xmlString);
+
 				SAXBuilder builder = new SAXBuilder();
-				String xmlString = "<root>" + ((OTXMLString)resource).getContent().trim() + "</root>";
+				xmlString = "<root>" + xmlString.trim() + "</root>";
 				StringReader reader = new StringReader(xmlString);
 				try{
 					Document xmlStringDoc = builder.build(reader, resourceName);

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.76 $
- * $Date: 2007-08-14 17:57:03 $
+ * $Revision: 1.77 $
+ * $Date: 2007-08-14 18:27:43 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -49,6 +49,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
 
@@ -204,7 +205,7 @@ public class OTViewer extends JFrame
 
 	private AbstractAction loadAction;
 
-	private AbstractAction reloadAction;
+	private AbstractAction reloadWindowAction;
 
 	private AbstractAction saveAction;
 
@@ -434,53 +435,55 @@ public class OTViewer extends JFrame
 			}
 		});
 
-		if (url != null) {
-			try {
-				loadURL(new URL(url));
-			} catch (Exception e) {
-				// FIXME: this should popup a dialog
-				System.err.println("Can't load url");
-				e.printStackTrace();
-				return;
-			}
-			if (otrunk != null) {
-				OTMainFrame mainFrame = (OTMainFrame) otrunk
-				        .getService(OTMainFrame.class);
-
-				if (!mainFrame.getShowLeftPanel()) {
-					splitPane.getLeftComponent().setVisible(false);
-				}
-
-				useScrollPane = true;
-				if (mainFrame.getFrame() != null) {
-					if (mainFrame.getFrame().isResourceSet("width")
-					        && mainFrame.getFrame().isResourceSet("height")) {
-						int cornerX = 100;
-						int cornerY = 100;
-						int sizeX = mainFrame.getFrame().getWidth();
-						int sizeY = mainFrame.getFrame().getHeight();
-
-						setBounds(cornerX, cornerY, cornerX + sizeX, cornerY
-						        + sizeY);
-						repaint();
-					}
-					useScrollPane = mainFrame.getFrame().getUseScrollPane();
-				}
-
-				bodyPanel.setUseScrollPane(useScrollPane);
-			}
-
-			// method that was refactored out of loadURL
-			try {
-				setupBodyPanel();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if (url == null) {
+			return;
 		}
 
+		try {
+	        initializeURL(new URL(url));
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (Exception e) {
+			// FIXME: this should popup a dialog
+			System.err.println("Can't load url");
+			e.printStackTrace();
+			return;
+		}
 	}
 
+	public void initializeURL(URL url) throws Exception
+	{
+		loadURL(url);
+
+		OTMainFrame mainFrame = (OTMainFrame) otrunk
+		.getService(OTMainFrame.class);
+
+		if (!mainFrame.getShowLeftPanel()) {
+			splitPane.getLeftComponent().setVisible(false);
+		}
+
+		useScrollPane = true;
+		if (mainFrame.getFrame() != null) {
+			if (mainFrame.getFrame().isResourceSet("width")
+					&& mainFrame.getFrame().isResourceSet("height")) {
+				int cornerX = 100;
+				int cornerY = 100;
+				int sizeX = mainFrame.getFrame().getWidth();
+				int sizeY = mainFrame.getFrame().getHeight();
+
+				setBounds(cornerX, cornerY, cornerX + sizeX, cornerY
+						+ sizeY);
+				repaint();
+			}
+			useScrollPane = mainFrame.getFrame().getUseScrollPane();
+		}
+
+		bodyPanel.setUseScrollPane(useScrollPane);
+
+		setupBodyPanel();
+	}
+	
 	public void initWithWizard(String url)
 	{
 		justStarted = true;
@@ -539,7 +542,7 @@ public class OTViewer extends JFrame
 	{
 		currentAuthoredFile = file;
 		try {
-			loadURL(currentAuthoredFile.toURL());
+			initializeURL(currentAuthoredFile.toURL());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -705,7 +708,7 @@ public class OTViewer extends JFrame
 	public void reload()
 	    throws Exception
 	{
-		loadURL(currentURL);
+		initializeURL(currentURL);
 	}
 
 	public OTDatabase getUserDataDb()
@@ -901,7 +904,7 @@ public class OTViewer extends JFrame
 
 	public void createActions()
 	{
-		newUserDataAction = new AbstractAction() {
+		newUserDataAction = new AbstractAction("New") {
 
 			/**
 			 * nothing to serialize here
@@ -919,9 +922,8 @@ public class OTViewer extends JFrame
 			}
 
 		};
-		newUserDataAction.putValue(Action.NAME, "New");
 
-		loadUserDataAction = new AbstractAction() {
+		loadUserDataAction = new AbstractAction("Open...") {
 			/**
 			 * nothing to serialize here. Just the parent class.
 			 */
@@ -938,9 +940,8 @@ public class OTViewer extends JFrame
 			}
 
 		};
-		loadUserDataAction.putValue(Action.NAME, "Open...");
 
-		exportToHtmlAction = new AbstractAction() {
+		exportToHtmlAction = new AbstractAction("Export to html...") {
 			/**
 			 * nothing to serialize here
 			 */
@@ -956,10 +957,10 @@ public class OTViewer extends JFrame
 				(new Thread(otxc)).start();
 			}
 		};
-		exportToHtmlAction.putValue(Action.NAME, "Export to html...");
+		// Isn't it enabled by default?
 		exportToHtmlAction.setEnabled(true);
 
-		saveUserDataAction = new AbstractAction() {
+		saveUserDataAction = new AbstractAction("Save") {
 
 			/**
 			 * Nothing to serialize here
@@ -989,9 +990,8 @@ public class OTViewer extends JFrame
 				}
 			}
 		};
-		saveUserDataAction.putValue(Action.NAME, "Save");
 
-		saveUserDataAsAction = new AbstractAction() {
+		saveUserDataAsAction = new AbstractAction("Save As...") {
 
 			/**
 			 * nothing to serizile here
@@ -1047,9 +1047,8 @@ public class OTViewer extends JFrame
 			}
 
 		};
-		saveUserDataAsAction.putValue(Action.NAME, "Save As...");
 
-		loadAction = new AbstractAction() {
+		loadAction = new AbstractAction("Open Authored Content...") {
 
 			/**
 			 * nothing to serizile here
@@ -1079,14 +1078,14 @@ public class OTViewer extends JFrame
 				if (file != null && file.exists()) {
 					System.out.println("load file name: " + file);
 					loadFile(file);
+					
 					exportToHtmlAction.setEnabled(true);
 				}
 			}
 
 		};
-		loadAction.putValue(Action.NAME, "Open Authored Content...");
 
-		saveAction = new AbstractAction() {
+		saveAction = new AbstractAction("Save Authored Content...") {
 
 			/**
 			 * nothing to serizile here
@@ -1140,9 +1139,8 @@ public class OTViewer extends JFrame
 				} // end if (remoteUrl == null)
 			}
 		};
-		saveAction.putValue(Action.NAME, "Save Authored Content...");
 
-		saveAsAction = new AbstractAction() {
+		saveAsAction = new AbstractAction("Save Authored Content As...") {
 
 			/**
 			 * nothing to serizile here
@@ -1197,9 +1195,8 @@ public class OTViewer extends JFrame
 				}
 			}
 		};
-		saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
 
-		saveRemoteAsAction = new AbstractAction() {
+		saveRemoteAsAction = new AbstractAction("Save Remotely As...") {
 
 			/**
 			 * nothing to serizile here
@@ -1271,12 +1268,11 @@ public class OTViewer extends JFrame
 				}
 			}
 		};
-		saveRemoteAsAction.putValue(Action.NAME, "Save Remotely As...");
 
-		exportImageAction = new AbstractAction() {
+		exportImageAction = new AbstractAction("Export Image...") {
 
 			/**
-			 * nothing to serizile here
+			 * nothing to serialize here
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -1290,9 +1286,8 @@ public class OTViewer extends JFrame
 				Util.makeScreenShot(currentComp);
 			}
 		};
-		exportImageAction.putValue(Action.NAME, "Export Image...");
 
-		exportHiResImageAction = new AbstractAction() {
+		exportHiResImageAction = new AbstractAction("Export Hi Res Image...") {
 			/**
 			 * nothing to serizile here
 			 */
@@ -1304,9 +1299,8 @@ public class OTViewer extends JFrame
 				Util.makeScreenShot(currentComp, 2, 2);
 			}
 		};
-		exportHiResImageAction.putValue(Action.NAME, "Export Hi Res Image...");
 
-		debugAction = new AbstractAction() {
+		debugAction = new AbstractAction("Debug Mode") {
 
 			/**
 			 * nothing to serizile here
@@ -1337,12 +1331,11 @@ public class OTViewer extends JFrame
 				exportToHtmlAction.setEnabled(true);
 			}
 		};
-		debugAction.putValue(Action.NAME, "Debug Mode");
 
-		showConsoleAction = new AbstractAction() {
+		showConsoleAction = new AbstractAction("Show Console") {
 
 			/**
-			 * nothing to serizile here
+			 * nothing to serialize here
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -1353,9 +1346,8 @@ public class OTViewer extends JFrame
 				}
 			}
 		};
-		showConsoleAction.putValue(Action.NAME, "Show Console");
 
-		reloadAction = new AbstractAction() {
+		reloadWindowAction = new AbstractAction("Reload window") {
 
 			/**
 			 * nothing to serialize here
@@ -1371,7 +1363,6 @@ public class OTViewer extends JFrame
 				}
 			}
 		};
-		reloadAction.putValue(Action.NAME, "Reload window");
 
 		exitAction = new ExitAction();
 
@@ -1458,7 +1449,7 @@ public class OTViewer extends JFrame
 
 		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)
 		        || Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
-			fileMenu.add(reloadAction);
+			fileMenu.add(reloadWindowAction);
 		}
 
 		JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem(debugAction);
