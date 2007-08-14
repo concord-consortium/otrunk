@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.77 $
- * $Date: 2007-08-14 18:27:43 $
+ * $Revision: 1.78 $
+ * $Date: 2007-08-14 19:20:56 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -1463,13 +1463,19 @@ public class OTViewer extends JFrame
 
 	boolean checkForReplace(File file)
 	{
-		if (file == null)
+		if (file == null){
 			return false;
-		if (!file.exists())
+		}
+		
+		if (!file.exists()) {
 			return true; // File doesn't exist, so go ahead and save
-		if (file.compareTo(currentAuthoredFile) == 0)
+		}
+		
+		if (currentAuthoredFile != null && file.compareTo(currentAuthoredFile) == 0){
 			return true; // we're already authoring this file, so no need to
 							// prompt
+		}
+		
 		final Object[] options = { "Yes", "No" };
 		return javax.swing.JOptionPane.showOptionDialog(null, "The file '"
 		        + file.getName() + "' already exists.  "
