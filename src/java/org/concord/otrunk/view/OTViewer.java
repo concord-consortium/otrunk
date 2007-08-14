@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.78 $
- * $Date: 2007-08-14 19:20:56 $
+ * $Revision: 1.79 $
+ * $Date: 2007-08-14 19:53:32 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -1182,6 +1182,7 @@ public class OTViewer extends JFrame
 						try {
 							ExporterJDOM.export(file, xmlDB.getRoot(), xmlDB);
 							currentAuthoredFile = file;
+							currentURL = file.toURL();
 							xmlDB.setDirty(false);
 						} catch (Exception e) {
 							e.printStackTrace();
