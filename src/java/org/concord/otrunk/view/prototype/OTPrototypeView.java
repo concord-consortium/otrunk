@@ -14,13 +14,14 @@ public class OTPrototypeView extends AbstractOTView
 	implements OTJComponentView, OTViewEntryAware
 {
 	OTPrototypeViewEntry viewEntry;
-	
+		
 	/**
 	 * We need to keep a reference to the controller
 	 * so it can add listeners to things and not get
 	 * garbage collected.
 	 */
 	OTPrototypeController controller;
+	PrototypeControllerInstance controllerInstance;
 	
 	public JComponent getComponent(OTObject otObject, boolean editable) 
 	{
@@ -29,15 +30,24 @@ public class OTPrototypeView extends AbstractOTView
 		// for now just ignore the passed in object
 		// and look up the view for our object, 
 		// What should happen is that the OtObject should be proxied
-		// so that certain properties from it can come from the passed
+ 		// so that certain properties from it can come from the passed
 		// in object.
 		
 		OTObject prototype = viewEntry.getPrototype();
 
-		controller = viewEntry.getController();		
+		controller = viewEntry.getController();
 		JComponent component = null;
 		if(controller != null) {
-			component = getControllerComponent(otObject, otViewFactory);
+			controllerInstance = controller.getControllerInstance();			
+			OTObject prototypeCopy = getPrototypeCopy(otObject);
+
+			OTObject objectToView = getControllerViewObject(otObject, prototypeCopy);
+			
+			// return the component for the view 
+			OTJComponentView view = (OTJComponentView)
+				otViewFactory.getView(objectToView, viewEntry.getViewEntry());
+			
+			component = view.getComponent(objectToView, false);			
 		} else {
 			// there is no controller, so we can't create a live view but
 			// we can display a view of the prototype
@@ -54,17 +64,40 @@ public class OTPrototypeView extends AbstractOTView
 		}		
 	}
 
-	protected JComponent getControllerComponent(OTObject otObject, 
-		OTViewFactory otViewFactory)	
+	protected OTObject getPrototypeCopy(OTObject model)
 	{
-		String copyKey = otObject.getGlobalId().toString();
-		return controller.getComponent(otObject, copyKey, null, viewEntry, otViewFactory);
+		String prototypeCopyKey = model.getGlobalId().toString();
+		
+		if(viewEntry.getCopyPrototype()){
+			OTObject prototypeCopy = viewEntry.getPrototypeCopies().getObject(prototypeCopyKey);
+
+			// make one if there isn't
+			if(prototypeCopy == null) {			
+				try {
+					prototypeCopy =
+						model.getOTObjectService().copyObject(viewEntry.getPrototype(), -1);
+					viewEntry.getPrototypeCopies().putObject(prototypeCopyKey, prototypeCopy);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}			
+			}
+			return prototypeCopy;
+		} else {
+			return viewEntry.getPrototype();
+		}
+
+	}
+	
+	protected OTObject getControllerViewObject(OTObject model, OTObject prototypeCopy)
+	{
+		return controllerInstance.getViewObject(model, prototypeCopy, null);
 	}
 	
 	
 	public void viewClosed() {
 		// TODO Auto-generated method stub
-		controller.close();
+		controllerInstance.close();
 	}
 
 	/* (non-Javadoc)

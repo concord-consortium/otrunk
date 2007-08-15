@@ -24,6 +24,14 @@ public class OTPrototypeProxyController extends DefaultOTObject implements
 	public OTPrototypeProxyController(OTResourceSchema resources) {
 		super(resources);
 	}
+
+	// FIXME this needs to be refactored.
+	// If we ever plan to use it again.
+	public PrototypeControllerInstance getControllerInstance()
+	{
+	    // TODO Auto-generated method stub
+	    return null;
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.view.OTPrototypeViewController#getComponent(org.concord.otrunk.view.OTPrototypeViewConfig, org.concord.framework.otrunk.view.OTViewFactory)
