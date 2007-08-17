@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2007-07-25 17:06:35 $
+ * $Revision: 1.22 $
+ * $Date: 2007-08-17 13:21:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,11 +34,23 @@ package org.concord.otrunk.xml;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTObjectMap;
+import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTResourceSchema;
+import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.framework.otrunk.otcore.OTClassProperty;
+import org.concord.framework.otrunk.otcore.OTType;
 import org.concord.otrunk.OTInvocationHandler;
+import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.otcore.impl.OTClassImpl;
+import org.concord.otrunk.otcore.impl.OTClassPropertyImpl;
+import org.concord.otrunk.otcore.impl.OTCorePackage;
 
 
 /**
@@ -77,6 +89,10 @@ public class ReflectionTypeDefinitions
 		    }
 		}		
 		
+		// These object handlers will be processed in a second pass 
+		// to setup the OTClass structure
+		ArrayList objectHandlersToProcess = new ArrayList();
+		
 		for(int i=0; i<typeClasses.size(); i++) {
 			Class otObjectClass = (Class)typeClasses.get(i); 
 			String className = otObjectClass.getName();
@@ -112,9 +128,18 @@ public class ReflectionTypeDefinitions
 			
 			Vector resourceDefs = new Vector();
 			addResources(resourceDefs, resourceSchemaClass, typeClasses, true);
+			
+			OTClass existingOTClass = OTrunkImpl.getOTClass(className);
+			OTClass newOTClass = null;
+			if(existingOTClass == null ){
+				newOTClass = new OTClassImpl();
+				OTrunkImpl.putOTClass(className, newOTClass);				
+			}
+			
 			ResourceDefinition [] resourceDefsArray = new ResourceDefinition[resourceDefs.size()];
 			for(int j=0; j<resourceDefsArray.length; j++) {
-				resourceDefsArray[j] = (ResourceDefinition)resourceDefs.get(j);
+				ResourceDefinition resourceDef = (ResourceDefinition)resourceDefs.get(j);
+				resourceDefsArray[j] = resourceDef;				
 			}
 			ObjectTypeHandler objectType = 
 				new ObjectTypeHandler(
@@ -124,13 +149,82 @@ public class ReflectionTypeDefinitions
 						resourceDefsArray,
 						typeService,
 						xmlDB);
-						
+
+			if(newOTClass != null){
+				objectHandlersToProcess.add(objectType);				
+			}
+			
 			typeService.registerUserType(className, objectType);
 			
 			if(addShortcuts) {
 			    int lastDot = className.lastIndexOf(".");
 			    String localClassName = className.substring(lastDot+1,className.length());
 			    typeService.registerUserType(localClassName, objectType);
+			}
+		}
+		
+		for(int i=0; i<objectHandlersToProcess.size(); i++){
+			ObjectTypeHandler objectType = (ObjectTypeHandler) objectHandlersToProcess.get(i);
+			
+			OTClass otClass = OTrunkImpl.getOTClass(objectType.getClassName());
+			
+			ResourceDefinition [] resourceDefsArray = objectType.getResourceDefinitions();
+			for(int j=0; j<resourceDefsArray.length; j++){
+				ResourceDefinition resourceDef = resourceDefsArray[j];
+				String resourceName = resourceDef.getName();
+				
+				if(resourceName.equals("localId")){
+					// skip this one
+					continue;
+				}
+				
+				OTType otType = null;
+				String resourceType = resourceDef.getType();
+				Class resourceTypeClass = resourceDef.getTypeClass();
+				
+				if(TypeService.BOOLEAN.equals(resourceType)){
+					otType = OTCorePackage.BOOLEAN_TYPE;
+				} else if(TypeService.DOUBLE.equals(resourceType)){
+					otType = OTCorePackage.DOUBLE_TYPE;
+				} else if(TypeService.FLOAT.equals(resourceType)){
+					otType = OTCorePackage.FLOAT_TYPE;
+				} else if(TypeService.INTEGER.equals(resourceType)){
+					otType = OTCorePackage.INTEGER_TYPE;
+				} else if(TypeService.LONG.equals(resourceType)){
+					otType = OTCorePackage.LONG_TYPE;
+				} else if(TypeService.STRING.equals(resourceType)){
+					otType = OTCorePackage.STRING_TYPE;
+				} else if(TypeService.XML_STRING.equals(resourceType)){
+					otType = OTCorePackage.XML_STRING_TYPE;
+				} else if(TypeService.OBJECT.equals(resourceType)){
+					otType = OTrunkImpl.getOTClass(resourceTypeClass.getName());
+
+					if(otType == null){
+						// TODO For now we just add dummy classes we should do some more careful
+						// type checking here,  
+						System.err.println("Can't find OTClass for: " + resourceTypeClass.getName() + 
+								" adding dummy OTClass");
+						OTClass dummyClass = new OTClassImpl();
+						OTrunkImpl.putOTClass(resourceTypeClass.getName(), dummyClass);
+					} 
+				} else if(TypeService.LIST.equals(resourceType)){
+					if(resourceTypeClass.equals(OTResourceList.class)){
+						otType = OTCorePackage.RESOURCE_LIST_TYPE;
+					} else if(resourceTypeClass.equals(OTObjectList.class)){
+						otType = OTCorePackage.OBJECT_LIST_TYPE;
+					}
+				} else if(TypeService.MAP.equals(resourceType)){
+					if(resourceTypeClass.equals(OTResourceMap.class)){
+						otType = OTCorePackage.RESOURCE_MAP_TYPE;
+					} else if(resourceTypeClass.equals(OTObjectMap.class)){
+						otType = OTCorePackage.OBJECT_MAP_TYPE;
+					}
+				} 
+				
+				OTClassProperty otClassProperty = new OTClassPropertyImpl(resourceName, otType, null);
+				
+				// might need to check for duplicates, but I think we fixed further upstream
+				otClass.getProperties().add(otClassProperty);
 			}
 		}
 	}
