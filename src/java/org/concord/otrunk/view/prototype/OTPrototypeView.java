@@ -4,13 +4,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.view.AbstractOTView;
+import org.concord.framework.otrunk.view.AbstractOTJComponentView;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
-import org.concord.framework.otrunk.view.OTViewFactory;
 
-public class OTPrototypeView extends AbstractOTView
+public class OTPrototypeView extends AbstractOTJComponentView
 	implements OTJComponentView, OTViewEntryAware
 {
 	OTPrototypeViewEntry viewEntry;
@@ -25,8 +24,6 @@ public class OTPrototypeView extends AbstractOTView
 	
 	public JComponent getComponent(OTObject otObject, boolean editable) 
 	{
-		OTViewFactory otViewFactory = getViewFactory();
-		
 		// for now just ignore the passed in object
 		// and look up the view for our object, 
 		// What should happen is that the OtObject should be proxied
@@ -36,26 +33,23 @@ public class OTPrototypeView extends AbstractOTView
 		OTObject prototype = viewEntry.getPrototype();
 
 		controller = viewEntry.getController();
+		OTObject objectToView = null;
 		JComponent component = null;
 		if(controller != null) {
 			controllerInstance = controller.getControllerInstance();			
 			OTObject prototypeCopy = getPrototypeCopy(otObject);
 
-			OTObject objectToView = getControllerViewObject(otObject, prototypeCopy);
+			objectToView = getControllerViewObject(otObject, prototypeCopy);
 			
-			// return the component for the view 
-			OTJComponentView view = (OTJComponentView)
-				otViewFactory.getView(objectToView, viewEntry.getViewEntry());
-			
-			component = view.getComponent(objectToView, false);			
 		} else {
-			// there is no controller, so we can't create a live view but
-			// we can display a view of the prototype
-			OTJComponentView currentView =
-				(OTJComponentView)otViewFactory.getView(prototype, viewEntry.getViewEntry());
-
-			component = currentView.getComponent(prototype, false);
+			objectToView = prototype;
 		}
+
+		// return the component for the view 
+		OTJComponentView view = getJComponentService().getObjectView(objectToView, null, null, 
+				viewEntry.getViewEntry());
+				
+		component = view.getComponent(objectToView, false);			
 
 		if(component == null) {
 			return new JLabel("No view for object: " + prototype);
@@ -80,13 +74,20 @@ public class OTPrototypeView extends AbstractOTView
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}			
+				}
+				
+				initPrototypeCopy(model, prototypeCopy);
 			}
 			return prototypeCopy;
 		} else {
 			return viewEntry.getPrototype();
 		}
 
+	}
+	
+	protected void initPrototypeCopy(OTObject model, OTObject prototypeCopy)
+	{
+		controllerInstance.initPrototypeCopy(model, prototypeCopy);
 	}
 	
 	protected OTObject getControllerViewObject(OTObject model, OTObject prototypeCopy)

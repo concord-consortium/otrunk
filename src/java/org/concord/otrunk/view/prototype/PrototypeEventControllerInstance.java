@@ -29,4 +29,9 @@ public class PrototypeEventControllerInstance
 		helper.removeAllListeners();
 	}
 
+	public void initPrototypeCopy(OTObject model, OTObject prototypeCopy)
+    {
+		// we don't need to do any initialization here	    
+    }
+
 }

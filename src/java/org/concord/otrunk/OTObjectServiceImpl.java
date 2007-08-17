@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.20 $
- * $Date: 2007-08-11 05:38:33 $
+ * $Revision: 1.21 $
+ * $Date: 2007-08-17 13:21:28 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -91,9 +91,11 @@ public class OTObjectServiceImpl
     protected OTObjectInternal createOTObjectInternal(Class objectClass)
     	throws Exception
     {
+    	String className = objectClass.getName();
     	OTDataObjectType type = new OTDataObjectType(objectClass.getName());
         OTDataObject dataObject = createDataObject(type);        
-    	OTObjectInternal otObjectImpl = new OTObjectInternal(dataObject, this);
+    	OTObjectInternal otObjectImpl = 
+    		new OTObjectInternal(dataObject, this, OTrunkImpl.getOTClass(className));
     	return otObjectImpl;
     }
     
@@ -125,13 +127,14 @@ public class OTObjectServiceImpl
             return otObject;
         }
 
-    	OTObjectInternal otObjectInternal = new OTObjectInternal(childDataObject, this);
-    	String otObjectClassStr = otObjectInternal.getOTClassName();
+    	String otObjectClassStr = OTrunkImpl.getClassName(childDataObject);
         if(otObjectClassStr == null) {
             return null;
-        }
-            
+        }            
         Class otObjectClass = Class.forName(otObjectClassStr);
+        
+    	OTObjectInternal otObjectInternal = 
+    		new OTObjectInternal(childDataObject, this, OTrunkImpl.getOTClass(otObjectClassStr));
     
         return loadOTObject(otObjectInternal, otObjectClass);        
     }

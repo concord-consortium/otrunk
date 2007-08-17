@@ -32,6 +32,7 @@ package org.concord.otrunk;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.WeakHashMap;
@@ -47,6 +48,7 @@ import org.concord.framework.otrunk.OTPackage;
 import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
+import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -87,7 +89,9 @@ public class OTrunkImpl implements OTrunk
     Vector objectServices = new Vector();
 
 	private Vector registeredPackageClasses = new Vector();;
-    
+
+	private static HashMap otClassMap = new HashMap(); 
+	
     public final static String getClassName(OTDataObject dataObject)
     {
     	OTDataObjectType type = dataObject.getType();
@@ -615,4 +619,14 @@ public class OTrunkImpl implements OTrunk
 	public OTObjectServiceImpl getRootObjectService() {
 		return rootObjectService;
 	}	
+	
+	public static OTClass getOTClass(String className)
+	{
+		return (OTClass) otClassMap.get(className);
+	}
+	
+	public static void putOTClass(String className, OTClass otClass)
+	{
+		otClassMap.put(className, otClass);
+	}
 }

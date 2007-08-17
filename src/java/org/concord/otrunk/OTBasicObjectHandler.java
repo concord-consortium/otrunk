@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2007-08-01 14:08:54 $
+ * $Revision: 1.14 $
+ * $Date: 2007-08-17 13:21:28 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -70,14 +70,6 @@ public class OTBasicObjectHandler extends OTInvocationHandler
 	        throw new RuntimeException("Trying to use the same handler for 2 proxy objects");
 	    }
 	    
-	    String methodName = method.getName();
-				
-		// skip the init call if this is a basic object that is being proxied
-		if(methodName.equals("init")) {
-			return null;
-		}
-
-		
 		return super.invoke(proxy, method, args);
 	}	
 }

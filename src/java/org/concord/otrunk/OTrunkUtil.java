@@ -18,6 +18,8 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceList;
+import org.concord.framework.otrunk.OTXMLString;
+import org.concord.framework.otrunk.otcore.OTClassProperty;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -39,52 +41,44 @@ public class OTrunkUtil
 	 * @return
 	 * @throws NoSuchMethodException
 	 */
-	public static Object getPropertyValue(String propertyPath, Object root)
+	public static Object getPropertyValue(String propertyPath, OTObject root)
 	   throws NoSuchMethodException
 	{
 		Object currentObject = root;
 		StringTokenizer toks = new StringTokenizer(propertyPath, "/");
+		String currentProperty = null;
 		while(toks.hasMoreTokens()){
-			String propertyName = toks.nextToken();
+			if(!(currentObject instanceof OTObject)){
+				throw new RuntimeException("Invalid path: " + propertyPath + 
+						" element: " + currentProperty + " did not return an OTObject");
+			}
+			
+			currentProperty = toks.nextToken();
 			currentObject = 
-				getNonPathPropertyValue(propertyName, currentObject);
+				getNonPathPropertyValue(currentProperty, (OTObject) currentObject);
 		}
 		return currentObject;
 	}
 	
-	public final static Object getNonPathPropertyValue(String propertyName, Object obj) 
+	public final static Object getNonPathPropertyValue(String propertyName, OTObject obj) 
 		throws NoSuchMethodException
 	{
 		// find the get or is method on the object with this name
-		Class objClass = obj.getClass();
-		String methodCase = propertyToMethodCase(propertyName);
 		
 		if(propertyName.endsWith("]")){
 			Pattern arrayPattern = Pattern.compile("(.*)\\[(\\d*)\\]");
-			Matcher m = arrayPattern.matcher(methodCase);
+			Matcher m = arrayPattern.matcher(propertyName);
 			if(m.matches()){
-				methodCase = m.group(1);
+				propertyName = m.group(1);
 				String indexStr = m.group(2);
 				
-				// get the ObjectList
-				// call set with this index
-				String methodName = "get" + methodCase;
-
-				Method getListMethod = objClass.getMethod(methodName, null);
-				Object list = null;
-				try {
-					list = getListMethod.invoke(obj, null);
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				OTClassProperty classProperty = obj.otClass().getProperty(propertyName);
+				if(classProperty == null){
+					throw new RuntimeException("Property: " + propertyName + 
+							" doesn't exist on object: " + obj);
 				}
-								
+				Object list = obj.otGet(classProperty);
+												
 				// remove the old one 
 				int index = Integer.parseInt(indexStr);
 				
@@ -98,26 +92,12 @@ public class OTrunkUtil
 			}
 		} else {
 
-			Method method = null;
-			try {
-				method = objClass.getMethod("get" + methodCase, null);
-			} catch (NoSuchMethodException e) {
-				// do nothing because we should try the is method
-				method = objClass.getMethod("is" + methodCase, null);
+			OTClassProperty classProperty = obj.otClass().getProperty(propertyName);
+			if(classProperty == null){
+				throw new RuntimeException("Property: " + propertyName + 
+						" doesn't exist on object: " + obj);
 			}
-
-			try {
-				return method.invoke(obj, null);
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			return obj.otGet(classProperty);
 		}
 		
 		return null;
@@ -194,7 +174,8 @@ public class OTrunkUtil
 			}
 
 			if(setMethod == null){
-				throw new NoSuchMethodException("propertyName: " + propertyName);
+				throw new NoSuchMethodException("propertyName: " + propertyName + 
+						" newValue: " + value);
 			}
 			
 			Class paramType = setMethod.getParameterTypes()[0];
@@ -235,11 +216,17 @@ public class OTrunkUtil
 				}
 			}
 			
-			if(paramType == String.class &&
-					(value.getClass().isPrimitive() ||
-							Number.class.isAssignableFrom(value.getClass())))
-			{
-				value = "" + value;
+			if(paramType == String.class){
+				if(value == null){
+					// leave it alone so the param is set to null
+				} else if(value.getClass().isPrimitive() ||
+						value instanceof Number ||
+						value instanceof Boolean){
+					value = "" + value;
+				} else if(value instanceof OTXMLString){
+					value = ((OTXMLString)value).getContent();
+				}
+				
 			}
 			
 			params = new Object[]{value};
@@ -249,7 +236,7 @@ public class OTrunkUtil
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
+				System.err.println("Can't call: " + setMethod + " with: " + value.getClass());
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
@@ -269,13 +256,20 @@ public class OTrunkUtil
 	{
 		Object currentObject = root;
 		StringTokenizer toks = new StringTokenizer(propertyPath, "/");
+		String currentProperty = null;
 		while(toks.hasMoreTokens()){
-			String propertyName = toks.nextToken();
+			if(!(currentObject instanceof OTObject)){
+				throw new RuntimeException("Invalid path: " + propertyPath + 
+						" element: " + currentProperty + " did not return an OTObject");
+			}
+			
+
+			currentProperty = toks.nextToken();
 			if(toks.hasMoreTokens()){
 				currentObject = 
-					getNonPathPropertyValue(propertyName, currentObject);
+					getNonPathPropertyValue(currentProperty, (OTObject) currentObject);
 			} else {
-				setNonPathPropertyValue(propertyName, currentObject, value);				
+				setNonPathPropertyValue(currentProperty, currentObject, value);				
 			}		
 		}
 	}

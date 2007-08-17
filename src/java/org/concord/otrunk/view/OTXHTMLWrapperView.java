@@ -8,6 +8,8 @@ import javax.swing.JComponent;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.framework.otrunk.otcore.OTClassProperty;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.otrunk.view.document.OTDocument;
 import org.concord.otrunk.view.document.OTDocumentView;
@@ -39,7 +41,11 @@ public class OTXHTMLWrapperView extends OTDocumentView
 	 */
 	public JComponent getComponent(OTObject otObject, boolean editable) 
 	{
-		
+		// FIXME this should be replaced with something like the prototype view setup
+		// An actual OTCompoundDoc should be created and its properties set, and
+		// then listeners can be added to it, to monitor changes in both directions
+		// This concept of wrapping one view type with another should also be more generically
+		// controlled, so new view types can be added and wrappers can be made.		
 		OTDocument doc = new OTDocument() {
 
 			public String getDocumentText() {
@@ -79,7 +85,32 @@ public class OTXHTMLWrapperView extends OTDocumentView
 
 			public void setName(String name) {
 				throw new UnsupportedOperationException();
-			}			
+			}
+
+			public OTClass otClass()
+            {
+				throw new UnsupportedOperationException();
+            }
+
+			public Object otGet(OTClassProperty property)
+            {
+				throw new UnsupportedOperationException();
+            }
+
+			public boolean otIsSet(OTClassProperty property)
+            {
+				throw new UnsupportedOperationException();
+            }
+
+			public void otSet(OTClassProperty property, Object newValue)
+            {
+				throw new UnsupportedOperationException();
+            }
+
+			public void otUnSet(OTClassProperty property)
+            {
+				throw new UnsupportedOperationException();
+            }			
 		};
 		
 		return super.getComponent(doc, editable);
