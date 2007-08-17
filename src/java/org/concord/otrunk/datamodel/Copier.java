@@ -65,6 +65,9 @@ public class Copier
 			if(itemCopyEntry == null){
 				OTDataObject itemObj = 
 					otDb.getOTDataObject(root, (OTID)child);
+				if(itemObj == null){
+					throw new IllegalStateException("Can't find child id: " + child);
+				}
 				OTDataObject itemCopy = 
 					otDb.createDataObject(itemObj.getType());
 				int copyMaxDepth = -1;
@@ -174,9 +177,29 @@ public class Copier
 					} else {
 						// If we are here it is because we didn't already store this 
 						// copied object somewhere.  
+						
+						// We should first check if the otid is a valid id, if not then it is
+						// an invalid match
+						OTDataObject matchedDataObject = otDb.getOTDataObject(root, otid);
+						if(matchedDataObject == null){
+							// this id isn't in our database or it is invalid
+							// print a warning and continue
+							System.err.println("Can't find object to copy: " + otid + " skipping object");
+							
+							// put the same string back in. 
+							matcher.appendReplacement(copiedStringBuf, "$0");
+							
+							continue;
+							
+						}
+
+						
 						// If we have an orphanList then the object can be stored there
 						// if we not then print a warning message and use the original
 						// object.
+						
+						
+						
 						if(orphanList == null){
 							System.err.println("Cannot copy objects referenced from " +
 							"xml strings, that are not stored somewhere else");
