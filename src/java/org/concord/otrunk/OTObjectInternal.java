@@ -521,6 +521,7 @@ public class OTObjectInternal implements OTObjectInterface
 
 	public void otSet(OTClassProperty property, Object newValue)
     {
+		// FIXME should probably do some type checking here
 		setResource(property.getName(), newValue);
     }
 

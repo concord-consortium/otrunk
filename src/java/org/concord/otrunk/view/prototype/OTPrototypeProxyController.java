@@ -27,7 +27,7 @@ public class OTPrototypeProxyController extends DefaultOTObject implements
 
 	// FIXME this needs to be refactored.
 	// If we ever plan to use it again.
-	public PrototypeControllerInstance getControllerInstance()
+	public PrototypeControllerInstance createControllerInstance()
 	{
 	    // TODO Auto-generated method stub
 	    return null;

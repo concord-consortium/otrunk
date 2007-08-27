@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.55 $
- * $Date: 2007-07-31 14:36:20 $
+ * $Revision: 1.56 $
+ * $Date: 2007-08-27 14:53:09 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -84,6 +84,7 @@ public class OTViewContainerPanel extends JPanel
     boolean currentObjectEditable = false;
     OTJComponentView currentView = null;
     OTViewEntry currentViewEntry = null;
+    OTViewChild currentViewChild = null;    
     
     private OTJComponentService jComponentService;	
 	
@@ -236,8 +237,24 @@ public class OTViewContainerPanel extends JPanel
 		// have the option to not queue this event.
 		
 		currentObject = otObject;
-		currentObjectEditable = editable;
 		currentViewEntry = viewEntry;
+		currentObjectEditable = editable;
+		currentViewChild = null;
+		
+		if (otObject instanceof OTViewChild){
+			OTViewChild viewChild = (OTViewChild) otObject; 
+						
+			currentObject = viewChild.getObject();
+			if (viewChild.getViewid() != null){
+				currentViewEntry = viewChild.getViewid();
+			}
+			
+			// We save the currentViewChild so its settings can be used for the scroll pane
+			// The settings from the viewChild are simply set here because some views reuse their
+			// container panels, and set the scroll properties.  Those settings should be preserved
+			// even if a viewChild temporarily overrides them.
+			currentViewChild = viewChild;
+		}		
 		
 		removeAll();
 		
@@ -276,7 +293,12 @@ public class OTViewContainerPanel extends JPanel
 		    {
 		    	JComponent myComponent = createJComponent(); 
 
-				if(isUseScrollPane()) {
+		    	boolean localUseScrollPane = isUseScrollPane();
+		    	if(currentViewChild != null){
+		    		localUseScrollPane = currentViewChild.getUseScrollPane();
+		    	}
+
+				if(localUseScrollPane) {
 					JScrollPane scrollPane = new JScrollPane();
 					scrollPane.setOpaque(false);
 					
@@ -302,7 +324,11 @@ public class OTViewContainerPanel extends JPanel
 					
 					scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 					
-					if (!scrollPanelHasBorder){
+			    	boolean localScrollPanelHasBorder = scrollPanelHasBorder;
+			    	if(currentViewChild != null){
+			    		localScrollPanelHasBorder = currentViewChild.getScrollPanelHasBorder();
+			    	}
+					if (!localScrollPanelHasBorder){
 						scrollPane.setBorder(BorderFactory.createEmptyBorder());
 					}
 					
@@ -320,7 +346,7 @@ public class OTViewContainerPanel extends JPanel
 				// We have to queue this up, because during the setup of this
 				// component other things might be queued, that cause scrolling
 				// to happen. 
-				// this way the scrolling should remain diabled until all 
+				// this way the scrolling should remain disabled until all 
 				// of them are complete.
 				SwingUtilities.invokeLater(new Runnable(){
 					/* (non-Javadoc)

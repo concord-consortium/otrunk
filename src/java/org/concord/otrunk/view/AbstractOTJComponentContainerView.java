@@ -31,9 +31,6 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 
 	protected JComponent createSubViewComponent(OTObject otObject)
 	{
-		if (otObject instanceof OTViewChild){
-			return createSubViewComponent(otObject, ((OTViewChild)otObject).getUseScrollPane());
-		}
 		return createSubViewComponent(otObject, false);
 	}
 	
@@ -42,16 +39,8 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 		OTViewContainerPanel otObjectPanel = createtViewContainerPanel();
 		otObjectPanel.setUseScrollPane(useScrollPane);
 		
-		if (otObject instanceof OTViewChild){
-			otObjectPanel.setScrollPanelHasBorder(((OTViewChild)otObject).getScrollPanelHasBorder());
-			if (((OTViewChild)otObject).getViewid() != null){
-				otObjectPanel.setCurrentObject(((OTViewChild)otObject).getObject(), ((OTViewChild)otObject).getViewid(), true);
-			} else{
-			otObjectPanel.setCurrentObject(((OTViewChild)otObject).getObject());
-			}
-		} else {
-			otObjectPanel.setCurrentObject(otObject);
-		}
+		// The OTViewContainerPanel automatically handles the OTViewChild object
+		otObjectPanel.setCurrentObject(otObject);
 		return otObjectPanel;
 	}
 	

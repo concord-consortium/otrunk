@@ -44,6 +44,16 @@ public interface OTPrototypeViewEntry
 	public boolean getCopyPrototype();
 	public final static boolean DEFAULT_copyPrototype = true;
 
+	/**
+	 * Control saving of the prototype copies.  If this is false then the protoype will be 
+	 * recopied each time it is viewed.  And it won't be put into the prototypeCopies list.
+	 * 
+	 * This is different than turning off copying all together with the copyPrototype option.
+	 *  
+	 */
+	public boolean getSavePrototypeCopies();
+	public final static boolean DEFAULT_savePrototypeCopies = true;
+	
 	
 	public static String DEFAULT_viewClass="org.concord.otrunk.view.prototype.OTPrototypeView";
 }

@@ -27,7 +27,7 @@ public class OTPrototypeEventController extends DefaultOTObject implements
 		this.resources = (ResourceSchema) resources;		
 	}
 		
-	public PrototypeControllerInstance getControllerInstance()
+	public PrototypeControllerInstance createControllerInstance()
 	{
 		return new PrototypeEventControllerInstance(resources);
 	}
