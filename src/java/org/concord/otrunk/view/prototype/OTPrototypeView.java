@@ -22,21 +22,17 @@ public class OTPrototypeView extends AbstractOTJComponentView
 	OTPrototypeController controller;
 	PrototypeControllerInstance controllerInstance;
 	
+	OTJComponentView viewOfPrototype;
+	
 	public JComponent getComponent(OTObject otObject, boolean editable) 
 	{
-		// for now just ignore the passed in object
-		// and look up the view for our object, 
-		// What should happen is that the OtObject should be proxied
- 		// so that certain properties from it can come from the passed
-		// in object.
-		
 		OTObject prototype = viewEntry.getPrototype();
 
 		controller = viewEntry.getController();
 		OTObject objectToView = null;
 		JComponent component = null;
 		if(controller != null) {
-			controllerInstance = controller.getControllerInstance();			
+			controllerInstance = controller.createControllerInstance();			
 			OTObject prototypeCopy = getPrototypeCopy(otObject);
 
 			objectToView = getControllerViewObject(otObject, prototypeCopy);
@@ -46,10 +42,10 @@ public class OTPrototypeView extends AbstractOTJComponentView
 		}
 
 		// return the component for the view 
-		OTJComponentView view = getJComponentService().getObjectView(objectToView, null, null, 
+		viewOfPrototype = getJComponentService().getObjectView(objectToView, null, null, 
 				viewEntry.getViewEntry());
 				
-		component = view.getComponent(objectToView, false);			
+		component = viewOfPrototype.getComponent(objectToView, false);			
 
 		if(component == null) {
 			return new JLabel("No view for object: " + prototype);
@@ -70,7 +66,10 @@ public class OTPrototypeView extends AbstractOTJComponentView
 				try {
 					prototypeCopy =
 						model.getOTObjectService().copyObject(viewEntry.getPrototype(), -1);
-					viewEntry.getPrototypeCopies().putObject(prototypeCopyKey, prototypeCopy);
+					
+					if(viewEntry.getSavePrototypeCopies()){
+						viewEntry.getPrototypeCopies().putObject(prototypeCopyKey, prototypeCopy);
+					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -96,9 +95,19 @@ public class OTPrototypeView extends AbstractOTJComponentView
 	}
 	
 	
-	public void viewClosed() {
-		// TODO Auto-generated method stub
-		controllerInstance.close();
+	public void viewClosed() 
+	{
+		// first pass the close on to the view of our prototype copy
+		viewOfPrototype.viewClosed();
+		
+		// Now call the close method on the controllerInstance so it can do any cleanup it has to do
+		if(controllerInstance == null){
+			System.err.println("null controllerInstance in prototypeView");
+		} else {
+			controllerInstance.close();
+		}
+		
+		
 	}
 
 	/* (non-Javadoc)

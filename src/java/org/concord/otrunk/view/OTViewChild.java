@@ -7,6 +7,7 @@ import org.concord.framework.otrunk.view.OTViewEntry;
 public interface OTViewChild extends OTObjectInterface {
 	
 	public OTObject getObject();
+	public void setObject(OTObject object);
 	
 	public OTViewEntry getViewid();
 	

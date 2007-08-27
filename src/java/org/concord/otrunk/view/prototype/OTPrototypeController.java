@@ -11,5 +11,5 @@ import org.concord.framework.otrunk.OTObject;
  */
 public interface OTPrototypeController extends OTObject 
 {
-	PrototypeControllerInstance getControllerInstance();	
+	PrototypeControllerInstance createControllerInstance();	
 }

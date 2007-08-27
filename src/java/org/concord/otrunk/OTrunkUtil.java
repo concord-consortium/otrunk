@@ -3,8 +3,6 @@
  */
 package org.concord.otrunk;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.StringTokenizer;
@@ -103,16 +101,10 @@ public class OTrunkUtil
 		return null;
 	}
 
-	public final static void setNonPathPropertyValue(String propertyName, Object obj, 
+	public final static void setNonPathPropertyValue(String propertyName, OTObject obj, 
 			Object value) 
 	throws NoSuchMethodException
 	{
-		// find the get or is method on the object with this name
-		Class objClass = obj.getClass();
-		String methodCase = propertyToMethodCase(propertyName);
-		Method setMethod = null;
-		Object [] params = null;
-
 		// check if this is an array reference
 		if(propertyName.endsWith("]")){
 			if(value == null){
@@ -121,30 +113,17 @@ public class OTrunkUtil
 			}
 			
 			Pattern arrayPattern = Pattern.compile("(.*)\\[(\\d*)\\]");
-			Matcher m = arrayPattern.matcher(methodCase);
+			Matcher m = arrayPattern.matcher(propertyName);
 			if(m.matches()){
-				methodCase = m.group(1);
+				propertyName = m.group(1);
 				String indexStr = m.group(2);
 				
 				// get the ObjectList
 				// call set with this index
-				String methodName = "get" + methodCase;
-
-				Method getListMethod = objClass.getMethod(methodName, null);
-				Object list = null;
-				try {
-					list = getListMethod.invoke(obj, null);
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-								
+				OTClassProperty property = obj.otClass().getProperty(propertyName);
+				
+				Object list = obj.otGet(property);
+												
 				// remove the old one 
 				int index = Integer.parseInt(indexStr);
 				
@@ -161,24 +140,14 @@ public class OTrunkUtil
 			}
 		} else {
 
-			// because we don't have an easy way to figure out the correct
-			// arguments for the set method, we'll just get them all 
-			// and select the first one with a matching name.
-			String methodName = "set" + methodCase;
-			Method [] methods = objClass.getMethods();
-			for(int i=0; i<methods.length; i++){
-				if(methods[i].getName().equals(methodName)){
-					setMethod = methods[i];
-					break;
-				}
-			}
+			OTClassProperty property = obj.otClass().getProperty(propertyName);
 
-			if(setMethod == null){
+			if(property == null){
 				throw new NoSuchMethodException("propertyName: " + propertyName + 
 						" newValue: " + value);
 			}
-			
-			Class paramType = setMethod.getParameterTypes()[0];
+
+			Class paramType = property.getType().getInstanceClass();
 			if(value instanceof String){
 				String valueStr = (String) value;
 				if(paramType == Float.class ||
@@ -213,7 +182,9 @@ public class OTrunkUtil
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
 					}
-				}
+				} else if(paramType == OTXMLString.class){
+					value = new OTXMLString(valueStr);
+				}				
 			}
 			
 			if(paramType == String.class){
@@ -229,19 +200,7 @@ public class OTrunkUtil
 				
 			}
 			
-			params = new Object[]{value};
-			try {
-				setMethod.invoke(obj, params);
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				System.err.println("Can't call: " + setMethod + " with: " + value.getClass());
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			obj.otSet(property, value);			
 		}
 		
 	}
@@ -269,7 +228,7 @@ public class OTrunkUtil
 				currentObject = 
 					getNonPathPropertyValue(currentProperty, (OTObject) currentObject);
 			} else {
-				setNonPathPropertyValue(currentProperty, currentObject, value);				
+				setNonPathPropertyValue(currentProperty, (OTObject) currentObject, value);				
 			}		
 		}
 	}
