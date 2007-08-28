@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2006-10-02 02:17:43 $
- * $Author: scytacki $
+ * $Revision: 1.4 $
+ * $Date: 2007-08-28 19:37:21 $
+ * $Author: aunger $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -34,6 +34,7 @@ package org.concord.otrunk.xml.jdom;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -123,8 +124,16 @@ public class RNGSchemaGenerator
         
         try {
             File xmlFile = new File(args[0]);
+            File outFile = null;
+            if (args[1] != null) {
+            	outFile = new File(args[1]);
+            }
+            if (xmlFile.isDirectory()) {
+            	String cmd = "ruby -e 'f = File.new(\"/tmp/all-otrunk.xml\",\"w\")' -e 'f.write(\"<otrunk>\n\")' -e '`grep -rh \"import class\" .`.collect {|l| l.scan(/class=\"[^\"]+\"/)[0]}.sort.uniq.each do |i| f.write(\"<import #{i} />\n\"); end;' -e 'f.write(\"</otrunk>\n\")' -e 'f.flush(); f.close()'";
+            	Process p = Runtime.getRuntime().exec(cmd);
+            	xmlFile = new File("/tmp/all-otrunk.xml");
+            }
             FileInputStream xmlStream = new FileInputStream(xmlFile);
-            
             URL contextURL = xmlFile.toURL();
             
             // parse the xml file...
@@ -173,8 +182,14 @@ public class RNGSchemaGenerator
             
             
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-            
-            outputter.output(doc, System.out);
+            if (outFile != null) {
+            	outputter.output(doc, new FileOutputStream(outFile));
+            	String path = outFile.getCanonicalPath();
+            	String cmd = "java -jar ../thirdparty/trang.jar -I rng -O xsd " + outFile.getCanonicalPath() + " " + path.substring(0,path.lastIndexOf('.')) + ".xsd";
+            	Runtime.getRuntime().exec(cmd);
+            } else {
+            	outputter.output(doc, System.out);
+            }
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -314,14 +329,14 @@ public class RNGSchemaGenerator
         
         if(AMBIGUOUS_ATTRIBUTES) {
             Element choice = createRNGElement("choice");
-            Element attributeDef = createAttributeDef(choice, name, false, false);
+            Element attributeDef = createAttributeDef(choice, name, false, true);
             attributeDef.addContent((Element)typeDef.clone());                
             
             Element elementDef = createElementDef(choice, name);
             elementDef.addContent((Element)typeDef.clone()); 
             return choice;
         } else {
-            Element attributeDef = createAttributeDef(null, name, false, false);
+            Element attributeDef = createAttributeDef(null, name, false, true);
             attributeDef.addContent((Element)typeDef.clone());
             return attributeDef;
         }       
@@ -349,7 +364,7 @@ public class RNGSchemaGenerator
 
     public static Element createAttributeDef(Element elementDef, String name)
     {
-        return createAttributeDef(elementDef, name, true, false);
+        return createAttributeDef(elementDef, name, true, true);
     }
     
     public static Element createAttributeDef(Element elementDef, String name, 
