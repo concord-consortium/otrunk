@@ -252,6 +252,9 @@ public class OTObjectInternal implements OTObjectInterface
 	public boolean isResourceSet(String resourceName)
     {		
 		OTClassProperty property = otClass().getProperty(resourceName);
+		if(property == null){
+			throw new IllegalStateException("Property: " + resourceName + " doesn't exist on OTClass: " + otClass().getInstanceClass().getName());
+		}
 		return otIsSet(property);
     }
 
