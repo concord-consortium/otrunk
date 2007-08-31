@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-08-28 19:37:21 $
- * $Author: aunger $
+ * $Revision: 1.5 $
+ * $Date: 2007-08-31 03:24:41 $
+ * $Author: sbannasch $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -69,8 +69,8 @@ public class RNGSchemaGenerator
     // if it is false then only OTDataStore works
     public static boolean AMBIGUOUS_OBJECT_NAMES = false;
 
-    // Set this to false if you want to force a consitant way of 
-    // referencing objects.  Current it can be done in one of 
+    // Set this to false if you want to force a consistent way of 
+    // referencing objects.  Currently it can be done in one of 
     // two ways
     // if the resource name is myObject then you can do:
     // 1. <myObject><object refid="blah"/></myObject>
@@ -129,7 +129,7 @@ public class RNGSchemaGenerator
             	outFile = new File(args[1]);
             }
             if (xmlFile.isDirectory()) {
-            	String cmd = "ruby -e 'f = File.new(\"/tmp/all-otrunk.xml\",\"w\")' -e 'f.write(\"<otrunk>\n\")' -e '`grep -rh \"import class\" .`.collect {|l| l.scan(/class=\"[^\"]+\"/)[0]}.sort.uniq.each do |i| f.write(\"<import #{i} />\n\"); end;' -e 'f.write(\"</otrunk>\n\")' -e 'f.flush(); f.close()'";
+            	String cmd = "ruby ./schema/collect_imports.rb " + args[0];
             	Process p = Runtime.getRuntime().exec(cmd);
             	xmlFile = new File("/tmp/all-otrunk.xml");
             }
