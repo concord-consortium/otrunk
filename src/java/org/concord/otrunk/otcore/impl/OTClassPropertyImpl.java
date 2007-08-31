@@ -25,6 +25,11 @@ public class OTClassPropertyImpl
 		return defaultValue;
 	}
 
+	public void setDefault(Object defaultValue)
+	{
+		this.defaultValue = defaultValue;
+	}
+	
 	public OTType getType()
 	{
 		return type;
