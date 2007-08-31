@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.80 $
- * $Date: 2007-08-31 15:03:33 $
- * $Author: scytacki $
+ * $Revision: 1.81 $
+ * $Date: 2007-08-31 17:34:47 $
+ * $Author: aunger $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -37,9 +37,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -286,6 +289,28 @@ public class OTViewer extends JFrame
 		consoleFrame.setSize(800, 600);
 
 		commDialog = new JDialog(this, true);
+		
+		// for debugging
+		// add a breakpoint below, run in debugging mode, and then hit Meta-B
+		// the object you're currently focused on will be passed in here and you can
+		// start exploring the data structures, etc.
+		KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		
+		KeyEventDispatcher deleteDispatcher = new KeyEventDispatcher(){					
+			public boolean dispatchKeyEvent(KeyEvent e) {
+				if ( ((e.getModifiersEx() & java.awt.event.KeyEvent.KEY_RELEASED) != 0) && 
+						((e.getModifiersEx() & java.awt.event.InputEvent.META_DOWN_MASK) != 0) && 
+						(e.getKeyCode() == java.awt.event.KeyEvent.VK_B) ) {
+					Object o = e.getSource();
+					return true;
+				}
+				
+				return false;
+			}
+			
+		};
+
+		focusManager.addKeyEventDispatcher(deleteDispatcher);
 	}
 
 	public void setUserMode(int mode)
