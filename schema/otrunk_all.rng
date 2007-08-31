@@ -85,6 +85,29 @@
             <text />
           </optional>
         </element>
+        <element name="PfSlider">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="value" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="maximum" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="minimum" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTDataAxis">
           <optional>
             <attribute name="local_id">
@@ -103,6 +126,10 @@
             <data type="float" />
           </optional>
           <optional>
+            <attribute name="intervalWorld" />
+            <text />
+          </optional>
+          <optional>
             <attribute name="max" />
             <data type="float" />
           </optional>
@@ -110,6 +137,37 @@
             <attribute name="label" />
             <text />
           </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTListBox">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="items">
+            <ref name="listContents" />
+          </element>
+          <element name="selectedItems">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTPrototypeScriptController">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="script">
+            <ref name="otObject" />
+          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -136,6 +194,33 @@
           <element name="prototypeGraphables">
             <ref name="listContents" />
           </element>
+          <optional>
+            <attribute name="showToolbar" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTPhetWaveModel">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="authoredDataURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectWidth" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -197,6 +282,35 @@
             <attribute name="columns" />
             <text />
           </optional>
+          <optional>
+            <attribute name="rows" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="PfResponseTable">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="correctAnswerText" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="cols" />
+            <text />
+          </optional>
+          <element name="cells">
+            <ref name="listContents" />
+          </element>
+          <element name="text">
+            <ref name="anyXMLFragment" />
+          </element>
           <optional>
             <attribute name="rows" />
             <text />
@@ -270,6 +384,55 @@
           <element name="version">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTLinearEquation">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="function">
+            <ref name="otObject" />
+          </element>
+          <element name="resultValue">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="allowMoveEquationPoint" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="selectable" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="visible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="selected" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="expressionForm" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionName" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionOrdinal" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="color" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -464,6 +627,23 @@
             <text />
           </optional>
         </element>
+        <element name="PfQuery">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="responses">
+            <ref name="listContents" />
+          </element>
+          <element name="text">
+            <ref name="anyXMLFragment" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTUDLExploration">
           <optional>
             <attribute name="local_id">
@@ -510,6 +690,20 @@
             <text />
           </optional>
         </element>
+        <element name="OTInterfaceManager">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="deviceConfigs">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTDIYSection">
           <optional>
             <attribute name="local_id">
@@ -537,6 +731,38 @@
             <ref name="otObject" />
           </element>
         </element>
+        <element name="PfResponse">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="input">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="markupLanguage" />
+            <text />
+          </optional>
+          <element name="correctAnswer">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="queryID" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="correctAnswerText" />
+            <text />
+          </optional>
+          <element name="text">
+            <ref name="anyXMLFragment" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTModelerModel">
           <optional>
             <attribute name="local_id">
@@ -554,6 +780,29 @@
           <optional>
             <attribute name="showCompleteToolbar" />
             <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTPhetDischargeLampsModel">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="authoredDataURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectWidth" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
           </optional>
           <optional>
             <attribute name="name" />
@@ -627,6 +876,27 @@
             <text />
           </optional>
         </element>
+        <element name="PfTechnicalHint">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="vendorChoice">
+            <ref name="otObject" />
+          </element>
+          <element name="hintMap">
+            <ref name="mapContents" />
+          </element>
+          <optional>
+            <attribute name="title" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTUDLMenu">
           <optional>
             <attribute name="local_id">
@@ -639,6 +909,57 @@
           <element name="menuRule">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTQuadraticFunction">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="coeffA" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="coeffB" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="coeffC" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="selectable" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="visible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="selected" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="expressionForm" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionName" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionOrdinal" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="color" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -690,6 +1011,27 @@
           </optional>
           <optional>
             <attribute name="height" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSplitPane">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="second">
+            <ref name="otObject" />
+          </element>
+          <element name="first">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="orientation" />
             <text />
           </optional>
           <optional>
@@ -878,6 +1220,52 @@
             <text />
           </optional>
         </element>
+        <element name="OTLoggingRequest">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="startCondition" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="triggerPosition" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="preTriggerSamples" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="triggerChannel" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="triggerValue" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="startTime" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="period" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="recordingTime" />
+            <data type="float" />
+          </optional>
+          <element name="sensorRequests">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTDataGraphable">
           <optional>
             <attribute name="local_id">
@@ -927,6 +1315,10 @@
             <text />
           </optional>
           <optional>
+            <attribute name="lineWidth" />
+            <data type="float" />
+          </optional>
+          <optional>
             <attribute name="name" />
             <text />
           </optional>
@@ -949,6 +1341,20 @@
           </optional>
           <element name="image">
             <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSelectableList">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="graphables">
+            <ref name="listContents" />
           </element>
           <optional>
             <attribute name="name" />
@@ -1049,6 +1455,30 @@
             <text />
           </optional>
         </element>
+        <element name="OTTree">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="selectedObject">
+            <ref name="otObject" />
+          </element>
+          <element name="objectsToInsert">
+            <ref name="listContents" />
+          </element>
+          <element name="root">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="selectedPath" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTUDLQuestions">
           <optional>
             <attribute name="local_id">
@@ -1105,20 +1535,18 @@
             <text />
           </optional>
         </element>
-        <element name="OTText">
+        <element name="OTLoggerImporter">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
-          <optional>
-            <attribute name="isPassword" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="text" />
-            <text />
-          </optional>
+          <element name="request">
+            <ref name="otObject" />
+          </element>
+          <element name="chooser">
+            <ref name="otObject" />
+          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -1132,6 +1560,25 @@
           </optional>
           <optional>
             <attribute name="mainClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTText">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="isPassword" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="text" />
             <text />
           </optional>
           <optional>
@@ -1173,6 +1620,34 @@
             <attribute name="text" />
             <text />
           </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="PfCompoundDoc">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="bodyText">
+            <ref name="anyXMLFragment" />
+          </element>
+          <optional>
+            <attribute name="input" />
+            <data type="boolean" />
+          </optional>
+          <element name="documentRefs">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="markupLanguage" />
+            <text />
+          </optional>
+          <element name="children">
+            <ref name="listContents" />
+          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -1304,6 +1779,40 @@
             <text />
           </optional>
         </element>
+        <element name="OTGraphFunctionsScreen">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="graphableList">
+            <ref name="otObject" />
+          </element>
+          <element name="valueObject">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSensorDataProxy">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="request">
+            <ref name="otObject" />
+          </element>
+          <element name="zeroSensor">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTZoomTransform">
           <optional>
             <attribute name="local_id">
@@ -1324,6 +1833,25 @@
           <optional>
             <attribute name="scale" />
             <data type="double" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTPoint2D">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="x" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="y" />
+            <data type="float" />
           </optional>
           <optional>
             <attribute name="name" />
@@ -1354,10 +1882,10 @@
               <text />
             </attribute>
           </optional>
-          <element name="variables">
+          <element name="referenceObjects">
             <ref name="listContents" />
           </element>
-          <element name="referenceObjects">
+          <element name="variables">
             <ref name="listContents" />
           </element>
           <element name="contents">
@@ -1398,6 +1926,25 @@
           <element name="mapping">
             <ref name="listContents" />
           </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTDeviceConfig">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="deviceId" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="configString" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -1493,6 +2040,31 @@
             <text />
           </optional>
         </element>
+        <element name="OTQGrapher">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="valueObject">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="imageModelIndex" />
+            <text />
+          </optional>
+          <element name="qualitativeGraphable">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTViewBundle">
           <optional>
             <attribute name="local_id">
@@ -1524,6 +2096,67 @@
             <text />
           </optional>
         </element>
+        <element name="OTDataBarGraphable">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="maxBarsToSelect" />
+            <text />
+          </optional>
+          <element name="dataProducer">
+            <ref name="otObject" />
+          </element>
+          <element name="dataStore">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="connectPoints" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="drawMarks" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="controllable" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="drawing" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="allowHide" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="xColumn" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="yColumn" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="locked" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="color" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="lineWidth" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTWorld">
           <optional>
             <attribute name="local_id">
@@ -1532,6 +2165,25 @@
           </optional>
           <optional>
             <attribute name="speciesPath" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTFlowerInterfaceExt">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="numberPetals" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="color" />
             <text />
           </optional>
           <optional>
@@ -1616,6 +2268,37 @@
             <text />
           </optional>
         </element>
+        <element name="OTLinearPiecewiseGrapher">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="imageModelIndex" />
+            <text />
+          </optional>
+          <element name="graphArea">
+            <ref name="otObject" />
+          </element>
+          <element name="grid">
+            <ref name="otObject" />
+          </element>
+          <element name="graphableList">
+            <ref name="otObject" />
+          </element>
+          <element name="valueObject">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTUDLCSSModifier">
           <optional>
             <attribute name="local_id">
@@ -1676,6 +2359,20 @@
             <text />
           </optional>
         </element>
+        <element name="OTSetupLogger">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="request">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTDrawingTool">
           <optional>
             <attribute name="local_id">
@@ -1702,6 +2399,70 @@
           </optional>
           <optional>
             <attribute name="preferredHeight" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTRTTInteractiveContainer">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="interactive">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTQualGraphable">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="segments">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="startXPosition" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="startYPosition" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="selectable" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="visible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="selected" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="expressionForm" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionName" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionOrdinal" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="color" />
             <text />
           </optional>
           <optional>
@@ -1843,6 +2604,61 @@
             <text />
           </optional>
         </element>
+        <element name="OTLinearFunctionPushpin">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="pushpinX" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="pushpinOn" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="slope" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="yIntercept" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="selectable" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="visible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="selected" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="expressionForm" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionName" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionOrdinal" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="color" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTSection">
           <optional>
             <attribute name="local_id">
@@ -1943,6 +2759,51 @@
             <ref name="listContents" />
           </element>
           <optional>
+            <attribute name="showToolbar" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTGraphFunctionList">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="currentColorIndex" />
+            <text />
+          </optional>
+          <element name="graphables">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTPhetFaradayModel">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="authoredDataURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectWidth" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
+          <optional>
             <attribute name="name" />
             <text />
           </optional>
@@ -2012,6 +2873,28 @@
             <text />
           </optional>
         </element>
+        <element name="OTExperimentRequest">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="period" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="recordingTime" />
+            <data type="float" />
+          </optional>
+          <element name="sensorRequests">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTDataColumnDescription">
           <optional>
             <attribute name="local_id">
@@ -2046,6 +2929,27 @@
           <element name="calculator">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTLinearFunctionAnalyzer">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="graphableList">
+            <ref name="otObject" />
+          </element>
+          <element name="valueObject">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -2090,6 +2994,33 @@
           <optional>
             <attribute name="stepBack" />
             <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="PfImage">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="imageURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="imageBytes" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="scalePercent" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="width" />
+            <text />
           </optional>
           <optional>
             <attribute name="name" />
@@ -2307,6 +3238,48 @@
             <text />
           </optional>
         </element>
+        <element name="OTLinearPiecewise">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="segments">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="selectable" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="visible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="selected" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="expressionForm" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionName" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionOrdinal" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="color" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTDataStore">
           <optional>
             <attribute name="local_id">
@@ -2439,6 +3412,28 @@
             <text />
           </optional>
         </element>
+        <element name="PfTextObject">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="bodyText" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="input" />
+            <data type="boolean" />
+          </optional>
+          <element name="children">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTExpression">
           <optional>
             <attribute name="local_id">
@@ -2447,6 +3442,25 @@
           </optional>
           <optional>
             <attribute name="expression" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTFlowerObject">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="numberPetals" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="color" />
             <text />
           </optional>
           <optional>
@@ -2552,6 +3566,21 @@
             <text />
           </optional>
         </element>
+        <element name="OTValue">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="value" />
+            <data type="double" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTPrototypeViewEntry">
           <optional>
             <attribute name="local_id">
@@ -2650,6 +3679,37 @@
           <element name="action">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTQuadraticGrapher">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="graphArea">
+            <ref name="otObject" />
+          </element>
+          <element name="grid">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="showTraceVertex" />
+            <data type="boolean" />
+          </optional>
+          <element name="graphableList">
+            <ref name="otObject" />
+          </element>
+          <element name="valueObject">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -2820,6 +3880,58 @@
             <text />
           </optional>
         </element>
+        <element name="OTLinearTransformer">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="showGhosts" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="imageModelIndex" />
+            <text />
+          </optional>
+          <element name="graphableList">
+            <ref name="otObject" />
+          </element>
+          <element name="valueObject">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTPhetSoundModel">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="authoredDataURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectWidth" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTPlacementContainer">
           <optional>
             <attribute name="local_id">
@@ -2954,6 +4066,69 @@
             <text />
           </optional>
         </element>
+        <element name="OTLinearSegment">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="closedStart" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="closedEnd" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="domainStart" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="domainEnd" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="slope" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="yIntercept" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="selectable" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="visible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="selected" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="expressionForm" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionName" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionOrdinal" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="color" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTNLogoModel">
           <optional>
             <attribute name="local_id">
@@ -3010,6 +4185,25 @@
             <text />
           </optional>
         </element>
+        <element name="OTFlowerInterface">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="numberPetals" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="color" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTButton">
           <optional>
             <attribute name="local_id">
@@ -3028,15 +4222,16 @@
             <text />
           </optional>
         </element>
-        <element name="OTBeanShell">
+        <element name="OTZeroSensor">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
-          <element name="variables">
-            <ref name="listContents" />
-          </element>
+          <optional>
+            <attribute name="sensorIndex" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -3247,6 +4442,47 @@
             <text />
           </optional>
         </element>
+        <element name="RunActivityProperties">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="authoredDataURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="activityPath" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="errorSilent" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="dynamicLoading" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="codebase" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="jarPaths" />
+            <text />
+          </optional>
+          <element name="stateMap">
+            <ref name="mapContents" />
+          </element>
+          <element name="globalsMap">
+            <ref name="mapContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTDefinition">
           <optional>
             <attribute name="local_id">
@@ -3380,6 +4616,17 @@
             <text />
           </optional>
         </element>
+        <element name="OTLoggerRecordChooser">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTCCKModel">
           <optional>
             <attribute name="local_id">
@@ -3395,6 +4642,14 @@
           </element>
           <optional>
             <attribute name="useDCandAC" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="showElectrons" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="showMultimeter" />
             <data type="boolean" />
           </optional>
           <optional>
@@ -3414,6 +4669,73 @@
           </optional>
           <optional>
             <attribute name="engineClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="PfChoice">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="choices">
+            <ref name="listContents" />
+          </element>
+          <element name="currentChoice">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="displayType" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="multipleSelect" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSensorRequest">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="unit" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="stepSize" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="requiredMax" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="requiredMin" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="displayPrecision" />
+            <text />
+          </optional>
+          <element name="paramMap">
+            <ref name="mapContents" />
+          </element>
+          <optional>
+            <attribute name="type" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="port" />
             <text />
           </optional>
           <optional>
@@ -3467,6 +4789,53 @@
           <element name="notebook">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTLinearFunction">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="slope" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="yIntercept" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="selectable" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="visible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="selected" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="expressionForm" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionName" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="functionOrdinal" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="color" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -3654,6 +5023,29 @@
           </optional>
           <optional>
             <attribute name="version" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTQualSegment">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="endXPosition" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="endYPosition" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="type" />
             <text />
           </optional>
           <optional>
