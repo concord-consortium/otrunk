@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-08-31 03:24:41 $
- * $Author: sbannasch $
+ * $Revision: 1.6 $
+ * $Date: 2007-08-31 15:36:31 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -35,6 +35,8 @@ package org.concord.otrunk.xml.jdom;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -131,6 +133,46 @@ public class RNGSchemaGenerator
             if (xmlFile.isDirectory()) {
             	String cmd = "ruby ./schema/collect_imports.rb " + args[0];
             	Process p = Runtime.getRuntime().exec(cmd);
+            	final InputStream errStream = p.getErrorStream();
+            	final InputStream outStream = p.getInputStream();
+            	Thread processPrinter = (new Thread(){
+            		byte [] buffer = new byte [1000];
+            		public void run()
+            		{
+            			while(!isInterrupted()){
+            				try {
+	                            sleep(100);
+                            } catch (InterruptedException e1) {
+	                            // TODO Auto-generated catch block
+	                            e1.printStackTrace();
+                            }
+            				int numRead;
+            				try {
+            					numRead = errStream.read(buffer, 0, 1000);
+            					if(numRead > 0){
+            						System.err.write(buffer, 0, numRead);
+            					}
+            				} catch (IOException e) {
+            					// TODO Auto-generated catch block
+            					e.printStackTrace();
+            				}
+
+            				try {
+            					numRead = outStream.read(buffer, 0, 1000);
+            					if(numRead > 0){
+            						System.out.write(buffer, 0, numRead);
+            					}
+            				} catch (IOException e) {
+            					// TODO Auto-generated catch block
+            					e.printStackTrace();
+            				}
+            			}
+            		}
+            	});
+            	processPrinter.start();            	
+            	p.waitFor();
+            	processPrinter.interrupt();
+            	
             	xmlFile = new File("/tmp/all-otrunk.xml");
             }
             FileInputStream xmlStream = new FileInputStream(xmlFile);
