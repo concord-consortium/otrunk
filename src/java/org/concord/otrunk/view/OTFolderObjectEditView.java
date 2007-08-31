@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2007-05-18 22:01:52 $
- * $Author: imoncada $
+ * $Revision: 1.13 $
+ * $Date: 2007-08-31 15:03:33 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -111,9 +111,14 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	 */
 	protected void showEditPopUpMenu(MouseEvent evt)
 	{
+		TreePath pathForLocation = tree.getPathForLocation(evt.getX(), evt.getY());
+		if(pathForLocation == null){
+			return;
+		}
+		
 		if (selectedObject == null) return;
 		
-		if (menu == null) createMenu();
+		if (menu == null) createMenu(pathForLocation);
 		
 		menu.getPopupMenu().show(tree, evt.getX(), evt.getY());
 		
@@ -124,29 +129,29 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 	 * Creates a new pop up menu with the edit actions
 	 * Right now only "add" and "delete" are implemented
 	 */
-	protected void createMenu()
+	protected void createMenu(TreePath pathForLocation)
 	{		
 		menu = new JMenu();
 		//"Add" action is only for folders
 		if (selectedObject instanceof OTFolder){
-			menu.add(new OTFolderObjectAction("add"));
+			menu.add(new OTFolderObjectAction("add", pathForLocation));
 			menu.addSeparator();
 		}
 		
 		//Edit action 
-		menu.add(new OTFolderObjectAction("rename"));
+		menu.add(new OTFolderObjectAction("rename", pathForLocation));
 		//These actions are only for objects with a parent folder
 		if (parentObject != null){
 			//Copy (duplicate)
-			menu.add(new OTFolderObjectAction("duplicate"));
+			menu.add(new OTFolderObjectAction("duplicate", pathForLocation));
 			//Delete
-			menu.add(new OTFolderObjectAction("delete"));
+			menu.add(new OTFolderObjectAction("delete", pathForLocation));
 		}
 		
 		menu.addSeparator();
 		//Move
-		menu.add(new OTFolderObjectAction("moveup"));
-		menu.add(new OTFolderObjectAction("movedown"));
+		menu.add(new OTFolderObjectAction("moveup", pathForLocation));
+		menu.add(new OTFolderObjectAction("movedown", pathForLocation));
 	}
 	
 	class OTFolderObjectAction extends AbstractAction
@@ -155,13 +160,17 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 		 * Not intended to be serialized, just added remove compile warning
 		 */
 		private static final long serialVersionUID = 1L;
+		private TreePath pathForAction;
 		
 		/**
 		 *
 		 */
-		public OTFolderObjectAction(String actionCommand)
+		public OTFolderObjectAction(String actionCommand, TreePath pathForAction)
 		{
 			super(actionCommand);
+			
+			this.pathForAction = pathForAction;
+			
 			putValue(Action.ACTION_COMMAND_KEY, actionCommand);
 			
 			if (actionCommand.equals("add")){
@@ -239,7 +248,7 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 			
 			if (parentObject instanceof OTFolder){
 				((OTFolder)parentObject).addChild(otObj);
-				treeModel.fireTreeStructureChanged(selectedNode);
+				treeModel.fireTreeStructureChanged(pathForAction);
 			}
 			else{
 				System.err.println("Error: OT Objects can only be added to OT Folders.");
@@ -290,7 +299,7 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 				}
 			}
 
-			treeModel.fireTreeStructureChanged(selectedNode);
+			treeModel.fireTreeStructureChanged(pathForAction);
 		}
 
 		/**
@@ -337,7 +346,7 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 				}
 			}
 
-			treeModel.fireTreeStructureChanged(selectedNode);
+			treeModel.fireTreeStructureChanged(pathForAction);
 		}
 		
 		/**
@@ -362,7 +371,7 @@ public class OTFolderObjectEditView extends OTFolderObjectView
 			if (selectedObject instanceof OTFolder){
 				((OTFolder)selectedObject).addChild(otObj);
 				
-				treeModel.fireTreeStructureChanged(selectedNode);
+				treeModel.fireTreeStructureChanged(pathForAction);
 			}
 			else{
 				System.err.println("Error: OT Objects can only be added to OT Folders.");

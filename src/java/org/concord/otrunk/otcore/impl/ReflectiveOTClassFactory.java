@@ -1,6 +1,7 @@
 package org.concord.otrunk.otcore.impl;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTXMLString;
 import org.concord.framework.otrunk.otcore.OTClass;
-import org.concord.framework.otrunk.otcore.OTClassProperty;
 import org.concord.framework.otrunk.otcore.OTType;
 import org.concord.otrunk.OTInvocationHandler;
 import org.concord.otrunk.OTrunkImpl;
@@ -177,7 +177,22 @@ public class ReflectiveOTClassFactory
 
 			OTType otType = getOTType(resourceType, resourceClass);
 			
-			OTClassProperty property = new OTClassPropertyImpl(resourceName, otType, null);
+			OTClassPropertyImpl property = new OTClassPropertyImpl(resourceName, otType, null);
+			
+	        try {
+	            Field defaultField = javaClass.getField("DEFAULT_" + resourceName);
+	            if(defaultField != null) {
+	                Object defaultValue =  defaultField.get(null);
+	                property.setDefault(defaultValue);
+	            }
+	        } catch (NoSuchFieldException e) {
+	        	// It is normal to have undefined default values so we shouldn't throw an
+	        	// exception in this case.
+	        } catch (IllegalArgumentException e) {
+	            e.printStackTrace();
+            } catch (IllegalAccessException e) {
+	            e.printStackTrace();
+            }
 			
 			otClass.getOTClassProperties().add(property);			
 		}		

@@ -21,7 +21,7 @@ public class OTCorePackage
     public final static OTPrimitiveType FLOAT_TYPE = 
     	new OTPrimitiveTypeImpl(TypeService.FLOAT, Float.class);
     public final static OTPrimitiveType DOUBLE_TYPE = 
-    	new OTPrimitiveTypeImpl(TypeService.BOOLEAN, Double.class);
+    	new OTPrimitiveTypeImpl(TypeService.DOUBLE, Double.class);
     public final static OTPrimitiveType BLOB_TYPE = 
     	new OTPrimitiveTypeImpl(TypeService.BLOB, byte[].class);
     public final static OTPrimitiveType STRING_TYPE = 

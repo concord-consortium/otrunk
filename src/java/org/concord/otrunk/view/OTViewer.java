@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.79 $
- * $Date: 2007-08-14 19:53:32 $
+ * $Revision: 1.80 $
+ * $Date: 2007-08-31 15:03:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -77,6 +77,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
 
 import org.concord.applesupport.AppleApplicationAdapter;
 import org.concord.applesupport.AppleApplicationUtil;
@@ -670,11 +671,11 @@ public class OTViewer extends JFrame
 
 		if (showTree && !overrideShowTree) {
 			folderTreeModel
-			        .fireTreeStructureChanged((SimpleTreeNode) folderTreeModel
-			                .getRoot());
+			        .fireTreeStructureChanged(new TreePath((SimpleTreeNode) folderTreeModel
+			                .getRoot()));
 			dataTreeModel
-			        .fireTreeStructureChanged((SimpleTreeNode) dataTreeModel
-			                .getRoot());
+			        .fireTreeStructureChanged(new TreePath((SimpleTreeNode) dataTreeModel
+			                .getRoot()));
 		}
 
 		Frame frame = (Frame) SwingUtilities.getRoot(this);
