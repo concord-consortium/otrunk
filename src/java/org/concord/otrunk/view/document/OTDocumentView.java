@@ -107,6 +107,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	}
 
 	public JComponent getComponent(OTObject otObject, boolean editable) {
+		System.out.println("getting component");
 		this.otObject = otObject;
 		setup(otObject);
 		initTextAreaModel();
