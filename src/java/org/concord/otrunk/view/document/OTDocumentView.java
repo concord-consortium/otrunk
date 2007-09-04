@@ -77,7 +77,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 	protected JComponent previewComponent = null;
 
-	JEditorPane editorPane = null;
+	protected JEditorPane editorPane = null;
 
 	DocumentBuilderFactory xmlDocumentFactory = null;
 
