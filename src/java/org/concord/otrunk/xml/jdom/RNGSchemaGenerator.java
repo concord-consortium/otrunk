@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2007-08-31 15:36:31 $
+ * $Revision: 1.7 $
+ * $Date: 2007-09-05 00:21:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -143,8 +143,9 @@ public class RNGSchemaGenerator
             				try {
 	                            sleep(100);
                             } catch (InterruptedException e1) {
-	                            // TODO Auto-generated catch block
-	                            e1.printStackTrace();
+                            	// interrupt the thread again so the interrupted flag is set, and then continue
+                            	// on with one last read before exiting.
+                            	interrupt();
                             }
             				int numRead;
             				try {
