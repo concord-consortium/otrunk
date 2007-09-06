@@ -285,7 +285,9 @@ public class ReflectiveOTClassFactory
 	{
 		OTType otType = null;
 		
-		if(TypeService.BOOLEAN.equals(resourceType)){
+		if(TypeService.BLOB.equals(resourceType)){
+			otType = OTCorePackage.BLOB_TYPE;
+		} else if(TypeService.BOOLEAN.equals(resourceType)){
 			otType = OTCorePackage.BOOLEAN_TYPE;
 		} else if(TypeService.DOUBLE.equals(resourceType)){
 			otType = OTCorePackage.DOUBLE_TYPE;
