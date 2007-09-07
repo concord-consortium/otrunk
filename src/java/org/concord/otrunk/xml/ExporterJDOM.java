@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-08-14 18:27:43 $
+ * $Revision: 1.10 $
+ * $Date: 2007-09-07 11:25:06 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -348,7 +348,7 @@ public class ExporterJDOM
 				return null;
 			}
 			
-			Element typeEl = new Element("type");
+			Element typeEl = new Element(type);
 
 			String itemString;
 			if(!(item instanceof BlobResource)) {
