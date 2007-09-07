@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-01-27 23:46:22 $
+ * $Revision: 1.12 $
+ * $Date: 2007-09-07 02:04:11 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -33,7 +33,6 @@
 package org.concord.otrunk.xml;
 
 import java.util.List;
-import java.util.Properties;
 
 /**
  * StringTypeHandler
@@ -53,7 +52,7 @@ public class StringTypeHandler extends PrimitiveResourceTypeHandler
 		super("string", String.class);
 	}
 		
-	public Object handleElement(String value, Properties elementProps)
+	public Object handleElement(String value)
 	{
 		return value;
 	}
@@ -61,8 +60,8 @@ public class StringTypeHandler extends PrimitiveResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	public Object handleElement(OTXMLElement element, Properties elementProps,
-	        String relativePath, XMLDataObject parent)
+	public Object handleElement(OTXMLElement element, String relativePath,
+	        XMLDataObject parent)
 	{
 	    // This is for backwards compatibility
 	    // if a string element has sub elements then it is treated 

@@ -29,7 +29,6 @@
  */
 package org.concord.otrunk.xml;
 
-import java.util.Properties;
 
 /**
  * @author scott
@@ -47,7 +46,7 @@ public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler
 		this.primitiveClass = primitiveClass;
 	}
 	
-	abstract public Object handleElement(String value, Properties elementProps)
+	abstract public Object handleElement(String value)
 		throws HandleElementException;
 	
 	/**
@@ -55,14 +54,13 @@ public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler
 	 * so objects, lists, and maps need to override this method.
 	 * 
 	 * @param element
-	 * @param elementProps
 	 * @return
 	 */
-	public Object handleElement(OTXMLElement element, Properties elementProps, 
-	        String relativePath, XMLDataObject parent)
+	public Object handleElement(OTXMLElement element, String relativePath, 
+	        XMLDataObject parent)
 	throws HandleElementException
 	{
-		return handleElement(element.getTextTrim(), elementProps);
+		return handleElement(element.getTextTrim());
 	}
 	
 	public Class getPrimitiveClass()

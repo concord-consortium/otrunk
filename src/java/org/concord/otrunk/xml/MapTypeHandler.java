@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-02-20 00:16:40 $
+ * $Revision: 1.10 $
+ * $Date: 2007-09-07 02:04:11 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,7 +34,6 @@ package org.concord.otrunk.xml;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 
 /**
@@ -62,8 +61,8 @@ public class MapTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.xml.ResourceTypeHandler#handleElement(org.jdom.Element, java.util.Properties)
 	 */
-	public Object handleElement(OTXMLElement element, Properties elementProps,
-	        String relativePath, XMLDataObject parent)
+	public Object handleElement(OTXMLElement element, String relativePath,
+	        XMLDataObject parent)
 	{
 		XMLDataMap map = new XMLDataMap(parent);
 		

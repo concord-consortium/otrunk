@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.25 $
- * $Date: 2007-05-10 21:04:02 $
+ * $Revision: 1.26 $
+ * $Date: 2007-09-07 02:04:11 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -43,9 +43,12 @@ import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTXMLString;
+import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.framework.otrunk.otcore.OTType;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
+import org.concord.otrunk.otcore.impl.OTCorePackage;
 
 /**
  * DOTypeService
@@ -168,6 +171,8 @@ public class TypeService
 	
 	Hashtable handlerMap = new Hashtable();
 	Vector dataObjects = new Vector();
+	private Hashtable shortcutMap = new Hashtable();
+	private Hashtable handlerByOTClassMap = new Hashtable();
 
 	public TypeService(URL contextURL)
 	{	
@@ -187,11 +192,39 @@ public class TypeService
 		for(int i=0; i<handlers.length; i++){
 			handlerMap.put(handlers[i].getPrimitiveName(), handlers[i]);
 		}
+		
+		handlerByOTClassMap.put(OTCorePackage.BOOLEAN_TYPE,       handlers[0]);
+		handlerByOTClassMap.put(OTCorePackage.INTEGER_TYPE,       handlers[1]);
+		handlerByOTClassMap.put(OTCorePackage.LONG_TYPE,          handlers[2]);
+		handlerByOTClassMap.put(OTCorePackage.FLOAT_TYPE,         handlers[3]);
+		handlerByOTClassMap.put(OTCorePackage.DOUBLE_TYPE,        handlers[4]);
+		handlerByOTClassMap.put(OTCorePackage.STRING_TYPE,        handlers[5]);
+		handlerByOTClassMap.put(OTCorePackage.XML_STRING_TYPE,    handlers[6]);
+		handlerByOTClassMap.put(OTCorePackage.BLOB_TYPE,          handlers[7]);
+		handlerByOTClassMap.put(OTCorePackage.OBJECT_LIST_TYPE,   handlers[8]);
+		handlerByOTClassMap.put(OTCorePackage.RESOURCE_LIST_TYPE, handlers[8]);
+		handlerByOTClassMap.put(OTCorePackage.OBJECT_MAP_TYPE,    handlers[9]);
+		handlerByOTClassMap.put(OTCorePackage.RESOURCE_MAP_TYPE,  handlers[9]);
 	}
 	
 	public void registerUserType(String name, ResourceTypeHandler handler)
 	{
 		handlerMap.put(name, handler);
+	}
+	
+	public void registerUserType(OTClass otClass, ResourceTypeHandler handler)
+	{
+		handlerByOTClassMap.put(otClass, handler);
+	}	
+	
+	public void registerShortcutName(String name, OTClass otClass)
+	{
+		shortcutMap.put(name, otClass);
+	}
+	
+	public OTClass getClassByShortcut(String shortcut)
+	{
+		return (OTClass) shortcutMap.get(shortcut);
 	}
 	
 	/**
@@ -207,6 +240,13 @@ public class TypeService
 		return handler;
 	}
 
+	public ResourceTypeHandler getElementHandler(OTType otType)
+	{
+		ResourceTypeHandler handler = (ResourceTypeHandler) handlerByOTClassMap.get(otType);
+		
+		return handler;
+	}
+	
 
 	public static String elementPath(OTXMLElement element)
 	{
@@ -259,7 +299,7 @@ public class TypeService
 		}
 		
 		try {
-			return handler.handleElement(child, null, relativePath, null);
+			return handler.handleElement(child, relativePath, null);
 		} catch (HandleElementException e) {
 			System.err.println("Error reading element: " + TypeService.elementPath(child));
 			return null;

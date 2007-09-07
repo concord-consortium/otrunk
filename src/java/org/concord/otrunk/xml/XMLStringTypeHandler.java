@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2007-05-10 21:04:02 $
+ * $Revision: 1.7 $
+ * $Date: 2007-09-07 02:04:11 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,7 +32,6 @@
 */
 package org.concord.otrunk.xml;
 
-import java.util.Properties;
 
 import org.concord.framework.otrunk.OTXMLString;
 
@@ -52,7 +51,7 @@ public class XMLStringTypeHandler extends PrimitiveResourceTypeHandler
         super("xmlstring", XMLParsableString.class);
     }
     
-	public Object handleElement(String value, Properties elementProps)
+	public Object handleElement(String value)
 	{
 		return new OTXMLString(value);
 	}
@@ -60,8 +59,8 @@ public class XMLStringTypeHandler extends PrimitiveResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	public Object handleElement(OTXMLElement element, Properties elementProps,
-	        String relativePath, XMLDataObject parent)
+	public Object handleElement(OTXMLElement element, String relativePath,
+	        XMLDataObject parent)
 	{	    
 	    String contentStr = element.getContentAsXMLText();
 	    return new XMLParsableString(contentStr);			    

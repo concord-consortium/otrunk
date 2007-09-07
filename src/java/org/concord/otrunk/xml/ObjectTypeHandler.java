@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.26 $
- * $Date: 2007-08-07 12:54:15 $
+ * $Revision: 1.27 $
+ * $Date: 2007-09-07 02:04:11 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,9 +34,12 @@ package org.concord.otrunk.xml;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.framework.otrunk.otcore.OTClassProperty;
+import org.concord.framework.otrunk.otcore.OTType;
+import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTIDFactory;
 
@@ -51,11 +54,11 @@ import org.concord.otrunk.datamodel.OTIDFactory;
  */
 public class ObjectTypeHandler extends ResourceTypeHandler
 {
+	OTClass otClass;
 	TypeService typeService;	
 	String objectName = null;
 	String objectClassName = null;
 	String parentObjectName = null;
-	ResourceDefinition [] resources = null;
 	XMLDatabase xmlDB = null;
 	
 	public ObjectTypeHandler(TypeService typeService, XMLDatabase xmlDB)
@@ -66,17 +69,17 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	}
 	
 	public ObjectTypeHandler(
+		    OTClass otClass,
 			String objectName,
 			String objectClassName,
 			String parentObjectName,
-			ResourceDefinition [] resources,
 			TypeService typeService,
 			XMLDatabase xmlDB)
 	{
 		this(typeService, xmlDB);
+		this.otClass = otClass;
 		this.objectName = objectName;
 		this.parentObjectName = parentObjectName;
-		this.resources = resources;
 		this.objectClassName = objectClassName;
 		
 		if(objectName == null){
@@ -99,8 +102,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	public Object handleElement(OTXMLElement element, Properties elementProps,
-	        String relativePath, XMLDataObject parent)
+	public Object handleElement(OTXMLElement element, String relativePath,
+	        XMLDataObject parent)
 	{
 		if(isObjectReferenceHandler()){
 			String refid = element.getAttributeValue("refid");
@@ -228,7 +231,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 
 	public String getClassName()
 	{
-		return objectClassName;
+		return otClass.getInstanceClass().getName();
 	}
 	
 	/**
@@ -249,18 +252,14 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	        int xmlType, String comment)
 		throws HandleElementException
 	{
-		Properties elementProps;
-
-		ResourceDefinition resourceDef = getResourceDefinition(childName);
-		
-		if(resourceDef == null) {
+		OTClassProperty otProperty = otClass.getProperty(childName);
+		if(otProperty == null) {
 			System.err.println("error reading childName: " + childName +
 					" in type: " + getObjectName());
 			return null;
 		}
-		elementProps = getResourceProperties(resourceDef);
-		String resPrimitiveType = resourceDef.getType();	
-
+		OTType otType = otProperty.getType();
+		
 		XMLReferenceInfo resInfo = null;
 		if(xmlDB.isTrackResourceInfo()){
 			resInfo = parent.getReferenceInfo(childName);
@@ -272,10 +271,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			
 			resInfo.comment = comment;
 		}
-		
-		String resourceType = resPrimitiveType;
-		if(resPrimitiveType.equals("object") &&
-		        childObj instanceof String){
+
+		if(otType instanceof OTClass &&
+				childObj instanceof String){
 		    
 		    // this is an object reference
 			String refid = (String)childObj;
@@ -284,7 +282,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			}		    
 		}
 		
-		if(resPrimitiveType.equals("object")) {
+		if(otType instanceof OTClass) {
 			if(!(childObj instanceof OTXMLElement)) {
 				System.err.println("child of type object must be an element or string");
 				return null;
@@ -314,29 +312,49 @@ public class ObjectTypeHandler extends ResourceTypeHandler
                     System.err.println("Warning: Only the first element is returned from " +
                             TypeService.elementPath(child));
                 }
-				resourceType = ((OTXMLElement)childObj).getName();
+				String childElementName = ((OTXMLElement)childObj).getName();
+				
+				// Should figure out how to get the OTType for this class name it could be
+				// a shortcut name.  First check if it is a Fully Qualified name.
+				if(childElementName.equals("object")){
+					otType = OTrunkImpl.getOTClass("org.concord.framework.otrunk.OTObject");
+				} else {
+					otType = OTrunkImpl.getOTClass(childElementName);
+
+					if(otType == null){
+						otType = typeService.getClassByShortcut(childElementName);
+					}
+					
+					if(otType == null){
+						throw new IllegalStateException("Can't find OTClass for <" + childElementName + "> check the imports"); 						
+					}
+				}				
 			}			
 		}
 		
-		ResourceTypeHandler resHandler = typeService.getElementHandler(resourceType);
+		if(otType == null){
+			throw new IllegalStateException("Can't find otType for property: " + otProperty); 
+		}
+		
+		ResourceTypeHandler resHandler = typeService.getElementHandler(otType);
 		
 		if(resHandler == null){
 			System.err.println("Can't find type handler for: " +
-					resourceType);
+					otType.getInstanceClass());
 			return null;
 		}
 		
 		if(childObj instanceof String) {
 			if(resHandler instanceof PrimitiveResourceTypeHandler){
 				return ((PrimitiveResourceTypeHandler)resHandler).
-					handleElement((String)childObj, elementProps);
+					handleElement((String)childObj);
 			} else {
 				throw new HandleElementException("Can't use an attribute for a non-primitive type");
 			}
 		} else {
 		    String childRelativePath = relativeParentPath + "/" + childName;
-			return resHandler.handleElement((OTXMLElement)childObj, elementProps,
-			        childRelativePath, parent);
+			return resHandler.handleElement((OTXMLElement)childObj, childRelativePath,
+			        parent);
 		}		
 	}
 	
@@ -355,44 +373,4 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		return null;		
 	}
 	
-	public ResourceDefinition [] getResourceDefinitions()
-	{
-		return resources;
-	}
-	
-	public ResourceDefinition getResourceDefinition(String name)
-	{	
-		if(resources == null) {
-			throw new RuntimeException("null resource defs in: " + objectName);
-		}
-		for(int i=0; i<resources.length; i++) {
-			if(resources[i].getName().equals(name)) {
-				return resources[i];
-			}
-		}
-
-		ObjectTypeHandler parentType = getParentType(); 
-		if(parentType == null) {
-			return null;
-		}
-
-		return parentType.getResourceDefinition(name);		
-	}
-	
-	public Properties getResourceProperties(ResourceDefinition resType)
-	{
-		// Go through the resource type object and make a properties
-		// object that descriptes the type both the type of the resource and
-		// any extra paramaters of the type
-		Properties props = new Properties();
-		ResourceDefinition.Parameter []  params = resType.getParameters();
-		if(params == null) {
-			return null;
-		}
-		
-		for(int i=0; i<params.length; i++){
-			props.setProperty(params[i].name, params[i].value);
-		}
-		return props;		
-	}	
 }

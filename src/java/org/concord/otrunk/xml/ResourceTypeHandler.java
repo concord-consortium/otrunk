@@ -23,16 +23,15 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.9 $
+ * $Date: 2007-09-07 02:04:11 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
 */
 package org.concord.otrunk.xml;
 
-import java.util.Properties;
 
 /**
  * ResourceTypeHandler
@@ -57,12 +56,10 @@ public abstract class ResourceTypeHandler
 	 * so objects, lists, and maps need to override this method.
 	 * 
 	 * @param element
-	 * @param elementProps
 	 * @return
 	 */
 	public abstract Object handleElement(OTXMLElement element, 
-	        Properties elementProps, String relativePath, 
-	        XMLDataObject parent)
+	        String relativePath, XMLDataObject parent)
 		throws HandleElementException;
 
 	public String getPrimitiveName()

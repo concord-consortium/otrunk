@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-01-27 23:46:22 $
+ * $Revision: 1.9 $
+ * $Date: 2007-09-07 02:04:11 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,7 +32,6 @@
 */
 package org.concord.otrunk.xml;
 
-import java.util.Properties;
 
 
 
@@ -55,7 +54,7 @@ public class FloatTypeHandler extends PrimitiveResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	public Object handleElement(String value, Properties elementProps)
+	public Object handleElement(String value)
 		throws HandleElementException
 	{
 		try {

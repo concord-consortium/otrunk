@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-09-05 00:21:42 $
+ * $Revision: 1.8 $
+ * $Date: 2007-09-07 02:04:12 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -37,18 +37,16 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Hashtable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
-import org.concord.otrunk.xml.ObjectTypeHandler;
-import org.concord.otrunk.xml.ReflectionTypeDefinitions;
-import org.concord.otrunk.xml.ResourceDefinition;
-import org.concord.otrunk.xml.TypeService;
+import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.framework.otrunk.otcore.OTClassProperty;
+import org.concord.framework.otrunk.otcore.OTType;
+import org.concord.otrunk.otcore.impl.OTCorePackage;
+import org.concord.otrunk.otcore.impl.ReflectiveOTClassFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -92,7 +90,7 @@ public class RNGSchemaGenerator
     // Turning this off allows xmllint to give better error messages
     // With it off invalid documents can be created because multiple
     // resources with the same name can be added.  This will be ignored
-    // if STRING_ORDERING is true.
+    // if STRICT_ORDERING is true.
     public static boolean USE_INTERLEAVE = true;
     
     // If this is true then a strict ordering of the resources in each
@@ -177,13 +175,8 @@ public class RNGSchemaGenerator
             	xmlFile = new File("/tmp/all-otrunk.xml");
             }
             FileInputStream xmlStream = new FileInputStream(xmlFile);
-            URL contextURL = xmlFile.toURL();
             
             // parse the xml file...
-            TypeService typeService = new TypeService(contextURL);
-            ObjectTypeHandler objectTypeHandler = new ObjectTypeHandler(typeService, null);
-            typeService.registerUserType("object", objectTypeHandler);
-            
             SAXBuilder builder = new SAXBuilder();
             Document document = builder.build(xmlStream);
             
@@ -197,29 +190,22 @@ public class RNGSchemaGenerator
             for(Iterator iterator=imports.iterator();iterator.hasNext();) {
                 Element currentImport=(Element)iterator.next();
                 String className = currentImport.getAttributeValue("class");
-                importedOTObjectClasses.add(className);
+                try{
+                	Class importClass = Class.forName(className);
+                	importedOTObjectClasses.add(importClass);
+                } catch (ClassNotFoundException e){
+                	System.err.println("Can't find class: " + className + " skipping it");
+                }
             }       
             
-            ReflectionTypeDefinitions.registerTypes(importedOTObjectClasses, typeService,
-                    null, false);   
-            
-            // the type service should now have all registers types so we can write out
-            // the schema
-            Hashtable typeMap = typeService.getHandlerMap();
-            
-            Set entries = typeMap.entrySet();
-            for(Iterator entryItr = entries.iterator(); entryItr.hasNext();) {
-                Map.Entry entry = (Map.Entry)entryItr.next();
-                if(entry.getValue() instanceof ObjectTypeHandler){
-                    if(entry.getKey().equals("object")) {
-                        continue;
-                    }
-                    
-                    Element objectDef = createOTObjectDef((String)entry.getKey(), 
-                            (ObjectTypeHandler)entry.getValue());
-                    
-                    otObjectChoice.addContent(objectDef);
-                }
+    		ArrayList referrencedOTClasses = ReflectiveOTClassFactory.singleton.loadClasses(importedOTObjectClasses);
+
+    		for(int i=0; i<referrencedOTClasses.size(); i++){
+    			OTClass otClass = (OTClass) referrencedOTClasses.get(i);
+    		
+    			Element objectDef = createOTObjectDef(otClass);
+
+    			otObjectChoice.addContent(objectDef);
             }   
             
             
@@ -238,10 +224,11 @@ public class RNGSchemaGenerator
         }
     }
     
-    public static Element createOTObjectDef(String name, ObjectTypeHandler objectType)
+    public static Element createOTObjectDef(OTClass otClass)
     {
         Vector printedResources = new Vector();
-        
+
+        String name = otClass.getInstanceClass().getName();
         int lastDot = name.lastIndexOf(".");
         String shortName = name.substring(lastDot+1,name.length());
 
@@ -279,51 +266,57 @@ public class RNGSchemaGenerator
             }
         }
         
-        ResourceDefinition [] resDefs = objectType.getResourceDefinitions();
-        if(resDefs == null) {
+        ArrayList properties = otClass.getOTAllClassProperties();
+        if(properties == null || properties.size() == 0) {
             return objectDef;
         }
-        for(int i=0; i<resDefs.length; i++) {
-            String resName = resDefs[i].getName();
+        
+        for(int i=0; i<properties.size(); i++) {
+        	OTClassProperty property = (OTClassProperty) properties.get(i);
+
+        	
+        	String resName = property.getName();
             if(printedResources.contains(resName)) {
                 continue;
             }
- 
-            String type = resDefs[i].getType();
+
+            OTType otType = property.getType();
             Element resourceDefElement = null;
             
             if(resName.equals("localId")) {
                 // skip local id definitions because
                 // we add that option to all objects
                 continue;
-            } else if(type.equals(TypeService.STRING)){
+            } else if(otType == OTCorePackage.STRING_TYPE){
                 resourceDefElement = createSimpleResourceDef(resName, "text");
-            } else if(type.equals(TypeService.XML_STRING)){
+            } else if(otType == OTCorePackage.XML_STRING_TYPE){
                 resourceDefElement = createElementDef(null, resName);
                 createPatternRef(resourceDefElement, "anyXMLFragment");
-            } else if(type.equals(TypeService.BOOLEAN)){
+            } else if(otType == OTCorePackage.BOOLEAN_TYPE){
                 resourceDefElement = createSimpleResourceDef(resName, "boolean");                
-            } else if(type.equals(TypeService.FLOAT)){
+            } else if(otType == OTCorePackage.FLOAT_TYPE){
                 resourceDefElement = createSimpleResourceDef(resName, "float");                                
-            } else if(type.equals(TypeService.DOUBLE)){
+            } else if(otType == OTCorePackage.DOUBLE_TYPE){
                 resourceDefElement = createSimpleResourceDef(resName, "double");                                
-            } else if(type.equals(TypeService.INTEGER)){                
+            } else if(otType == OTCorePackage.INTEGER_TYPE){                
+                // we want to allow hex values like 0xFFFFF making this
+                // basic text seems to be the only way to do that
+                resourceDefElement = createSimpleResourceDef(resName, "text");                                                
+            } else if(otType == OTCorePackage.LONG_TYPE){                
                 // we want to allow hex values like 0xFFFFF make this
                 // basic text seems to be the only way to do that
                 resourceDefElement = createSimpleResourceDef(resName, "text");                                                
-            } else if(type.equals(TypeService.LONG)){                
-                // we want to allow hex values like 0xFFFFF make this
-                // basic text seems to be the only way to do that
-                resourceDefElement = createSimpleResourceDef(resName, "text");                                                
-            } else if(type.equals(TypeService.BLOB)){
+            } else if(otType == OTCorePackage.BLOB_TYPE){
                 resourceDefElement = createSimpleResourceDef(resName, "text");                
-            } else if(type.equals(TypeService.LIST)){
+            } else if(otType == OTCorePackage.OBJECT_LIST_TYPE ||
+            		otType == OTCorePackage.RESOURCE_LIST_TYPE){
                 resourceDefElement = createElementDef(null, resName);
                 createPatternRef(resourceDefElement, "listContents");          
-            } else if(type.equals(TypeService.MAP)){
+            } else if(otType == OTCorePackage.OBJECT_MAP_TYPE ||
+            		otType == OTCorePackage.RESOURCE_MAP_TYPE){
                 resourceDefElement = createElementDef(null, resName);
                 createPatternRef(resourceDefElement, "mapContents");                
-            } else if(type.equals(TypeService.OBJECT)){
+            } else if(otType instanceof OTClass){
                 resourceDefElement = createElementDef(null, resName);
                 if(AMBIGUOUS_OBJECT_REFERENCES ||
                         ALLOW_EMPTY_RESOURCE_ELEMENTS) {
