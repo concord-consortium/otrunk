@@ -217,7 +217,11 @@ public class ReflectiveOTClassFactory
 			registerClass(nextClass);
 		}
 		
-		
+		return processAllNewlyRegisteredClasses();
+	}
+	
+	public ArrayList processAllNewlyRegisteredClasses()
+	{
 		for(int i=0; i<newlyRegisteredOTClasses.size(); i++){
 			OTClass nextOTClass = (OTClass) newlyRegisteredOTClasses.get(i);
 			addClassProperties(nextOTClass);
@@ -227,7 +231,7 @@ public class ReflectiveOTClassFactory
 		
 		newlyRegisteredOTClasses.clear();
 		
-		return newOTClasses;
+		return newOTClasses;		
 	}
 	
 	/**

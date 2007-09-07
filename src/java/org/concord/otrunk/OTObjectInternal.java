@@ -74,6 +74,9 @@ public class OTObjectInternal implements OTObjectInterface
 		String str = getOTClassName() + "@" +  getGlobalId();
 		hashCode = str.hashCode();
 
+		if(otClass == null){
+			throw new IllegalStateException("otClass cannot be null");
+		}
 		this.otClass = otClass;
     }	
 
