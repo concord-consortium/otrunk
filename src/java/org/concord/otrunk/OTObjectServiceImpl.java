@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2007-08-17 13:21:28 $
+ * $Revision: 1.22 $
+ * $Date: 2007-09-07 11:46:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -43,12 +43,14 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceSchema;
+import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.otrunk.datamodel.DataObjectUtil;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTTransientMapID;
+import org.concord.otrunk.otcore.impl.ReflectiveOTClassFactory;
 import org.concord.otrunk.overlay.CompositeDatabase;
 
 public class OTObjectServiceImpl
@@ -93,9 +95,22 @@ public class OTObjectServiceImpl
     {
     	String className = objectClass.getName();
     	OTDataObjectType type = new OTDataObjectType(objectClass.getName());
-        OTDataObject dataObject = createDataObject(type);        
+        OTDataObject dataObject = createDataObject(type); 
+        OTClass otClass = OTrunkImpl.getOTClass(className);
+        if(otClass == null){
+        	// Can't find existing otClass for this class try to make one
+        	otClass = ReflectiveOTClassFactory.singleton.registerClass(objectClass);
+        	if(otClass == null){
+        		// Java class isn't a valid OTObject
+            	throw new IllegalStateException("Invalid OTClass definition: " + className);
+        	}
+        	
+        	// This will add the properties for this new class plus any dependencies that
+        	// were registered at the same time.
+        	ReflectiveOTClassFactory.singleton.processAllNewlyRegisteredClasses();
+        }
     	OTObjectInternal otObjectImpl = 
-    		new OTObjectInternal(dataObject, this, OTrunkImpl.getOTClass(className));
+    		new OTObjectInternal(dataObject, this, otClass);
     	return otObjectImpl;
     }
     
