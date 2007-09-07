@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.23 $
- * $Date: 2007-08-27 14:53:09 $
+ * $Revision: 1.24 $
+ * $Date: 2007-09-07 02:04:11 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,13 +32,12 @@
 */
 package org.concord.otrunk.xml;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Vector;
 
-import org.concord.framework.otrunk.OTResourceSchema;
-import org.concord.otrunk.OTInvocationHandler;
+import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.otcore.impl.OTClassImpl;
 import org.concord.otrunk.otcore.impl.ReflectiveOTClassFactory;
 
 
@@ -80,32 +79,21 @@ public class ReflectionTypeDefinitions
 		
 		ReflectiveOTClassFactory.singleton.loadClasses(typeClasses);
 		
+		// This is a hack util the refactoring is more complete.  The current way that <object/> elements
+		// handled requires this.
+		OTClass baseObjectClass = OTrunkImpl.getOTClass("org.concord.framework.otrunk.OTObject");
+		typeService.registerUserType(baseObjectClass, typeService.getElementHandler("object"));
+		
 		for(int i=0; i<typeClasses.size(); i++) {
 			Class otObjectClass = (Class)typeClasses.get(i); 
 			String className = otObjectClass.getName();
 			
-			// do our magic here to register the type
-			// first figure out if it uses a seperate schema object
-			// get that object, otherwise use the class itself
-			Class resourceSchemaClass = null;
-			if(otObjectClass.isInterface()){
-				resourceSchemaClass = otObjectClass;
-			} else {
-				Constructor [] memberConstructors = otObjectClass.getConstructors();
-				Constructor resourceConstructor = memberConstructors[0]; 
-				Class [] params = resourceConstructor.getParameterTypes();
-						
-				// Check all the conditions for incorrect imports.
-				if(memberConstructors.length > 1 || params == null || 
-						params.length == 0 ||
-						!OTResourceSchema.class.isAssignableFrom(params[0])) {
-					System.err.println("Invalid constructor for OTrunk Object: " + className +
-							"\n   If you are using an otml file check the import statements");
-					throw new RuntimeException("OTObjects should only have 1 constructor" + "\n" +
-							" whose first argument is the resource schema");
-				}
-				
-				resourceSchemaClass = params[0];
+			OTClassImpl otClass = (OTClassImpl) OTrunkImpl.getOTClass(className);
+			
+			Class resourceSchemaClass = otClass.getInstanceClass();
+			Class constructorSchemaClass = otClass.getConstructorSchemaClass();
+			if(constructorSchemaClass != null){
+				resourceSchemaClass = constructorSchemaClass;
 			}
 
 			if(resourceSchemaClass == null) {
@@ -113,83 +101,24 @@ public class ReflectionTypeDefinitions
 						className);
 			}
 			
-			Vector resourceDefs = new Vector();
-			addResources(resourceDefs, resourceSchemaClass, typeClasses, true);
-						
-			ResourceDefinition [] resourceDefsArray = new ResourceDefinition[resourceDefs.size()];
-			for(int j=0; j<resourceDefsArray.length; j++) {
-				ResourceDefinition resourceDef = (ResourceDefinition)resourceDefs.get(j);
-				resourceDefsArray[j] = resourceDef;				
-			}
 			ObjectTypeHandler objectType = 
 				new ObjectTypeHandler(
+						otClass,
 						className,
 						className,
 						null,
-						resourceDefsArray,
 						typeService,
 						xmlDB);
 			
 			typeService.registerUserType(className, objectType);
+			typeService.registerUserType(otClass, objectType);
 			
 			if(addShortcuts) {
 			    int lastDot = className.lastIndexOf(".");
 			    String localClassName = className.substring(lastDot+1,className.length());
 			    typeService.registerUserType(localClassName, objectType);
+			    typeService.registerShortcutName(localClassName, otClass);
 			}
 		}		
-	}
-	
-	public static void addResources(List resources, Class resourceSchemaClass,
-	        List typeClasses, boolean processParents)
-	{
-		// Then look for all the getters and their types
-		Method [] methods;
-		if(processParents){
-			methods = resourceSchemaClass.getMethods();
-		} else {
-			methods = resourceSchemaClass.getDeclaredMethods();
-		}
-		for(int j=0; j<methods.length; j++) {
-			String methodName = methods[j].getName();
-			if(methodName.equals("getGlobalId") ||
-			        methodName.equals("getOTDatabase") ||
-                    methodName.equals("getOTObjectService")) {
-				continue;
-			}
-			
-			if(!methodName.startsWith("get")) {
-				continue;				
-			}
-			
-			String resourceName = OTInvocationHandler.getResourceName(3,methodName);
-			Class resourceClass = methods[j].getReturnType();
-			String resourceType = TypeService.getObjectPrimitiveType(resourceClass);
-
-			if(resourceType == null){
-			    // This resource type might be an interface that one of the other
-			    // typeClasses implements.  
-			    for(int k=0; k<typeClasses.size(); k++){
-			        Class typeClass = (Class)typeClasses.get(k);
-			        if(resourceClass.isAssignableFrom(typeClass)){
-			            resourceType = "object";
-			        }
-			    }
-			}			
-
-			if(resourceType == null){
-				System.err.println("Warning: the field: " + resourceName + " on class: " + resourceSchemaClass + "\n" + 
-                        "    has an unknown type: " + resourceClass + "\n"  +
-                        "  There are no imported classes that implement this type");
-                // in a strict assertion mode we might want to stop
-                // here, but setting the type to object seems pretty safe
-                resourceType = "object";
-			}
-			
-			ResourceDefinition resourceDef = new ResourceDefinition(resourceName,
-					resourceType, resourceClass, null);
-			resources.add(resourceDef);
-		}		
-	}
-	
+	}	
 }

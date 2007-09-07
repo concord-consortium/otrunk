@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-08-06 19:01:01 $
+ * $Revision: 1.12 $
+ * $Date: 2007-09-07 02:04:11 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -33,7 +33,6 @@
 package org.concord.otrunk.xml;
 
 import java.net.URL;
-import java.util.Properties;
 
 import org.concord.otrunk.datamodel.BlobResource;
 
@@ -60,7 +59,7 @@ public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.xml.ResourceTypeHandler#handleElement(org.jdom.Element, java.util.Properties)
 	 */	
-	public Object handleElement(String urlStr, Properties elementProps)
+	public Object handleElement(String urlStr)
 		throws HandleElementException
 	{		
 		try {

@@ -24,21 +24,21 @@ public class OTControllerRegistryImpl implements OTControllerRegistry
 	/* (non-Javadoc)
      * @see org.concord.otrunk.OTControllerRegistry#registerControllerClass(java.lang.Class)
      */
-	public void registerControllerClass(Class viewClass) {
-		if(controllerClasses.contains(viewClass)){
+	public void registerControllerClass(Class controllerClass) {
+		if(controllerClasses.contains(controllerClass)){
 			return;
 		}
 
-		controllerClasses.add(viewClass);
+		controllerClasses.add(controllerClass);
 		
 		Class [] classes;
-		classes = getRealObjectClasses(viewClass);
+		classes = getRealObjectClasses(controllerClass);
 		for(int i=0; i<classes.length; i++) {
-			controllerClassesFromRealObject.put(classes[i], viewClass);
+			controllerClassesFromRealObject.put(classes[i], controllerClass);
 		}
 
-		Class klass = getOTObjectClass(viewClass);
-		controllerClassesFromOTObject.put(klass, viewClass);		
+		Class klass = getOTObjectClass(controllerClass);
+		controllerClassesFromOTObject.put(klass, controllerClass);		
 	}
 
 	public final static Class [] getRealObjectClasses(Class controllerClass) {

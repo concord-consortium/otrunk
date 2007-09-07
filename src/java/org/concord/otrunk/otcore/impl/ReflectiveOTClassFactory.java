@@ -63,6 +63,12 @@ public class ReflectiveOTClassFactory
     		return otClass;
     	}
 
+    	if(!OTObject.class.isAssignableFrom(javaClass)){
+    		// this is an invalid javaClass, return null and count on the caller to
+    		// report this error
+    		return null;
+    	}
+    	
 		otClass = new OTClassImpl(javaClass);
 		OTrunkImpl.putOTClass(otClassName, otClass);
 		newlyRegisteredOTClasses.add(otClass);
@@ -102,7 +108,8 @@ public class ReflectiveOTClassFactory
 		if(javaSuperclass != null){
 			processSuperType(otClass, javaSuperclass);
 		}
-				
+		
+		
 		return otClass;
     }
     
@@ -160,20 +167,25 @@ public class ReflectiveOTClassFactory
 			if(resourceType == null){
 				String resourceClassName = resourceClass.getName();
 				OTClass resourceOTClass = OTrunkImpl.getOTClass(resourceClassName);
-				
-				if(resourceOTClass != null){
-					resourceType = "object";
+								
+				if(resourceOTClass == null){
+					// this resourceClass can't be found in our existing registered class
+					// try to register it
+					resourceOTClass = registerClass(resourceClass);
 				}
-			}			
 
-			if(resourceType == null){
-				System.err.println("Warning: the field: " + resourceName + " on class: " + javaClass + "\n" + 
-                        "    has an unknown type: " + resourceClass + "\n"  +
-                        "  There are no imported classes that implement this type");
-                // in a strict assertion mode we might want to stop
-                // here, but setting the type to object seems pretty safe
-                resourceType = "object";
-			}
+				if(resourceOTClass == null){
+					// if it is still null then we are in trouble
+					System.err.println("Warning: the field: " + resourceName + " on class: " + javaClass + "\n" + 
+	                        "    has an unknown type: " + resourceClass + "\n"  +
+	                        "  There are not available valid OTClasses which match this type");
+					
+	                // in a strict assertion mode we might want to stop
+	                // here, but setting the type to object seems pretty safe
+				}
+				
+				resourceType = "object";
+			}			
 
 			OTType otType = getOTType(resourceType, resourceClass);
 			
@@ -198,19 +210,24 @@ public class ReflectiveOTClassFactory
 		}		
 	}	
 
-	public void loadClasses(List classList)
+	public ArrayList loadClasses(List classList)
 	{		
 		for(Iterator i=classList.iterator(); i.hasNext();){
 			Class nextClass = (Class) i.next();
 			registerClass(nextClass);
 		}
 		
-		for(Iterator i=newlyRegisteredOTClasses.iterator(); i.hasNext();){
-			OTClass nextOTClass = (OTClass) i.next();
+		
+		for(int i=0; i<newlyRegisteredOTClasses.size(); i++){
+			OTClass nextOTClass = (OTClass) newlyRegisteredOTClasses.get(i);
 			addClassProperties(nextOTClass);
 		}
 		
+		ArrayList newOTClasses = (ArrayList) newlyRegisteredOTClasses.clone();
+		
 		newlyRegisteredOTClasses.clear();
+		
+		return newOTClasses;
 	}
 	
 	/**
@@ -239,13 +256,8 @@ public class ReflectiveOTClassFactory
 		} else if(OTResourceMap.class.isAssignableFrom(klass) ||
 				OTObjectMap.class.isAssignableFrom(klass)) {
 			return MAP;
-		} else if(OTObject.class.isAssignableFrom(klass) ) {
-			// OTIDs used to be allowed here.
-			// If an OTID is the type of a parameter, I think the code which
-			// translates these will get messed up.  So they are not allowed
-			// now
-			return OBJECT;
-		}
+		} 
+		
 		return null;
 	}
 

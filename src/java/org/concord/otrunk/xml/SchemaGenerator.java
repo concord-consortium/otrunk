@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-07-25 17:06:36 $
+ * $Revision: 1.6 $
+ * $Date: 2007-09-07 02:04:11 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -34,15 +34,14 @@ package org.concord.otrunk.xml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 
+import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.framework.otrunk.otcore.OTClassProperty;
+import org.concord.framework.otrunk.otcore.OTType;
+import org.concord.otrunk.otcore.impl.ReflectiveOTClassFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -65,18 +64,11 @@ public class SchemaGenerator
 		File xmlFile = new File(args[0]);
 		FileInputStream xmlStream = new FileInputStream(xmlFile);
 		
-		URL contextURL = xmlFile.toURL();
-		
 		// parse the xml file...
-		TypeService typeService = new TypeService(contextURL);
-		ObjectTypeHandler objectTypeHandler = new ObjectTypeHandler(typeService, null);
-		typeService.registerUserType("object", objectTypeHandler);
-
 		SAXBuilder builder = new SAXBuilder();
 		Document document = builder.build(xmlStream);
 		
 		Element rootElement = document.getRootElement();
-
 		
 		ArrayList importedOTObjectClasses = new ArrayList();
 				
@@ -85,51 +77,48 @@ public class SchemaGenerator
 		for(Iterator iterator=imports.iterator();iterator.hasNext();) {
 			Element currentImport=(Element)iterator.next();
 			String className = currentImport.getAttributeValue("class");
-			importedOTObjectClasses.add(className);
+			Class importClass = Class.forName(className);
+			importedOTObjectClasses.add(importClass);
 		}		
 		
-		ReflectionTypeDefinitions.registerTypes(importedOTObjectClasses, typeService,
-				null, false);	
-		
-		// the type service should now have all registers types so we can write out
-		// the schema
-		Hashtable typeMap = typeService.getHandlerMap();
+		ArrayList referrencedOTClasses = ReflectiveOTClassFactory.singleton.loadClasses(importedOTObjectClasses);
+						
+		for(int i=0; i<referrencedOTClasses.size(); i++){
+			OTClass otClass = (OTClass) referrencedOTClasses.get(i);
 
-		Vector printedResources = new Vector();
-		
-		Set entries = typeMap.entrySet();
-		for(Iterator entryItr = entries.iterator(); entryItr.hasNext();) {
-			Map.Entry entry = (Map.Entry)entryItr.next();
-			if(entry.getValue() instanceof ObjectTypeHandler){
-				if(entry.getKey().equals("object")) {
-					continue;
-				}
+			System.out.println("" + otClass.getInstanceClass().getName());
 
-				printedResources.clear();
-				
-				System.out.println("" + entry.getKey());
-				
-				ObjectTypeHandler objectType = (ObjectTypeHandler)entry.getValue();
-				ResourceDefinition [] resDefs = objectType.getResourceDefinitions();
-				if(resDefs == null) {
-					System.out.println("   no resource definitions ");
-				}
-				for(int i=0; i<resDefs.length; i++) {
-					String resName = resDefs[i].name;
-					if(printedResources.contains(resName)) {
-						continue;
-					}
-					int numSpaces = 20 - resName.length();
-					String spaces = "";
-					for(int j=0; j<numSpaces; j++) spaces += " ";
-					System.out.println("  " + resName + spaces + " : " +
-							resDefs[i].type);
-					printedResources.add(resName);
-				}
-				
-				System.out.println();
+			System.out.print("     extends ");
+			ArrayList superTypes = otClass.getOTSuperTypes();
+			for(int j=0; j<superTypes.size(); j++){
+				OTClass superType = (OTClass) superTypes.get(j);
+				System.out.print(superType.getInstanceClass().getName() + " ");
 			}
-		}	
+			System.out.println();
+			
+			ArrayList properties = otClass.getOTClassProperties();
+			if(properties == null || properties.size() == 0){
+				System.out.println("   no class properties");
+			}
+			for(int j=0; j<properties.size(); j++) {
+				OTClassProperty otProperty = (OTClassProperty) properties.get(j);
+				String resName = otProperty.getName();
+				int numSpaces = 20 - resName.length();
+				String spaces = "";
+				for(int k=0; k<numSpaces; k++) spaces += " ";
+				OTType otType = otProperty.getType();
+				String typeName = "null type";
+				if(otType != null){
+					Class typeClass = otType.getInstanceClass();
+					typeName = typeClass.getName();
+				}
+				System.out.println("  " + resName + spaces + " : " +
+						typeName);
+			}
+			
+			System.out.println();
+			
+		}
 	}
 	
 }
