@@ -86,7 +86,7 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	{
 		Object toBeStored = translateExternalToStored(object);
 		list.set(index, toBeStored);
-		notifyOTChange(OTChangeEvent.OP_CHANGE, object);
+		notifyOTChange(OTChangeEvent.OP_SET, object);
 	}
 
 	/* (non-Javadoc)
