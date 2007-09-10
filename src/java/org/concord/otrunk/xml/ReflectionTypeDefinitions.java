@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.24 $
- * $Date: 2007-09-07 02:04:11 $
+ * $Revision: 1.25 $
+ * $Date: 2007-09-10 17:08:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -89,6 +89,11 @@ public class ReflectionTypeDefinitions
 			String className = otObjectClass.getName();
 			
 			OTClassImpl otClass = (OTClassImpl) OTrunkImpl.getOTClass(className);
+			
+			if(otClass == null){
+				System.err.println("Warning cannot find valid OTClass for import: " + className);
+				continue;
+			}
 			
 			Class resourceSchemaClass = otClass.getInstanceClass();
 			Class constructorSchemaClass = otClass.getConstructorSchemaClass();

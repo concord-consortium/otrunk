@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.27 $
- * $Date: 2007-09-07 02:04:11 $
+ * $Revision: 1.28 $
+ * $Date: 2007-09-10 17:08:35 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -333,7 +333,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		}
 		
 		if(otType == null){
-			throw new IllegalStateException("Can't find otType for property: " + otProperty); 
+			throw new IllegalStateException("Can't find otType for property: " + otProperty.getName() + 
+					" on class: " + otClass.getInstanceClass().getName()); 
 		}
 		
 		ResourceTypeHandler resHandler = typeService.getElementHandler(otType);
