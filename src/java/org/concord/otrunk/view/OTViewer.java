@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.82 $
- * $Date: 2007-09-11 15:23:24 $
+ * $Revision: 1.83 $
+ * $Date: 2007-09-11 16:21:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,6 +32,7 @@
  */
 package org.concord.otrunk.view;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -40,9 +41,11 @@ import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -296,6 +299,8 @@ public class OTViewer extends JFrame
 		// start exploring the data structures, etc.
 		KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 		
+		
+		
 		KeyEventDispatcher deleteDispatcher = new KeyEventDispatcher(){					
 			public boolean dispatchKeyEvent(KeyEvent e) {
 				if ( (e.getID() == java.awt.event.KeyEvent.KEY_RELEASED)  && 
@@ -312,6 +317,27 @@ public class OTViewer extends JFrame
 		};
 
 		focusManager.addKeyEventDispatcher(deleteDispatcher);
+		
+		// If the mouse click is a real right click event and alt is pressed then this code will print
+		// out the toString method of the object which the mouse is over.
+		AWTEventListener awtEventListener = new AWTEventListener(){
+			public void eventDispatched(AWTEvent event)
+			{
+				if(!(event instanceof MouseEvent)){
+					return;
+				}
+				
+				MouseEvent mEvent = (MouseEvent) event;
+				
+				if(mEvent.getID() == MouseEvent.MOUSE_CLICKED &&
+						(mEvent.getButton() == MouseEvent.BUTTON3) &&
+						(mEvent.getModifiersEx() & MouseEvent.ALT_DOWN_MASK) != 0){
+					System.out.println(event.getSource().toString());					
+				}
+			}
+		};
+		
+		Toolkit.getDefaultToolkit().addAWTEventListener(awtEventListener, AWTEvent.MOUSE_EVENT_MASK);
 	}
 
 	public void setUserMode(int mode)
