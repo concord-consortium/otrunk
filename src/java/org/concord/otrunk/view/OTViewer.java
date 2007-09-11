@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.81 $
- * $Date: 2007-08-31 17:34:47 $
- * $Author: aunger $
+ * $Revision: 1.82 $
+ * $Date: 2007-09-11 15:23:24 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -146,7 +146,7 @@ public class OTViewer extends JFrame
 
 	private static OTViewFactory otViewFactory;
 
-	protected int userMode = 0;
+	protected int userMode = OTViewerHelper.NO_USER_MODE;
 
 	OTUserObject currentUser = null;
 
@@ -298,10 +298,11 @@ public class OTViewer extends JFrame
 		
 		KeyEventDispatcher deleteDispatcher = new KeyEventDispatcher(){					
 			public boolean dispatchKeyEvent(KeyEvent e) {
-				if ( ((e.getModifiersEx() & java.awt.event.KeyEvent.KEY_RELEASED) != 0) && 
+				if ( (e.getID() == java.awt.event.KeyEvent.KEY_RELEASED)  && 
 						((e.getModifiersEx() & java.awt.event.InputEvent.META_DOWN_MASK) != 0) && 
 						(e.getKeyCode() == java.awt.event.KeyEvent.VK_B) ) {
 					Object o = e.getSource();
+					System.out.println(o.toString());
 					return true;
 				}
 				
@@ -579,7 +580,11 @@ public class OTViewer extends JFrame
 	{
 		try {
 			xmlDB = new XMLDatabase(url, System.err);
-			if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)) {
+			
+			// Only track the resource info when there isn't a user.  Currently all classroom uses
+			// of OTViewer has NO_USER_MODE turned off, so using this setting safe to test
+			// the resource tracking without affecting real users.
+			if (userMode == OTViewerHelper.NO_USER_MODE) {
 				xmlDB.setTrackResourceInfo(true);
 			}
 			xmlDB.loadObjects();
