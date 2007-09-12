@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.36 $
- * $Date: 2007-08-06 19:01:01 $
- * $Author: scytacki $
+ * $Revision: 1.37 $
+ * $Date: 2007-09-12 16:17:34 $
+ * $Author: aunger $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -163,8 +163,11 @@ public class XMLDatabase
 		throws Exception
 	{
 		OTXMLElement rootElement = document.getRootElement();
-
+		
 		String dbBase = rootElement.getAttributeValue("codebase");
+		if (System.getProperty("otrunk.codebase", null) != null) {
+			dbBase = System.getProperty("otrunk.codebase");
+		}
 		if(dbBase != null && dbBase.length() > 0) {
 		    // this document has a specific base address
 		    
