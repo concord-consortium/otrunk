@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2007-08-07 19:18:33 $
- * $Author: scytacki $
+ * $Revision: 1.16 $
+ * $Date: 2007-09-14 23:18:59 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
@@ -70,13 +71,28 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 				
 		//Create a split pane with the preview pane and the text area 
 		JComponent editTextPane = super.getComponent(document, true);
-		JPanel editPane = createTextPanel(editTextPane);
+		final JPanel editPane = createTextPanel(editTextPane);
 		
 		//If preview is not available, don't use it then
 		if (previewView == null){
 			return editPane;
-		}
-		else{
+		} else if (viewEntry.getUsePopupEditWindows()){
+			JPanel holder = new JPanel(new BorderLayout());
+			JComponent previewPane = previewView.getComponent(document, false);
+			holder.add(previewPane, BorderLayout.CENTER);
+			JButton editButton = new JButton("Edit");
+			editButton.addActionListener(new ActionListener(){
+
+				public void actionPerformed(ActionEvent e)
+                {
+	                JFrame frame = new JFrame();
+	                frame.getContentPane().add(editPane);
+	                frame.pack();
+	                frame.setVisible(true);
+                }});
+			holder.add(editButton, BorderLayout.SOUTH);
+			return holder;
+		} else{
 			JComponent previewPane = previewView.getComponent(document, false);
 			
 			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
