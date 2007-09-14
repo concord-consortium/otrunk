@@ -81,7 +81,6 @@ public class OTJComponentServiceImpl implements OTJComponentService
                                           String mode, OTViewEntry viewEntry)
     {
     	OTView genericView = null;
-    	
     	if(viewEntry != null) {
     		genericView = viewFactory.getView(otObject, viewEntry, mode);
     	} else {

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-08-03 20:40:54 $
+ * $Revision: 1.3 $
+ * $Date: 2007-09-14 17:24:05 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -106,6 +106,7 @@ public class OTViewBundle extends DefaultOTObject
     public void registerServices(OTServiceContext serviceContext)
     {
         OTViewFactoryImpl factory =  new OTViewFactoryImpl(this);
+        factory.setMode(getCurrentMode());
         serviceContext.addService(OTViewFactory.class, factory);
         
         OTMainFrame mainFrame = new OTMainFrame(){

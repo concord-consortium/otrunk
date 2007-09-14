@@ -57,6 +57,7 @@ public class OTViewFactoryImpl implements OTViewFactory
     Vector viewMap = new Vector();
     OTViewBundle viewBundle;
     OTViewContext viewContext;
+	private String mode;
     
     public OTViewFactoryImpl(OTViewBundle viewBundle)
     {
@@ -145,8 +146,10 @@ public class OTViewFactoryImpl implements OTViewFactory
 	 */
 	public OTView getView(OTObject otObject, Class viewInterface, String modeStr) 
 	{
-		if(modeStr == null){
-			return getView(otObject, viewInterface);			
+		if(modeStr == null && getMode() != null){
+			return getView(otObject, viewInterface, getMode());			
+		} else if (modeStr == null){
+			return getView(otObject, viewInterface);
 		}
 		
 		InternalViewEntry entry = getViewInternal(otObject, viewInterface);
@@ -362,12 +365,17 @@ public class OTViewFactoryImpl implements OTViewFactory
 		return viewContext;
 	}
 
-	/* (non-Javadoc)
-     * @see org.concord.framework.otrunk.view.OTViewFactory#getDefaultMode()
-     */
-    public String getDefaultMode()
+	public String getMode()
     {
-    	return viewBundle.getCurrentMode();
+		if (mode == null && parent != null){
+			return parent.getMode();
+		}
+	    return mode;
+    }
+
+	public void setMode(String mode)
+    {
+	    this.mode = mode;
     }
 	
 }
