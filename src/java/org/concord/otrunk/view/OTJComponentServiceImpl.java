@@ -170,5 +170,9 @@ public class OTJComponentServiceImpl implements OTJComponentService
     {
 	    return viewContext;
     }
+	
+	public OTViewFactory getViewFactory(){
+		return viewFactory;
+	}
 
 }

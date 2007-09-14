@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.56 $
- * $Date: 2007-08-27 14:53:09 $
- * $Author: scytacki $
+ * $Revision: 1.57 $
+ * $Date: 2007-09-14 19:23:28 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -585,6 +585,9 @@ public class OTViewContainerPanel extends JPanel
 	public void setViewMode(String viewMode) 
 	{
 		this.viewMode  = viewMode;
+		if (viewMode == null){
+			this.viewMode = jComponentService.getViewFactory().getMode();
+		}
 	}
 	
 	public String getViewMode()

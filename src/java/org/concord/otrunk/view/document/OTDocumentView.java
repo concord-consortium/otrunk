@@ -296,7 +296,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 						OTJComponentView.class, viewMode);
 			}
 		}
-
+		
 		if (view instanceof OTXHTMLView) {
 			OTXHTMLView xhtmlView = (OTXHTMLView) view;
 			try {
@@ -345,7 +345,6 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 			String replacement = getIncludableReplacement(id, viewIdStr,
 					modeStr);
-
 			try {
 				m.appendReplacement(parsed, replacement);
 			} catch (IllegalArgumentException e) {
