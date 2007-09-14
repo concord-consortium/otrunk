@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-04-24 15:00:17 $
+ * $Revision: 1.5 $
+ * $Date: 2007-09-14 23:19:16 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -27,6 +27,9 @@ public interface OTObjectEditViewConfig
 	//This property is to specify the list of objects that can be inserted
 	//into the document using its edit view
 	public OTObjectList getObjectsToInsert();
+	
+	public boolean getUsePopupEditWindows();
+	public static boolean DEFAULT_usePopupEditWindows = false;
 	
 	public String getMode();
 	public void setMode(String mode);
