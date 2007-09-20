@@ -123,16 +123,17 @@ public class OTControllerServiceImpl implements OTControllerService
 
 		return null;		
 	}
-	
+
+	/**
+	 * You should check to see if the controller has already been created before
+	 * calling this method.
+	 * 
+	 * @param otObject
+	 * @param realObject
+	 * @return
+	 */
 	private final OTController getControllerInternal(OTObject otObject, Object realObject)
 	{
-		// check to see if we already have a controller for this otObject
-		OTController controller = getExistingControllerFromOTObject(otObject);
-		if (controller != null) {
-			// we already have a controller for this otObject
-			return controller;
-		}
-		
 		// need to find the OTController that can handle this OTObject
 		Class otObjectClass = null;
 		if(otObject != null) {
@@ -143,15 +144,24 @@ public class OTControllerServiceImpl implements OTControllerService
 			realObjectClass = realObject.getClass();
 		}
 		
-		controller =  createControllerInternal(otObjectClass, realObjectClass);
+		OTController controller =  createControllerInternal(otObjectClass, realObjectClass);
 		
 		return controller;
 	}
 
 	private OTController getAndInitializeController(OTObject otObject, Object realObject)
 	{
-		OTController controller = getControllerInternal(otObject, realObject);
-
+		// check to see if we already have a controller for this otObject
+		OTController controller = getExistingControllerFromOTObject(otObject);
+		if (controller != null) {
+			// we already have a controller for this otObject
+			// we don't need to initialize it because the only way we could have found an
+			// existing controller is if it was already initialized.
+			return controller;
+		} else {		
+			controller = getControllerInternal(otObject, realObject);
+		}
+		
 		if(sharedService != null && controller.isRealObjectSharable(otObject, realObject)){
 			controller.initialize(otObject, sharedService);
 		} else {
@@ -166,7 +176,7 @@ public class OTControllerServiceImpl implements OTControllerService
 	{
 		OTController controller = getExistingControllerFromOTObject(otObject);
 		if (controller != null) {
-			// we already have a controller for this otObject, so we can skip all the 
+			// we already have a controller for this otObject, so we can skip the 
 			// initialization performed below
 			return controller;
 		}
@@ -256,8 +266,16 @@ public class OTControllerServiceImpl implements OTControllerService
 	 */
 	private final Object setupRealObject(OTObject otObject, Object realObject)
 	{
-		OTController controller = getControllerInternal(otObject, realObject);
-
+		// check to see if we already have a controller for this otObject
+		OTController controller = getExistingControllerFromOTObject(otObject);
+		if (controller != null) {
+			// we already have a controller for this otObject
+			// we might not need to do the following initialization but that is how it was
+			// working before so I'm going to leave it that way for now.
+		} else {		
+			controller = getControllerInternal(otObject, realObject);
+		}
+		
 		/*
 		 * The relationships between the controller, ot and real object should be stored
 		 * before calling this method, to prevent infinite loops.  These loops will happen
@@ -451,24 +469,46 @@ public class OTControllerServiceImpl implements OTControllerService
 		return realObject;
 	}
 	
+	/**
+	 * This currently does not store the relationships between the 
+	 * controller, otObject, and real object.
+	 * It is not clear if it should or should not.
+	 * 
+	 * @see org.concord.framework.otrunk.OTControllerService#saveRealObject(java.lang.Object, org.concord.framework.otrunk.OTObject)
+	 */
 	public void saveRealObject(Object realObject, OTObject otObject) 
 	{
 		OTController controller = getAndInitializeController(otObject, realObject);		
 		controller.saveRealObject(realObject);
 	}
 	
+	/**
+	 * This currently does not store the relationships between the 
+	 * controller, otObject, and real object.
+	 * It is not clear if it should or should not.
+	 * 
+	 * @see org.concord.framework.otrunk.OTControllerService#registerRealObject(java.lang.Object, org.concord.framework.otrunk.OTObject)
+	 */
 	public void registerRealObject(Object realObject, OTObject otObject) 
 	{
 		OTController controller = getAndInitializeController(otObject, realObject);		
 		controller.registerRealObject(realObject);		
 	}
 	
+	/**
+	 * 
+	 * @see org.concord.framework.otrunk.OTControllerService#registerControllerClass(java.lang.Class)
+	 */
 	public void registerControllerClass(Class viewClass) 
 	{		
 		registry.registerControllerClass(viewClass);
 	}
 	
 	/**
+	 * This currently does not store the relationships between the 
+	 * controller, otObject, and real object.
+	 * It is not clear if it should or should not.
+	 * 
 	 * @see org.concord.framework.otrunk.OTControllerService#loadRealObject(org.concord.framework.otrunk.OTObject, java.lang.Object)
 	 */
 	public void loadRealObject(OTObject otObject, Object realObject)
@@ -477,7 +517,7 @@ public class OTControllerServiceImpl implements OTControllerService
 		controller.loadRealObject(realObject);
 	}
 
-	/* (non-Javadoc)
+	/** 
      * @see org.concord.framework.otrunk.OTControllerService#dispose()
      */
     public void dispose()
