@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.84 $
- * $Date: 2007-09-14 17:24:05 $
- * $Author: sfentress $
+ * $Revision: 1.85 $
+ * $Date: 2007-09-20 04:37:32 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -92,6 +92,7 @@ import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTrunk;
+import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
 import org.concord.framework.otrunk.view.OTViewContainer;
@@ -640,6 +641,8 @@ public class OTViewer extends JFrame
 		factoryContext.addViewService(OTFrameManager.class, frameManager);
 		factoryContext.addViewService(OTJComponentServiceFactory.class,
 		        new OTJComponentServiceFactoryImpl());
+		factoryContext.addViewService(OTExternalAppService.class,
+				new OTExternalAppServiceImpl());
 
 		currentURL = url;
 	}

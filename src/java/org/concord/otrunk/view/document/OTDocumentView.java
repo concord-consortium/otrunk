@@ -30,7 +30,6 @@
 package org.concord.otrunk.view.document;
 
 import java.io.StringReader;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -52,11 +51,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTView;
-import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
+import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.otrunk.OTrunkUtil;
 import org.w3c.dom.Document;
@@ -423,25 +423,10 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 				String linkTarget = e.getDescription();
 				if (linkTarget.startsWith("http")
 						|| linkTarget.startsWith("file")) {
-					try {
-						// FIXME this should be changed to be a service
-						// so external links can work in both a jnlp
-						// env and a regular application env
-						Class serviceManager = Class
-								.forName("javax.jnlp.ServiceManager");
-						Method lookupMethod = serviceManager.getMethod(
-								"lookup", new Class[] { String.class });
-						Object basicService = lookupMethod.invoke(null,
-								new Object[] { "javax.jnlp.BasicService" });
-						Method showDocument = basicService.getClass()
-								.getMethod("showDocument",
-										new Class[] { URL.class });
-						showDocument.invoke(basicService,
-								new Object[] { new URL(linkTarget) });
+					OTExternalAppService extAppService = 
+						(OTExternalAppService)getViewService(OTExternalAppService.class);
+					if(extAppService.showDocument(new URL(linkTarget))){
 						return;
-					} catch (Exception exp) {
-						System.err.println("Can't open external link.");
-						exp.printStackTrace();
 					}
 				}
 
