@@ -86,7 +86,7 @@ public class OTControllerServiceImpl implements OTControllerService
 			return realObject;
 		}		
 
-		realObject = setupRealObject(otObject, realObject);
+		realObject = setupRealObject(otObject, null);
 			
 		return realObject;		
 	}
@@ -161,6 +161,26 @@ public class OTControllerServiceImpl implements OTControllerService
 		return controller;		
 	}
 	
+	
+	public OTController getController(OTObject otObject)
+	{
+		OTController controller = getExistingControllerFromOTObject(otObject);
+		if (controller != null) {
+			// we already have a controller for this otObject, so we can skip all the 
+			// initialization performed below
+			return controller;
+		}
+
+		controller = getControllerInternal(otObject, null);		
+		
+		if(sharedService != null && controller.isRealObjectSharable(otObject, null)){
+			sharedService.initializeAndStoreRelationships(controller, otObject, null);
+		} else {
+			initializeAndStoreRelationships(controller, otObject, null);
+		}
+		
+		return controller;
+	}
 	
 	private final OTController createControllerInternal(Class otObjectClass, Class realObjectClass)
 	{
