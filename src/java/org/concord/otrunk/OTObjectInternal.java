@@ -169,6 +169,15 @@ public class OTObjectInternal implements OTObjectInterface
 		if(changeListener == null){
 			throw new IllegalArgumentException("changeListener cannot be null");
 		}
+
+		// Check if the changeListener has already been added 
+	    for(int i=0; i<changeListeners.size(); i++) {
+	        WeakReference ref = (WeakReference)changeListeners.get(i);
+	        if(changeListener == ref.get()) {
+	        	// this changeListener has already been added 
+	        	return;
+	        }
+	    }		
 		
 	    WeakReference listenerRef = new WeakReference(changeListener);
 	    changeListeners.add(listenerRef);
