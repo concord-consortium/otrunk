@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.28 $
- * $Date: 2007-09-10 17:08:35 $
+ * $Revision: 1.29 $
+ * $Date: 2007-09-24 03:18:53 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -254,8 +254,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	{
 		OTClassProperty otProperty = otClass.getProperty(childName);
 		if(otProperty == null) {
-			System.err.println("error reading childName: " + childName +
-					" in type: " + getObjectName());
+			System.err.println("error reading property \"" + childName + "\"" +
+					" it is not defined for type: " + getObjectName());
 			return null;
 		}
 		OTType otType = otProperty.getType();
