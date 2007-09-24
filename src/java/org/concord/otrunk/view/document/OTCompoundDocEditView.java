@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.16 $
- * $Date: 2007-09-14 23:18:59 $
+ * $Revision: 1.17 $
+ * $Date: 2007-09-24 20:25:05 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -10,6 +10,9 @@
 package org.concord.otrunk.view.document;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -90,7 +93,10 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	                frame.pack();
 	                frame.setVisible(true);
                 }});
-			holder.add(editButton, BorderLayout.SOUTH);
+			JPanel editButtonPanel = new JPanel();
+			editButtonPanel.setBackground(Color.WHITE);
+			editButtonPanel.add(editButton);
+			holder.add(editButtonPanel, BorderLayout.SOUTH);
 			return holder;
 		} else{
 			JComponent previewPane = previewView.getComponent(document, false);
