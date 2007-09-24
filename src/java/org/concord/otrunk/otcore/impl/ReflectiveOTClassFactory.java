@@ -155,13 +155,19 @@ public class ReflectiveOTClassFactory
                     methodName.equals("getOTObjectService")) {
 				continue;
 			}
+
+			Class resourceClass = methods[j].getReturnType();			
+			String resourceName = null;
 			
-			if(!methodName.startsWith("get")) {
-				continue;				
+			if(methodName.startsWith("get")){
+				resourceName = OTInvocationHandler.getResourceName(3,methodName);
+			} else if(methodName.startsWith("is") && resourceClass == Boolean.TYPE) {
+				resourceName = OTInvocationHandler.getResourceName(2,methodName);
+			} else {
+				// this method isn't a property definition method
+				continue;
 			}
-			
-			String resourceName = OTInvocationHandler.getResourceName(3,methodName);
-			Class resourceClass = methods[j].getReturnType();
+						
 			String resourceType = getObjectPrimitiveType(resourceClass);
 
 			if(resourceType == null){
