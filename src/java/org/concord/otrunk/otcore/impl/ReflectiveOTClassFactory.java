@@ -156,6 +156,11 @@ public class ReflectiveOTClassFactory
 				continue;
 			}
 
+			if(methods[j].getParameterTypes().length != 0){
+				// this method doesn't have the correct signature
+				continue;
+			}
+			
 			Class resourceClass = methods[j].getReturnType();			
 			String resourceName = null;
 			
