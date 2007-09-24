@@ -7,6 +7,7 @@ import javax.swing.JComponent;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.AbstractOTJComponentView;
+import org.concord.framework.otrunk.view.OTViewEntry;
 
 /**
  * @author scott
@@ -16,7 +17,7 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 {
 	private OTJComponentContainerHelper containerHelper;
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.concord.framework.otrunk.view.OTJComponentView#viewClosed()
 	 */
 	public void viewClosed()
@@ -36,11 +37,17 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 	
 	protected JComponent createSubViewComponent(OTObject otObject, boolean useScrollPane)
 	{
+		return createSubViewComponent(otObject, useScrollPane, null);
+	}
+	
+	protected JComponent createSubViewComponent(OTObject otObject, boolean useScrollPane, 
+		OTViewEntry viewEntry)
+	{
 		OTViewContainerPanel otObjectPanel = createtViewContainerPanel();
 		otObjectPanel.setUseScrollPane(useScrollPane);
 		
 		// The OTViewContainerPanel automatically handles the OTViewChild object
-		otObjectPanel.setCurrentObject(otObject);
+		otObjectPanel.setCurrentObject(otObject, viewEntry, true);
 		return otObjectPanel;
 	}
 	
