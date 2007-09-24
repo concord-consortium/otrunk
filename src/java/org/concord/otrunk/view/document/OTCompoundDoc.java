@@ -42,47 +42,56 @@ import org.concord.otrunk.view.OTFolderObject;
 
 /**
  * @author scott
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * 
+ * TODO To change the template for this generated type comment go to Window -
+ * Preferences - Java - Code Generation - Code and Comments
  */
 public class OTCompoundDoc extends OTFolderObject
-	implements OTDocument
+    implements OTDocument
 {
-	public static interface ResourceSchema extends OTFolderObject.ResourceSchema {
+	public static interface ResourceSchema
+	    extends OTFolderObject.ResourceSchema
+	{
 		public OTXMLString getBodyText();
+
 		public void setBodyText(OTXMLString text);
-		
+
 		public static boolean DEFAULT_input = true;
+
 		public boolean getInput();
+
 		public void setInput(boolean flag);
 
 		public OTObjectList getDocumentRefs();
+
 		public void setDocumentRefs(OTObjectList list);
-		
+
 		public String getMarkupLanguage();
+
 		public void setMarkupLanguage(String lang);
 	}
 
 	private ResourceSchema resources;
 
-	public OTCompoundDoc(ResourceSchema resources) 
+	public OTCompoundDoc(ResourceSchema resources)
 	{
 		super(resources);
-		this.resources = resources;		
+		this.resources = resources;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.concord.portfolio.PortfolioObject#getBodyText()
 	 */
-	public String getBodyText() 
-	{	  
-	    OTXMLString xmlString = resources.getBodyText();
-	    if(xmlString ==  null) {
-	        return null;
-	    }
-	    
-	    return xmlString.getContent();
+	public String getBodyText()
+	{
+		OTXMLString xmlString = resources.getBodyText();
+		if (xmlString == null) {
+			return null;
+		}
+
+		return xmlString.getContent();
 	}
 
 	public boolean getInput()
@@ -90,12 +99,12 @@ public class OTCompoundDoc extends OTFolderObject
 		// How do we set default values for primitives...
 		return resources.getInput();
 	}
-	
+
 	public void setInput(boolean flag)
 	{
 		resources.setInput(flag);
 	}
-	
+
 	public void addDocumentReference(OTObject pfObject)
 	{
 		OTObjectList embedded = resources.getDocumentRefs();
@@ -107,96 +116,104 @@ public class OTCompoundDoc extends OTFolderObject
 		OTObjectList embedded = resources.getDocumentRefs();
 		embedded.add(embeddedId);
 	}
-	
+
 	/**
-	 * Returns the list of objects that are actually referenced in the body text.
-	 * Not to be confused with getDocumentRefs() in the resource schema.
+	 * Returns the list of objects that are actually referenced in the body
+	 * text. Not to be confused with getDocumentRefs() in the resource schema.
 	 * 
-	 * If it finds a referenced object that was not already specified in the DocumentRefs, 
-	 * it adds it to the list.
+	 * If it finds a referenced object that was not already specified in the
+	 * DocumentRefs, it adds it to the list.
 	 * 
-	 * TODO: This method should be renamed to getReferencedObjects() or something like that
+	 * TODO: This method should be renamed to getReferencedObjects() or
+	 * something like that
 	 * 
 	 * @return
 	 */
-	public Vector getDocumentRefs() {
+	public Vector getDocumentRefs()
+	{
 		String bodyText = getBodyText();
-		
-		Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
-		Matcher m = p.matcher(bodyText);
-		while (m.find()) {
-			String idStr = m.group(1);
-			OTID id = getReferencedId(idStr);
-			OTObject obj = getReferencedObject(id);
-			if(obj != null) addDocumentReference(obj);
-		}
 
-		p = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>");
-		m = p.matcher(bodyText);
-		while (m.find()) {
-			String idStr = m.group(1);
-			if(!(idStr.startsWith("http:") || idStr.startsWith("file:")
-					|| idStr.startsWith("https:"))) {
+		if (bodyText != null) {
+			Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
+			Matcher m = p.matcher(bodyText);
+			while (m.find()) {
+				String idStr = m.group(1);
 				OTID id = getReferencedId(idStr);
 				OTObject obj = getReferencedObject(id);
-				if(obj != null) addDocumentReference(obj);
+				if (obj != null)
+					addDocumentReference(obj);
+			}
+
+			p = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>");
+			m = p.matcher(bodyText);
+			while (m.find()) {
+				String idStr = m.group(1);
+				if (!(idStr.startsWith("http:") || idStr.startsWith("file:") || idStr
+				        .startsWith("https:"))) {
+					OTID id = getReferencedId(idStr);
+					OTObject obj = getReferencedObject(id);
+					if (obj != null)
+						addDocumentReference(obj);
+				}
 			}
 		}
-		
 		return resources.getDocumentRefs().getVector();
 	}
-	
+
 	public void removeAllDocumentReference()
 	{
 		OTObjectList embedded = resources.getDocumentRefs();
 		embedded.removeAll();
 	}
-		
+
 	public String getDocumentText()
 	{
 		return getBodyText();
 	}
-	
+
 	public void setDocumentText(String text)
 	{
 		setBodyText(text);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.concord.portfolio.objects.PfTextObject#setBodyText(java.lang.String)
 	 */
 	public void setBodyText(String bodyText)
 	{
-	    OTXMLString xmlString = new OTXMLString(bodyText);
+		OTXMLString xmlString = new OTXMLString(bodyText);
 		resources.setBodyText(xmlString);
 
 		removeAllDocumentReference();
-		
+
 		// pattern to match the whole body of a resource file.
-		// this should match the object tag not the format of the 
+		// this should match the object tag not the format of the
 		// reference, but currently objects can be referenced in links
-		// and in objects.  And there can be viewEntry references
+		// and in objects. And there can be viewEntry references
 		// So this pattern will match any uuid that starts with quotes
 		// and then grab everything after that to the end quote
-		Pattern p = Pattern.compile("\"([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}[^\"]*)\"");
+		Pattern p = Pattern
+		        .compile("\"([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}[^\"]*)\"");
 		Matcher m = p.matcher(bodyText);
 		while (m.find()) {
 			String idStr = m.group(1);
 			OTID id = getReferencedId(idStr);
 			addDocumentReference(id);
-		}				
+		}
 	}
-	
+
 	public void setMarkupLanguage(String lang)
 	{
 		resources.setMarkupLanguage(lang);
 	}
-	
+
 	public String getMarkupLanguage()
 	{
 		return resources.getMarkupLanguage();
 	}
-	
+
 	public OTObjectService getOTObjectService()
 	{
 		return resources.getOTObjectService();
