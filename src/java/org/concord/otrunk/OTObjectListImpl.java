@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2007-08-06 18:57:32 $
+ * $Revision: 1.13 $
+ * $Date: 2007-09-25 00:10:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -170,8 +170,15 @@ public class OTObjectListImpl extends OTCollectionImpl
 		OTID id = (OTID)list.get(index);
 		list.remove(index);
 
-		// TODO this should be checked to see if this is the right thing here
-		notifyOTChange(OTChangeEvent.OP_REMOVE, id);		
+		OTObject obj = null;
+        try {
+	        obj = objectInternal.getOTObject(id);
+        } catch (Exception e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+        
+		notifyOTChange(OTChangeEvent.OP_REMOVE, obj);		
 	}
 	
 	/**
