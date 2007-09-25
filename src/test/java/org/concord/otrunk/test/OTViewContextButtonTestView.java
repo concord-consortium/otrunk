@@ -29,7 +29,7 @@ public class OTViewContextButtonTestView extends AbstractOTJComponentView
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.view.OTJComponentView#getComponent(org.concord.framework.otrunk.OTObject, boolean)
 	 */
-	public JComponent getComponent(OTObject otObject, boolean editable)
+	public JComponent getComponent(OTObject otObject)
 	{
 		OTViewContextButtonTest testObject = (OTViewContextButtonTest) otObject;
 		

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2007-03-11 23:38:44 $
+ * $Revision: 1.7 $
+ * $Date: 2007-09-25 12:22:21 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -84,11 +84,9 @@ public class OTDocumentObjectView extends ComponentView
     	// instead
     	String modeStr = (String) attr.getAttribute("mode");
     	
-    	boolean editable = true;
-    	
     	if(editStr != null && editStr.equalsIgnoreCase("false"))
     	{
-    		editable = false;
+    		System.err.println("Warning: the editable attribute in object elements in documents is no longer supported");
     	}
     	
     	if(refId != null && refId.length() > 0) {
@@ -111,7 +109,7 @@ public class OTDocumentObjectView extends ComponentView
         	}
         	
         	viewContainerPanel.setCurrentObject(childObject, 
-        			viewEntry, editable);
+        			viewEntry);
 
         	// CHECKME we will probably have problems when this panel
         	// changes sizes after its content is loaded

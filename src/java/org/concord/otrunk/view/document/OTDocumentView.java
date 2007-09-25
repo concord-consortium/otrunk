@@ -106,7 +106,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		pfObject = (OTDocument) doc;
 	}
 
-	public JComponent getComponent(OTObject otObject, boolean editable) {
+	public JComponent getComponent(OTObject otObject) {
 		this.otObject = otObject;
 		setup(otObject);
 		initTextAreaModel();
@@ -119,10 +119,6 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		updateFormatedView();
 
 		setReloadOnViewEntryChange(true);
-
-		if (!editable) {
-			return previewComponent;
-		}
 
 		// JScrollPane renderedScrollPane = new JScrollPane(previewComponent);
 		// renderedScrollPane.getViewport().setViewPosition(new Point(0,0));

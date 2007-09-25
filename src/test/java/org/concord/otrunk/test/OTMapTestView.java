@@ -30,7 +30,7 @@ public class OTMapTestView implements OTJComponentView {
 		map.put("myLongBlob", testBlobStr.getBytes());		
 	}
 	
-	public JComponent getComponent(OTObject otObject, boolean editable) {
+	public JComponent getComponent(OTObject otObject) {
 		OTResourceMap otMap = ((OTMapTestObject)otObject).getResourceMap();
 		if(otMap.size() == 0){
 			Set entries = map.entrySet();

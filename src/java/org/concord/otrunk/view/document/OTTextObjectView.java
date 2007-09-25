@@ -87,11 +87,16 @@ public class OTTextObjectView extends AbstractOTJComponentView
 		}		
 	}
 	
-	public JComponent getComponent(OTObject otObject, boolean editable)
+	public JComponent getComponent(OTObject otObject)
 	{
 		setup(otObject);
 		
-		if(pfObject.getInput() && editable) {
+		// To make something editable it is better to make:
+		// either a second view class should be created and a 
+		// separate view entry used to point to that.  Or a custom viewEntry should be 
+		// created with this view using a property of that view entry to determine 
+		// if it should be editable or not.
+		if(pfObject.getInput()) {
 		
 			initTextAreaModel();
 		

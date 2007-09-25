@@ -15,7 +15,7 @@ public class OTMainClassLauncherView extends AbstractOTJComponentView
 	
 	OTMainClassLauncher launcher;
 	
-	public JComponent getComponent(OTObject otObject, boolean editable)
+	public JComponent getComponent(OTObject otObject)
 	{
 		/**
 		 * This is a hack because getComponent is getting called twice in some cases.

@@ -39,7 +39,7 @@ public class OTJComponentServiceImpl implements OTJComponentService
 	}
 	
 	public JComponent getComponent(OTObject otObject,
-			OTViewContainer container, boolean editable) 
+		OTViewContainer container) 
 	{
         OTJComponentView view = getObjectView(otObject, container);
 
@@ -47,20 +47,15 @@ public class OTJComponentServiceImpl implements OTJComponentService
             return new JLabel("No view for object: " + otObject);
         }
 
-        return getComponent(otObject, view, editable);
-        
+        return getComponent(otObject, view);
 	}
-
-	/* (non-Javadoc)
-     * @see org.concord.framework.otrunk.view.OTJComponentService#getComponent(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTJComponentView, boolean)
-     */
-    public JComponent getComponent(OTObject otObject, OTJComponentView view, 
-                                   boolean editable)
-    {
-        JComponent component = view.getComponent(otObject, editable);
-        objToComponent.put(otObject, component);
-        return component;
-    }
+	
+	public JComponent getComponent(OTObject otObject, OTJComponentView view)
+	{
+		JComponent component = view.getComponent(otObject);
+		objToComponent.put(otObject, component);
+		return component;
+	}
 
 	public OTJComponentView getObjectView(OTObject otObject,
 			OTViewContainer container) 

@@ -31,7 +31,7 @@ public class OTChooserView extends AbstractOTJComponentView implements OTViewEnt
 	
 	String mode;
 	
-	public JComponent getComponent(OTObject otObject, boolean editable) {
+	public JComponent getComponent(OTObject otObject) {
 		
 		this.otObject = otObject;
 		property = ((OTChooserViewEntry)viewEntry).getPropertyName();
@@ -70,8 +70,7 @@ public class OTChooserView extends AbstractOTJComponentView implements OTViewEnt
 			try {
 			//	URL url = new URL(sUrl);
 				
-				JComponent mwPanel = getChildComponent(otObject, null, false,
-						"normal");
+				JComponent mwPanel = getChildComponent(otObject, null, "normal");
 				mainPanel.removeAll();
 				mainPanel.add(mwPanel);
 				insertButton.setText("Change " + name);

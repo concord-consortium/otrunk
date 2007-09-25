@@ -24,7 +24,7 @@ public class OTPrototypeView extends AbstractOTJComponentView
 	
 	OTJComponentView viewOfPrototype;
 	
-	public JComponent getComponent(OTObject otObject, boolean editable) 
+	public JComponent getComponent(OTObject otObject) 
 	{
 		OTObject prototype = viewEntry.getPrototype();
 
@@ -45,7 +45,7 @@ public class OTPrototypeView extends AbstractOTJComponentView
 		viewOfPrototype = getJComponentService().getObjectView(objectToView, null, null, 
 				viewEntry.getViewEntry());
 				
-		component = viewOfPrototype.getComponent(objectToView, false);			
+		component = viewOfPrototype.getComponent(objectToView);			
 
 		if(component == null) {
 			return new JLabel("No view for object: " + prototype);

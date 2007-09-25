@@ -45,7 +45,7 @@ public class OTFolderObjectView extends AbstractOTView
 	 * @see org.concord.framework.otrunk.view.OTJComponentView#getComponent(org.concord.framework.otrunk.OTObject,
 	 *      boolean)
 	 */
-	public JComponent getComponent(OTObject otObject, boolean editable) {
+	public JComponent getComponent(OTObject otObject) {
 		otFolderObject = (OTFolderObject) otObject;
 
 		treeModel = new SimpleTreeModel();

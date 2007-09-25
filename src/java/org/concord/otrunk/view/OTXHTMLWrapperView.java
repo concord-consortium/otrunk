@@ -39,7 +39,7 @@ public class OTXHTMLWrapperView extends OTDocumentView
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.view.document.OTDocumentView#getComponent(org.concord.framework.otrunk.OTObject, boolean)
 	 */
-	public JComponent getComponent(OTObject otObject, boolean editable) 
+	public JComponent getComponent(OTObject otObject) 
 	{
 		// FIXME this should be replaced with something like the prototype view setup
 		// An actual OTCompoundDoc should be created and its properties set, and
@@ -113,6 +113,6 @@ public class OTXHTMLWrapperView extends OTDocumentView
             }			
 		};
 		
-		return super.getComponent(doc, editable);
+		return super.getComponent(doc);
 	}
 }

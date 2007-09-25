@@ -85,7 +85,7 @@ public class OTTextObjectNonEditableView extends AbstractOTJComponentView
 		}		
 	}
 	
-	public JComponent getComponent(OTObject otObject, boolean editable)
+	public JComponent getComponent(OTObject otObject)
 	{
 		setup(otObject);
 

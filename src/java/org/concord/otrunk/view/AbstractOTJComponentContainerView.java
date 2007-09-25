@@ -47,7 +47,7 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 		otObjectPanel.setUseScrollPane(useScrollPane);
 		
 		// The OTViewContainerPanel automatically handles the OTViewChild object
-		otObjectPanel.setCurrentObject(otObject, viewEntry, true);
+		otObjectPanel.setCurrentObject(otObject, viewEntry);
 		return otObjectPanel;
 	}
 	
