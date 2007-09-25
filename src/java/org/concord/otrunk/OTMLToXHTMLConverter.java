@@ -212,7 +212,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
     {
         OTJComponentView objView = getOTJComponentView(obj);
         
-        JComponent comp = objView.getComponent(obj, false);
+        JComponent comp = objView.getComponent(obj);
         return comp;
     }
     

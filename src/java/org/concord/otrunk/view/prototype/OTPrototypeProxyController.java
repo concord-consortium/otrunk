@@ -66,7 +66,7 @@ public class OTPrototypeProxyController extends DefaultOTObject implements
 		if(currentView == null){
 			return null;
 		}
-		return currentView.getComponent(proxy, false);
+		return currentView.getComponent(proxy);
 	}
 
 	/* (non-Javadoc)

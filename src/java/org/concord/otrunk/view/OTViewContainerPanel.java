@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.57 $
- * $Date: 2007-09-14 19:23:28 $
- * $Author: sfentress $
+ * $Revision: 1.58 $
+ * $Date: 2007-09-25 12:22:21 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -81,7 +81,6 @@ public class OTViewContainerPanel extends JPanel
     private static final long serialVersionUID = 1L;
     
     OTObject currentObject = null;
-    boolean currentObjectEditable = false;
     OTJComponentView currentView = null;
     OTViewEntry currentViewEntry = null;
     OTViewChild currentViewChild = null;    
@@ -210,18 +209,10 @@ public class OTViewContainerPanel extends JPanel
 	
 	public void setCurrentObject(OTObject otObject)
 	{
-		// I'm not sure why editable is true by default here
-		// but that is how it was before
-		setCurrentObject(otObject, null, true);
+		setCurrentObject(otObject, null);
 	}
 		
-	public void setCurrentObject(OTObject otObject, boolean editable)
-	{
-		setCurrentObject(otObject, null, editable);
-	}
-	
-	public void setCurrentObject(OTObject otObject, OTViewEntry viewEntry, 
-			boolean editable)
+	public void setCurrentObject(OTObject otObject, OTViewEntry viewEntry)
 	{
 		if(currentView != null) {
 		    currentView.viewClosed();
@@ -238,7 +229,6 @@ public class OTViewContainerPanel extends JPanel
 		
 		currentObject = otObject;
 		currentViewEntry = viewEntry;
-		currentObjectEditable = editable;
 		currentViewChild = null;
 		
 		if (otObject instanceof OTViewChild){
@@ -412,8 +402,7 @@ public class OTViewContainerPanel extends JPanel
 			return new JLabel("No view for object: " + currentObject);
 		} 
 		
-		return jComponentService.getComponent(currentObject, 
-				currentView, currentObjectEditable);
+		return jComponentService.getComponent(currentObject, currentView);
 	}
 	
 	/* (non-Javadoc)
@@ -536,7 +525,7 @@ public class OTViewContainerPanel extends JPanel
 	
 	public void reloadView()
     {
-		setCurrentObject(currentObject, currentViewEntry,currentObjectEditable);
+		setCurrentObject(currentObject, currentViewEntry);
     }
 
 	public OTViewContainer getUpdateableContainer()
@@ -620,10 +609,6 @@ public class OTViewContainerPanel extends JPanel
 		return image;
 	}
 	
-	public boolean isCurrentObjectEditable() {
-		return currentObjectEditable;
-	}
-
 	public void setParentContainer(OTViewContainer parentContainer)
     {
 	    this.parentContainer = parentContainer;

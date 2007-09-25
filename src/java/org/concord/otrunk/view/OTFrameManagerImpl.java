@@ -99,7 +99,7 @@ public class OTFrameManagerImpl implements OTFrameManager
 		// call setCurrentObject on that view container with a null
 		// frame
 		frameContainer.container.setViewMode(viewMode);
-		frameContainer.container.setCurrentObject(otObject, viewEntry, true);
+		frameContainer.container.setCurrentObject(otObject, viewEntry);
 		frameContainer.frame.setVisible(true);
 	}
 	

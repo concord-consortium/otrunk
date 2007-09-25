@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2007-09-24 20:25:05 $
- * $Author: sfentress $
+ * $Revision: 1.18 $
+ * $Date: 2007-09-25 12:22:21 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -11,8 +11,6 @@ package org.concord.otrunk.view.document;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -58,7 +56,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		super();
 	}
 
-	public JComponent getComponent(OTObject otObject, boolean editable)
+	public JComponent getComponent(OTObject otObject)
 	{
 		document = otObject;
 		((OTChangeNotifying)document).addOTChangeListener(this);
@@ -73,7 +71,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		//System.out.println("preview view is " + previewView);
 				
 		//Create a split pane with the preview pane and the text area 
-		JComponent editTextPane = super.getComponent(document, true);
+		JComponent editTextPane = super.getComponent(document);
 		final JPanel editPane = createTextPanel(editTextPane);
 		
 		//If preview is not available, don't use it then
@@ -81,7 +79,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 			return editPane;
 		} else if (viewEntry.getUsePopupEditWindows()){
 			JPanel holder = new JPanel(new BorderLayout());
-			JComponent previewPane = previewView.getComponent(document, false);
+			JComponent previewPane = previewView.getComponent(document);
 			holder.add(previewPane, BorderLayout.CENTER);
 			JButton editButton = new JButton("Edit");
 			editButton.addActionListener(new ActionListener(){
@@ -99,7 +97,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 			holder.add(editButtonPanel, BorderLayout.SOUTH);
 			return holder;
 		} else{
-			JComponent previewPane = previewView.getComponent(document, false);
+			JComponent previewPane = previewView.getComponent(document);
 			
 			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 			                           editPane, previewPane);
