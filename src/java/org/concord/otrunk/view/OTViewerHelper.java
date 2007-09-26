@@ -65,6 +65,15 @@ public class OTViewerHelper
 	public final static String AUTHOR_PROP = "otrunk.view.author";
 	public final static String REMOTE_URL_PROP = "otrunk.remote_url";
 	public final static String REST_ENABLED_PROP = "otrunk.rest_enabled";
+	public final static String ROOT_OBJECT_PROP = "otrunk.root.localid";
+	public final static String VIEW_MODE_PROP = "otrunk.view.mode";
+	/**
+	 * This is yet another hack to support something like layers or mutliple files.
+	 * If this is set to url that url will be loaded in first and the OTSystem 
+	 * will be used from that instead from the regular url.
+	 * 
+	 */
+	public final static String SYSTEM_OTML_PROP = "otrunk.system.otml";	
 
 	protected static boolean cannotReadProperties = false;
 
@@ -75,7 +84,15 @@ public class OTViewerHelper
 	private OTUser currentUser;
 	OTFrameManagerImpl frameManager; 
 
-
+	/**
+	 * This method should be used to read properties because in some places
+	 * properties cannot be read.  So this will catch the exception when that
+	 * happens, and it will not try to read the properties again.
+	 * 
+	 * @param property
+	 * @param defaultValue
+	 * @return
+	 */
 	public static boolean getBooleanProp(String property, boolean defaultValue)
 	{
 		if(cannotReadProperties){
@@ -85,11 +102,30 @@ public class OTViewerHelper
 		try {
 			return Boolean.getBoolean(property);
 		} catch (AccessControlException e){			
-			System.err.println(e);
-			System.err.println("Cannot read system properties, defaults will be used");
-			cannotReadProperties = true;
+			handlePropertyReadException(e);
 			return defaultValue;
 		}		
+	}
+
+	public static String getStringProp(String property)
+	{
+		if(cannotReadProperties){
+			return null;
+		}
+
+		try {
+			return System.getProperty(property);
+		} catch (AccessControlException e){			
+			handlePropertyReadException(e);
+			return null;
+		}				
+	}
+
+	protected static void handlePropertyReadException(AccessControlException e)
+	{
+		System.err.println(e);
+		System.err.println("Cannot read system properties, defaults will be used");
+		cannotReadProperties = true;		
 	}
 
 	public static boolean isDebug()
