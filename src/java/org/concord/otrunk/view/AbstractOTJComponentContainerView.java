@@ -25,9 +25,9 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 		removeAllSubViews();
 	}
 
-	protected OTViewContainerPanel createtViewContainerPanel()
+	protected OTViewContainerPanel createViewContainerPanel()
     {
-	    return getContainerHelper().createtViewContainerPanel();
+	    return getContainerHelper().createViewContainerPanel();
     }
 
 	protected JComponent createSubViewComponent(OTObject otObject)
@@ -43,7 +43,7 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 	protected JComponent createSubViewComponent(OTObject otObject, boolean useScrollPane, 
 		OTViewEntry viewEntry)
 	{
-		OTViewContainerPanel otObjectPanel = createtViewContainerPanel();
+		OTViewContainerPanel otObjectPanel = createViewContainerPanel();
 		otObjectPanel.setUseScrollPane(useScrollPane);
 		
 		// The OTViewContainerPanel automatically handles the OTViewChild object
