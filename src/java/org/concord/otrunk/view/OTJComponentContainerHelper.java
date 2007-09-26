@@ -43,7 +43,7 @@ public class OTJComponentContainerHelper
 		viewContainerPanels.removeAllElements();
 	}
 	
-	public OTViewContainerPanel createtViewContainerPanel()
+	public OTViewContainerPanel createViewContainerPanel()
 	{
 		OTViewContainerPanel viewContainerPanel = 
         	new OTViewContainerPanel(frameManager);

@@ -56,7 +56,7 @@ public class AbstractOTDocumentView extends OTTextObjectView
 			containerHelper.setParentContainer(viewContainer);
 		}
 
-		return containerHelper.createtViewContainerPanel();
+		return containerHelper.createViewContainerPanel();
 	}
 
 	public void viewClosed()
