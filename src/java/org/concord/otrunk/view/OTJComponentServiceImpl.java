@@ -161,6 +161,9 @@ public class OTJComponentServiceImpl implements OTJComponentService
     	
     };
 
+    /**
+     * @see org.concord.framework.otrunk.view.OTJComponentService#getJComponentViewContext()
+     */
 	public OTJComponentViewContext getJComponentViewContext()
     {
 	    return viewContext;
