@@ -104,8 +104,19 @@ public class OTPrototypeEventMappingHelper
 
 		// add listeners to the model and to the copy of the prototype
 		// FIXME this needs to be recursive based on the properties being mapped.
-		((OTChangeNotifying)model).addOTChangeListener(modelListener);
-		((OTChangeNotifying)prototypeCopy).addOTChangeListener(prototypeCopyListener);
+		if(model instanceof OTChangeNotifying){
+			((OTChangeNotifying)model).addOTChangeListener(modelListener);
+		} else {
+			System.err.println("Warning: " + model.otClass().getInstanceClass().getName() +
+			"can't notify about change events");
+		}
+
+		if(prototypeCopy instanceof OTChangeNotifying){
+			((OTChangeNotifying)prototypeCopy).addOTChangeListener(prototypeCopyListener);			
+		} else {
+			System.err.println("Warning: " + prototypeCopy.otClass().getInstanceClass().getName() +
+			"can't notify about change events");			
+		}
 	}
 	
 	/**
