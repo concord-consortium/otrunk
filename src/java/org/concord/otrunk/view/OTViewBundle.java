@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2007-09-14 17:24:05 $
- * $Author: sfentress $
+ * $Revision: 1.4 $
+ * $Date: 2007-09-26 19:34:26 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -92,13 +92,17 @@ public class OTViewBundle extends DefaultOTObject
     
     public String getCurrentMode()
     {
+    	String sysPropViewMode = OTViewerHelper.getStringProp(OTViewerHelper.VIEW_MODE_PROP);
+    	if(sysPropViewMode != null){
+    		return sysPropViewMode;
+    	}
     	return resources.getCurrentMode();
     }
     
     public void setCurrentMode(String mode)
-    	{
-    		resources.setCurrentMode(mode);
-    	}
+    {
+    	resources.setCurrentMode(mode);
+    }
 
 	/* (non-Javadoc)
      * @see org.concord.framework.otrunk.OTBundle#registerServices(org.concord.framework.otrunk.OTServiceContext)
@@ -106,7 +110,7 @@ public class OTViewBundle extends DefaultOTObject
     public void registerServices(OTServiceContext serviceContext)
     {
         OTViewFactoryImpl factory =  new OTViewFactoryImpl(this);
-        factory.setMode(getCurrentMode());
+        factory.setDefaultViewMode(getCurrentMode());
         serviceContext.addService(OTViewFactory.class, factory);
         
         OTMainFrame mainFrame = new OTMainFrame(){

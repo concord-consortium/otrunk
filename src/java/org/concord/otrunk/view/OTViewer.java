@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.85 $
- * $Date: 2007-09-20 04:37:32 $
+ * $Revision: 1.86 $
+ * $Date: 2007-09-26 19:34:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -89,6 +89,7 @@ import org.concord.applesupport.AppleApplicationAdapter;
 import org.concord.applesupport.AppleApplicationUtil;
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTrunk;
@@ -605,8 +606,28 @@ public class OTViewer extends JFrame
 	private void loadURL(URL url)
 	    throws Exception
 	{
+		XMLDatabase systemDB = null;
+
 		try {
-			xmlDB = new XMLDatabase(url, System.err);
+			// try loading in the system object if there is one
+			String systemOtmlUrlStr = OTViewerHelper.getStringProp(OTViewerHelper.SYSTEM_OTML_PROP);
+			if(systemOtmlUrlStr != null){
+				URL systemOtmlUrl = new URL(systemOtmlUrlStr);
+				systemDB = new XMLDatabase(systemOtmlUrl, System.out);
+
+				// don't track the resource info on the system db.
+
+				systemDB.loadObjects();
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+			systemDB = null;
+		}
+
+		
+		try {
+			
+			xmlDB = new XMLDatabase(url, System.out);
 			
 			// Only track the resource info when there isn't a user.  Currently all classroom uses
 			// of OTViewer has NO_USER_MODE turned off, so using this setting safe to test
@@ -615,6 +636,8 @@ public class OTViewer extends JFrame
 				xmlDB.setTrackResourceInfo(true);
 			}
 			xmlDB.loadObjects();
+			
+			
 		} catch (org.jdom.input.JDOMParseException e) {
 			String xmlWarningTitle = "XML Decoding error";
 			String xmlWarningMessage = "There appears to a problem parsing the XML of this document. \n"
@@ -625,7 +648,9 @@ public class OTViewer extends JFrame
 			throw e;
 		}
 
-		otrunk = new OTrunkImpl(xmlDB,
+		
+		
+		otrunk = new OTrunkImpl(systemDB, xmlDB,
 		        new Object[] { new SwingUserMessageHandler(this) },
 		        new Class[] { UserMessageHandler.class });
 
@@ -666,6 +691,16 @@ public class OTViewer extends JFrame
 		reloadWindow();
 	}
 
+	protected OTObject getAuthoredRoot() throws Exception
+	{
+		String rootLocalId = OTViewerHelper.getStringProp(OTViewerHelper.ROOT_OBJECT_PROP);
+		if(rootLocalId != null){
+			OTID rootID = xmlDB.getOTIDFromLocalID(rootLocalId);
+			return otrunk.getOTObject(rootID);
+		}
+		return otrunk.getRoot();
+	}
+	
 	private void reloadWindow()
 	    throws Exception
 	{
@@ -674,7 +709,7 @@ public class OTViewer extends JFrame
 
 		switch (userMode) {
 		case OTViewerHelper.NO_USER_MODE:
-			root = otrunk.getRoot();
+			root = getAuthoredRoot();
 			break;
 		case OTViewerHelper.SINGLE_USER_MODE:
 			if (userDataDB == null) {
@@ -687,7 +722,7 @@ public class OTViewer extends JFrame
 
 				root = null;
 			} else {
-				OTObject otRoot = otrunk.getRoot();
+				OTObject otRoot = getAuthoredRoot();
 				root = otrunk.getUserRuntimeObject(otRoot, currentUser);
 
 				OTObject realRoot = otrunk.getRealRoot();
@@ -1445,7 +1480,7 @@ public class OTViewer extends JFrame
 			fileMenu.removeAll();
 		}
 
-		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)) {
+		if (OTViewerHelper.getBooleanProp(OTViewerHelper.AUTHOR_PROP, false)) {
 			userMode = OTViewerHelper.NO_USER_MODE;
 		}
 

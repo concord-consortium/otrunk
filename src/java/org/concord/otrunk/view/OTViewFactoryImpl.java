@@ -116,42 +116,19 @@ public class OTViewFactoryImpl implements OTViewFactory
     	return new OTViewFactoryImpl(this);
     }
     
-    /* (non-Javadoc)
+    /**
 	 * @see org.concord.otrunk.view.OTViewFactory#getView(org.concord.framework.otrunk.OTObject, java.lang.Class)
 	 */
     public OTView getView(OTObject otObject, Class viewInterface)
     {
-        InternalViewEntry entry = getViewInternal(otObject, viewInterface);
-         
-        if(entry == null) {
-        	return null;
-        }
-        OTView view = null;
-        try {
-            view = (OTView)entry.viewClass.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        OTViewEntry otEntry = entry.getOTViewEntry(otObject);
-        initView(view, otEntry);
-        
-        return view;
+    	return getView(otObject, viewInterface, null);
     }
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.concord.framework.otrunk.view.OTViewFactory#getView(org.concord.framework.otrunk.OTObject, java.lang.Class, java.lang.String)
 	 */
 	public OTView getView(OTObject otObject, Class viewInterface, String modeStr) 
-	{
-		if(modeStr == null && getMode() != null){
-			return getView(otObject, viewInterface, getMode());			
-		} else if (modeStr == null){
-			return getView(otObject, viewInterface);
-		}
-		
+	{		
 		InternalViewEntry entry = getViewInternal(otObject, viewInterface);
 		if(entry == null) {
 			return null;
@@ -175,46 +152,10 @@ public class OTViewFactoryImpl implements OTViewFactory
     
 	public OTView getView(OTObject otObject, OTViewEntry viewEntry) 
 	{
-		// because we have the view entry we don't need to actually
-		// look up this view.
-		if (getViewBundle() != null && getViewBundle().getCurrentMode() != null &&
-				getViewBundle().getCurrentMode().length() > 1){
-			return getView(otObject, viewEntry, getViewBundle().getCurrentMode());
-		} else {
-        String viewClassStr = viewEntry.getViewClass();
-        String objClassStr = viewEntry.getObjectClass();        
-        
-        ClassLoader loader = getClass().getClassLoader();
-		
-        try {
-            Class objectClass = loader.loadClass(objClassStr);
-
-            if(!objectClass.isInstance(otObject)){
-        		throw new RuntimeException("viewEntry: " + viewEntry + 
-        				" cannot handle otObject: " + otObject);
-        	}
-            
-            OTView view = null;
-            Class viewClass = loader.loadClass(viewClassStr);
-            view = (OTView)viewClass.newInstance();
-
-            initView(view, viewEntry);
-        	return view;                       
-        } catch (ClassNotFoundException e) {
-            System.err.println("Can't find view: " + viewClassStr + 
-                    " for object: " + objClassStr);
-            System.err.println("  error: " + e.toString());
-        } catch (InstantiationException e) {
-        	e.printStackTrace();
-        } catch (IllegalAccessException e) {
-        	e.printStackTrace();
-        }
-		
-		return null;
-		}
+		return getView(otObject, viewEntry, null);		
 	}
 	
-	private OTView getView(OTObject otObject, OTViewEntry viewEntry, boolean dontUseMode) 
+	private OTView getViewInternal(OTObject otObject, OTViewEntry viewEntry) 
 	{
 		// because we have the view entry we don't need to actually
 		// look up this view.
@@ -303,15 +244,28 @@ public class OTViewFactoryImpl implements OTViewFactory
 
     }
 
-	/* (non-Javadoc)
-	 * @see org.concord.framework.otrunk.view.OTViewFactory#getView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewEntry, java.lang.String)
-	 */
-	public OTView getView(OTObject otObject, OTViewEntry viewEntry, String modeStr) 
-	{
-		if(modeStr == null){
-			return getView(otObject, viewEntry, true);			
-		}
-		
+    /**
+     * This will return the viewEntry setup by this mode.  If no viewEntry is 
+     * found for this mode, then it will return null. 
+     * 
+     * If modeStr == null then getDefaultViewMode will be used to look up the 
+     * view mode.
+     * If modeStr equals NO_VIEW_MODE then this method will return null;
+     * 
+     * @param viewEntry
+     * @param modeStr
+     * @return
+     */
+    protected OTViewEntry getModeViewEntry(OTViewEntry viewEntry, String modeStr)
+    {
+    	if(modeStr == null){
+    		modeStr = getDefaultViewMode();
+    	}
+    	
+    	if(NO_VIEW_MODE.equals(modeStr)){
+    		return null;
+    	}
+
 		OTViewBundle viewBundle = getViewBundle();
 		OTViewMode mode = null;
 		OTObjectList modes = viewBundle.getModes();
@@ -321,7 +275,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 				mode = curMode;
 				break;
 			}
-		}
+		}		
 		
 		OTObjectMap map = mode.getMap();
 
@@ -331,21 +285,38 @@ public class OTViewFactoryImpl implements OTViewFactory
 		if(modeViewEntry == null){
 			modeViewEntry = mode.getDefault();
 		}
-		if(modeViewEntry == null){
-			return getView(otObject, viewEntry, true);			
+
+		return modeViewEntry;
+    }
+    
+	/* (non-Javadoc)
+	 * @see org.concord.framework.otrunk.view.OTViewFactory#getView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewEntry, java.lang.String)
+	 */
+	public OTView getView(OTObject otObject, OTViewEntry viewEntry, String modeStr) 
+	{
+		OTViewEntry activeViewEntry = viewEntry;
+		
+		OTViewEntry modeViewEntry = getModeViewEntry(viewEntry, modeStr);
+
+		if(modeViewEntry != null){
+			activeViewEntry = modeViewEntry;
 		}
 
-		// pass the viewEntry was requested to the newly created view
+		OTView view = getViewInternal(otObject, activeViewEntry);
+
+		// if the modeViewEntry is not null then 
+		// pass the viewEntry that was requested to the newly created view
 		// this is useful for mode views that want to display other modes of
 		// the original view entry.
 		// this entry might have been specified by the user, or it could have 
 		// been determined by looking up an interface and object type.
-		OTView view = getView(otObject, modeViewEntry, true);
-		if(view instanceof OTRequestedViewEntryAware) {
+		if(modeViewEntry != null && 
+				view instanceof OTRequestedViewEntryAware) {
 			((OTRequestedViewEntryAware)view).setRequestedViewEntry(viewEntry);
 		}
 		
 		return view;
+		
 	}
 	
 	public OTViewBundle getViewBundle()
@@ -364,16 +335,45 @@ public class OTViewFactoryImpl implements OTViewFactory
 	{
 		return viewContext;
 	}
+	
+	/**
+	 * Return the view mode set for this view factory.  If this is 
+	 * null then getDefaultViewMode will try to return the view mode
+	 * off the parent.
+	 * 
+	 * @return
+	 */
+	public String getDefaultViewModeLocal()
+	{
+		return mode;
+	}
 
-	public String getMode()
+	/**
+	 * This returns the view mode used if null is passed in for the view mode
+	 * to the getView methods.
+	 * 
+	 * @see org.concord.framework.otrunk.view.OTViewFactory#getDefaultViewMode()
+	 */
+	public String getDefaultViewMode()
     {
 		if (mode == null && parent != null){
-			return parent.getMode();
+			return parent.getDefaultViewMode();
+		}
+		
+		if(mode == null){
+			return NO_VIEW_MODE;
 		}
 	    return mode;
     }
 
-	public void setMode(String mode)
+	/**
+	 * This sets the default view mode for this view factory.  If it is null
+	 * then the viewMode of the parent is used.  If this is set to null
+	 * and there is no parent, then NO_VIEW_MODE is used.
+	 * 
+	 * @see org.concord.framework.otrunk.view.OTViewFactory#setDefaultViewMode(java.lang.String)
+	 */
+	public void setDefaultViewMode(String mode)
     {
 	    this.mode = mode;
     }

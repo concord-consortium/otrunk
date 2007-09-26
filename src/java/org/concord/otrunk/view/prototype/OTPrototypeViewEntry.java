@@ -16,6 +16,15 @@ public interface OTPrototypeViewEntry
 	public OTViewEntry getViewEntry();
 	public void setViewEntry(OTViewEntry viewEntry);
 
+	/**
+	 * This is the viewMode that is used to get view of the prototype
+	 * by default it is null, so it will inherit the viewMode of itself.
+	 * 
+	 * @return
+	 */
+	public String getViewMode();
+	public void setViewMode(String viewMode);
+	
 	public OTPrototypeController getController();
 	public void setController(OTPrototypeController controller);
 	
