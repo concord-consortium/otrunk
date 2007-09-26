@@ -63,25 +63,25 @@ public class OTViewerHelper
 	public final static String TRACE_LISTENERS_PROP = "otrunk.trace.listeners";
 	public final static String TRACE_PACKAGES_PROP = "otrunk.trace.packages";
 	public final static String AUTHOR_PROP = "otrunk.view.author";
-  public final static String REMOTE_URL_PROP = "otrunk.remote_url";
-  public final static String REST_ENABLED_PROP = "otrunk.rest_enabled";
-	
-  	protected static boolean cannotReadProperties = false;
-  
+	public final static String REMOTE_URL_PROP = "otrunk.remote_url";
+	public final static String REST_ENABLED_PROP = "otrunk.rest_enabled";
+
+	protected static boolean cannotReadProperties = false;
+
 	private OTrunk otrunk;
 	private OTViewFactory viewFactory;
 	private OTDatabase otDB;
 	private OTDatabase userOtDB;	
 	private OTUser currentUser;
 	OTFrameManagerImpl frameManager; 
-	
-	
+
+
 	public static boolean getBooleanProp(String property, boolean defaultValue)
 	{
 		if(cannotReadProperties){
 			return defaultValue;
 		}
-		
+
 		try {
 			return Boolean.getBoolean(property);
 		} catch (AccessControlException e){			
@@ -91,7 +91,7 @@ public class OTViewerHelper
 			return defaultValue;
 		}		
 	}
-	
+
 	public static boolean isDebug()
 	{
 		return getBooleanProp(DEBUG_PROP, false);
@@ -101,7 +101,7 @@ public class OTViewerHelper
 	{
 		return getBooleanProp(TRACE_PROP, false);
 	}
-	
+
 	public static OTUserObject createUser(String name, OTObjectService objService)
 	throws Exception
 	{
@@ -113,10 +113,10 @@ public class OTViewerHelper
 	public OTViewerHelper()
 	{
 	}
-	
-	
+
+
 	public void loadOTrunk(OTDatabase otDB, Component parentComponent)
-		throws Exception
+	throws Exception
 	{
 		this.otDB = otDB;
 		otrunk = new OTrunkImpl(otDB,
@@ -125,11 +125,11 @@ public class OTViewerHelper
 
 		viewFactory = 
 			(OTViewFactory) otrunk.getService(OTViewFactory.class);
-			
+
 		// Maybe this shouldn't happen here
 		frameManager = new OTFrameManagerImpl();
 		frameManager.setViewFactory(viewFactory);
-		
+
 		OTViewContext factoryContext = viewFactory.getViewContext();
 
 		factoryContext.addViewService(OTrunk.class, otrunk);
@@ -150,14 +150,14 @@ public class OTViewerHelper
 	{
 		URLConnection urlConn = url.openConnection();
 		urlConn.setRequestProperty("Content-Type", "application/xml");
-			
+
 		InputStream input = urlConn.getInputStream();
 
 		return loadOTDatabase(input, url);
 	}	
-	
+
 	public OTDatabase loadOTDatabase(InputStream input, URL url)
-		throws Exception
+	throws Exception
 	{
 		XMLDatabase xmlDB = new XMLDatabase(input, url, System.err);
 		xmlDB.loadObjects();
@@ -171,13 +171,13 @@ public class OTViewerHelper
 		xmlDB.loadObjects();
 		return  xmlDB;
 	}
-	
+
 	public void saveOTDatabase(OTDatabase otDB, OutputStream output)
 	throws Exception
 	{
 		Exporter.export(output, otDB.getRoot(), otDB);
 	}
-	
+
 	public String saveOTDatabase(OTDatabase otDB)
 	throws Exception
 	{
@@ -186,13 +186,13 @@ public class OTViewerHelper
 
 		return userDataWriter.toString();
 	}
-	
+
 	public void saveOTDatabaseXML(OTDatabase otDB, URL url)
 	throws Exception
 	{
 		saveOTDatabaseXML(otDB, url, "PUT");
 	}
-	
+
 	/**
 	 * This will send the xml of a OT Database to a url.  This method sets
 	 * the content-type to "application/xml" 
@@ -220,25 +220,25 @@ public class OTViewerHelper
 		}			
 		// url
 		OutputStream outStream = urlConn.getOutputStream();
-		
+
 		Exporter.export(outStream, otDB.getRoot(), otDB);
-		
+
 		outStream.flush();
 		outStream.close();
-		
+
 		InputStream response = urlConn.getInputStream();
 
 		// It seems like I have to read the response other wise the put isn't accepted.		
 		byte [] inBytes = new byte [1000];
 		response.read(inBytes);
-				
+
 		response.close();
 
 		if(urlConn instanceof HttpURLConnection) {
 			((HttpURLConnection)urlConn).disconnect();
 		}
 	}	
-	
+
 	/**
 	 * 
 	 * @param frame
@@ -248,12 +248,12 @@ public class OTViewerHelper
 	{
 		OTViewContainerPanel otContainer = new OTViewContainerPanel(frameManager);
 		otContainer.setTopLevelContainer(true);
-		
+
 		otContainer.setOTViewFactory(getViewFactory());
 
 		return otContainer;
 	}
-	
+
 	public void loadUserData(OTDatabase userOtDB, String name)
 	throws Exception
 	{
@@ -269,38 +269,38 @@ public class OTViewerHelper
 	public void newAnonUserData()
 	{
 		try {
-		    // make a brand new userDB
+			// make a brand new userDB
 			userOtDB = new XMLDatabase();
-			
+
 			OTObjectService objService = ((OTrunkImpl)otrunk).createObjectService(userOtDB);
 
 			OTStateRoot stateRoot = (OTStateRoot)objService.createObject(OTStateRoot.class);
 			userOtDB.setRoot(stateRoot.getGlobalId());
 			stateRoot.setFormatVersionString("1.0");		
 			((XMLDatabase)userOtDB).setDirty(false);
-					    		    
-		    OTUserObject userObject = createUser("anon_single_user", objService);
-            
-            ((OTrunkImpl)otrunk).initUserObjectService((OTObjectServiceImpl)objService, userObject, stateRoot);
-            
-            currentUser = userObject;
+
+			OTUserObject userObject = createUser("anon_single_user", objService);
+
+			((OTrunkImpl)otrunk).initUserObjectService((OTObjectServiceImpl)objService, userObject, stateRoot);
+
+			currentUser = userObject;
 		} catch (Exception e) {
-		    e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
-	
+
 	public OTObject getRootObject() 
-		throws Exception
+	throws Exception
 	{
 		OTObject root = getOtrunk().getRoot();
 		if(currentUser != null){
 			return getOtrunk().getUserRuntimeObject(root, currentUser);
 		}
-		
+
 		return root;
 	}
-	
+
 	public OTrunk getOtrunk() 
 	{
 		return otrunk;
@@ -315,12 +315,12 @@ public class OTViewerHelper
 	{
 		return otDB;
 	}
-	
+
 	public OTDatabase getUserOtDB()
 	{
 		return userOtDB;
 	}
-	
+
 	public OTUser getCurrentUser()
 	{
 		return currentUser;
