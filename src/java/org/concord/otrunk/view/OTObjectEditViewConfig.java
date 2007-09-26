@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.5 $
- * $Date: 2007-09-14 23:19:16 $
+ * $Revision: 1.6 $
+ * $Date: 2007-09-26 18:49:59 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -33,4 +33,7 @@ public interface OTObjectEditViewConfig
 	
 	public String getMode();
 	public void setMode(String mode);
+	
+	public boolean getCopyNewObjectsByDefault();
+	public static boolean DEFAULT_copyNewObjectsByDefault = false;
 }
