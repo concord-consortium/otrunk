@@ -16,7 +16,8 @@ import org.concord.framework.otrunk.OTXMLString;
  */
 public class Copier 
 {
-	OTDatabase otDb;
+	OTDatabase destinationDb;
+	OTDatabase sourceDb;
 	OTDataObject root;
 	
 	Vector toBeCopied;
@@ -36,9 +37,10 @@ public class Copier
     	}    	
     }
     
-	public Copier(OTDatabase otDb, OTDataList orphanDataList)
+	public Copier(OTDatabase sourceDb, OTDatabase destinationDb, OTDataList orphanDataList)
 	{
-		this.otDb = otDb;
+		this.destinationDb = destinationDb;
+		this.sourceDb = sourceDb;
 		this.toBeCopied = new Vector();
 		this.orphanList = orphanDataList;
 	}
@@ -64,12 +66,12 @@ public class Copier
 			CopyEntry itemCopyEntry = getCopyEntry((OTID)child);
 			if(itemCopyEntry == null){
 				OTDataObject itemObj = 
-					otDb.getOTDataObject(root, (OTID)child);
+					sourceDb.getOTDataObject(root, (OTID)child);
 				if(itemObj == null){
 					throw new IllegalStateException("Can't find child id: " + child);
 				}
 				OTDataObject itemCopy = 
-					otDb.createDataObject(itemObj.getType());
+					destinationDb.createDataObject(itemObj.getType());
 				int copyMaxDepth = -1;
 				if(maxDepth != -1){
 					copyMaxDepth = maxDepth-1; 
@@ -90,7 +92,7 @@ public class Copier
     		OTDataList orphanDataList, int maxDepth) 
     throws Exception
     {
-    	Copier copier = new Copier(dest.getDatabase(), orphanDataList);
+    	Copier copier = new Copier(source.getDatabase(), dest.getDatabase(), orphanDataList);
     	copier.internalCopyInto(source, dest, maxDepth);    	
     }
     
