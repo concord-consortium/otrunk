@@ -80,6 +80,7 @@ public class OTrunkImpl implements OTrunk
 	OTServiceContext serviceContext = new OTServiceContextImpl();	
 
 	protected OTDatabase rootDb;
+	protected OTDatabase systemDb;
 	
     protected OTObjectServiceImpl rootObjectService;
     
@@ -88,7 +89,8 @@ public class OTrunkImpl implements OTrunk
 	
     Vector objectServices = new Vector();
 
-	private Vector registeredPackageClasses = new Vector();;
+	private Vector registeredPackageClasses = new Vector();
+	private OTObjectServiceImpl systemObjectService;;
 
 	private static HashMap otClassMap = new HashMap(); 
 	
@@ -105,6 +107,12 @@ public class OTrunkImpl implements OTrunk
 
 	public OTrunkImpl(OTDatabase db, Object [] services, Class [] serviceClasses)
 	{	
+		this(null, db, services, serviceClasses);
+	}
+	
+	public OTrunkImpl(OTDatabase systemDb, OTDatabase db, Object [] services, Class [] serviceClasses)
+	{	
+
 		// Setup the services this has to be done before addDatabase
 		// because addDatabase initializes the OTPackages loaded by that
 		// database
@@ -116,29 +124,42 @@ public class OTrunkImpl implements OTrunk
 		
 		serviceContext.addService(OTControllerRegistry.class, 
 				new OTControllerRegistryImpl());
-		
+
 		this.rootDb = db;
 		addDatabase(db);
 
-		rootObjectService = new OTObjectServiceImpl(this);
-        rootObjectService.setCreationDb(rootDb);
-        rootObjectService.setMainDb(rootDb);
-        
+		rootObjectService = createObjectService(rootDb);
+
+		if(systemDb != null){
+			systemObjectService = createObjectService(systemDb);
+			addDatabase(systemDb);
+	        if(OTViewerHelper.isTrace()) {
+	        	systemObjectService.addObjectServiceListener(new TraceListener("system: " + db));
+	        }
+		} else {
+			// there is no real system db so just use the main db
+			systemDb = db;
+			systemObjectService = rootObjectService;
+		}
+		this.systemDb = systemDb;
+		
+
         if(OTViewerHelper.isTrace()) {
         	rootObjectService.addObjectServiceListener(new TraceListener("root: " + db));
         }
         
 		// We should look up if there are any sevices.
 		try {
-			OTObject root = getRealRoot();
-			if(!(root instanceof OTSystem)) {
+			OTSystem otSystem = getSystem();
+			if(otSystem == null){
+				System.err.println("Warning: No OTSystem object found");
 				return;
 			}
 			
 			// This is deprecated but we use it anyhow for backward compatibility
-			OTObjectList serviceList = ((OTSystem)root).getServices(); 
+			OTObjectList serviceList = otSystem.getServices(); 
 			
-			OTObjectList bundleList = ((OTSystem)root).getBundles();
+			OTObjectList bundleList = otSystem.getBundles();
 			
 			Vector combined = new Vector();
 			combined.addAll(serviceList.getVector());
@@ -182,7 +203,18 @@ public class OTrunkImpl implements OTrunk
 		OTID id = obj.getGlobalId();
 		rootDb.setRoot(id);
 	}
-		
+	
+	public OTSystem getSystem() throws Exception
+	{
+		OTDataObject systemDO = systemDb.getRoot();
+		OTID systemID = systemDO.getGlobalId();
+		OTObject systemObject = systemObjectService.getOTObject(systemID);
+		if(systemObject instanceof OTSystem){
+			return (OTSystem) systemObject;
+		}
+		return null;
+	}
+	
 	public OTObject getRealRoot() throws Exception
 	{
 		OTDataObject rootDO = getRootDataObject();

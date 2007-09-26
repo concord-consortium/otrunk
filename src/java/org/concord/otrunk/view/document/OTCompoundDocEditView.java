@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.19 $
- * $Date: 2007-09-26 18:49:59 $
- * $Author: sfentress $
+ * $Revision: 1.20 $
+ * $Date: 2007-09-26 19:34:26 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -26,6 +26,7 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
+import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.otrunk.view.OTObjectEditViewConfig;
 import org.concord.otrunk.view.OTObjectListViewer;
 
@@ -61,8 +62,10 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		document = otObject;
 		((OTChangeNotifying)document).addOTChangeListener(this);
 		
-		//Get the OTDocumentView view as the 'hardcoded' preview
-		previewView = (OTDocumentView)getViewFactory().getView(document, OTDocumentView.class);
+		//Get the OTDocumentView view as the 'hardcoded' preview  
+		// this uses the NO_VIEW_MODE so the returned OTDocumentView doesn't get replaced by 
+		// the edit view if the default mode is set to something else.
+		previewView = (OTDocumentView)getViewFactory().getView(document, OTDocumentView.class, OTViewFactory.NO_VIEW_MODE);
 		
 		//set mode of OTDocumentView to mode set for OTObjectEditViewConfig, so objects
 		//in the Doc will be in the correct mode

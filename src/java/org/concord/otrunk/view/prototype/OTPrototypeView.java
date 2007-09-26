@@ -41,6 +41,13 @@ public class OTPrototypeView extends AbstractOTJComponentView
 			objectToView = prototype;
 		}
 
+		String viewMode = viewEntry.getViewMode();
+		
+		// FIXME For now we need to set the default view mode of the factory otherwise children views of this
+		// viewOfPrototype will not use this viewMode, if possible this should happen automatically when 
+		// a view is requested with a particular mode.
+		getViewFactory().setDefaultViewMode(viewMode);
+		
 		// return the component for the view 
 		viewOfPrototype = getJComponentService().getObjectView(objectToView, null, null, 
 				viewEntry.getViewEntry());

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.58 $
- * $Date: 2007-09-25 12:22:21 $
+ * $Revision: 1.59 $
+ * $Date: 2007-09-26 19:34:25 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -575,7 +575,7 @@ public class OTViewContainerPanel extends JPanel
 	{
 		this.viewMode  = viewMode;
 		if (viewMode == null){
-			this.viewMode = jComponentService.getViewFactory().getMode();
+			this.viewMode = jComponentService.getViewFactory().getDefaultViewMode();
 		}
 	}
 	
