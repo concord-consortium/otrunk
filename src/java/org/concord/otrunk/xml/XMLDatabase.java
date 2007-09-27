@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.37 $
- * $Date: 2007-09-12 16:17:34 $
- * $Author: aunger $
+ * $Revision: 1.38 $
+ * $Date: 2007-09-27 18:20:54 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -242,7 +242,7 @@ public class XMLDatabase
 		}
 		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode, relativePath);
 		
-		System.err.println("loaded all the objects");
+		statusStream.println("loaded all the objects");
 		
 		// Need to handle local_id this will be stored as XMLDataObjectRef with in the
 		// tree. this is what the objectReferences vector is for
