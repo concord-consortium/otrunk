@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-09-07 11:25:06 $
+ * $Revision: 1.11 $
+ * $Date: 2007-09-27 18:20:54 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -38,6 +38,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -539,7 +540,7 @@ public class ExporterJDOM
 			    writeResourceElement(dataObj, objectEl, resourceName, content);
 			} else if(resource instanceof BlobResource){
 				BlobResource blob = (BlobResource) resource;
-				Object blobUrl = blob.getBlobURL();
+				URL blobUrl = blob.getBlobURL();
 				String blobString = null;
 				int defaultType = XMLReferenceInfo.ELEMENT;
 				if(blobUrl != null){
@@ -621,6 +622,12 @@ public class ExporterJDOM
 		return objectClass;
 	}
 
+	public static String getRelativeURL(URL codebase, URL url)
+	{
+		// TODO implement this
+		return null;
+	}
+	
 	public static String getClassName(String fullClassName)
 	{
 		return fullClassName.substring(fullClassName.lastIndexOf('.')+1);

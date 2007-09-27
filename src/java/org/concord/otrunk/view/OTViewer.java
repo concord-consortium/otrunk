@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.86 $
- * $Date: 2007-09-26 19:34:26 $
+ * $Revision: 1.87 $
+ * $Date: 2007-09-27 18:20:54 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -347,6 +347,11 @@ public class OTViewer extends JFrame
 		userMode = mode;
 	}
 
+	public int getUserMode()
+	{
+		return userMode;
+	}
+	
 	public void updateTreePane()
 	{
 		Dimension minimumSize = new Dimension(100, 50);
