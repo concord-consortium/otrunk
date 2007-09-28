@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.20 $
- * $Date: 2007-09-26 19:34:26 $
- * $Author: scytacki $
+ * $Revision: 1.21 $
+ * $Date: 2007-09-28 16:06:29 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -13,6 +13,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -81,9 +83,15 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		if (previewView == null){
 			return editPane;
 		} else if (viewEntry.getUsePopupEditWindows()){
-			JPanel holder = new JPanel(new BorderLayout());
+		//	JPanel holder = new JPanel(new BorderLayout());
+			
 			JComponent previewPane = previewView.getComponent(document);
-			holder.add(previewPane, BorderLayout.CENTER);
+			
+		//	holder.add(previewPane, BorderLayout.CENTER);
+			
+			/*
+			 * CompoundDoc in BorderLayout in Scroll pane doesn't wrap. Removing edit button
+			 
 			JButton editButton = new JButton("Edit");
 			editButton.addActionListener(new ActionListener(){
 
@@ -98,7 +106,43 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 			editButtonPanel.setBackground(Color.WHITE);
 			editButtonPanel.add(editButton);
 			holder.add(editButtonPanel, BorderLayout.SOUTH);
-			return holder;
+			*/
+			previewPane.addMouseListener(new MouseListener(){
+
+				public void mouseClicked(MouseEvent evt)
+                {
+					if (!evt.getMouseModifiersText(evt.getModifiers()).equalsIgnoreCase("Button1")){
+						JFrame frame = new JFrame();
+		                frame.getContentPane().add(editPane);
+		                frame.pack();
+		                frame.setVisible(true);
+					}
+                }
+
+				public void mouseEntered(MouseEvent arg0)
+                {
+	                // TODO Auto-generated method stub
+	                
+                }
+
+				public void mouseExited(MouseEvent arg0)
+                {
+	                // TODO Auto-generated method stub
+	                
+                }
+
+				public void mousePressed(MouseEvent arg0)
+                {
+	                // TODO Auto-generated method stub
+	                
+                }
+
+				public void mouseReleased(MouseEvent arg0)
+                {
+	                // TODO Auto-generated method stub
+	                
+                }});
+			return previewPane;
 		} else{
 			JComponent previewPane = previewView.getComponent(document);
 			
