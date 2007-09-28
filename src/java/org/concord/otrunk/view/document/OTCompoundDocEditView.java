@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2007-09-28 16:06:29 $
+ * $Revision: 1.22 $
+ * $Date: 2007-09-28 16:07:58 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -83,30 +83,8 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		if (previewView == null){
 			return editPane;
 		} else if (viewEntry.getUsePopupEditWindows()){
-		//	JPanel holder = new JPanel(new BorderLayout());
-			
 			JComponent previewPane = previewView.getComponent(document);
-			
-		//	holder.add(previewPane, BorderLayout.CENTER);
-			
-			/*
-			 * CompoundDoc in BorderLayout in Scroll pane doesn't wrap. Removing edit button
-			 
-			JButton editButton = new JButton("Edit");
-			editButton.addActionListener(new ActionListener(){
-
-				public void actionPerformed(ActionEvent e)
-                {
-	                JFrame frame = new JFrame();
-	                frame.getContentPane().add(editPane);
-	                frame.pack();
-	                frame.setVisible(true);
-                }});
-			JPanel editButtonPanel = new JPanel();
-			editButtonPanel.setBackground(Color.WHITE);
-			editButtonPanel.add(editButton);
-			holder.add(editButtonPanel, BorderLayout.SOUTH);
-			*/
+		
 			previewPane.addMouseListener(new MouseListener(){
 
 				public void mouseClicked(MouseEvent evt)
