@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.23 $
- * $Date: 2007-09-26 19:34:26 $
+ * $Revision: 1.24 $
+ * $Date: 2007-09-29 04:30:29 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -49,7 +49,6 @@ import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
-import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.otcore.impl.ReflectiveOTClassFactory;
 import org.concord.otrunk.overlay.CompositeDatabase;
@@ -289,17 +288,11 @@ public class OTObjectServiceImpl
             Object mapToken = ((OTTransientMapID)id).getMapToken();
             return mapToken == creationDb.getDatabaseId();            
         }
-        
-        // simple approach would be to see if we have a data object for this one
-        // but this will probably break the way it works for student ids.  
-        // FIXME so for now we just check if it is a relative id and the relative part
-        // matches our database id
-        if(id instanceof OTRelativeID){
-        	OTID rootId = ((OTRelativeID)id).getRootId();
-        	return rootId.equals(mainDb.getDatabaseId());
-        }
-        
-        return false;
+
+        // Check our mainDb to see if it contains the object
+        // FIXME there is an issue here about what the difference between the 
+        // mainDb and the creationDb.
+        return mainDb.contains(id);
     }
     
     private OTDataObject createDataObject(OTDataObjectType type)
