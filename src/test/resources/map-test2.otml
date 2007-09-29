@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="33754150-b594-11d9-9669-0800200c9a66" >
+  <imports>
+    <import class="org.concord.otrunk.OTSystem"/>
+    <import class="org.concord.otrunk.view.OTViewEntry"/>
+    <import class="org.concord.otrunk.view.OTViewService"/>
+    <import class="org.concord.otrunk.test.OTMapTestObject"/>
+  </imports>
+  <objects>
+    <OTSystem>
+      <services>
+        <OTViewService/>
+      </services>
+      <root>
+        <OTMapTestObject name="Map Test">
+          <resourceMap>
+            <entry key="key1"><string>value1</string></entry>
+            <entry key="key2"><null/></entry>
+            <entry key="key3"><string>value3</string></entry>
+          </resourceMap>
+        </OTMapTestObject>
+      </root>
+    </OTSystem>
+  </objects>
+</otrunk>

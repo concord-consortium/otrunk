@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2007-09-07 02:04:11 $
+ * $Revision: 1.13 $
+ * $Date: 2007-09-29 04:33:15 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -101,9 +101,7 @@ public class ListTypeHandler extends ResourceTypeHandler
 		        childRelativePath = relativePath + "[" + index + "]";		        
 		    }
 			Object resValue = typeService.handleLiteralElement(child, childRelativePath);
-			if(resValue != null) {
-			    list.add(resValue);
-			}
+			list.add(resValue);
 			index++;
 			
 			previousComment = null;

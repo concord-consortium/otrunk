@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.26 $
- * $Date: 2007-09-07 02:04:11 $
+ * $Revision: 1.27 $
+ * $Date: 2007-09-29 04:33:15 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -176,6 +176,7 @@ public class TypeService
 
 	public TypeService(URL contextURL)
 	{	
+		// Remember the indexes matter because of the list down below
 		ResourceTypeHandler [] handlers = {
 				new BooleanTypeHandler(),
 				new IntegerTypeHandler(),
@@ -187,6 +188,7 @@ public class TypeService
 				new BlobTypeHandler(contextURL),
 				new ListTypeHandler(this),
 				new MapTypeHandler(this),	
+				new NullHandler(),
 		};
 		
 		for(int i=0; i<handlers.length; i++){

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.11 $
- * $Date: 2007-09-27 18:20:54 $
+ * $Revision: 1.12 $
+ * $Date: 2007-09-29 04:33:15 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -232,11 +232,6 @@ public class ExporterJDOM
 			    OTDataList list = (OTDataList)resource;
 				for(int j=0;j<list.size(); j++) {
 					Object listElement = list.get(j);
-					if(listElement == null) {
-						System.err.println("null list item (allowed??)");
-						continue;
-					}
-		
 					processCollectionItem(dataObject, listElement);
 				}
 			} else if(resource instanceof OTDataMap) {
@@ -331,7 +326,9 @@ public class ExporterJDOM
 			Object item, String parentResourceName)
 	throws Exception
 	{
-		if(item instanceof OTID) {
+		if(item == null) {
+			return new Element("null");			
+		} else if(item instanceof OTID) {
 			// this is an object reference
 			// recurse
             return exportID(parentDataObj, (OTID)item, parentResourceName);
@@ -506,10 +503,6 @@ public class ExporterJDOM
 			    ArrayList content = new ArrayList();
 				for(int j=0;j<list.size(); j++) {
 					Object listElement = list.get(j);
-					if(listElement == null) {
-						System.err.println("null list item (allowed??)");
-						continue;
-					}
 					if(list instanceof XMLDataList){
 						XMLReferenceInfo info = ((XMLDataList)list).getReferenceInfo(j);
 						if(info != null && info.comment != null){
@@ -532,10 +525,8 @@ public class ExporterJDOM
 			    	entryEl.setAttribute("key", mapKeys[j]);
 			    	
 			        Object mapValue = map.get(mapKeys[j]);
-			        if(mapValue != null) {
-			            Element collectionEl = exportCollectionItem(dataObj, mapValue, resourceName);
-			            entryEl.addContent(collectionEl);
-			        }
+			        Element collectionEl = exportCollectionItem(dataObj, mapValue, resourceName);
+			        entryEl.addContent(collectionEl);
 			    }
 			    writeResourceElement(dataObj, objectEl, resourceName, content);
 			} else if(resource instanceof BlobResource){
