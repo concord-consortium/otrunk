@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.87 $
- * $Date: 2007-09-27 18:20:54 $
- * $Author: scytacki $
+ * $Revision: 1.88 $
+ * $Date: 2007-10-01 21:20:56 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -251,7 +251,7 @@ public class OTViewer extends JFrame
 		otViewFactory = factory;
 	}
 
-	public OTViewer(boolean showTree)
+	public OTViewer()
 	{
 		super();
 
@@ -519,7 +519,7 @@ public class OTViewer extends JFrame
 		OTMainFrame mainFrame = (OTMainFrame) otrunk
 		.getService(OTMainFrame.class);
 
-		if (!mainFrame.getShowLeftPanel()) {
+		if (Boolean.getBoolean(HIDE_TREE_PROP) || !mainFrame.getShowLeftPanel()) {
 			splitPane.getLeftComponent().setVisible(false);
 		}
 
@@ -831,7 +831,7 @@ public class OTViewer extends JFrame
 	{
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-		OTViewer viewer = new OTViewer(!Boolean.getBoolean(HIDE_TREE_PROP));
+		OTViewer viewer = new OTViewer();
 
 		if (Boolean.getBoolean(OTViewerHelper.SINGLE_USER_PROP)) {
 			viewer.setUserMode(OTViewerHelper.SINGLE_USER_MODE);
