@@ -34,7 +34,7 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	{
 		Object toBeStored = translateExternalToStored(object);
 		list.add(toBeStored);
-		notifyOTChange(OTChangeEvent.OP_ADD, object);
+		notifyOTChange(OTChangeEvent.OP_ADD, object, null);
 	}
 
 	/* (non-Javadoc)
@@ -45,7 +45,7 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 		Object toBeStored = translateExternalToStored(object);
 
 		list.add(index, toBeStored);
-		notifyOTChange(OTChangeEvent.OP_ADD, object);
+		notifyOTChange(OTChangeEvent.OP_ADD, object, null);
 	}
 
 	/* (non-Javadoc)
@@ -64,7 +64,7 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	{
 		Object obj = list.get(index);
 		list.remove(index);
-		notifyOTChange(OTChangeEvent.OP_REMOVE, obj);
+		notifyOTChange(OTChangeEvent.OP_REMOVE, obj, null);
 	}
 
 	/* (non-Javadoc)
@@ -75,7 +75,7 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	public void remove(Object obj) 
 	{
 		list.remove(obj);
-		notifyOTChange(OTChangeEvent.OP_REMOVE, obj);
+		notifyOTChange(OTChangeEvent.OP_REMOVE, obj, null);
 		
 	}
 
@@ -85,8 +85,8 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	public void set(int index, Object object) 
 	{
 		Object toBeStored = translateExternalToStored(object);
-		list.set(index, toBeStored);
-		notifyOTChange(OTChangeEvent.OP_SET, object);
+		Object previousValue = list.set(index, toBeStored);
+		notifyOTChange(OTChangeEvent.OP_SET, object, previousValue);
 	}
 
 	/* (non-Javadoc)
@@ -95,7 +95,7 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 	public void removeAll() 
 	{
 		list.removeAll();
-		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null);
+		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);
 	}
 
 	/* (non-Javadoc)

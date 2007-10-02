@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2007-08-01 14:00:38 $
+ * $Revision: 1.4 $
+ * $Date: 2007-10-02 01:07:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -94,10 +94,11 @@ public class XMLDataList
 		updateModifiedTime();
 	}
 
-	public void set(int index, Object object)
+	public Object set(int index, Object object)
 	{
-		list.set(index, object);
+		Object previousValue = list.set(index, object);
 		updateModifiedTime();
+		return previousValue;
 	}
 	
 	/* (non-Javadoc)

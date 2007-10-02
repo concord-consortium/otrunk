@@ -109,7 +109,7 @@ public class OTObjectInternal implements OTObjectInterface
      * @see org.concord.otrunk.OTObjectInternal#notifyOTChange(java.lang.String, java.lang.String, java.lang.Object)
      */
     public void notifyOTChange(String property, String operation, 
-    	Object value)
+    	Object value, Object previousValue)
     {
     	if(!doNotifyListeners || !hasListeners){
     		return;
@@ -124,7 +124,8 @@ public class OTObjectInternal implements OTObjectInterface
     	changeEvent.setProperty(property);
     	changeEvent.setOperation(operation);
     	changeEvent.setValue(value);
-
+    	changeEvent.setPreviousValue(previousValue);
+    	
     	for(int i=0;i<changeListeners.size(); i++){
     		WeakReference ref = (WeakReference)changeListeners.get(i);
     		Object listener = ref.get();
@@ -147,10 +148,11 @@ public class OTObjectInternal implements OTObjectInterface
     		}
     	}
 
-    	// clear the value so it doesn't remain around and 
+    	// clear the value and previous value so it doesn't remain around and 
     	// so it can be garbage collected
     	changeEvent.setValue(null);
-
+    	changeEvent.setPreviousValue(null);
+    	
     	if(toBeRemoved != null) {
     		for(int i=0; i<toBeRemoved.size(); i++) {
     			changeListeners.remove(toBeRemoved.get(i));
@@ -250,7 +252,7 @@ public class OTObjectInternal implements OTObjectInterface
 		// setResource should only return true if the dataObject was 
 		// actually changed with this call
 		if(setResourceInternal(name, value)){
-			notifyOTChange(name, OTChangeEvent.OP_SET, value);			
+			notifyOTChange(name, OTChangeEvent.OP_SET, value, oldValue);			
 		}
 		
 		return true;

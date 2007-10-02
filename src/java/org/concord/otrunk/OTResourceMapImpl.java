@@ -39,14 +39,17 @@ public class OTResourceMapImpl extends OTResourceCollectionImpl
 	public void put(String key, Object resource) 
 	{
 		Object toBeStored = translateExternalToStored(resource);
-		map.put(key, toBeStored);
-		notifyOTChange(OTChangeEvent.OP_PUT, key);
+		Object previousValue = map.put(key, toBeStored);
+		// FIXME this doesn't translate the previous value to its 
+		// external format, because that would cause a bunch of bytes  to 
+		// be downloaded for something that is just being thrown away
+		notifyOTChange(OTChangeEvent.OP_PUT, key, previousValue);
 	}
 
 	public void removeAll() 
 	{
 		map.removeAll();
-		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null);
+		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);
 	}
 
 	public int size() 

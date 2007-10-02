@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2007-09-25 00:10:40 $
+ * $Revision: 1.14 $
+ * $Date: 2007-10-02 01:07:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -99,7 +99,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 		}
 
 		list.add(id);
-		notifyOTChange(OTChangeEvent.OP_ADD, obj);
+		notifyOTChange(OTChangeEvent.OP_ADD, obj, null);
 	}
 	
 	public void add(int index, OTObject obj)
@@ -110,7 +110,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 		}
 
 		list.add(index, id);
-		notifyOTChange(OTChangeEvent.OP_ADD, obj);
+		notifyOTChange(OTChangeEvent.OP_ADD, obj, null);
 	}
 
 	/*
@@ -122,7 +122,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 	{
 		list.add(id);
 		// TODO this should be checked to see if this is the right thing here
-		notifyOTChange(OTChangeEvent.OP_ADD, id);
+		notifyOTChange(OTChangeEvent.OP_ADD, id, null);
 	}
 	
 	public void set(int index, OTObject obj)
@@ -131,10 +131,19 @@ public class OTObjectListImpl extends OTCollectionImpl
 		if(id == null) {
 			throw new RuntimeException("adding null id object list");
 		}
-
 		
-		list.set(index, id);
-		notifyOTChange(OTChangeEvent.OP_SET, obj);
+		Object previousObject = list.set(index, id);
+		
+		if(previousObject instanceof OTID){
+	        try {
+		        previousObject = objectInternal.getOTObject((OTID) previousObject);
+	        } catch (Exception e) {
+		        // TODO Auto-generated catch block
+		        e.printStackTrace();
+	        }			
+		}
+
+		notifyOTChange(OTChangeEvent.OP_SET, obj, previousObject);
 	}
 
 	public int size()
@@ -145,7 +154,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 	public void removeAll()
 	{
 		list.removeAll();
-		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null);
+		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);
 	}
 
 	/**
@@ -159,7 +168,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 		}
 
 		list.remove(id);
-		notifyOTChange(OTChangeEvent.OP_REMOVE, obj);
+		notifyOTChange(OTChangeEvent.OP_REMOVE, obj, null);
 	}
 
 	/**
@@ -178,7 +187,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 	        e.printStackTrace();
         }
         
-		notifyOTChange(OTChangeEvent.OP_REMOVE, obj);		
+		notifyOTChange(OTChangeEvent.OP_REMOVE, obj, null);		
 	}
 	
 	/**
