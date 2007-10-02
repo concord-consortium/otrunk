@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.22 $
- * $Date: 2007-09-28 16:07:58 $
+ * $Revision: 1.23 $
+ * $Date: 2007-10-02 14:28:32 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -15,12 +15,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.io.StringReader;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.JViewport;
 
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeNotifying;
@@ -31,6 +37,9 @@ import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.otrunk.view.OTObjectEditViewConfig;
 import org.concord.otrunk.view.OTObjectListViewer;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 /**
  * OTCompoundDocEditView
@@ -50,6 +59,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	protected OTDocumentView previewView;
 	protected OTObjectEditViewConfig viewEntry;
 	protected OTObject document;
+	private JComponent editTextPane;
 	
 	/**
 	 * 
@@ -76,8 +86,8 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		//System.out.println("preview view is " + previewView);
 				
 		//Create a split pane with the preview pane and the text area 
-		JComponent editTextPane = super.getComponent(document);
-		final JPanel editPane = createTextPanel(editTextPane);
+		editTextPane = super.getComponent(document);
+		final JPanel editPane = createTextPanel();
 		
 		//If preview is not available, don't use it then
 		if (previewView == null){
@@ -137,7 +147,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	 * Sets up the top panel that allows to edit the text and 
 	 * also has the buttons to insert objects
 	 */
-	public JPanel createTextPanel(JComponent editTextPane)
+	public JPanel createTextPanel()
 	{
 		textPanel = new JPanel();
 		textPanel.setLayout(new BorderLayout());
@@ -196,8 +206,25 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 			
 		}
 		else if (e.getActionCommand().equals("updatePreview")){
-			
-			updatePreviewView();
+			boolean textHasErrors = false;
+			SAXBuilder builder = new SAXBuilder();
+			try {
+	        	StringReader reader = new StringReader(((JTextArea)((JViewport)((JScrollPane)editTextPane).getComponent(0)).getComponent(0)).getText());
+	            Document documentJDOM = builder.build(reader);
+            } catch (JDOMException e1) {
+            	String warning = "Warning: There is an HTML error in your text.\n " + e1.getLocalizedMessage();
+            	JOptionPane.showMessageDialog(textPanel, warning,
+            		    "HTML error",
+            		    JOptionPane.ERROR_MESSAGE);
+            	System.err.println("User-generated XML error: "+e1.getCause());
+            	textHasErrors = true;
+            } catch (IOException e1) {
+	            e1.printStackTrace();
+            }
+            
+            if (!textHasErrors){
+            	updatePreviewView();
+            }
 		}
 	}
 
