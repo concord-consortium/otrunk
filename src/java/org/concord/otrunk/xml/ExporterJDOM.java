@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2007-10-02 17:39:52 $
+ * $Revision: 1.15 $
+ * $Date: 2007-10-02 19:25:29 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -93,12 +93,15 @@ public class ExporterJDOM
 
 	// don't match hrefs with colons those are external links				
 	private static Pattern hrefPattern = Pattern.compile("(href=\")([^:\"]*)(\")");
+	private static File saveFile;
 
 	
 	public static void export(File outputFile, OTDataObject rootObject, OTDatabase db)
 	throws Exception
 	{
-		FileOutputStream outputStream = new FileOutputStream(outputFile);
+		saveFile = outputFile;
+		File tempFile = File.createTempFile(outputFile.getName(), ".tmp");
+		FileOutputStream outputStream = new FileOutputStream(tempFile);
 		
 		export(outputStream, rootObject, db);
 	}
@@ -111,6 +114,16 @@ public class ExporterJDOM
 		export(writer, rootObject, db);
 	}
 	
+	/*
+	 * FIXME: Is there any reason to support an export method that uses a writer, instead of
+	 * using just the export methods above and creating the writer in the method itself?
+	 * 
+	 * As it is now, we have to use a tmp file to avoid writing over the old one, but it's
+	 * really just a place holder so that the method signatures are happy -- it's never used.
+	 * If we just had one export method that accepted a file, or two if we want to support accepting
+	 * an outputStream, then we could create the writer at the last minute and not bother with the
+	 * tmp file.  -SF
+	 */
 	public static void export(Writer writer, OTDataObject rootObject, OTDatabase db)
 	throws Exception
 	{
@@ -136,7 +149,15 @@ public class ExporterJDOM
 		// and the classnames.  Flag duplicate classnames.
 		processObject(rootObject);
 		
-		Element rootObjectElement = exportObject(rootObject, null, null);
+		// Try to create XML. If invalid XML exists AND user chooses to go back
+		// and fix the error, this will throw an exception. We will then NOT
+		// save the file.
+		Element rootObjectElement = null;
+		try {
+			rootObjectElement = exportObject(rootObject, null, null);
+		} catch (Exception e){
+			return;
+		}
 
 		Element otrunkEl = new Element("otrunk");
 		otrunkEl.setAttribute("id", otDb.getDatabaseId().toString());
@@ -159,9 +180,24 @@ public class ExporterJDOM
 		Document doc = new Document(otrunkEl);
 		Format format = Format.getPrettyFormat();
 		XMLOutputter outputter = new XMLOutputter(format);
-		outputter.output(doc, writer);
-				
-		writer.close();
+		
+		if (saveFile != null){
+			// If the current writer was for a temporary file, create a new one and use that.
+			System.out.println("making new file");
+			FileOutputStream outputStream = new FileOutputStream(saveFile);
+			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-8");
+			outputter.output(doc, outputStreamWriter);
+			
+			outputStreamWriter.close();
+			
+			// FIXME: Did this writer ever need to be open in the first place? See above.
+			writer.close();
+		} else {
+			System.out.println("using old one");
+    		outputter.output(doc, writer);
+    				
+    		writer.close();
+		}
 	}
 	
 	private static void processObject(OTDataObject dataObject) 
@@ -575,7 +611,6 @@ public class ExporterJDOM
 				try{
 					Document xmlStringDoc = builder.build(reader, resourceName);
 					Element rootXMLStringEl = xmlStringDoc.getRootElement();
-
 					writeResourceElement(dataObj, objectEl, resourceName, rootXMLStringEl.cloneContent());
 				
 				} catch(JDOMParseException e){
