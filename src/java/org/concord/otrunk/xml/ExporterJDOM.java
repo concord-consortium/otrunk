@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2007-10-02 19:25:29 $
+ * $Revision: 1.16 $
+ * $Date: 2007-10-02 19:33:54 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -156,7 +156,8 @@ public class ExporterJDOM
 		try {
 			rootObjectElement = exportObject(rootObject, null, null);
 		} catch (Exception e){
-			return;
+			// break and pass exception on up
+			throw e;
 		}
 
 		Element otrunkEl = new Element("otrunk");
