@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.12 $
- * $Date: 2007-09-29 04:33:15 $
+ * $Revision: 1.13 $
+ * $Date: 2007-10-02 01:43:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -613,12 +613,6 @@ public class ExporterJDOM
 		return objectClass;
 	}
 
-	public static String getRelativeURL(URL codebase, URL url)
-	{
-		// TODO implement this
-		return null;
-	}
-	
 	public static String getClassName(String fullClassName)
 	{
 		return fullClassName.substring(fullClassName.lastIndexOf('.')+1);
