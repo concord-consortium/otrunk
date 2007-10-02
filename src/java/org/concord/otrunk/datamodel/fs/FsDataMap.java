@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-03-09 05:26:13 $
+ * $Revision: 1.3 $
+ * $Date: 2007-10-02 01:07:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -77,16 +77,16 @@ public class FsDataMap
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceMap#put(java.lang.String, java.lang.Object)
 	 */
-	public void put(String key, Object resource)
+	public Object put(String key, Object resource)
 	{
 		if(readOnly) {
 			// TODO should throw an exception
-			return;
+			return null;
 		}
 
 		updateModifiedTime();
 
-		map.put(key, resource);
+		return map.put(key, resource);
 	}
 
 	/* (non-Javadoc)

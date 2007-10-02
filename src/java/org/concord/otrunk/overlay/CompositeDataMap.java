@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-08-06 19:02:35 $
+ * $Revision: 1.3 $
+ * $Date: 2007-10-02 01:07:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -94,10 +94,10 @@ final class CompositeDataMap extends CompositeDataCollection
     /* (non-Javadoc)
      * @see org.concord.framework.otrunk.OTResourceMap#put(java.lang.String, java.lang.Object)
      */
-    public void put(String key, Object resource)
+    public Object put(String key, Object resource)
     {
     	OTDataMap userMap = getUserMap();
     	resource = resolveIDResource(resource);
-    	userMap.put(key, resource);
+    	return userMap.put(key, resource);
     }    
 }

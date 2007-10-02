@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2007-09-29 04:33:15 $
+ * $Revision: 1.4 $
+ * $Date: 2007-10-02 01:07:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -70,10 +70,11 @@ public class XMLDataMap
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceMap#put(java.lang.String, java.lang.Object)
 	 */
-	public void put(String key, Object resource)
+	public Object put(String key, Object resource)
 	{
-		hTable.put(key, resource);		
+		Object previousValue = hTable.put(key, resource);		
 		updateModifiedTime();
+		return previousValue;
 	}
 
 	/* (non-Javadoc)

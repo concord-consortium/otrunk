@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-03-09 05:26:13 $
+ * $Revision: 1.3 $
+ * $Date: 2007-10-02 01:07:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -121,15 +121,15 @@ public class FsDataList
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#set(int, java.lang.Object)
 	 */
-	public void set(int index, Object object) 
+	public Object set(int index, Object object) 
 	{
 		if(readOnly) {
 			// TODO should throw an exception
-			return;
+			return null;
 		}
 
 		updateModifiedTime();
-		list.set(index, object);
+		return list.set(index, object);
 	}
 	
 	/* (non-Javadoc)

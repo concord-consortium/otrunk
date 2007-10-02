@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.9 $
- * $Date: 2007-08-01 14:08:55 $
+ * $Revision: 1.10 $
+ * $Date: 2007-10-02 01:07:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -99,13 +99,21 @@ public class OTObjectMapImpl extends OTCollectionImpl
 	}
 	
 	public void putObject(String key, OTObject pfObj)
-	{
-		// TODO need to check for existing user
-		try {
+	{		try {
 			OTID objId = pfObj.getGlobalId();			
 		
-			map.put(key, objId);
-			notifyOTChange(OTChangeEvent.OP_PUT, key);
+			Object previousObject = map.put(key, objId);
+			
+			if(previousObject instanceof OTID){
+		        try {
+			        previousObject = objectInternal.getOTObject((OTID) previousObject);
+		        } catch (Exception e) {
+			        // TODO Auto-generated catch block
+			        e.printStackTrace();
+		        }			
+			}
+
+			notifyOTChange(OTChangeEvent.OP_PUT, key, previousObject);
 		} catch (Exception e) {
 			e.printStackTrace();	
 		}

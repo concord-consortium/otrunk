@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-08-01 14:08:55 $
+ * $Revision: 1.2 $
+ * $Date: 2007-10-02 01:07:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -67,10 +67,10 @@ final class CompositeDataList extends CompositeDataCollection
 		}
 	}
 
-	public void set(int index, Object object)
+	public Object set(int index, Object object)
 	{
         object = resolveIDResource(object);
-	    getUserList().set(index, object);
+	    return getUserList().set(index, object);
 	}
 
 	/* (non-Javadoc)

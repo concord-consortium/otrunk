@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-02-20 00:16:41 $
+ * $Revision: 1.2 $
+ * $Date: 2007-10-02 01:07:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -51,7 +51,7 @@ public interface OTDataList extends OTDataCollection
 
 	public abstract void add(int index, Object object);
 	
-	public void set(int index, Object object);
+	public Object set(int index, Object object);
 	
 	public void remove(int index);
 	

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-02-20 00:16:41 $
+ * $Revision: 1.2 $
+ * $Date: 2007-10-02 01:07:23 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -45,7 +45,7 @@ package org.concord.otrunk.datamodel;
  */
 public interface OTDataMap extends OTDataCollection
 {
-	public void put(String key, Object resource);
+	public Object put(String key, Object resource);
 	public Object get(String key);
 	
 	public String [] getKeys();

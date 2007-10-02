@@ -28,10 +28,11 @@ public abstract class OTCollectionImpl
 
 	/**
 	 * The final keyword is so this can be optimized by the compiler
+	 * @param previousObject TODO
 	 */
-	protected final void notifyOTChange(String operation, Object object)
+	protected final void notifyOTChange(String operation, Object object, Object previousObject)
 	{
-		objectInternal.notifyOTChange(property, operation, object);
+		objectInternal.notifyOTChange(property, operation, object, previousObject);
 	}
 			
 }
