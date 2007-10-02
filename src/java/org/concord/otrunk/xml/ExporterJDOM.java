@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2007-10-02 01:43:05 $
- * $Author: scytacki $
+ * $Revision: 1.14 $
+ * $Date: 2007-10-02 17:39:52 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -44,6 +44,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.JOptionPane;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTXMLString;
@@ -577,10 +579,29 @@ public class ExporterJDOM
 					writeResourceElement(dataObj, objectEl, resourceName, rootXMLStringEl.cloneContent());
 				
 				} catch(JDOMParseException e){
+	            	System.err.println("User-generated XML error: "+e.getCause());
+					
 					System.err.println("Invalid xmlString");
 					System.err.println("-----");
 					System.err.println(xmlString);
 					System.err.println("-----");
+					
+					// show warning, and let user choose to go back and edit
+					String warning = "Warning: There is an HTML error in your text.\n " + e.getCause();
+					Object[] options = {"Save anyway and ignore the errors",
+							"I will go back and fix the error"};
+	            	boolean saveAnyway = JOptionPane.showOptionDialog(null, warning,
+	            		    "HTML error",
+	            		    JOptionPane.YES_NO_OPTION,
+	            		    JOptionPane.ERROR_MESSAGE,
+	            		    null,
+	            		    options,
+	            		    options[1]) == 0;
+	            	if (!saveAnyway){
+	            		throw new Exception("JDOMParseException caught. User will edit invalid XML");
+	            	} else {
+	            		// TODO: escape invalid xml
+	            	}
 					e.printStackTrace();					
 				}
 			} else {
