@@ -1,5 +1,6 @@
 package org.concord.otrunk.test;
 
+import java.io.File;
 import java.net.MalformedURLException;
 
 import junit.framework.TestCase;
@@ -107,4 +108,38 @@ public class RelativeURLTest extends TestCase
 		
 		assertEquals("bye.txt", result);
 	}
+	
+	public void test10() throws MalformedURLException
+	{
+		File contextFile = new File("/home/test/context.txt");
+		File relativeFile = new File("/home/test/relative.txt");
+		
+		String result = URLUtil.getRelativeURL(
+				contextFile.toURL(), relativeFile.toURL());
+		
+		assertEquals("relative.txt", result);
+	}
+	
+	public void test11() throws MalformedURLException
+	{
+		File relativeFile = new File("/home/test/relative.txt");
+		
+		String result = URLUtil.getRelativeURL(
+				new java.net.URL("http://hello.com/home/test/context.txt"), 
+				relativeFile.toURL());
+		
+		assertEquals(relativeFile.toURL().toExternalForm(), result);
+	}
+
+	public void test12() throws MalformedURLException
+	{
+		File contextFile = new File("/context.txt");
+		File relativeFile = new File("/home/test/relative.txt");
+		
+		String result = URLUtil.getRelativeURL(
+				contextFile.toURL(), relativeFile.toURL());
+		
+		assertEquals("home/test/relative.txt", result);
+	}
+	
 }
