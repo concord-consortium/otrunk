@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.16 $
- * $Date: 2007-10-02 19:33:54 $
- * $Author: sfentress $
+ * $Revision: 1.17 $
+ * $Date: 2007-10-03 01:59:13 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -606,8 +606,10 @@ public class ExporterJDOM
 				xmlString = exportXMLString(refidPattern, xmlString);
 				xmlString = exportXMLString(hrefPattern, xmlString);
 
+				String originalString = xmlString.trim();
+				
 				SAXBuilder builder = new SAXBuilder();
-				xmlString = "<root>" + xmlString.trim() + "</root>";
+				xmlString = "<root>" + originalString + "</root>";
 				StringReader reader = new StringReader(xmlString);
 				try{
 					Document xmlStringDoc = builder.build(reader, resourceName);
@@ -636,7 +638,7 @@ public class ExporterJDOM
 	            	if (!saveAnyway){
 	            		throw new Exception("JDOMParseException caught. User will edit invalid XML");
 	            	} else {
-	            		// TODO: escape invalid xml
+						writeResource(dataObj, objectEl, resourceName, XMLStringTypeHandler.INVALID_PREFIX + originalString, XMLReferenceInfo.ELEMENT);
 	            	}
 					e.printStackTrace();					
 				}

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-09-07 02:04:11 $
+ * $Revision: 1.8 $
+ * $Date: 2007-10-03 01:59:13 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -46,6 +46,8 @@ import org.concord.framework.otrunk.OTXMLString;
  */
 public class XMLStringTypeHandler extends PrimitiveResourceTypeHandler
 {
+	public static String INVALID_PREFIX = "__invalid_xml__:";
+	
     public XMLStringTypeHandler()
     {
         super("xmlstring", XMLParsableString.class);
@@ -63,6 +65,10 @@ public class XMLStringTypeHandler extends PrimitiveResourceTypeHandler
 	        XMLDataObject parent)
 	{	    
 	    String contentStr = element.getContentAsXMLText();
+	    if(contentStr.startsWith(INVALID_PREFIX)){
+	    	String invalidText = element.getTextTrim();
+	    	return new XMLParsableString(invalidText.substring(INVALID_PREFIX.length()));
+	    }
 	    return new XMLParsableString(contentStr);			    
 	}
 }
