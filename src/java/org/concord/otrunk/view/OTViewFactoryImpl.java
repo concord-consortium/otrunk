@@ -173,6 +173,11 @@ public class OTViewFactoryImpl implements OTViewFactory
         				" cannot handle otObject: " + otObject);
         	}
             
+            if(viewClassStr == null){
+            	throw new RuntimeException("viewEntry " + viewEntry + 
+            			" has a null viewClass");
+            }
+            
             OTView view = null;
             Class viewClass = loader.loadClass(viewClassStr);
             view = (OTView)viewClass.newInstance();

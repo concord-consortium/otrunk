@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.59 $
- * $Date: 2007-09-26 19:34:25 $
+ * $Revision: 1.60 $
+ * $Date: 2007-10-03 21:38:38 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -57,9 +57,9 @@ import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
+import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
-import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.otrunk.OTControllerServiceImpl;
 import org.concord.swing.util.ComponentScreenshot;
 
@@ -155,7 +155,7 @@ public class OTViewContainerPanel extends JPanel
 	 */
 	public void setOTViewFactory(OTViewFactory factory)
 	{
-		// add our own controller service if we have been setup to do so.
+		// add our own controller service factory if we have been setup to do so.
 		if(isTopLevelContainer()){			
 			OTControllerServiceFactory controllerServiceFactory = new OTControllerServiceFactory(){
 
