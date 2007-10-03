@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.23 $
- * $Date: 2007-10-02 14:28:32 $
- * $Author: sfentress $
+ * $Revision: 1.24 $
+ * $Date: 2007-10-03 02:40:57 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -10,7 +10,6 @@
 package org.concord.otrunk.view.document;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -23,10 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.JViewport;
 
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeNotifying;
@@ -37,7 +33,6 @@ import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.otrunk.view.OTObjectEditViewConfig;
 import org.concord.otrunk.view.OTObjectListViewer;
-import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
@@ -99,7 +94,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 
 				public void mouseClicked(MouseEvent evt)
                 {
-					if (!evt.getMouseModifiersText(evt.getModifiers()).equalsIgnoreCase("Button1")){
+					if (!MouseEvent.getMouseModifiersText(evt.getModifiers()).equalsIgnoreCase("Button1")){
 						JFrame frame = new JFrame();
 		                frame.getContentPane().add(editPane);
 		                frame.pack();
@@ -209,8 +204,9 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 			boolean textHasErrors = false;
 			SAXBuilder builder = new SAXBuilder();
 			try {
-	        	StringReader reader = new StringReader(((JTextArea)((JViewport)((JScrollPane)editTextPane).getComponent(0)).getComponent(0)).getText());
-	            Document documentJDOM = builder.build(reader);
+				String documentText = "<root>" + ((OTCompoundDoc)document).getBodyText() + "</root>";				
+	        	StringReader reader = new StringReader(documentText);
+	            builder.build(reader);
             } catch (JDOMException e1) {
             	String warning = "Warning: There is an HTML error in your text.\n " + e1.getLocalizedMessage();
             	JOptionPane.showMessageDialog(textPanel, warning,
