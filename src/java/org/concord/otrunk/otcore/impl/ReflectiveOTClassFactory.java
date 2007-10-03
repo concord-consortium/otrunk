@@ -140,13 +140,9 @@ public class ReflectiveOTClassFactory
 		// just in this class.  The class will have a list of parent classes that it will
 		// combine to return all of the possible class properties when they are requested.
 
-		Class javaClass = ((OTClassImpl)otClass).getInstanceClass();
-		Class schemaClass = ((OTClassImpl)otClass).getConstructorSchemaClass();
-		if(schemaClass != null){
-			javaClass = schemaClass;
-		}
+		Class schemaInterface =  ((OTClassImpl)otClass).getSchemaInterface();
 		
-		Method [] methods = javaClass.getDeclaredMethods();
+		Method [] methods = schemaInterface.getDeclaredMethods();
 			
 		for(int j=0; j<methods.length; j++) {
 			String methodName = methods[j].getName();
@@ -187,7 +183,7 @@ public class ReflectiveOTClassFactory
 
 				if(resourceOTClass == null){
 					// if it is still null then we are in trouble
-					System.err.println("Warning: the field: " + resourceName + " on class: " + javaClass + "\n" + 
+					System.err.println("Warning: the field: " + resourceName + " on class: " + schemaInterface + "\n" + 
 	                        "    has an unknown type: " + resourceClass + "\n"  +
 	                        "  There are not available valid OTClasses which match this type");
 					
@@ -203,7 +199,7 @@ public class ReflectiveOTClassFactory
 			OTClassPropertyImpl property = new OTClassPropertyImpl(resourceName, otType, null);
 			
 	        try {
-	            Field defaultField = javaClass.getField("DEFAULT_" + resourceName);
+	            Field defaultField = schemaInterface.getField("DEFAULT_" + resourceName);
 	            if(defaultField != null) {
 	                Object defaultValue =  defaultField.get(null);
 	                property.setDefault(defaultValue);

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.25 $
- * $Date: 2007-09-10 17:08:35 $
+ * $Revision: 1.26 $
+ * $Date: 2007-10-03 21:44:16 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -95,11 +95,7 @@ public class ReflectionTypeDefinitions
 				continue;
 			}
 			
-			Class resourceSchemaClass = otClass.getInstanceClass();
-			Class constructorSchemaClass = otClass.getConstructorSchemaClass();
-			if(constructorSchemaClass != null){
-				resourceSchemaClass = constructorSchemaClass;
-			}
+			Class resourceSchemaClass = otClass.getSchemaInterface();
 
 			if(resourceSchemaClass == null) {
 				throw new RuntimeException("Can't find valid schema class for: " +

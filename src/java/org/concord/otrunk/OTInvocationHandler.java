@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.23 $
- * $Date: 2007-08-17 13:21:28 $
+ * $Revision: 1.24 $
+ * $Date: 2007-10-03 21:44:16 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -52,10 +52,10 @@ import org.concord.framework.otrunk.OTObjectInterface;
 public class OTInvocationHandler
 	implements InvocationHandler
 {
+	protected static HashMap internalMethodMap;
+	 
 	OTObjectInternal otObjectImpl;
 	
-	protected static HashMap internalMethodMap;
- 
     /**
      * @param dataObject
      * @param db
@@ -63,7 +63,6 @@ public class OTInvocationHandler
     public OTInvocationHandler(OTObjectInternal otObjectImpl, OTrunkImpl db, Class schemaInterface)
     {
     	this.otObjectImpl = otObjectImpl;
-    	otObjectImpl.setSchemaInterface(schemaInterface);
         
         if(internalMethodMap == null){
         	initializeInternalMethodMap();
@@ -135,13 +134,16 @@ public class OTInvocationHandler
 			return internalMethod.invoke(otObjectImpl, args);
 		}
 		
+		// The return type is needed as a hint to the getResource method
+		// This hint is needed to handle Blob resources which can be returned
+		// as either urls or byte[].
+		Class returnType = method.getReturnType();
+		
 		if(methodName.startsWith("is")) {
-            String resourceName = getResourceName(2, methodName); 
-            Class returnType = method.getReturnType();
+            String resourceName = getResourceName(2, methodName);
             return otObjectImpl.getResource(resourceName, returnType);            
 		} else if(methodName.startsWith("get")) {
 			String resourceName = getResourceName(3, methodName).intern(); 
-			Class returnType = method.getReturnType();
 			return otObjectImpl.getResource(resourceName, returnType);
 		} else if(methodName.startsWith("set")){
 			String resourceName = getResourceName(3, methodName); 

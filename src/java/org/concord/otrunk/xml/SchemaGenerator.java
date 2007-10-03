@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2007-09-07 02:04:11 $
+ * $Revision: 1.7 $
+ * $Date: 2007-10-03 21:44:16 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -86,13 +86,13 @@ public class SchemaGenerator
 		for(int i=0; i<referrencedOTClasses.size(); i++){
 			OTClass otClass = (OTClass) referrencedOTClasses.get(i);
 
-			System.out.println("" + otClass.getInstanceClass().getName());
+			System.out.println("" + otClass.getName());
 
 			System.out.print("     extends ");
 			ArrayList superTypes = otClass.getOTSuperTypes();
 			for(int j=0; j<superTypes.size(); j++){
 				OTClass superType = (OTClass) superTypes.get(j);
-				System.out.print(superType.getInstanceClass().getName() + " ");
+				System.out.print(superType.getName() + " ");
 			}
 			System.out.println();
 			

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2007-09-07 02:04:12 $
+ * $Revision: 1.9 $
+ * $Date: 2007-10-03 21:44:16 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -228,7 +228,7 @@ public class RNGSchemaGenerator
     {
         Vector printedResources = new Vector();
 
-        String name = otClass.getInstanceClass().getName();
+        String name = otClass.getName();
         int lastDot = name.lastIndexOf(".");
         String shortName = name.substring(lastDot+1,name.length());
 

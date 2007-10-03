@@ -1,8 +1,8 @@
 package org.concord.otrunk;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -32,8 +32,12 @@ public class OTObjectInternal implements OTObjectInterface
             OTViewerHelper.TRACE_LISTENERS_PROP, false);
 
 	protected OTObjectServiceImpl objectService;
-	
-    Vector changeListeners = new Vector();
+
+	/**
+	 * This is null unless there are actually listeners added this saves some 
+	 * memory.
+	 */
+    ArrayList changeListeners = null;
 
     /**
      * This is for debugging purposes it contains a mapping from
@@ -49,10 +53,6 @@ public class OTObjectInternal implements OTObjectInterface
      */
     protected boolean doNotifyListeners = true;
     
-    /**
-     * An internal variable to speed up skipping of the listener notification
-     */
-    protected boolean hasListeners = false;
     protected OTChangeEvent changeEvent;
     protected OTObject changeEventSource;
 
@@ -61,10 +61,7 @@ public class OTObjectInternal implements OTObjectInterface
 	
 	private String changeEventSourceInstanceID;
 
-	private Class schemaInterface;
-
 	private int hashCode;
-
 	
 	public OTObjectInternal(OTDataObject dataObject, OTObjectServiceImpl objectService, OTClass otClass)
     {
@@ -111,7 +108,7 @@ public class OTObjectInternal implements OTObjectInterface
     public void notifyOTChange(String property, String operation, 
     	Object value, Object previousValue)
     {
-    	if(!doNotifyListeners || !hasListeners){
+    	if(!doNotifyListeners || changeListeners == null){
     		return;
     	}
 
@@ -158,7 +155,7 @@ public class OTObjectInternal implements OTObjectInterface
     			changeListeners.remove(toBeRemoved.get(i));
     		}
     		if(changeListeners.size() == 0){
-    			hasListeners = false;
+    			changeListeners = null;
     		}
     	}
     }
@@ -172,6 +169,10 @@ public class OTObjectInternal implements OTObjectInterface
 			throw new IllegalArgumentException("changeListener cannot be null");
 		}
 
+		if(changeListeners == null){
+			changeListeners = new ArrayList();
+		}
+		
 		// Check if the changeListener has already been added 
 	    for(int i=0; i<changeListeners.size(); i++) {
 	        WeakReference ref = (WeakReference)changeListeners.get(i);
@@ -196,7 +197,6 @@ public class OTObjectInternal implements OTObjectInterface
 	    		changeListenerLabels.put(listenerRef, "" + changeListener);
 	    	}
 	    }
-	    hasListeners = true;
     }
 
 	/* (non-Javadoc)
@@ -209,6 +209,12 @@ public class OTObjectInternal implements OTObjectInterface
 	    	System.out.println("   listener:" + changeListener);
 	    }
 
+	    if(changeListeners == null){
+	    	System.err.println("Warning: trying to remove a listener that hasn't been added: " + 
+	    			changeListener);
+	    	return;
+	    }
+	    
 	    // param OTChangeListener listener		    
 	    for(int i=0; i<changeListeners.size(); i++) {
 	        WeakReference ref = (WeakReference)changeListeners.get(i);
@@ -219,7 +225,7 @@ public class OTObjectInternal implements OTObjectInterface
 	        }
 	    }
 	    if(changeListeners.size() == 0) {
-	    	hasListeners = false;
+	    	changeListeners = null;
 	    }
 	}
 
@@ -241,7 +247,9 @@ public class OTObjectInternal implements OTObjectInterface
 			value = new BlobResource((byte[])value);
 		} else if(value instanceof URL){
 			value = new BlobResource((URL)value);
-		}
+		} 
+		
+		// if the value is a BlobResource itself then it will pass right though to here
 		
 		// Check to see if it is equal before we go further
 	    Object oldValue = getResourceValue(name);
@@ -267,14 +275,34 @@ public class OTObjectInternal implements OTObjectInterface
     {		
 		OTClassProperty property = otClass().getProperty(resourceName);
 		if(property == null){
-			throw new IllegalStateException("Property: " + resourceName + " doesn't exist on OTClass: " + otClass().getInstanceClass().getName());
+			throw new IllegalStateException("Property: " + resourceName + " doesn't exist on OTClass: " + otClass().getName());
 		}
 		return otIsSet(property);
     }
 
 	public Object getResource(String resourceName, Class returnType)
-	throws Exception
+		throws Exception
 	{
+		OTClassProperty classProperty = otClass().getProperty(resourceName);
+		return getResource(classProperty, returnType);
+	}
+	
+	public Object getResource(String resourceName)
+		throws Exception
+	{
+			return getResource(resourceName, null);
+	}
+	
+	public Object getResource(OTClassProperty property, Class returnType)
+		throws Exception
+	{
+		String resourceName = property.getName();
+		OTType type = property.getType();
+		if(returnType == null){
+			returnType = type.getInstanceClass();
+		}
+
+		
         // If this class is the one handling the overlays then this call
         // would be substituted by one that goes through all of the overlayed data objects.
 	    Object resourceValue = getResourceValue(resourceName);
@@ -295,7 +323,7 @@ public class OTObjectInternal implements OTObjectInterface
 	            	if(!returnType.isAssignableFrom(object.getClass())){
 	            		System.err.println("Error: Type Mismatch");
 	            		System.err.println("  value: " + object);
-	            		System.err.println("  parentObject: " + schemaInterface.toString());
+	            		System.err.println("  parentObject: " + otClass.getName());
 	            		System.err.println("  resourceName: " + resourceName);
 	        	        System.err.println("  expected type is: " + returnType);
 	            		return null;
@@ -348,22 +376,22 @@ public class OTObjectInternal implements OTObjectInterface
 	    		return blob.getBytes();
 	    	} else if(returnType == URL.class){
 	    		return blob.getBlobURL();
+	    	} else {
+	    		return blob;
 	    	}
 	    } else if(resourceValue == null && 
-	    		(returnType == String.class || returnType.isPrimitive())) {
-	        try {
-	            Field defaultField = schemaInterface.getField("DEFAULT_" + resourceName);
-	            if(defaultField != null) {
-	                return defaultField.get(null);
-	            }
-	        } catch (NoSuchFieldException e) {
-	        	// It is normal to have undefined strings so we shouldn't throw an
-	        	// exception in that case.
-	        	if(returnType != String.class){
-	        		throw new RuntimeException("No default value set for \"" + resourceName + "\" " +
-	        				"in class: " + schemaInterface);
-	        	}
-	        }
+	    		(returnType == String.class || returnType.isPrimitive() ||
+	    				returnType == Boolean.class || returnType == Short.class ||
+	    				returnType == Character.class || returnType == Integer.class ||
+	    				returnType == Float.class || returnType == Double.class ||
+	    				returnType == Long.class)) {
+	    	Object defaultValue = property.getDefault();
+	    	if(defaultValue == null && returnType != String.class){
+	    		throw new RuntimeException("No default value set for \"" + resourceName + "\" " +
+	    				"in class: " + otClass.getName());	        		
+	    	}
+	    	
+	    	return defaultValue;
 	    }
 	    
 	    if(resourceValue == null) return null;
@@ -371,7 +399,7 @@ public class OTObjectInternal implements OTObjectInterface
 	    if(!returnType.isInstance(resourceValue) &&
 	            !returnType.isPrimitive()){
 	        System.err.println("invalid resource value for: " + resourceName);
-	        System.err.println("  object type: " + schemaInterface.toString());
+	        System.err.println("  object type: " + otClass.getName());
 	        System.err.println("  resourceValue is: " + resourceValue.getClass());
 	        System.err.println("  expected type is: " + returnType);
 	        return null;
@@ -461,7 +489,7 @@ public class OTObjectInternal implements OTObjectInterface
 			System.out.println("finalizing object: " + internalToString());
 		}
 		if(traceListeners){
-			if(changeListeners.size() != 0){
+			if(changeListeners != null){
 				// Check for the case where there is just the TraceListener
 				if(changeListeners.size() == 1){
 					WeakReference ref = (WeakReference)changeListeners.get(0);
@@ -510,19 +538,10 @@ public class OTObjectInternal implements OTObjectInterface
 		throw new UnsupportedOperationException("should not be called");
     }
 
-	public void setSchemaInterface(Class schemaInterface)
-    {
-		this.schemaInterface = schemaInterface;
-    }
-
 	public Object otGet(OTClassProperty property)
-    {
-		String name = property.getName();
-		OTType type = property.getType();
-		Class returnClass = type.getInstanceClass();
-		
+    {		
 		try {
-	        return getResource(name, returnClass);
+	        return getResource(property, null);
         } catch (Exception e) {
 	        // TODO Auto-generated catch block
 	        e.printStackTrace();

@@ -8,6 +8,7 @@ import org.concord.framework.otrunk.OTXMLString;
 import org.concord.framework.otrunk.otcore.OTListType;
 import org.concord.framework.otrunk.otcore.OTMapType;
 import org.concord.framework.otrunk.otcore.OTPrimitiveType;
+import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.xml.TypeService;
 
 public class OTCorePackage
@@ -23,7 +24,7 @@ public class OTCorePackage
     public final static OTPrimitiveType DOUBLE_TYPE = 
     	new OTPrimitiveTypeImpl(TypeService.DOUBLE, Double.class);
     public final static OTPrimitiveType BLOB_TYPE = 
-    	new OTPrimitiveTypeImpl(TypeService.BLOB, byte[].class);
+    	new OTPrimitiveTypeImpl(TypeService.BLOB, BlobResource.class);
     public final static OTPrimitiveType STRING_TYPE = 
     	new OTPrimitiveTypeImpl(TypeService.STRING, String.class);
     public final static OTPrimitiveType XML_STRING_TYPE = 

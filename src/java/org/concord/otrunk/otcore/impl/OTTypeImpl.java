@@ -6,15 +6,18 @@ public abstract class OTTypeImpl implements OTType
 {
 	protected Class instanceClass;
 	
+	public OTTypeImpl(Class instanceClass)
+	{
+		this.instanceClass = instanceClass;
+	}
+	
 	public Class getInstanceClass()
 	{
-		if(instanceClass != null){
-			return instanceClass;
-		}
-		
-		instanceClass = createInstanceClass();
 		return instanceClass;
 	}
-
-	protected abstract Class createInstanceClass();
+	
+	public String getName()
+	{
+		return getInstanceClass().getName();
+	}
 }
