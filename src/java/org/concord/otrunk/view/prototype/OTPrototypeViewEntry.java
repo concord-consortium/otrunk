@@ -62,7 +62,5 @@ public interface OTPrototypeViewEntry
 	 */
 	public boolean getSavePrototypeCopies();
 	public final static boolean DEFAULT_savePrototypeCopies = true;
-	
-	
-	public static String DEFAULT_viewClass="org.concord.otrunk.view.prototype.OTPrototypeView";
+		
 }

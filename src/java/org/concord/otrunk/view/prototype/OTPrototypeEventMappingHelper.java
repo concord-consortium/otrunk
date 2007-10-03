@@ -107,14 +107,14 @@ public class OTPrototypeEventMappingHelper
 		if(model instanceof OTChangeNotifying){
 			((OTChangeNotifying)model).addOTChangeListener(modelListener);
 		} else {
-			System.err.println("Warning: " + model.otClass().getInstanceClass().getName() +
+			System.err.println("Warning: " + model.otClass().getName() +
 			"can't notify about change events");
 		}
 
 		if(prototypeCopy instanceof OTChangeNotifying){
 			((OTChangeNotifying)prototypeCopy).addOTChangeListener(prototypeCopyListener);			
 		} else {
-			System.err.println("Warning: " + prototypeCopy.otClass().getInstanceClass().getName() +
+			System.err.println("Warning: " + prototypeCopy.otClass().getName() +
 			"can't notify about change events");			
 		}
 	}

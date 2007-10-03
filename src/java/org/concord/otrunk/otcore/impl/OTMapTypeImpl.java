@@ -2,19 +2,11 @@ package org.concord.otrunk.otcore.impl;
 
 import org.concord.framework.otrunk.otcore.OTMapType;
 
-public class OTMapTypeImpl implements OTMapType
+public class OTMapTypeImpl extends OTTypeImpl
+	implements OTMapType
 {
-
-	private Class instanceClass;
-
 	public OTMapTypeImpl(Class instanceClass)
 	{
-		this.instanceClass = instanceClass;
-	}
-	
-	public Class getInstanceClass()
-    {
-		return instanceClass;
-    }
-
+		super(instanceClass);
+	}	
 }

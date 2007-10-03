@@ -2,18 +2,11 @@ package org.concord.otrunk.otcore.impl;
 
 import org.concord.framework.otrunk.otcore.OTListType;
 
-public class OTListTypeImpl implements OTListType
+public class OTListTypeImpl extends OTTypeImpl 
+	implements OTListType
 {
-	private Class instanceClass;
-
 	public OTListTypeImpl(Class instanceClass)
 	{
-		this.instanceClass = instanceClass;
-	}
-	
-	public Class getInstanceClass()
-    {
-		return instanceClass;
-    }
-
+		super(instanceClass);
+	}	
 }

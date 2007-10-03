@@ -19,8 +19,6 @@ import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTXMLString;
 import org.concord.framework.otrunk.otcore.OTClassProperty;
 import org.concord.otrunk.datamodel.BlobResource;
-import org.concord.otrunk.datamodel.OTDataObject;
-import org.concord.otrunk.datamodel.OTDatabase;
 
 /**
  * @author scott
@@ -150,35 +148,21 @@ public class OTrunkUtil
 			Class paramType = property.getType().getInstanceClass();
 			if(value instanceof String){
 				String valueStr = (String) value;
-				if(paramType == Float.class ||
-						paramType == Float.TYPE){
+				if(paramType == Float.class){
 					value = Float.valueOf(valueStr);
-				} else if(paramType == Integer.class ||
-						paramType == Integer.TYPE){
+				} else if(paramType == Integer.class){
 					value = Integer.valueOf(valueStr);
-				} else if(paramType == Boolean.class ||
-						paramType == Boolean.TYPE){
+				} else if(paramType == Boolean.class){
 					value = Boolean.valueOf(valueStr);
-				} else if(paramType == Double.class ||
-						paramType == Double.TYPE){
+				} else if(paramType == Double.class){
 					value = Double.valueOf(valueStr);
-				} else if(paramType == Long.class ||
-						paramType == Long.TYPE){
+				} else if(paramType == Long.class){
 					value = Long.valueOf(valueStr);
-				} else if(paramType == Short.class ||
-						paramType == Short.TYPE){
+				} else if(paramType == Short.class){
 					value = Short.valueOf(valueStr);
-				} else if(paramType == URL.class){
+				} else if(paramType == BlobResource.class){
 					try {
 						value = new URL(valueStr);
-					} catch (MalformedURLException e) {
-						e.printStackTrace();
-					}
-				} else if(paramType == byte[].class){
-					try {
-						URL url = new URL(valueStr);
-						setBlobUrl((OTObject)obj, propertyName, url);
-						return;
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
 					}
@@ -275,37 +259,6 @@ public class OTrunkUtil
 		return null;
 	}
 	
-	private static OTDataObject getDataObject(OTObject object)
-		throws Exception
-	{
-		OTID id = object.getGlobalId();
-		OTObjectServiceImpl objServiceImpl = 
-			(OTObjectServiceImpl)object.getOTObjectService();
-
-		OTDataObject dataObject = objServiceImpl.mainDb.getOTDataObject(null, id);
-		if(dataObject == null && objServiceImpl.creationDb != null){
-			dataObject = objServiceImpl.creationDb.getOTDataObject(null, id);
-		}
-		
-		return dataObject;
-	}
-	
-	public static void setBlobUrl(OTObject object, String propertyName, URL url)
-	{
-		// This is a hack because there isn't a better way yet
-		OTDataObject dataObject = null;
-		try {
-	        dataObject = getDataObject(object);
-        } catch (Exception e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-        }
-		
-        OTDatabase db = dataObject.getDatabase();
-        BlobResource blobRes = db.createBlobResource(url);
-        dataObject.setResource(propertyName, blobRes);        
-	}
-
 	public static String escapeReplacement(String replacement) {
     	if (replacement == null) {
     		return null;

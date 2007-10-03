@@ -12,13 +12,12 @@ public class OTClassImpl extends OTTypeImpl
 	private ArrayList superTypes = new ArrayList();
 	
 	private ArrayList properties = new ArrayList();
-	Class javaClass;
+
 	Class constructorSchemaClass;
-	
-	
+		
 	public OTClassImpl(Class javaClass)
 	{
-		this.javaClass = javaClass;
+		super(javaClass);
 	}
 	
 	public void setConstructorSchemaClass(Class schemaClass)
@@ -31,6 +30,16 @@ public class OTClassImpl extends OTTypeImpl
     	return constructorSchemaClass;
     }
 
+	public Class getSchemaInterface()
+	{
+		Class schemaClass = getConstructorSchemaClass();
+		if(schemaClass != null){
+			return schemaClass;
+		}
+		
+		return getInstanceClass();
+	}
+	
 	public ArrayList getOTAllClassProperties()
 	{		
 		ArrayList allProperties = new ArrayList(properties);		
@@ -113,11 +122,6 @@ public class OTClassImpl extends OTTypeImpl
 		}
 
 		return allSuperTypes;
-	}
-	
-	protected Class createInstanceClass() 
-	{
-		return javaClass;
 	}
 	
 	public ArrayList getOTSuperTypes()
