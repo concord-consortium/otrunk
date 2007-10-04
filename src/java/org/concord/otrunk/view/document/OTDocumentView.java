@@ -119,6 +119,10 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		updateFormatedView();
 
 		setReloadOnViewEntryChange(true);
+		
+		if (viewEntry instanceof OTDocumentViewConfig){
+			getViewContainer().setUpdateable(((OTDocumentViewConfig)viewEntry).getViewContainerIsUpdateable());
+		}
 
 		// JScrollPane renderedScrollPane = new JScrollPane(previewComponent);
 		// renderedScrollPane.getViewport().setViewPosition(new Point(0,0));

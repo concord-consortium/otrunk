@@ -25,4 +25,8 @@ public interface OTDocumentViewConfig
 	public void setCss(String css);
 	
 	public OTObjectList getCssBlocks();
+	
+	public boolean getViewContainerIsUpdateable();
+	public void setViewContainerIsUpdateable(boolean viewContainerIsUpdateable);
+	public static boolean DEFAULT_viewContainerIsUpdateable = true;
 }
