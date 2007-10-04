@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.14 $
- * $Date: 2007-10-02 01:07:23 $
+ * $Revision: 1.15 $
+ * $Date: 2007-10-04 21:18:10 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,6 +32,7 @@
 */
 package org.concord.otrunk;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTChangeEvent;
@@ -54,6 +55,15 @@ public class OTObjectListImpl extends OTCollectionImpl
 {
 	protected OTDataList list;
 	
+    /**
+     * This is used to store references to the OTObjects, this prevents them from 
+     * getting garbage collected as long as this collection is referenced. <p>
+     * 
+     * Using an ArrayList seemed like the natural thing to do, but it is hard to keep
+     * that synchronized with the data list.  So instead a map is used.
+     */
+	protected HashMap referenceMap;
+	
 	public OTObjectListImpl(String property, OTDataList resList, OTObjectInternal objectInternal)
 	{
 		super(property, objectInternal);
@@ -68,7 +78,13 @@ public class OTObjectListImpl extends OTCollectionImpl
 				System.err.println("Null item in object list index: " + index);
 				return null;
 			}
-			return objectInternal.getOTObject(id);
+			OTObject otObject = objectInternal.getOTObject(id);
+			
+			if(referenceMap == null){
+				referenceMap = new HashMap();
+			}
+			referenceMap.put(id, otObject);
+			return otObject;
 		} catch (Exception e) {
 			e.printStackTrace();			
 		}
@@ -99,6 +115,12 @@ public class OTObjectListImpl extends OTCollectionImpl
 		}
 
 		list.add(id);
+		
+		if(referenceMap == null){
+			referenceMap = new HashMap();
+		}
+		referenceMap.put(id, obj);
+		
 		notifyOTChange(OTChangeEvent.OP_ADD, obj, null);
 	}
 	
@@ -110,6 +132,12 @@ public class OTObjectListImpl extends OTCollectionImpl
 		}
 
 		list.add(index, id);
+		
+		if(referenceMap == null){
+			referenceMap = new HashMap();
+		}
+		referenceMap.put(id, obj);
+		
 		notifyOTChange(OTChangeEvent.OP_ADD, obj, null);
 	}
 
@@ -121,7 +149,10 @@ public class OTObjectListImpl extends OTCollectionImpl
 	public void add(OTID id)
 	{
 		list.add(id);
-		// TODO this should be checked to see if this is the right thing here
+
+		// FIXME will screw up some listeners which expect an object not an 
+		//  id.  But the reason this call is here is for efficiency so the actual
+		//  OTObject doesn't need to be created.  So it isn't clear what to do  		
 		notifyOTChange(OTChangeEvent.OP_ADD, id, null);
 	}
 	
@@ -143,6 +174,17 @@ public class OTObjectListImpl extends OTCollectionImpl
 	        }			
 		}
 
+		if(referenceMap == null){
+			referenceMap = new HashMap();
+		}
+		referenceMap.put(id, obj);
+		
+		if(previousObject != null){
+			// FIXME we should remove the reference from this list only if it hasn't
+			// be set into 2 different places.  We'd need to track where each object 
+			// was inserted to do this correctly.
+		}
+		
 		notifyOTChange(OTChangeEvent.OP_SET, obj, previousObject);
 	}
 
@@ -154,6 +196,9 @@ public class OTObjectListImpl extends OTCollectionImpl
 	public void removeAll()
 	{
 		list.removeAll();
+		
+		referenceMap = null;
+		
 		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);
 	}
 
@@ -168,6 +213,10 @@ public class OTObjectListImpl extends OTCollectionImpl
 		}
 
 		list.remove(id);
+		if(referenceMap != null){
+			referenceMap.put(id, null);
+		}
+		
 		notifyOTChange(OTChangeEvent.OP_REMOVE, obj, null);
 	}
 
@@ -187,9 +236,14 @@ public class OTObjectListImpl extends OTCollectionImpl
 	        e.printStackTrace();
         }
         
+		list.remove(id);
+		if(referenceMap != null){
+			referenceMap.put(id, null);
+		}
+
 		notifyOTChange(OTChangeEvent.OP_REMOVE, obj, null);		
 	}
-	
+		
 	/**
 	 * This is package protected.  It should not be used outside of this package,
 	 * because it will be removed at some point.

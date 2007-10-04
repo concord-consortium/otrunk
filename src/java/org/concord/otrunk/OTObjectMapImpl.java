@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.10 $
- * $Date: 2007-10-02 01:07:23 $
+ * $Revision: 1.11 $
+ * $Date: 2007-10-04 21:18:10 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -32,6 +32,7 @@
 */
 package org.concord.otrunk;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTChangeEvent;
@@ -54,6 +55,11 @@ public class OTObjectMapImpl extends OTCollectionImpl
 {
     protected OTDataMap map;
     
+    /**
+     * This is used to store references to the OTObjects, this prevents them from 
+     * getting garbage collected as long as this collection is referenced.
+     */
+    protected HashMap referenceMap;
     
 	public OTObjectMapImpl(String resourceName, OTDataMap map, OTObjectInternal handler)
 	{
@@ -63,7 +69,15 @@ public class OTObjectMapImpl extends OTCollectionImpl
 
 	public int getNumberOfObjects()
 	{
-		return map.size();		
+		return size();
+	}
+	
+	protected void saveReference(String key, OTObject value)
+	{
+		if(referenceMap == null){
+			referenceMap = new HashMap();
+		}
+		referenceMap.put(key, value);		
 	}
 	
 	public OTObject getObject(String key) 
@@ -74,8 +88,9 @@ public class OTObjectMapImpl extends OTCollectionImpl
 		}
 		
 		try {
-			OTObject pfObj = objectInternal.getOTObject(objId);
-			return pfObj;
+			OTObject otObj = objectInternal.getOTObject(objId);
+			
+			return otObj;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -98,9 +113,9 @@ public class OTObjectMapImpl extends OTCollectionImpl
 		return names;
 	}
 	
-	public void putObject(String key, OTObject pfObj)
+	public void putObject(String key, OTObject otObj)
 	{		try {
-			OTID objId = pfObj.getGlobalId();			
+			OTID objId = otObj.getGlobalId();			
 		
 			Object previousObject = map.put(key, objId);
 			
@@ -113,10 +128,24 @@ public class OTObjectMapImpl extends OTCollectionImpl
 		        }			
 			}
 
+			saveReference(key, otObj);
+			
 			notifyOTChange(OTChangeEvent.OP_PUT, key, previousObject);
 		} catch (Exception e) {
 			e.printStackTrace();	
 		}
 	}
+
+	public void removeAll()
+    {
+		map.removeAll();
+		referenceMap = null;
+		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);
+    }
+
+	public int size()
+    {
+		return map.size();		
+    }
 }
 
