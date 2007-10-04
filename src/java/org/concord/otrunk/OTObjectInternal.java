@@ -11,6 +11,7 @@ import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectCollection;
 import org.concord.framework.otrunk.OTObjectInterface;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
@@ -62,13 +63,15 @@ public class OTObjectInternal implements OTObjectInterface
 	private String changeEventSourceInstanceID;
 
 	private int hashCode;
+
+	private HashMap referencedObjects;
 	
 	public OTObjectInternal(OTDataObject dataObject, OTObjectServiceImpl objectService, OTClass otClass)
     {
 		this.objectService = objectService;
     	this.dataObject = dataObject;
     	
-		String str = getOTClassName() + "@" +  getGlobalId();
+		String str = getOTClassName() + "@" +  getGlobalId().hashCode();
 		hashCode = str.hashCode();
 
 		if(otClass == null){
@@ -242,6 +245,8 @@ public class OTObjectInternal implements OTObjectInterface
 		if(value instanceof OTObject) {
 			OTObject child = (OTObject)value;
 			OTID childId = child.getGlobalId();
+			
+			saveReference(name, value);
 			value = childId;
 		} else if(value instanceof byte[]) {
 			value = new BlobResource((byte[])value);
@@ -260,6 +265,10 @@ public class OTObjectInternal implements OTObjectInterface
 		// setResource should only return true if the dataObject was 
 		// actually changed with this call
 		if(setResourceInternal(name, value)){
+			// Handle the case where someone set a object reference to null
+			if(oldValue instanceof OTID && value == null){
+				saveReference(name, null);
+			}
 			notifyOTChange(name, OTChangeEvent.OP_SET, value, oldValue);			
 		}
 		
@@ -294,6 +303,19 @@ public class OTObjectInternal implements OTObjectInterface
 	}
 	
 	public Object getResource(OTClassProperty property, Class returnType)
+		throws Exception
+	{
+		Object value = getResourceInternal(property, returnType);
+		
+		// If the resource value is an OTObject save a reference to it		
+		if(value instanceof OTObject || value instanceof OTObjectCollection){
+			String propertyName = property.getName();
+			saveReference(propertyName, value);
+		}
+		return value;
+	}
+	
+	public Object getResourceInternal(OTClassProperty property, Class returnType)
 		throws Exception
 	{
 		String resourceName = property.getName();
@@ -480,6 +502,14 @@ public class OTObjectInternal implements OTObjectInterface
 			return true;
 		}
 		return false;
+	}
+	
+	protected void saveReference(String key, Object value)
+	{
+		if(referencedObjects == null){
+			referencedObjects = new HashMap();
+		}
+		referencedObjects.put(key, value);
 	}
 	
 	protected void finalize()
