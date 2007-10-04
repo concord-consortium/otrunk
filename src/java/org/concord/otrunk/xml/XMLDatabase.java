@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.38 $
- * $Date: 2007-09-27 18:20:54 $
- * $Author: scytacki $
+ * $Revision: 1.39 $
+ * $Date: 2007-10-04 21:12:09 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -120,7 +120,7 @@ public class XMLDatabase
 	public XMLDatabase(URL xmlURL)
 		throws Exception
 	{
-		this(xmlURL.openStream(), xmlURL, null);
+		this(xmlURL.openStream(), xmlURL, System.out);
 	}
 
 	public XMLDatabase(URL xmlURL, PrintStream statusStream)
