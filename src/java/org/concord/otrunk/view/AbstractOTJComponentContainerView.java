@@ -48,6 +48,9 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 		
 		// The OTViewContainerPanel automatically handles the OTViewChild object
 		otObjectPanel.setCurrentObject(otObject, viewEntry);
+		
+		// set parent of new viewcontainer to this viewcontainer
+		otObjectPanel.setParentContainer(viewContainer);
 		return otObjectPanel;
 	}
 	
