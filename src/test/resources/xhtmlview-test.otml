@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="33754150-b594-11d9-9669-0800200c9a66" >
+  <imports>
+    <import class="org.concord.otrunk.OTSystem"/>
+    <import class="org.concord.otrunk.view.OTViewEntry"/>
+    <import class="org.concord.otrunk.view.OTViewBundle"/>
+    <import class="org.concord.otrunk.view.document.OTTextObject"/>
+  </imports>
+  <objects>
+    <OTSystem>
+      <bundles>
+        <OTViewBundle>
+          <viewEntries>
+            <OTViewEntry local_id="text_edit"
+              objectClass="org.concord.otrunk.view.document.OTTextObject" 
+              viewClass="org.concord.otrunk.test.OTXHTMLTestView"/>
+          </viewEntries>
+        </OTViewBundle>
+      </bundles>
+      <root>        
+        <OTTextObject name="Test Object"/>
+      </root>
+    </OTSystem>
+  </objects>
+</otrunk>
