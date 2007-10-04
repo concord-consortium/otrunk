@@ -71,8 +71,6 @@ import org.concord.otrunk.view.OTViewerHelper;
  */
 public class OTrunkImpl implements OTrunk
 {
-	public final static String PROP_OBJECT_GC = "otrunk.object.gc";
-	
 	protected Hashtable loadedObjects = new Hashtable();
 	protected Hashtable compositeDatabases = new Hashtable();
     protected Hashtable userObjectServices = new Hashtable();
@@ -603,39 +601,18 @@ public class OTrunkImpl implements OTrunk
 		return ((OTSystem)root).getFirstObjectNoUserData();
     }
 
-    private static Boolean gcObjectVariable;
-    private static boolean gcObjects()
-    {
-    	if(gcObjectVariable != null){
-    		return gcObjectVariable.booleanValue();
-    	}
-    	
-    	boolean flag = OTViewerHelper.getBooleanProp(PROP_OBJECT_GC, false);
-    	gcObjectVariable = new Boolean(flag);
-    	return flag;
-    }
-    
     void putLoadedObject(OTObject otObject, OTID otId)
     {
-    	if(gcObjects()){
-            WeakReference objRef = new WeakReference(otObject);
-            loadedObjects.put(otId, objRef);    		
-    	} else {
-    		loadedObjects.put(otId, otObject);
-    	}
+    	WeakReference objRef = new WeakReference(otObject);
+    	loadedObjects.put(otId, objRef);    		
     }
     
     OTObject getLoadedObject(OTID otId)
     {
-    	Object otObjectValue = loadedObjects.get(otId);
     	OTObject otObject = null;
-    	if(otObjectValue instanceof Reference) {
-    		Reference otObjectRef = (Reference)otObjectValue;
-    		if(otObjectRef != null) {
-    			otObject = (OTObject)otObjectRef.get();
-    		}
-    	} else {
-    		otObject = (OTObject) otObjectValue;
+    	Reference otObjectRef = (Reference)loadedObjects.get(otId);
+    	if(otObjectRef != null) {
+    		otObject = (OTObject)otObjectRef.get();
     	}
 
     	if(otObject != null) {
