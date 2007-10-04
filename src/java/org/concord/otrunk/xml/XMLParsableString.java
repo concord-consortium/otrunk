@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-05-10 21:04:02 $
+ * $Revision: 1.8 $
+ * $Date: 2007-10-04 21:28:21 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -80,7 +80,7 @@ public class XMLParsableString
 			String localId = m.group(1);
 			OTID globalId = (OTID)localIdMap.get(localId);
 			if(globalId != null) {
-				String globalIdStr = globalId.toString();
+				String globalIdStr = globalId.toExternalForm();
 				m.appendReplacement(parsed, globalIdStr);
 			}
 		}

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.8 $
- * $Date: 2006-02-06 18:18:38 $
+ * $Revision: 1.9 $
+ * $Date: 2007-10-04 21:28:21 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -84,7 +84,7 @@ public class OTUUID extends UUID
 			hwAddress = NativeInterfaces.getPrimaryInterface();
 		} catch (Throwable t) {
 			// can't get the hardware address for some reason
-			System.err.println("OTrunk: Not using native library for uuids");
+			System.out.println("OTrunk: Not using native library for uuids");
 			noEthernetInterfaces = true;
 			return null;
 		}
@@ -123,4 +123,23 @@ public class OTUUID extends UUID
     	}
     	return new OTUUID(id.toString());
 	}
+	
+    /**
+     * This returns a unique string for this id.  This is not the actual id.<p>
+     * 
+     * The actual id is not returned because using the toString method on an OTID
+     * cannot always return the correct thing.  The method OTObjectService.getExternalID 
+     * should be used instead. 
+     * 
+     * @see java.lang.Object#toString()
+     */
+	public String toString()
+	{
+		return "%" + super.toString();
+	}
+
+	public String toExternalForm()
+    {
+		return super.toString();
+    }
 }

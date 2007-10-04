@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.39 $
- * $Date: 2007-10-04 21:12:09 $
- * $Author: imoncada $
+ * $Revision: 1.40 $
+ * $Date: 2007-10-04 21:28:21 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -238,7 +238,7 @@ public class XMLDatabase
 		// so in that case the correct database id is used.
 		String relativePath = "anon_root";
 		if(databaseId != null) {
-		    relativePath = databaseId.toString() + "/";
+		    relativePath = databaseId.toExternalForm() + "/";
 		}
 		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode, relativePath);
 		
@@ -421,7 +421,7 @@ public class XMLDatabase
     	Object oldValue = dataObjects.put(dataObject.getGlobalId(), dataObject);
     	if(oldValue != null) {
     		dataObjects.put(dataObject.getGlobalId(), oldValue);
-    		throw new Exception("repeated unique id: " + dataObject.getGlobalId());
+    		throw new Exception("repeated unique id: " + dataObject.getGlobalId().toExternalForm());
     	}
 
     	if(element != null) {
@@ -574,7 +574,7 @@ public class XMLDatabase
 							OTID globalId = getGlobalId(keys[j]);
 							if(globalId != null) {
 								map.remove(keys[j]);
-								keys[j] = globalId.toString();
+								keys[j] = globalId.toExternalForm();
 								map.put(keys[j], oldElement);
 							}
 						}

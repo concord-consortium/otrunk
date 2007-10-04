@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.24 $
- * $Date: 2007-09-29 04:30:29 $
+ * $Revision: 1.25 $
+ * $Date: 2007-10-04 21:28:21 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -397,7 +397,11 @@ public class OTObjectServiceImpl
 			return ((CompositeDatabase)mainDb).resolveID(globalId).toString();
 		}
 		
-		return globalId.toString();
+		if(globalId instanceof OTTransientMapID){
+			throw new RuntimeException("Cannot get an external id for " + globalId +
+					" using this object service with mainDb: " + mainDb);
+		}
+		return globalId.toExternalForm();
     }
 
 }

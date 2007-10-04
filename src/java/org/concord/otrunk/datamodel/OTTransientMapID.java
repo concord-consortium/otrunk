@@ -19,15 +19,18 @@ public class OTTransientMapID
         return mapToken.toString() + "!" + mappedId.toString();		
 	}
 	
-	/**
-	 * This method is used by the hashCode implementation of OTObjects, so it is called a lot.
-	 * It would be good to warn people about using this, but then there needs to be a way to ignore
-	 * the hashCode calls.
-	 */
+    /**
+     * This returns a unique string for this id.  This is not the actual id.<p>
+     * 
+     * The actual id is not returned because using the toString method on an OTID
+     * cannot always return the correct thing.  The method OTObjectService.getExternalID 
+     * should be used instead. 
+     * 
+     * @see java.lang.Object#toString()
+     */
     public String toString()
     {
-    	String idStr = internalToString();
-        return idStr;
+    	return "%" + internalToString();
     }
 
     public OTID getMappedId()
@@ -58,5 +61,10 @@ public class OTTransientMapID
     	}
     	
     	return mappedId.equals(other.getMappedId());
+    }
+
+	public String toExternalForm()
+    {
+		throw new RuntimeException("Transient IDs do not have a direct external form, OTObjectImpl.getExternalID should used instead.\n");
     }
 }
