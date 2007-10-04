@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-08-03 20:52:23 $
- * $Author: maven $
+ * $Revision: 1.4 $
+ * $Date: 2007-10-04 21:28:21 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -53,9 +53,18 @@ public class OTPathID
         this.path = path;
     }
     
+    /**
+     * This returns a unique string for this id.  This is not the actual id.<p>
+     * 
+     * The actual id is not returned because using the toString method on an OTID
+     * cannot always return the correct thing.  The method OTObjectService.getExternalID 
+     * should be used instead. 
+     * 
+     * @see java.lang.Object#toString()
+     */
     public String toString()
     {
-        return path;
+        return "%" + path;
     }
     
     public boolean equals(Object other)
@@ -67,6 +76,11 @@ public class OTPathID
     
     public int hashCode()
     {
-        return toString().hashCode();
+        return path.hashCode();
+    }
+
+	public String toExternalForm()
+    {
+		return path;
     }
 }

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.30 $
- * $Date: 2007-10-03 21:44:16 $
+ * $Revision: 1.31 $
+ * $Date: 2007-10-04 21:28:21 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -142,7 +142,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		String objRelativePath = relativePath;
 		OTID objId = obj.getGlobalId();
 		if(idStr != null || localIdStr != null) {
-		    objRelativePath = objId.toString(); 
+		    objRelativePath = objId.toExternalForm(); 
 		}
 
 		OTDataObjectType type = new OTDataObjectType(getClassName());

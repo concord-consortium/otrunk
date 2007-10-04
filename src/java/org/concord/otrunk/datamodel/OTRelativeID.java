@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.3 $
- * $Date: 2005-08-22 21:09:52 $
+ * $Revision: 1.4 $
+ * $Date: 2007-10-04 21:28:21 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -59,13 +59,27 @@ public class OTRelativeID
         }
     }
 
-    public String toString()
+    protected String toStringInternal()
     {
         if(rootId == null) {
             return relativeId.toString();
         }
         
-        return rootId.toString() + "!" + relativeId.toString();
+        return rootId.toExternalForm() + "!" + relativeId.toExternalForm();    	
+    }
+    
+    /**
+     * This returns a unique string for this id.  This is not the actual id.<p>
+     * 
+     * The actual id is not returned because using the toString method on an OTID
+     * cannot always return the correct thing.  The method OTObjectService.getExternalID 
+     * should be used instead. 
+     * 
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+    	return "%" + toStringInternal();
     }
     
     public OTID getRootId()
@@ -83,7 +97,7 @@ public class OTRelativeID
      */
     public int hashCode()
     {
-        return toString().hashCode();
+        return toStringInternal().hashCode();
     }
     
     public boolean equals(Object other)
@@ -107,5 +121,10 @@ public class OTRelativeID
                 (otherId.getRootId() == null || 
                         otherId.getRootId().equals(rootId));
                         
+    }
+
+	public String toExternalForm()
+    {
+		return toStringInternal();
     }
 }
