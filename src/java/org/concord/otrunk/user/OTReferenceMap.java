@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-08-06 19:04:14 $
+ * $Revision: 1.8 $
+ * $Date: 2007-10-05 18:03:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -90,7 +90,7 @@ public class OTReferenceMap extends DefaultOTObject
             OTDatabase stateDb)
     {
 		OTResourceMap stateMap = resources.getMap();
-		OTID userStateId = (OTID)stateMap.get(template.getGlobalId().toString());
+		OTID userStateId = (OTID)stateMap.get(template.getGlobalId().toExternalForm());
 		// System.err.println("OTReferenceMap: requesting stateObject for: " +
 		//        template.getGlobalId());
 		if(userStateId == null) {
@@ -111,7 +111,7 @@ public class OTReferenceMap extends DefaultOTObject
         try {
             OTDataObject stateObject = stateDb.createDataObject(template.getType());
             OTResourceMap stateMap = resources.getMap();
-            stateMap.put(template.getGlobalId().toString(), 
+            stateMap.put(template.getGlobalId().toExternalForm(), 
                     stateObject.getGlobalId());
 
             // store some special resources in this object

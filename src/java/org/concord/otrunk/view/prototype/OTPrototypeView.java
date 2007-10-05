@@ -63,7 +63,7 @@ public class OTPrototypeView extends AbstractOTJComponentView
 
 	protected OTObject getPrototypeCopy(OTObject model)
 	{
-		String prototypeCopyKey = model.getGlobalId().toString();
+		String prototypeCopyKey = model.getOTObjectService().getExternalID(model);
 		
 		if(viewEntry.getCopyPrototype()){
 			OTObject prototypeCopy = viewEntry.getPrototypeCopies().getObject(prototypeCopyKey);

@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.13 $
- * $Date: 2007-07-22 04:49:00 $
+ * $Revision: 1.14 $
+ * $Date: 2007-10-05 18:03:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -154,7 +154,7 @@ public class FsDatabase implements OTDatabase
 			File dbPropFile = new File(dbFolder, "db.prop"); 
 			FileOutputStream outStream = new FileOutputStream(dbPropFile);
 			Properties dbProp = new Properties();
-			dbProp.put("root-id", rootId.toString());
+			dbProp.put("root-id", rootId.toExternalForm());
 			dbProp.store(outStream, "");
 			outStream.close();
 		}
@@ -168,7 +168,7 @@ public class FsDatabase implements OTDatabase
 		while (elements.hasMoreElements()) {
 			FsDataObject dataObject = (FsDataObject)(elements.nextElement());
 			OTID id = dataObject.getGlobalId();
-			String fileName = id.toString();
+			String fileName = id.toExternalForm();
 			File dataFile = new File(dbFolder, fileName);
 			FileOutputStream outStream = new FileOutputStream(dataFile);
 			ObjectOutputStream objOutStream = new ObjectOutputStream(outStream);

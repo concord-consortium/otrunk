@@ -61,7 +61,7 @@ public class OverlayImpl
         try {
             OTDataObject stateObject = overlayDb.createDataObject(baseObject.getType());
             OTResourceMap deltaObjectMap = otOverlay.getDeltaObjectMap();
-            deltaObjectMap.put(baseObject.getGlobalId().toString(), 
+            deltaObjectMap.put(baseObject.getGlobalId().toExternalForm(), 
                     stateObject.getGlobalId());
 			
             return stateObject;
@@ -74,7 +74,7 @@ public class OverlayImpl
 	public OTDataObject getDeltaObject(OTDataObject baseObject)
 	{
 		OTResourceMap detalObjectMap = otOverlay.getDeltaObjectMap();
-		OTID deltaObjectId = (OTID)detalObjectMap.get(baseObject.getGlobalId().toString());
+		OTID deltaObjectId = (OTID)detalObjectMap.get(baseObject.getGlobalId().toExternalForm());
 		// System.err.println("OTReferenceMap: requesting stateObject for: " +
 		//        template.getGlobalId());
 		if(deltaObjectId == null) {

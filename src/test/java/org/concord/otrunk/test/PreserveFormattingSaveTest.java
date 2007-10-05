@@ -46,6 +46,19 @@ public class PreserveFormattingSaveTest {
 		output.close();
 		System.err.println("JDOM export time: " + (System.currentTimeMillis() - startTime));
 		
+		startTime = System.currentTimeMillis();
+		output = new FileOutputStream(args[1]);
+		Exporter.export(output, mainDb.getRoot(), mainDb);
+		output.close();
+		System.err.println("Old export time: " + (System.currentTimeMillis() - startTime));
+
+		startTime = System.currentTimeMillis();
+		output = new FileOutputStream(args[1]);
+		ExporterJDOM.useFullClassNames = false;
+		ExporterJDOM.export(output, mainDb.getRoot(), mainDb);
+		output.close();
+		System.err.println("JDOM export time: " + (System.currentTimeMillis() - startTime));
+
 		System.exit(0);
 	}
 
