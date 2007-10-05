@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.19 $
- * $Date: 2007-10-05 15:57:42 $
+ * $Revision: 1.20 $
+ * $Date: 2007-10-05 18:32:27 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -168,7 +168,7 @@ public class ExporterJDOM
 			// create a temporary Id if there isn't one already
 			dbID = OTUUID.createOTUUID();
 		}
-		otrunkEl.setAttribute("id", otDb.getDatabaseId().toExternalForm());
+		otrunkEl.setAttribute("id", dbID.toExternalForm());
 		
 		Element importsEl = new Element("imports");
 		otrunkEl.addContent(importsEl);
