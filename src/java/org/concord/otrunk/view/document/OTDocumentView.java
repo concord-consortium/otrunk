@@ -55,6 +55,7 @@ import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTView;
+import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTXHTMLView;
@@ -121,7 +122,10 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		setReloadOnViewEntryChange(true);
 		
 		if (viewEntry instanceof OTDocumentViewConfig){
-			getViewContainer().setUpdateable(((OTDocumentViewConfig)viewEntry).getViewContainerIsUpdateable());
+			OTViewContainer thisViewContainer = getViewContainer();
+			if (thisViewContainer != null){
+				getViewContainer().setUpdateable(((OTDocumentViewConfig)viewEntry).getViewContainerIsUpdateable());
+			}
 		}
 
 		// JScrollPane renderedScrollPane = new JScrollPane(previewComponent);
