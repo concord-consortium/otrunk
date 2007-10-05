@@ -242,33 +242,42 @@ public class OTObjectInternal implements OTObjectInterface
      */
     public boolean setResource(String name, Object value)
 	{
+    	Object dataValue = value;
 		if(value instanceof OTObject) {
 			OTObject child = (OTObject)value;
 			OTID childId = child.getGlobalId();
 			
-			saveReference(name, value);
-			value = childId;
+			saveReference(name, child);
+			dataValue = childId;
 		} else if(value instanceof byte[]) {
-			value = new BlobResource((byte[])value);
+			dataValue = new BlobResource((byte[])value);
 		} else if(value instanceof URL){
-			value = new BlobResource((URL)value);
+			dataValue = new BlobResource((URL)value);
 		} 
 		
 		// if the value is a BlobResource itself then it will pass right though to here
 		
 		// Check to see if it is equal before we go further
 	    Object oldValue = getResourceValue(name);
-	    if(oldValue != null && oldValue.equals(value)){
+	    if(oldValue != null && oldValue.equals(dataValue)){
 	        return false;
 	    }
 
 		// setResource should only return true if the dataObject was 
 		// actually changed with this call
-		if(setResourceInternal(name, value)){
-			// Handle the case where someone set a object reference to null
-			if(oldValue instanceof OTID && value == null){
-				saveReference(name, null);
-			}
+		if(setResourceInternal(name, dataValue)){
+			if(oldValue instanceof OTID){
+				// Handle the case where someone set a object reference to null
+				if(value == null){
+					saveReference(name, null);
+				}
+
+				try {
+	                oldValue = getOTObject((OTID) oldValue);
+                } catch (Exception e) {
+	                e.printStackTrace();	               
+                }
+			}			
 			notifyOTChange(name, OTChangeEvent.OP_SET, value, oldValue);			
 		}
 		

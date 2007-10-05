@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.40 $
- * $Date: 2007-10-04 21:28:21 $
+ * $Revision: 1.41 $
+ * $Date: 2007-10-05 18:03:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -134,6 +134,11 @@ public class XMLDatabase
 	{
 		this.statusStream = statusStream;
 
+		// create the database Id
+		// this might get overriden when the objects are loaded in.
+		databaseId = OTUUID.createOTUUID();
+
+		
 		// parse the xml file...
 		printStatus("Started Loading File...");
 		

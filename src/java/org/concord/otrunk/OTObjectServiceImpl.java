@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.25 $
- * $Date: 2007-10-04 21:28:21 $
+ * $Revision: 1.26 $
+ * $Date: 2007-10-05 18:03:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -394,7 +394,7 @@ public class OTObjectServiceImpl
     {
 		OTID globalId = object.getGlobalId();
 		if(mainDb instanceof CompositeDatabase){
-			return ((CompositeDatabase)mainDb).resolveID(globalId).toString();
+			return ((CompositeDatabase)mainDb).resolveID(globalId).toExternalForm();
 		}
 		
 		if(globalId instanceof OTTransientMapID){

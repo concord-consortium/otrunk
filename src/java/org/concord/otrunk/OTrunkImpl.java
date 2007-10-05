@@ -449,13 +449,13 @@ public class OTrunkImpl implements OTrunk
                 
         OTObjectMap userStateMapMap = stateRoot.getUserMap();
 
-        OTReferenceMap userStateMap = (OTReferenceMap)userStateMapMap.getObject(userId.toString());
+        OTReferenceMap userStateMap = (OTReferenceMap)userStateMapMap.getObject(userId.toExternalForm());
         if(userStateMap == null) {
         	// this is inferring that the createObject method will
         	// create the object in the correct database.  
         	userStateMap = 
         		(OTReferenceMap)objService.createObject(OTReferenceMap.class);
-        	userStateMapMap.putObject(userId.toString(), userStateMap);
+        	userStateMapMap.putObject(userId.toExternalForm(), userStateMap);
         	userStateMap.setUser((OTUserObject)user);
         }
 

@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.88 $
- * $Date: 2007-10-01 21:20:56 $
- * $Author: imoncada $
+ * $Revision: 1.89 $
+ * $Date: 2007-10-05 18:03:39 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -110,7 +110,6 @@ import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
-import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.swing.CustomDialog;
@@ -977,7 +976,7 @@ public class OTViewer extends JFrame
 
 		// Send POST output.
 		urlDataOut = new DataOutputStream(urlConn.getOutputStream());
-		Exporter.export(urlDataOut, xmlDB.getRoot(), xmlDB);
+		ExporterJDOM.export(urlDataOut, xmlDB.getRoot(), xmlDB);
 		urlDataOut.flush();
 		urlDataOut.close();
 
@@ -1081,7 +1080,7 @@ public class OTViewer extends JFrame
 
 				if (currentUserFile.exists()) {
 					try {
-						Exporter.export(currentUserFile, userDataDB.getRoot(),
+						ExporterJDOM.export(currentUserFile, userDataDB.getRoot(),
 						        userDataDB);
 						userDataDB.setDirty(false);
 					} catch (Exception e) {
@@ -1132,7 +1131,7 @@ public class OTViewer extends JFrame
 					}
 
 					try {
-						Exporter.export(currentUserFile, userDataDB.getRoot(),
+						ExporterJDOM.export(currentUserFile, userDataDB.getRoot(),
 						        userDataDB);
 						userDataDB.setDirty(false);
 						setTitle(baseFrameTitle + ": "

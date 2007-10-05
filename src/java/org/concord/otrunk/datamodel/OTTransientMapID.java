@@ -7,16 +7,18 @@ public class OTTransientMapID
 {
 	OTID mappedId;
 	Object mapToken;
+	int hashCode;
 	
 	public OTTransientMapID(Object mapToken, OTID mappedId)
 	{
 		this.mappedId = mappedId;
 		this.mapToken = mapToken;
+		hashCode = mapToken.hashCode() + mappedId.hashCode();
 	}
 	
 	protected String internalToString()
 	{
-        return mapToken.toString() + "!" + mappedId.toString();		
+        return mapToken.toString() + "!" + mappedId.toExternalForm();		
 	}
 	
     /**
@@ -45,7 +47,7 @@ public class OTTransientMapID
     
     public int hashCode()
     {
-    	return internalToString().hashCode();
+    	return hashCode;
     }
     
     public boolean equals(Object obj)

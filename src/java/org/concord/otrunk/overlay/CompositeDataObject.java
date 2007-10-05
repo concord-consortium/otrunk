@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-08-06 19:04:14 $
+ * $Revision: 1.3 $
+ * $Date: 2007-10-05 18:03:39 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -218,7 +218,7 @@ public class CompositeDataObject
 		
 		if(localActiveDelta == null) {
 			localActiveDelta = database.createActiveDeltaObject(baseObject);
-			System.err.println("created delta object: " + localActiveDelta.getGlobalId());
+			System.err.println("created delta object: " + localActiveDelta.getGlobalId().toExternalForm());
 		}
 		
 		return localActiveDelta;

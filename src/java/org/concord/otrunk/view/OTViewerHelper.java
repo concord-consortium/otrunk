@@ -47,7 +47,7 @@ import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
-import org.concord.otrunk.xml.Exporter;
+import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.view.SwingUserMessageHandler;
 
@@ -211,14 +211,14 @@ public class OTViewerHelper
 	public void saveOTDatabase(OTDatabase otDB, OutputStream output)
 	throws Exception
 	{
-		Exporter.export(output, otDB.getRoot(), otDB);
+		ExporterJDOM.export(output, otDB.getRoot(), otDB);
 	}
 
 	public String saveOTDatabase(OTDatabase otDB)
 	throws Exception
 	{
 		StringWriter userDataWriter = new StringWriter();
-		Exporter.export(userDataWriter, otDB.getRoot(), otDB);
+		ExporterJDOM.export(userDataWriter, otDB.getRoot(), otDB);
 
 		return userDataWriter.toString();
 	}
@@ -257,7 +257,7 @@ public class OTViewerHelper
 		// url
 		OutputStream outStream = urlConn.getOutputStream();
 
-		Exporter.export(outStream, otDB.getRoot(), otDB);
+		ExporterJDOM.export(outStream, otDB.getRoot(), otDB);
 
 		outStream.flush();
 		outStream.close();
