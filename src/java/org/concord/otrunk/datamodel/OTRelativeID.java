@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-10-04 21:28:21 $
+ * $Revision: 1.5 $
+ * $Date: 2007-10-05 16:00:04 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -62,7 +62,7 @@ public class OTRelativeID
     protected String toStringInternal()
     {
         if(rootId == null) {
-            return relativeId.toString();
+            return relativeId.toExternalForm();
         }
         
         return rootId.toExternalForm() + "!" + relativeId.toExternalForm();    	
