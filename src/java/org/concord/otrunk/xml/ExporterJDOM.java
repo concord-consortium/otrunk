@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.18 $
- * $Date: 2007-10-05 15:44:38 $
+ * $Revision: 1.19 $
+ * $Date: 2007-10-05 15:57:42 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -449,13 +449,13 @@ public class ExporterJDOM
 			OTID relRelId = relId.getRelativeId();			
 			if(relId.getRootId().equals(otDb.getDatabaseId()) && 
 					relRelId instanceof OTPathID &&
-					relRelId.toString().startsWith("/")){
+					relRelId.toExternalForm().startsWith("/")){
 				// this id is relative to our database
 				// or at least it should be
-				return "${" + relRelId.toString().substring(1) + "}";
+				return "${" + relRelId.toExternalForm().substring(1) + "}";
 			}
 		}
-		return id.toString();
+		return id.toExternalForm();
     }
     
 	public static Element exportObject(OTDataObject dataObj, OTDataObject parent, String parentResourceName)
@@ -515,7 +515,7 @@ public class ExporterJDOM
 			// do that yet.
 			ArrayList incomingReferences = (ArrayList) incomingReferenceMap.get(id);
 			if(incomingReferences != null && incomingReferences.size() > 1){
-				objectEl.setAttribute("id", id.toString());
+				objectEl.setAttribute("id", id.toExternalForm());
 			}
 		}
 		
