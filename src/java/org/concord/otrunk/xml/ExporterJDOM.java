@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.17 $
- * $Date: 2007-10-03 01:59:13 $
+ * $Revision: 1.18 $
+ * $Date: 2007-10-05 15:44:38 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -59,6 +59,7 @@ import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
+import org.concord.otrunk.datamodel.OTUUID;
 import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -161,7 +162,13 @@ public class ExporterJDOM
 		}
 
 		Element otrunkEl = new Element("otrunk");
-		otrunkEl.setAttribute("id", otDb.getDatabaseId().toString());
+		
+		OTID dbID = otDb.getDatabaseId();
+		if(dbID == null){
+			// create a temporary Id if there isn't one already
+			dbID = OTUUID.createOTUUID();
+		}
+		otrunkEl.setAttribute("id", otDb.getDatabaseId().toExternalForm());
 		
 		Element importsEl = new Element("imports");
 		otrunkEl.addContent(importsEl);
