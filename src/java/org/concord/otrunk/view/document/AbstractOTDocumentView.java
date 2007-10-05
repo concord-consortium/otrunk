@@ -48,7 +48,7 @@ public class AbstractOTDocumentView extends OTTextObjectView
 		}
 	}
 
-	public OTViewContainerPanel createtViewContainerPanel()
+	public OTViewContainerPanel createViewContainerPanel()
 	{
 		if (containerHelper == null) {
 			containerHelper = new OTJComponentContainerHelper(

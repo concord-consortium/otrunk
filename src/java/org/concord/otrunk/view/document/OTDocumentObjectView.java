@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.7 $
- * $Date: 2007-09-25 12:22:21 $
- * $Author: scytacki $
+ * $Revision: 1.8 $
+ * $Date: 2007-10-05 15:36:35 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -67,7 +67,7 @@ public class OTDocumentObjectView extends ComponentView
     {
     	super(elem);
     	this.docView = docView;
-        viewContainerPanel = docView.createtViewContainerPanel();
+        viewContainerPanel = docView.createViewContainerPanel();
     }
 
     protected Component createComponent() 
