@@ -44,8 +44,8 @@ import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTPrintDimension;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
-import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTViewContext;
+import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTXHTMLHelper;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.swing.util.ComponentScreenshot;
@@ -267,7 +267,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
         {
             // TODO Auto-generated method stub
             try{                            
-                String id = otObject.getGlobalId().toString();
+                String id = otObject.getOTObjectService().getExternalID(otObject);
                 id = id.replaceAll("/", "_");
                 id = id.replaceAll("!", "") + ".png";
                 
