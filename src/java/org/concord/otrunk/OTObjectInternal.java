@@ -604,4 +604,9 @@ public class OTObjectInternal implements OTObjectInterface
     {
 		throw new UnsupportedOperationException("not implemented yet");
     }
+
+	public String otExternalId()
+    {
+		return objectService.getExternalID(changeEventSource);
+    }
 }

@@ -13,7 +13,7 @@ public class OTXHTMLTestView
 			"Test XHTMLView<br/>\n" +
 			"Name of object: " + otObject.getName() + "<br/>\n" + 
 			"The following Link should refresh this page<br/>\n" +
-			"<a href=\"" + otObject.getOTObjectService().getExternalID(otObject) + "\">Link to ourselves<a/>";  
+			"<a href=\"" + otObject.otExternalId() + "\">Link to ourselves<a/>";  
 	    return text;
     }
 
