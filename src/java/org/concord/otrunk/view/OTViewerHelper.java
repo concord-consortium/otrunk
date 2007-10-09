@@ -67,6 +67,8 @@ public class OTViewerHelper
 	public final static String REST_ENABLED_PROP = "otrunk.rest_enabled";
 	public final static String ROOT_OBJECT_PROP = "otrunk.root.localid";
 	public final static String VIEW_MODE_PROP = "otrunk.view.mode";
+	public final static String CODEBASE_PROP = "otrunk.codebase";
+	
 	/**
 	 * This is yet another hack to support something like layers or mutliple files.
 	 * If this is set to url that url will be loaded in first and the OTSystem 

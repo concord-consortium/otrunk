@@ -18,7 +18,7 @@ public class URLUtil
     	}
     
     	// As far as I can tell the authority includes the host and the port		
-    	if(context.getAuthority() == null ||
+    	if(context.getAuthority() != null && !context.getAuthority().equals("") &&
     			!context.getAuthority().equals(url.getAuthority())){
     		return urlStr;
     	}

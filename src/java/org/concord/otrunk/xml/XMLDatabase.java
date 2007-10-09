@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.41 $
- * $Date: 2007-10-05 18:03:39 $
+ * $Revision: 1.42 $
+ * $Date: 2007-10-09 14:58:18 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -169,24 +169,25 @@ public class XMLDatabase
 	{
 		OTXMLElement rootElement = document.getRootElement();
 		
-		String dbBase = rootElement.getAttributeValue("codebase");
-		if (System.getProperty("otrunk.codebase", null) != null) {
-			dbBase = System.getProperty("otrunk.codebase");
+		String dbCodeBase = rootElement.getAttributeValue("codebase");
+		String systemCodeBase = OTViewerHelper.getStringProp(OTViewerHelper.CODEBASE_PROP);
+		if(systemCodeBase != null){
+			dbCodeBase = systemCodeBase;
 		}
-		if(dbBase != null && dbBase.length() > 0) {
+		if(dbCodeBase != null && dbCodeBase.length() > 0) {
 		    // this document has a specific base address
 		    
 		    // make sure the address ends with a slash
-		    if(!dbBase.endsWith("/")) {
-		        dbBase += "/";
+		    if(!dbCodeBase.endsWith("/")) {
+		        dbCodeBase += "/";
 		    }
 		    
 		    // add a pseudo file to the end so the URL class treats
 		    // this as a correct contextURL: it strips off the last part
 		    // of the context url.
-		    dbBase += "pseudo.txt";
+		    dbCodeBase += "pseudo.txt";
 		    try {
-		        contextURL = new URL(dbBase);
+		        contextURL = new URL(dbCodeBase);
 		    } catch (MalformedURLException e) {
 		        // the base url was not formed right
 		        e.printStackTrace();
