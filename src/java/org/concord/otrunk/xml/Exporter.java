@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.22 $
- * $Date: 2007-07-26 17:20:07 $
+ * $Revision: 1.23 $
+ * $Date: 2007-10-09 22:20:26 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -58,6 +58,7 @@ import org.concord.otrunk.datamodel.OTDatabase;
  *
  * Date created: Nov 17, 2004
  *
+ * @deprecated ExporterJDOM should be used instead.  This class does not handle ids and null objects correctly.
  * @author scott<p>
  *
  */
