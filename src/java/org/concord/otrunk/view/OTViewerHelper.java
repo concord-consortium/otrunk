@@ -140,6 +140,16 @@ public class OTViewerHelper
 		return getBooleanProp(TRACE_PROP, false);
 	}
 
+	public static boolean isAuthorMode()
+	{
+		return getBooleanProp(AUTHOR_PROP, false);
+	}
+	
+	public static boolean isRestEnabled()
+	{
+		return getBooleanProp(REST_ENABLED_PROP, true);
+	}
+	
 	public static OTUserObject createUser(String name, OTObjectService objService)
 	throws Exception
 	{
