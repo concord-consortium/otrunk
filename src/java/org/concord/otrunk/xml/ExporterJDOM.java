@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.20 $
- * $Date: 2007-10-05 18:32:27 $
+ * $Revision: 1.21 $
+ * $Date: 2007-10-09 15:01:34 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -80,61 +80,121 @@ import org.jdom.output.XMLOutputter;
  */
 public class ExporterJDOM
 {
-	static OTDatabase otDb;
-	static ArrayList writtenIds;
-	static ArrayList processedClasses;
-	static HashMap containers;
-	
 	public static boolean useFullClassNames = false;
-	private static ArrayList processedIds;
-	private static ArrayList duplicateClasses;
-	private static HashMap incomingReferenceMap;
-	
+
 	private static Pattern refidPattern = Pattern.compile("(refid=\")([^\"]*)(\")");
 
 	// don't match hrefs with colons those are external links				
 	private static Pattern hrefPattern = Pattern.compile("(href=\")([^:\"]*)(\")");
-	private static File saveFile;
 
+	OTDatabase otDb;
+	ArrayList writtenIds;
+	ArrayList processedClasses;
+	HashMap containers;
+	
+	private ArrayList processedIds;
+	private ArrayList duplicateClasses;
+	private HashMap incomingReferenceMap;
+	
+	private URL contextURL;
 	
 	public static void export(File outputFile, OTDataObject rootObject, OTDatabase db)
 	throws Exception
 	{
-		saveFile = outputFile;
-		File tempFile = File.createTempFile(outputFile.getName(), ".tmp");
-		FileOutputStream outputStream = new FileOutputStream(tempFile);
-		
-		export(outputStream, rootObject, db);
+		ExporterJDOM exporter = new ExporterJDOM();
+		exporter.setContextURL(outputFile.toURL());
+		Document doc = exporter.buildDocument(rootObject, db);
+
+		FileOutputStream outputStream = new FileOutputStream(outputFile);
+		writeDocument(doc, outputStream);
 	}
 
 	
+	/**
+	 * Calling this method might be unsafe when the outputstream is updating
+	 * a File that already exists. 
+	 * When the outputstream is created the File could be erased. So if there is an 
+	 * error while exporting the database, then the original file not be there
+	 * as a backup.
+	 * 
+	 * It is better to create an instance, call buildDocument and then create
+	 * the outputstream and call writeDocument.
+	 * 
+	 * @param outputStream
+	 * @param rootObject
+	 * @param db
+	 * @throws Exception
+	 */
 	public static void export(OutputStream outputStream, OTDataObject rootObject, OTDatabase db)
 	throws Exception
 	{		
-		OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
-		export(writer, rootObject, db);
+		ExporterJDOM exporter = new ExporterJDOM();
+		Document doc = exporter.buildDocument(rootObject, db);
+		
+		writeDocument(doc, outputStream);
 	}
-	
-	/*
-	 * FIXME: Is there any reason to support an export method that uses a writer, instead of
-	 * using just the export methods above and creating the writer in the method itself?
+
+	/**
+	 * Calling this method is a unsafe when the writer is writing to a File.  
+	 * As soon as the writer is created, the file gets erased.  So if there is an 
+	 * error while exporting the database, then the original file not be there
+	 * as a backup.
 	 * 
-	 * As it is now, we have to use a tmp file to avoid writing over the old one, but it's
-	 * really just a place holder so that the method signatures are happy -- it's never used.
-	 * If we just had one export method that accepted a file, or two if we want to support accepting
-	 * an outputStream, then we could create the writer at the last minute and not bother with the
-	 * tmp file.  -SF
+	 * It is better to create an instance, call buildDocument and then create
+	 * the writer and call writeDocument.
+	 * 
+	 * @param writer
+	 * @param rootObject
+	 * @param db
+	 * @throws Exception
 	 */
 	public static void export(Writer writer, OTDataObject rootObject, OTDatabase db)
 	throws Exception
+	{
+		ExporterJDOM exporter = new ExporterJDOM();		
+		Document doc = exporter.buildDocument(rootObject, db);
+		
+		writeDocument(doc, writer);
+	}	
+	
+	public static void writeDocument(Document doc, OutputStream outputStream)
+	throws Exception
+	{
+		OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
+		writeDocument(doc, writer);
+	}
+
+	public static void writeDocument(Document doc, Writer writer)
+	throws Exception
+	{
+		Format format = Format.getPrettyFormat();
+		XMLOutputter outputter = new XMLOutputter(format);
+
+		outputter.output(doc, writer);
+		writer.close();
+	}
+
+	public ExporterJDOM()
 	{
 		writtenIds = new ArrayList();
 		processedClasses = new ArrayList();
 		duplicateClasses = new ArrayList();
 		containers = new HashMap();
 		processedIds = new ArrayList();
-		incomingReferenceMap = new HashMap();
-		
+		incomingReferenceMap = new HashMap();		
+	}
+
+	/**
+	 * Create a JDOM document which can then be written out with the writeDocument methods.
+	 * 
+	 * @param rootObject
+	 * @param db
+	 * @return
+	 * @throws Exception
+	 */
+	public Document buildDocument(OTDataObject rootObject, OTDatabase db)
+	throws Exception
+	{		
 		// If this is a XMLDatabase pre-populate the written classes with the databases existing classes.
 		// This preserves any imported classes that might not have been actually used in the otml file
 		// these imported classes are currently the only way to load in packages, so they need to be preserved.
@@ -186,29 +246,11 @@ public class ExporterJDOM
 		objectsEl.addContent(rootObjectElement);
 
 		Document doc = new Document(otrunkEl);
-		Format format = Format.getPrettyFormat();
-		XMLOutputter outputter = new XMLOutputter(format);
 		
-		if (saveFile != null){
-			// If the current writer was for a temporary file, create a new one and use that.
-			System.out.println("making new file");
-			FileOutputStream outputStream = new FileOutputStream(saveFile);
-			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, "UTF-8");
-			outputter.output(doc, outputStreamWriter);
-			
-			outputStreamWriter.close();
-			
-			// FIXME: Did this writer ever need to be open in the first place? See above.
-			writer.close();
-		} else {
-			System.out.println("using old one");
-    		outputter.output(doc, writer);
-    				
-    		writer.close();
-		}
+		return doc;		
 	}
 	
-	private static void processObject(OTDataObject dataObject) 
+	private void processObject(OTDataObject dataObject) 
 		throws Exception
     {
 		OTID id = dataObject.getGlobalId();
@@ -302,7 +344,7 @@ public class ExporterJDOM
     }
 
 
-	private static void processXMLString(Pattern pattern, OTDataObject dataObject, 
+	private void processXMLString(Pattern pattern, OTDataObject dataObject, 
 		OTXMLString xmlString) 
 		throws Exception
 	{
@@ -314,7 +356,7 @@ public class ExporterJDOM
 		}
 	}
 	
-	private static String exportXMLString(Pattern pattern, String xmlString)
+	private String exportXMLString(Pattern pattern, String xmlString)
 	{
 		Matcher m = pattern.matcher(xmlString);
 		StringBuffer parsed = new StringBuffer();
@@ -331,7 +373,7 @@ public class ExporterJDOM
 		return parsed.toString();
 	}
 	
-	private static void processCollectionItem(OTDataObject parent, Object listElement) 
+	private void processCollectionItem(OTDataObject parent, Object listElement) 
 		throws Exception
 	{
 		if(listElement instanceof OTID) {
@@ -343,7 +385,7 @@ public class ExporterJDOM
 		}		
 	}
 		
-	private static void processReference(OTDataObject parent, OTID id) 
+	private void processReference(OTDataObject parent, OTID id) 
 		throws Exception
     {
         OTDataObject childObject = otDb.getOTDataObject(parent, id);
@@ -368,7 +410,7 @@ public class ExporterJDOM
         }
     }
 
-	public static Element exportCollectionItem(OTDataObject parentDataObj, 
+	public Element exportCollectionItem(OTDataObject parentDataObj, 
 			Object item, String parentResourceName)
 	throws Exception
 	{
@@ -411,7 +453,7 @@ public class ExporterJDOM
 		}
 	}
 
-    public static Element exportID(OTDataObject parent, OTID id, String parentResourceName)
+    public Element exportID(OTDataObject parent, OTID id, String parentResourceName)
     throws Exception
     {
         OTDataObject childObject = otDb.getOTDataObject(parent, id);
@@ -428,7 +470,7 @@ public class ExporterJDOM
         }
     }
     
-    public static Element exportObjectReference(OTID id)
+    public Element exportObjectReference(OTID id)
     {
 		Element objectEl = new Element("object");
 		String convertedId = convertId(id);
@@ -442,7 +484,7 @@ public class ExporterJDOM
      * @param id
      * @return
      */
-    public static String convertId(OTID id)
+    public String convertId(OTID id)
     {
 		if(id instanceof OTRelativeID){
 			OTRelativeID relId = (OTRelativeID) id;
@@ -458,7 +500,7 @@ public class ExporterJDOM
 		return id.toExternalForm();
     }
     
-	public static Element exportObject(OTDataObject dataObj, OTDataObject parent, String parentResourceName)
+	public Element exportObject(OTDataObject dataObj, OTDataObject parent, String parentResourceName)
 	throws Exception
 	{
 		OTID id = dataObj.getGlobalId();
@@ -581,7 +623,12 @@ public class ExporterJDOM
 				String blobString = null;
 				int defaultType = XMLReferenceInfo.ELEMENT;
 				if(blobUrl != null){
-					blobString = blobUrl.toString();
+					if(contextURL != null){
+						blobString = URLUtil.getRelativeURL(contextURL, blobUrl);
+					} else {
+						blobString = blobUrl.toString();
+					}
+					
 					defaultType = XMLReferenceInfo.ATTRIBUTE;
 				} else {
 					blobString = BlobTypeHandler.base64(blob.getBytes());
@@ -660,7 +707,7 @@ public class ExporterJDOM
 		return objectEl;
 	}	
 	
-	public static String getObjectElementName(String objectClass)	
+	public String getObjectElementName(String objectClass)	
 	{
 		/* I don't know why this is being done, but it was here before
 		 * so I'll leave it for now.
@@ -742,4 +789,16 @@ public class ExporterJDOM
 			objectEl.setAttribute(resourceName, resourceValue);					
 		}
 	}
+
+
+	public URL getContextURL()
+    {
+    	return contextURL;
+    }
+
+
+	public void setContextURL(URL contextURL)
+    {
+    	this.contextURL = contextURL;
+    }
 }
