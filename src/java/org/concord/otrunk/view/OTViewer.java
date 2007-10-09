@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.90 $
- * $Date: 2007-10-09 18:34:50 $
- * $Author: imoncada $
+ * $Revision: 1.91 $
+ * $Date: 2007-10-09 22:37:50 $
+ * $Author: scytacki $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -291,7 +291,7 @@ public class OTViewer extends JFrame
 		consoleFrame.getContentPane().add(view);
 		consoleFrame.setSize(800, 600);
 
-		if (Boolean.getBoolean(SHOW_CONSOLE_PROP)){
+		if (OTViewerHelper.getBooleanProp(SHOW_CONSOLE_PROP, false)){
 			consoleFrame.setVisible(true);
 		}
 		
@@ -521,7 +521,7 @@ public class OTViewer extends JFrame
 		OTMainFrame mainFrame = (OTMainFrame) otrunk
 		.getService(OTMainFrame.class);
 
-		if (Boolean.getBoolean(HIDE_TREE_PROP) || !mainFrame.getShowLeftPanel()) {
+		if (OTViewerHelper.getBooleanProp(HIDE_TREE_PROP, false) || !mainFrame.getShowLeftPanel()) {
 			splitPane.getLeftComponent().setVisible(false);
 		}
 
@@ -835,9 +835,9 @@ public class OTViewer extends JFrame
 
 		OTViewer viewer = new OTViewer();
 
-		if (Boolean.getBoolean(OTViewerHelper.SINGLE_USER_PROP)) {
+		if (OTViewerHelper.getBooleanProp(OTViewerHelper.SINGLE_USER_PROP, false)) {
 			viewer.setUserMode(OTViewerHelper.SINGLE_USER_MODE);
-		} else if (Boolean.getBoolean(OTViewerHelper.NO_USER_PROP)) {
+		} else if (OTViewerHelper.getBooleanProp(OTViewerHelper.NO_USER_PROP, false)) {
 			viewer.setUserMode(OTViewerHelper.NO_USER_MODE);
 		}
 
@@ -1203,8 +1203,7 @@ public class OTViewer extends JFrame
 			{
 				if (remoteURL != null) {
 					try {
-						if (Boolean
-						        .getBoolean(OTViewerHelper.REST_ENABLED_PROP)) {
+						if (OTViewerHelper.isRestEnabled()) {
 							try {
 								remoteSaveData(OTViewer.HTTP_PUT);
 							} catch (Exception e) {
@@ -1331,8 +1330,7 @@ public class OTViewer extends JFrame
 
 				JPanel checkboxPanel = new JPanel();
 				JCheckBox restCheckbox = new JCheckBox("REST Enabled?");
-				restCheckbox.setSelected(Boolean
-				        .getBoolean(OTViewerHelper.REST_ENABLED_PROP));
+				restCheckbox.setSelected(OTViewerHelper.isRestEnabled());
 				checkboxPanel.setBorder(new EmptyBorder(5, 5, 0, 0));
 				checkboxPanel.add(restCheckbox);
 
@@ -1351,6 +1349,8 @@ public class OTViewer extends JFrame
 				if (returnVal == 0) {
 					try {
 						remoteURL = new URL(textField.getText());
+						// WARNING this will cause a security exception if we are running in a applet or jnlp which 
+						//  has a security sandbox.
 						System.setProperty(OTViewerHelper.REST_ENABLED_PROP,
 						        Boolean.toString(restCheckbox.isSelected()));
 						remoteSaveData(OTViewer.HTTP_POST);
@@ -1487,7 +1487,7 @@ public class OTViewer extends JFrame
 			fileMenu.removeAll();
 		}
 
-		if (OTViewerHelper.getBooleanProp(OTViewerHelper.AUTHOR_PROP, false)) {
+		if (OTViewerHelper.isAuthorMode()) {
 			userMode = OTViewerHelper.NO_USER_MODE;
 		}
 
@@ -1503,7 +1503,7 @@ public class OTViewer extends JFrame
 			fileMenu.add(saveUserDataAsAction);
 		}
 
-		if (Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
+		if (OTViewerHelper.isDebug()) {
 			if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
 				loadAction.putValue(Action.NAME, "Open Authored Content...");
 				saveAction.putValue(Action.NAME, "Save Authored Content");
@@ -1523,8 +1523,8 @@ public class OTViewer extends JFrame
 			fileMenu.add(saveRemoteAsAction);
 		}
 
-		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)
-		        && !Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
+		if (OTViewerHelper.isAuthorMode()
+		        && !OTViewerHelper.isDebug()) {
 			if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
 				loadAction.putValue(Action.NAME, "Open Authored Content...");
 				saveAction.putValue(Action.NAME, "Save Authored Content");
@@ -1540,7 +1540,7 @@ public class OTViewer extends JFrame
 			fileMenu.add(saveAsAction);
 		}
 
-		if (Boolean.getBoolean("otrunk.view.export_image")) {
+		if (OTViewerHelper.getBooleanProp("otrunk.view.export_image", false)) {
 			fileMenu.add(exportImageAction);
 
 			fileMenu.add(exportHiResImageAction);
@@ -1550,13 +1550,13 @@ public class OTViewer extends JFrame
 
 		fileMenu.add(showConsoleAction);
 
-		if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)
-		        || Boolean.getBoolean(OTViewerHelper.DEBUG_PROP)) {
+		if (OTViewerHelper.isAuthorMode()
+		        || OTViewerHelper.isDebug()) {
 			fileMenu.add(reloadWindowAction);
 		}
 
 		JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem(debugAction);
-		debugItem.setSelected(Boolean.getBoolean(OTViewerHelper.DEBUG_PROP));
+		debugItem.setSelected(OTViewerHelper.isDebug());
 		fileMenu.add(debugItem);
 
 		fileMenu.add(exitAction);
@@ -1703,8 +1703,8 @@ public class OTViewer extends JFrame
 			e.printStackTrace();
 		}
 
-	}
-
+	}	
+	
 	public boolean exit()
 	{
 		try {
@@ -1713,7 +1713,7 @@ public class OTViewer extends JFrame
 				return false;
 			}
 
-			if (Boolean.getBoolean(OTViewerHelper.AUTHOR_PROP)
+			if (OTViewerHelper.isAuthorMode()
 			        && !checkForUnsavedAuthorData()) {
 				// the user canceled the operation
 				return false;
