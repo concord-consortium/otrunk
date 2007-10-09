@@ -267,7 +267,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
         {
             // TODO Auto-generated method stub
             try{                            
-                String id = otObject.getOTObjectService().getExternalID(otObject);
+                String id = otObject.otExternalId();
                 id = id.replaceAll("/", "_");
                 id = id.replaceAll("!", "") + ".png";
                 

@@ -76,6 +76,11 @@ public class OTXHTMLWrapperView extends OTDocumentView
 				return xhtmlObject.getOTObjectService();
 			}
 
+			public String otExternalId()
+            {
+				return xhtmlObject.otExternalId();
+            }			
+
 			public void init() {
 				// This should not be called because this is a lifecycle
 				// method on an OTDocument.  And this isn't object isn't
