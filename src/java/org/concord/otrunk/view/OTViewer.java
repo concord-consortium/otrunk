@@ -23,9 +23,9 @@
 
 /*
  * Last modification information:
- * $Revision: 1.89 $
- * $Date: 2007-10-05 18:03:39 $
- * $Author: scytacki $
+ * $Revision: 1.90 $
+ * $Date: 2007-10-09 18:34:50 $
+ * $Author: imoncada $
  *
  * Licence Information
  * Copyright 2004 The Concord Consortium 
@@ -141,6 +141,8 @@ public class OTViewer extends JFrame
 	public final static String TITLE_PROP = "otrunk.view.frame_title";
 
 	public final static String HIDE_TREE_PROP = "otrunk.view.hide_tree";
+	
+	public final static String SHOW_CONSOLE_PROP = "otrunk.view.show_console";
 
 	public final static String HTTP_PUT = "PUT";
 
@@ -283,15 +285,16 @@ public class OTViewer extends JFrame
 		StreamRecord record = new StreamRecord(10000);
 		StreamRecordView view = new StreamRecordView(record);
 		consoleFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		System
-		        .setOut((PrintStream) view.addOutputStream(System.out,
-		                "Console"));
-		System.setErr((PrintStream) view
-		        .addOutputStream(System.err, System.out));
+		System.setOut((PrintStream) view.addOutputStream(System.out, "Console"));
+		System.setErr((PrintStream) view.addOutputStream(System.err, System.out));
 
 		consoleFrame.getContentPane().add(view);
 		consoleFrame.setSize(800, 600);
 
+		if (Boolean.getBoolean(SHOW_CONSOLE_PROP)){
+			consoleFrame.setVisible(true);
+		}
+		
 		commDialog = new JDialog(this, true);
 		
 		// for debugging
