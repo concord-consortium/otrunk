@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.27 $
- * $Date: 2007-09-29 04:33:15 $
+ * $Revision: 1.28 $
+ * $Date: 2007-10-10 03:09:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -290,7 +290,11 @@ public class TypeService
 
 		ResourceTypeHandler handler = getElementHandler(childName);
 		if(handler == null) {			
-			System.err.println("can't find handler for: " + elementPath(child));
+			System.err.println("Invalid OTType: " + childName  + "\n" +
+				"   located at: " + elementPath(child) + "\n" +					
+				// FIXME we should be able to figure out if this is supposed to be a 
+				//   OTObject or a primitive based on who is calling it
+				"   if this is supposed to be an OTObject check the imports");
 			return null;
 		}
 		String childTypeName = handler.getPrimitiveName();

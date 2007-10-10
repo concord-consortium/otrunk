@@ -31,6 +31,7 @@ package org.concord.otrunk.view;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.util.SimpleTreeNode;
+import org.concord.view.NullTreeNode;
 
 
 public class OTFolderNode 
@@ -119,6 +120,8 @@ public class OTFolderNode
 				return new OTFolderNode((OTObject)pfChild);
 			} else if(pfChild instanceof OTFolder) {
 				return new OTFolderNode((OTFolder)pfChild);
+			} else if(pfChild == null) {
+				return new NullTreeNode();
 			}
 		}
 		

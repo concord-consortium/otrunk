@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.15 $
- * $Date: 2007-10-04 21:18:10 $
+ * $Revision: 1.16 $
+ * $Date: 2007-10-10 03:09:05 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -75,7 +75,10 @@ public class OTObjectListImpl extends OTCollectionImpl
 		try {
 			OTID id = (OTID)list.get(index);
 			if(id == null) {
-				System.err.println("Null item in object list index: " + index);
+				System.err.println("Null item in object list: \n" + 
+						"   " + objectInternal.getGlobalId() + "." +
+						property + "[" + index + "]");
+				
 				return null;
 			}
 			OTObject otObject = objectInternal.getOTObject(id);
