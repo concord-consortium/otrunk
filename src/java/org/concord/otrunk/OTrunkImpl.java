@@ -492,6 +492,13 @@ public class OTrunkImpl implements OTrunk
     	OTPackage otPackage;
         try {
 	        otPackage = (OTPackage)packageClass.newInstance();
+	        Class [] dependencies = otPackage.getPackageDependencies();
+	        if(dependencies != null){
+	        	for(int i=0; i<dependencies.length; i++){
+	        		registerPackageClass(dependencies[i]);
+	        	}
+	        }
+	        
 	    	otPackage.initialize(this);
         } catch (InstantiationException e) {
 	        // TODO Auto-generated catch block
