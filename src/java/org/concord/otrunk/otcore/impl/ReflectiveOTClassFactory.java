@@ -217,6 +217,16 @@ public class ReflectiveOTClassFactory
 		}		
 	}	
 
+	public ArrayList loadClasses(Class [] classList)
+	{		
+		for(int i=0; i<classList.length; i++){
+			Class nextClass = classList[i];
+			registerClass(nextClass);
+		}
+		
+		return processAllNewlyRegisteredClasses();
+	}
+	
 	public ArrayList loadClasses(List classList)
 	{		
 		for(Iterator i=classList.iterator(); i.hasNext();){
