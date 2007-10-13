@@ -28,7 +28,7 @@ public class ExceptionThrowingListenerTest
 		
 		((OTChangeNotifying)otObject).addOTChangeListener(myListener);
 		
-		otObject.setName("new name");
+		((OTBasicTestObject)otObject).setString("new string");
 
 		return new JLabel("Test View");
     }
