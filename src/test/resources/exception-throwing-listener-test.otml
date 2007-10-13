@@ -4,21 +4,19 @@
     <import class="org.concord.otrunk.OTSystem"/>
     <import class="org.concord.otrunk.view.OTViewEntry"/>
     <import class="org.concord.otrunk.view.OTViewBundle"/>
-    <import class="org.concord.otrunk.test.OTListTestObject"/>
   </imports>
   <objects>
-    <OTSystem>
+    <OTSystem local_id="system">
       <bundles>
-        <OTViewBundle/>
+        <OTViewBundle>
+        	<viewEntries>
+        	  <OTViewEntry objectClass="org.concord.otrunk.OTSystem"
+        	  	viewClass="org.concord.otrunk.test.ExceptionThrowingListenerTest"/>        	  
+        	</viewEntries>        
+        </OTViewBundle>
       </bundles>
       <root>
-        <OTListTestObject name="List">
-          <resourceList>
-            <string>index0</string>
-            <null/>
-            <string>index1</string>
-          </resourceList>
-        </OTListTestObject>
+        <object refid="${system}"/>
       </root>
     </OTSystem>
   </objects>
