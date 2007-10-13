@@ -32,6 +32,9 @@ public class OTObjectInternal implements OTObjectInterface
 	public final static boolean traceListeners = OTViewerHelper.getBooleanProp(
             OTViewerHelper.TRACE_LISTENERS_PROP, false);
 
+	public final static String LISTENER_THROWABLE_MESSAGE =
+		"Throwable thrown by an OTObjecListener, other listeners might not be notified";
+	
 	protected OTObjectServiceImpl objectService;
 
 	/**
@@ -126,28 +129,43 @@ public class OTObjectInternal implements OTObjectInterface
     	changeEvent.setValue(value);
     	changeEvent.setPreviousValue(previousValue);
     	
-    	for(int i=0;i<changeListeners.size(); i++){
-    		WeakReference ref = (WeakReference)changeListeners.get(i);
-    		Object listener = ref.get();
-    		if(traceListeners && !(listener instanceof TraceListener)){
-    			System.out.println("sending stateChanged " + changeEvent.getDescription() +
-    					" to " + listener);
-    		}
-    		if(listener != null) {
-    			((OTChangeListener)listener).stateChanged(changeEvent);
-    		} else {
-    			// the listener was gc'd so lets mark it to be removed
-    			if(toBeRemoved == null) {
-    				toBeRemoved = new Vector();
-    			}
-    			if(traceListeners){
-    				System.out.println("otChangeListener garbage collected:" +
-    						changeListenerLabels.get(ref));
-    			}
-    			toBeRemoved.add(ref);
-    		}
-    	}
+    	try {
 
+    		for(int i=0;i<changeListeners.size(); i++){
+    			WeakReference ref = (WeakReference)changeListeners.get(i);
+    			Object listener = ref.get();
+    			if(traceListeners && !(listener instanceof TraceListener)){
+    				System.out.println("sending stateChanged " + changeEvent.getDescription() +
+    						" to " + listener);
+    			}
+    			if(listener != null) {
+    				((OTChangeListener)listener).stateChanged(changeEvent);
+    			} else {
+    				// the listener was gc'd so lets mark it to be removed
+    				if(toBeRemoved == null) {
+    					toBeRemoved = new Vector();
+    				}
+    				if(traceListeners){
+    					System.out.println("otChangeListener garbage collected:" +
+    							changeListenerLabels.get(ref));
+    				}
+    				toBeRemoved.add(ref);
+    			}
+    		}
+
+    	// The Errors and runtime exceptions are printed out here because the code which caused
+    	// this change event might not expect an exception and might be silently catching exceptions
+    	// for its own reasons. 
+    	} catch (Error err) {
+    		System.err.println(LISTENER_THROWABLE_MESSAGE);
+    		err.printStackTrace();
+    		throw(err);
+    	} catch (RuntimeException exp) {
+    		System.err.println(LISTENER_THROWABLE_MESSAGE);
+    		exp.printStackTrace();
+    		throw(exp);
+    	}
+    		
     	// clear the value and previous value so it doesn't remain around and 
     	// so it can be garbage collected
     	changeEvent.setValue(null);
