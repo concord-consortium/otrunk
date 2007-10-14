@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.21 $
- * $Date: 2007-10-09 15:01:34 $
+ * $Revision: 1.22 $
+ * $Date: 2007-10-14 05:37:03 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -504,31 +504,13 @@ public class ExporterJDOM
 	throws Exception
 	{
 		OTID id = dataObj.getGlobalId();
-		
-		// Check if we have written out this object already
-		// if so then just write a reference and continue
-		if(writtenIds.contains(id)) {
-			return exportObjectReference(id);
+
+		// Check if we should write out a reference
+		if(shouldWriteReference(dataObj, parent, parentResourceName)) {
+			return exportObjectReference(id);			
 		}
 		
-		XMLDataObject xmlDO = null;
-		
-		// check if this object has valid container
-		if(dataObj instanceof XMLDataObject){
-			xmlDO = (XMLDataObject) dataObj;
-			
-			XMLDataObject container = xmlDO.getContainer();
-			if(container != null && processedIds.contains(container.getGlobalId())){
-				// this is a valid container
-				if(parent != container || 
-						!parentResourceName.equals(xmlDO.getContainerResourceKey())){
-					// this isn't the parent, or it isn't the right resource in the parent
-					// so just write a reference
-					return exportObjectReference(id);
-				}
-			}			
-		}
-		
+				
 		// If we are here then the object hasn't been written out before
 		// and if it has a valid container then we are inside of that container
 		writtenIds.add(id);
@@ -539,6 +521,11 @@ public class ExporterJDOM
 		String objectElementName =  getObjectElementName(objectFullClassName);
 		
 		Element objectEl = new Element(objectElementName);
+		
+		XMLDataObject xmlDO = null;
+		if(dataObj instanceof XMLDataObject){
+			xmlDO = (XMLDataObject) dataObj;
+		}
 		
 		if(xmlDO != null && xmlDO.getLocalId() != null){
 			// FIXME this is dangerous if the object is being copied from one db 
@@ -726,6 +713,76 @@ public class ExporterJDOM
 		return objectClass;
 	}
 
+    protected boolean shouldWriteReference(OTDataObject dataObj, OTDataObject parent, 
+    	String parentResourceName)
+    {
+		OTID id = dataObj.getGlobalId();
+		
+		// Check if we have written out this object already
+		// if so then just write a reference so the object isn't written twice
+		if(writtenIds.contains(id)) {
+			return true;
+		}
+
+		// check if this object has valid container
+		if(!(dataObj instanceof XMLDataObject)){
+			return false;
+		}
+		
+		XMLDataObject	xmlDO = (XMLDataObject) dataObj;
+			
+		XMLDataObject container = xmlDO.getContainer();
+		if(container == null || !processedIds.contains(container.getGlobalId())){
+			// the container isn't set, or the container isn't going to be written out
+			// by this exporter
+			return false;
+		}
+
+		// this is a valid container
+		// does it have the current object in this spot
+		String containerResourceName = xmlDO.getContainerResourceKey();
+				
+		if(parent == container && 
+						parentResourceName.equals(containerResourceName)){
+			// our parent is the container and our parent property is the same as the container property
+			return false;
+		}
+
+		// this isn't the parent, or it isn't the right resource in the parent
+		Object containedValue = container.getResource(containerResourceName);
+		if(containedValue.equals(id)){
+			// the container still contains the correct value						
+			// so just write a reference here
+			return true;
+		}
+					
+		if(containedValue instanceof OTDataList){
+			OTDataList dataListContainer = ((OTDataList)containedValue);
+			for(int i=0; i<dataListContainer.size(); i++){
+				if(id.equals(dataListContainer.get(i))){
+					// our container list still references us
+					return true;
+				}
+			}						
+			// our container list doesn't reference us anymore
+			return false;
+		}
+					
+		if(containedValue instanceof OTDataMap){
+			OTDataMap dataMapContainer = (OTDataMap) containedValue;
+			String [] keys = dataMapContainer.getKeys();
+			for(int i=0; i<keys.length; i++){
+				if(id.equals(dataMapContainer.get(keys[i]))){
+					// our previous container map still references us
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		return false;
+    }
+    
 	public static String getClassName(String fullClassName)
 	{
 		return fullClassName.substring(fullClassName.lastIndexOf('.')+1);

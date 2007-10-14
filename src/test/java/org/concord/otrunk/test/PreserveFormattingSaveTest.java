@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 
-import org.concord.otrunk.xml.Exporter;
 import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
 
@@ -35,30 +34,11 @@ public class PreserveFormattingSaveTest {
 		
 		long startTime = System.currentTimeMillis();
 		FileOutputStream output = new FileOutputStream(args[1]);
-		Exporter.export(output, mainDb.getRoot(), mainDb);
-		output.close();
-		System.err.println("Old export time: " + (System.currentTimeMillis() - startTime));
-
-		startTime = System.currentTimeMillis();
-		output = new FileOutputStream(args[1]);
 		ExporterJDOM.useFullClassNames = false;
 		ExporterJDOM.export(output, mainDb.getRoot(), mainDb);
 		output.close();
 		System.err.println("JDOM export time: " + (System.currentTimeMillis() - startTime));
 		
-		startTime = System.currentTimeMillis();
-		output = new FileOutputStream(args[1]);
-		Exporter.export(output, mainDb.getRoot(), mainDb);
-		output.close();
-		System.err.println("Old export time: " + (System.currentTimeMillis() - startTime));
-
-		startTime = System.currentTimeMillis();
-		output = new FileOutputStream(args[1]);
-		ExporterJDOM.useFullClassNames = false;
-		ExporterJDOM.export(output, mainDb.getRoot(), mainDb);
-		output.close();
-		System.err.println("JDOM export time: " + (System.currentTimeMillis() - startTime));
-
 		System.exit(0);
 	}
 
