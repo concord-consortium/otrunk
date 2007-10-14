@@ -17,11 +17,14 @@
         </OTViewBundle>
       </bundles>
       <root>
-        <OTFolderObject name="list">
+        <OTFolderObject name="root">
           <children>
-            <OTFolderObject name="subfolder1"/>
-            <InvalidOTClass name="invalid"/>
-            <OTFolderObject name="subfolder2"/>
+            <OTFolderObject local_id="subfolder1"/>
+            <OTFolderObject local_id="subfolder2">
+              <children>
+              	<object refid="${subfolder1}"/>
+              </children>
+            </OTFolderObject>
           </children>
         </OTFolderObject>
       </root>

@@ -8,6 +8,6 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.concord.otrunk.test.PreserveFormattingSaveTest"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="src/test/resources/containment-test.otml target/temp/containment-out.otml"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="src/test/resources/containment-test.otml src/test/resources/output/containment-out.otml"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="OTrunk"/>
 </launchConfiguration>
