@@ -15,13 +15,26 @@ import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.AbstractOTJComponentView;
 
+/**
+ * 
+ * LostOTEventTest <br>
+ * This class is to test reiterant stateChanged methods.  If a set method is called
+ * on the same object inside of a stateChanged method, then that stateChanged is called 
+ * a second time before the first call to it is complete.  This used to cause problems
+ * with the change events.  But that is fixed now. 
+ * 
+ * <p>
+ * Date created: Oct 14, 2007
+ * 
+ * @author scytacki<p>
+ *
+ */
 public class LostOTEventTest extends AbstractOTJComponentView 
 	implements OTChangeListener, ActionListener
 {
 	protected OTBasicTestObject otObject;
 	protected JLabel textLabel;
-	
-	protected boolean bSetValue;
+	protected JCheckBox optionCheck;
 	
 	public JComponent getComponent(OTObject otObject)
     {
@@ -31,9 +44,7 @@ public class LostOTEventTest extends AbstractOTJComponentView
 		JButton button = new JButton("click here");
 		button.setActionCommand("button");
 		textLabel = new JLabel(this.otObject.getString());
-		JCheckBox optionCheck = new JCheckBox("set value?", true);
-		bSetValue = optionCheck.isSelected();
-		optionCheck.addActionListener(this);
+		optionCheck = new JCheckBox("set value?", true);
 		button.addActionListener(this);
 
 		panel.add(optionCheck);
@@ -55,7 +66,7 @@ public class LostOTEventTest extends AbstractOTJComponentView
 		System.out.println("1. " + e + " "+ e.getDescription());
 		//The first event should be property string
 		if (e.getProperty().equals("string")){
-			if (bSetValue){
+			if (optionCheck.isSelected()){
 				otObject.setValue(otObject.getValue()+1);
 			}
 			
@@ -71,9 +82,6 @@ public class LostOTEventTest extends AbstractOTJComponentView
     {
     	if (e.getActionCommand().equals("button")){
     		otObject.setString(otObject.getString() + "0");
-    	}
-    	else{
-    		bSetValue =!bSetValue;
     	}
     }			
 }

@@ -57,7 +57,6 @@ public class OTObjectInternal implements OTObjectInterface
      */
     protected boolean doNotifyListeners = true;
     
-    protected OTChangeEvent changeEvent;
     protected OTObject changeEventSource;
 
 	protected OTDataObject dataObject;
@@ -120,9 +119,7 @@ public class OTObjectInternal implements OTObjectInterface
 
     	Vector toBeRemoved = null;
 
-    	if(changeEvent == null) {
-    		changeEvent = new OTChangeEvent(changeEventSource);
-    	}
+    	OTChangeEvent changeEvent = new OTChangeEvent(changeEventSource);
 
     	changeEvent.setProperty(property);
     	changeEvent.setOperation(operation);
@@ -165,12 +162,7 @@ public class OTObjectInternal implements OTObjectInterface
     		exp.printStackTrace();
     		throw(exp);
     	}
-    		
-    	// clear the value and previous value so it doesn't remain around and 
-    	// so it can be garbage collected
-    	changeEvent.setValue(null);
-    	changeEvent.setPreviousValue(null);
-    	
+    		    	
     	if(toBeRemoved != null) {
     		for(int i=0; i<toBeRemoved.size(); i++) {
     			changeListeners.remove(toBeRemoved.get(i));
