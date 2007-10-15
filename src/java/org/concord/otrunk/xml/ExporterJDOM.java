@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.22 $
- * $Date: 2007-10-14 05:37:03 $
+ * $Revision: 1.23 $
+ * $Date: 2007-10-15 18:20:40 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -489,9 +489,13 @@ public class ExporterJDOM
 		if(id instanceof OTRelativeID){
 			OTRelativeID relId = (OTRelativeID) id;
 			OTID relRelId = relId.getRelativeId();			
+			String externalRelRelId = relRelId.toExternalForm();
 			if(relId.getRootId().equals(otDb.getDatabaseId()) && 
 					relRelId instanceof OTPathID &&
-					relRelId.toExternalForm().startsWith("/")){
+					externalRelRelId.startsWith("/") &&
+					// This last condition is a hack so path ids which start with an expanded local_id
+					// don't get written out as local_is
+					(externalRelRelId.substring(1).indexOf('/') == -1)){
 				// this id is relative to our database
 				// or at least it should be
 				return "${" + relRelId.toExternalForm().substring(1) + "}";
