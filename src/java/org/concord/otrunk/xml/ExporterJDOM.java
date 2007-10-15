@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.23 $
- * $Date: 2007-10-15 18:20:40 $
+ * $Revision: 1.24 $
+ * $Date: 2007-10-15 19:35:31 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -83,6 +83,8 @@ public class ExporterJDOM
 	public static boolean useFullClassNames = false;
 
 	private static Pattern refidPattern = Pattern.compile("(refid=\")([^\"]*)(\")");
+
+	private static Pattern viewidPattern = Pattern.compile("(viewid=\")([^\"]*)(\")");
 
 	// don't match hrefs with colons those are external links				
 	private static Pattern hrefPattern = Pattern.compile("(href=\")([^:\"]*)(\")");
@@ -325,8 +327,21 @@ public class ExporterJDOM
 			} else if(resource instanceof OTDataMap) {
 			    OTDataMap map = (OTDataMap)resource;
 			    String [] mapKeys = map.getKeys();
-			    for(int j=0; j<mapKeys.length; j++) {			    	
-			        Object mapValue = map.get(mapKeys[j]);
+			    for(int j=0; j<mapKeys.length; j++) {		
+			    	// We currently support special maps that use object ids as keys.  
+			    	// The code below handles this situation.  This is code is a bit dangerous because
+			    	// we might incorrectly identify a key as an id, but there isn't a better solution 
+			    	// at the moment.
+			    	try {
+			    		OTID otid = OTIDFactory.createOTID(mapKeys[j]);
+			    		if(otid != null){
+			    			processReference(dataObject, otid);
+			    		}
+			    	} catch (Throwable t) {
+			    		// silently ignore ids which can't be parsed correctly
+			    	}
+			    	
+			        Object mapValue = map.get(mapKeys[j]);			        
 			        if(mapValue != null) {
 			        	processCollectionItem(dataObject, mapValue);
 			        }
@@ -339,6 +354,7 @@ public class ExporterJDOM
 				// if it is a local_id reference
 				processXMLString(refidPattern, dataObject, (OTXMLString) resource);
 				processXMLString(hrefPattern, dataObject, (OTXMLString) resource);
+				processXMLString(viewidPattern, dataObject, (OTXMLString) resource);				
 			}
 		}
     }
@@ -479,12 +495,13 @@ public class ExporterJDOM
     }
 
     /**
-     * Check if this id is actually a local id reference.  If it is then
-     * return the ${xxx} notation used in the otml files.
+     * This will return true of the passed in a id is a localId in the current
+     * database.
+     * 
      * @param id
      * @return
      */
-    public String convertId(OTID id)
+    public boolean isLocalId(OTID id)
     {
 		if(id instanceof OTRelativeID){
 			OTRelativeID relId = (OTRelativeID) id;
@@ -496,12 +513,28 @@ public class ExporterJDOM
 					// This last condition is a hack so path ids which start with an expanded local_id
 					// don't get written out as local_is
 					(externalRelRelId.substring(1).indexOf('/') == -1)){
-				// this id is relative to our database
-				// or at least it should be
-				return "${" + relRelId.toExternalForm().substring(1) + "}";
+				return true;
 			}
 		}
-		return id.toExternalForm();
+		return false;
+
+    }
+    
+    /**
+     * Check if this id is actually a local id reference.  If it is then
+     * return the ${xxx} notation used in the otml files.
+     * @param id
+     * @return
+     */
+    public String convertId(OTID id)
+    {
+    	if(isLocalId(id)){
+			OTRelativeID relId = (OTRelativeID) id;
+			OTID relRelId = relId.getRelativeId();			
+			return "${" + relRelId.toExternalForm().substring(1) + "}";    		
+    	} else {
+    		return id.toExternalForm();
+    	}
     }
     
 	public Element exportObject(OTDataObject dataObj, OTDataObject parent, String parentResourceName)
@@ -601,7 +634,26 @@ public class ExporterJDOM
 			    for(int j=0; j<mapKeys.length; j++) {
 			    	Element entryEl = new Element("entry");
 			    	content.add(entryEl);
-			    	entryEl.setAttribute("key", mapKeys[j]);
+			    	
+			    	// We currently support special maps that use object ids as keys.  Inorder to preserve the otml
+			    	// correctly we need to check if the mapKey is an id and if so then it should be converted.
+			    	// When it is converted it will be turned into a ${} local_id reference.  Because we don't know
+			    	// if the keys of the map are supposed to be ids or just plain strings.  We have to be careful to
+			    	// not screw up regular strings that look like ids.
+			    	// So we only modify the key if it is a local_id in this database.
+			    	String exportedKey = mapKeys[j];
+			    	try {
+			    		OTID otid = OTIDFactory.createOTID(mapKeys[j]);
+			    		if(otid != null){
+			    			if(isLocalId(otid)){
+			    				exportedKey = convertId(otid);
+			    			}
+			    		}
+			    	} catch (Throwable t) {
+			    		// silently ignore ids which can't be parsed correctly
+			    	}
+
+			    	entryEl.setAttribute("key", exportedKey);
 			    	
 			        Object mapValue = map.get(mapKeys[j]);
 			        Element collectionEl = exportCollectionItem(dataObj, mapValue, resourceName);
@@ -649,6 +701,7 @@ public class ExporterJDOM
 				
 				String xmlString = ((OTXMLString)resource).getContent();
 				xmlString = exportXMLString(refidPattern, xmlString);
+				xmlString = exportXMLString(viewidPattern, xmlString);
 				xmlString = exportXMLString(hrefPattern, xmlString);
 
 				String originalString = xmlString.trim();
