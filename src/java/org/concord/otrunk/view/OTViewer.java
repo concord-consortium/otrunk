@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.91 $
- * $Date: 2007-10-09 22:37:50 $
+ * $Revision: 1.92 $
+ * $Date: 2007-10-16 22:06:33 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -1179,9 +1179,14 @@ public class OTViewer extends JFrame
 
 				if (file != null && file.exists()) {
 					System.out.println("load file name: " + file);
+					// if they open an authored file then they are overriding the remoteURL,
+					// at least for now.  This makes the title bar update correctly, and 
+					// fixes a lockup that happens when they have opened a local file and then
+					// try to save it again.
+					remoteURL = null;
 					loadFile(file);
 					
-					exportToHtmlAction.setEnabled(true);
+					exportToHtmlAction.setEnabled(true);										
 				}
 			}
 
