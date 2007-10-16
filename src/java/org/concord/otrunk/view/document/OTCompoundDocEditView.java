@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.25 $
- * $Date: 2007-10-16 18:36:42 $
+ * $Revision: 1.26 $
+ * $Date: 2007-10-16 18:52:23 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -33,8 +33,6 @@ import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.otrunk.view.OTObjectEditViewConfig;
 import org.concord.otrunk.view.OTObjectListViewer;
-import org.concord.otrunk.view.OTViewContainerPanel;
-import org.concord.otrunk.view.OTViewContainerPanel.MyViewContainer;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
