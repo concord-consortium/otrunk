@@ -1,8 +1,8 @@
 /*
  * Last modification information:
- * $Revision: 1.24 $
- * $Date: 2007-10-03 02:40:57 $
- * $Author: scytacki $
+ * $Revision: 1.25 $
+ * $Date: 2007-10-16 18:36:42 $
+ * $Author: sfentress $
  *
  * Licence Information
  * Copyright 2007 The Concord Consortium 
@@ -33,6 +33,8 @@ import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.otrunk.view.OTObjectEditViewConfig;
 import org.concord.otrunk.view.OTObjectListViewer;
+import org.concord.otrunk.view.OTViewContainerPanel;
+import org.concord.otrunk.view.OTViewContainerPanel.MyViewContainer;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
@@ -73,12 +75,14 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		// this uses the NO_VIEW_MODE so the returned OTDocumentView doesn't get replaced by 
 		// the edit view if the default mode is set to something else.
 		previewView = (OTDocumentView)getViewFactory().getView(document, OTDocumentView.class, OTViewFactory.NO_VIEW_MODE);
+
+		// no view container exists...
+	//	MyViewContainer previewViewContainer = (MyViewContainer)previewView.getViewContainer();
+	//	previewViewContainer.setParentContainer(getViewContainer());
 		
 		//set mode of OTDocumentView to mode set for OTObjectEditViewConfig, so objects
 		//in the Doc will be in the correct mode
 		previewView.setViewMode(viewEntry.getMode());
-		
-		//System.out.println("preview view is " + previewView);
 				
 		//Create a split pane with the preview pane and the text area 
 		editTextPane = super.getComponent(document);
@@ -89,7 +93,7 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 			return editPane;
 		} else if (viewEntry.getUsePopupEditWindows()){
 			JComponent previewPane = previewView.getComponent(document);
-		
+			
 			previewPane.addMouseListener(new MouseListener(){
 
 				public void mouseClicked(MouseEvent evt)
@@ -192,7 +196,11 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 			OTObjectService objectService = document.getOTObjectService();
 			String strObjID = objectService.getExternalID(objToInsert);
 			
-			String strObjText = "<object refid=\"" + strObjID + "\" />";
+			String paragraphBreak = "";
+			if (viewEntry.getAddParagraphAfterObject()){
+				paragraphBreak = "<p/>";
+			}
+			String strObjText = "<object refid=\"" + strObjID + "\" />" + paragraphBreak;
 			
 			int pos = textArea.getSelectionStart();
 			textArea.insert(strObjText, pos);
