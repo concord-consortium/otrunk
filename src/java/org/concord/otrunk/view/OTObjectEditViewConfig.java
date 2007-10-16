@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.6 $
- * $Date: 2007-09-26 18:49:59 $
+ * $Revision: 1.7 $
+ * $Date: 2007-10-16 18:37:24 $
  * $Author: sfentress $
  *
  * Licence Information
@@ -36,4 +36,11 @@ public interface OTObjectEditViewConfig
 	
 	public boolean getCopyNewObjectsByDefault();
 	public static boolean DEFAULT_copyNewObjectsByDefault = false;
+	
+	public boolean getViewContainerIsUpdateable();
+	public static boolean DEFAULT_viewContainerIsUpdateable = false;
+	
+	public boolean getAddParagraphAfterObject();
+	public void setAddParagraphAfterObject(boolean addParagraphAfterObject);
+	public static boolean DEFAULT_addParagraphAfterObject = true;
 }
