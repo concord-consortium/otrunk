@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.4 $
- * $Date: 2007-10-02 01:07:23 $
+ * $Revision: 1.5 $
+ * $Date: 2007-10-16 13:34:08 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -33,6 +33,7 @@
 package org.concord.otrunk.xml;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.concord.otrunk.datamodel.OTDataMap;
 
@@ -49,7 +50,7 @@ import org.concord.otrunk.datamodel.OTDataMap;
 public class XMLDataMap 
 	implements OTDataMap
 {
-	HashMap hTable = new HashMap();
+	HashMap hTable = new LinkedHashMap();
 	XMLDataObject dataObject;
 	
 	HashMap referenceInfoMap = new HashMap();
