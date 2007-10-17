@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.25 $
- * $Date: 2007-10-17 15:17:51 $
+ * $Revision: 1.26 $
+ * $Date: 2007-10-17 20:25:27 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -896,7 +896,9 @@ public class ExporterJDOM
 				Comment comment = new Comment(resInfo.comment);
 				objectEl.addContent(comment);
 			}
-		}
+		} else if(resourceValue.indexOf('\n') > 0){
+			writeElement = true;
+		}		
 		
 		if(writeElement){
 			Element resourceEl = new Element(resourceName);
