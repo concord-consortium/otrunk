@@ -29,8 +29,14 @@
  */
 package org.concord.otrunk.view.document;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.io.FileNotFoundException;
+
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,6 +55,8 @@ import javax.swing.text.Element;
 import javax.swing.text.html.HTML;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.bsf.util.IOUtils;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTExternalAppService;
@@ -189,18 +197,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 			if (viewEntry instanceof OTDocumentViewConfig) {
 				
-				String css = "";
-				if (viewEntry.getCss() != null && viewEntry.getCss().length() > 0){
-					css = css + viewEntry.getCss();
-				}
-				
-				if (viewEntry.getCssBlocks() != null && viewEntry.getCssBlocks().getVector().size() > 0){
-					Vector cssBlocks =  viewEntry.getCssBlocks().getVector(); 
-					for (int i = 0; i < cssBlocks.size(); i++) {
-		                OTCssText cssText = (OTCssText) cssBlocks.get(i);
-		                css = css + " " + cssText.getCssText();
-	                }
-				}
+				String css = getCssText();
 				
 				String XHTML_PREFIX = XHTML_PREFIX_START + css
 						+ XHTML_PREFIX_END;
@@ -519,4 +516,45 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		}
 	}
 
+	/** 
+	 * Retrieves the CSS style text used for the document view.
+	 * @return String containing (raw) CSS definitions, or a blank string.
+	 */
+	protected String getCssText() {
+		String css = "";
+		
+		if (viewEntry.getCss() != null && viewEntry.getCss().length() > 0){
+			css += viewEntry.getCss();
+		}
+		
+		if (viewEntry.getCssBlocks() != null && viewEntry.getCssBlocks().getVector().size() > 0){
+			Vector cssBlocks =  viewEntry.getCssBlocks().getVector();
+			
+			for (int i = 0; i < cssBlocks.size(); i++) {
+                OTCssText cssText = (OTCssText) cssBlocks.get(i);
+                
+                // retrieve CSS definitions (originally) from the otml file
+                String text = cssText.getCssText();
+                
+                // if no cssText, then get src which is a URL for the css file
+                if (text == null) {
+                	URL url = cssText.getSrc();
+                	
+                	if (url != null) {
+                		try {
+                			URLConnection urlConnection = url.openConnection();
+                			InputStream inStream = urlConnection.getInputStream();
+                			text = IOUtils.getStringFromReader(new InputStreamReader(inStream));
+                		}
+                		catch (IOException e){
+                			text = "";
+                			e.printStackTrace();
+                		}
+                	}
+                }
+                css += " " + text;
+            }
+		}
+		return css;
+	}
 }
