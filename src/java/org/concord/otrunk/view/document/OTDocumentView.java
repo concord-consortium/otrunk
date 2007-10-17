@@ -30,10 +30,9 @@
 package org.concord.otrunk.view.document;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
 
 import java.net.URL;
 import java.net.URLConnection;
@@ -56,8 +55,6 @@ import javax.swing.text.html.HTML;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.bsf.util.IOUtils;
-
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrame;
@@ -67,6 +64,7 @@ import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTXHTMLView;
+
 import org.concord.otrunk.OTrunkUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -543,8 +541,12 @@ public class OTDocumentView extends AbstractOTDocumentView implements
                 	if (url != null) {
                 		try {
                 			URLConnection urlConnection = url.openConnection();
-                			InputStream inStream = urlConnection.getInputStream();
-                			text = IOUtils.getStringFromReader(new InputStreamReader(inStream));
+                			BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                			String line = reader.readLine();
+                			while (line != null) {
+                				text += line;
+                				line = reader.readLine();
+                			}
                 		}
                 		catch (IOException e){
                 			text = "";
