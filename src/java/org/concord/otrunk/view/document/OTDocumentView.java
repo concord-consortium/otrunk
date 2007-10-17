@@ -556,7 +556,6 @@ public class OTDocumentView extends AbstractOTDocumentView implements
                 		}
                 	}
                 }
-                System.out.println(text);
                 css += " " + text;
             }
 		}
