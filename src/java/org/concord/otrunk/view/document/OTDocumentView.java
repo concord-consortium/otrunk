@@ -66,6 +66,7 @@ import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 
 import org.concord.otrunk.OTrunkUtil;
+import org.concord.otrunk.view.OTObjectEditViewConfig;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -80,7 +81,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		ChangeListener, HyperlinkListener, OTXHTMLView, OTViewEntryAware {
 	public static boolean addedCustomLayout = false;
 
-	JTabbedPane tabbedPane = null;
+	protected JTabbedPane tabbedPane = null;
 
 	protected JComponent previewComponent = null;
 
@@ -536,6 +537,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
                 
                 // if no cssText, then get src which is a URL for the css file
                 if (text == null) {
+                	text = "";
                 	URL url = cssText.getSrc();
                 	
                 	if (url != null) {
@@ -554,6 +556,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
                 		}
                 	}
                 }
+                System.out.println(text);
                 css += " " + text;
             }
 		}
