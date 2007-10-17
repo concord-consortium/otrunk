@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.24 $
- * $Date: 2007-10-15 19:35:31 $
+ * $Revision: 1.25 $
+ * $Date: 2007-10-17 15:17:51 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -740,6 +740,9 @@ public class ExporterJDOM
 	            	}
 					e.printStackTrace();					
 				}
+			} else if(resource instanceof String) {
+				writeResource(dataObj, objectEl, resourceName, (String) resource, 
+						XMLReferenceInfo.ATTRIBUTE);								
 			} else {
 				String primitiveString = resource.toString();
 
