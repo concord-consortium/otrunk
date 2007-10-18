@@ -75,6 +75,7 @@ public class OTFrameManagerImpl implements OTFrameManager
 			frameContainer.frame = jFrame;
 			OTViewContainerPanel otContainer = new OTViewContainerPanel(this);
 			otContainer.setTopLevelContainer(true);
+			otContainer.setUseScrollPane(otFrame.getUseScrollPane());
 			
 			frameContainer.container = otContainer;	
 			OTViewContext factoryContext = viewFactory.getViewContext();
