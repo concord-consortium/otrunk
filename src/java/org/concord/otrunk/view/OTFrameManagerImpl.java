@@ -46,23 +46,28 @@ public class OTFrameManagerImpl implements OTFrameManager
 		putObjectInFrame(otObject, null, otFrame, null, positionX, positionY);
 	}
 	
-	public void putObjectInFrame(OTObject otObject, 
-			org.concord.framework.otrunk.view.OTViewEntry viewEntry,
+	public void putObjectInFrame(OTObject otObject, OTViewEntry viewEntry,
 			OTFrame otFrame) 
 	{
 		putObjectInFrame(otObject, viewEntry, otFrame, null);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.concord.framework.otrunk.view.OTFrameManager#putObjectInFrame(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewEntry, org.concord.framework.otrunk.view.OTFrame, java.lang.String)
-	 */
-	public void putObjectInFrame(OTObject otObject, OTViewEntry viewEntry, OTFrame otFrame, String viewMode) 
+	public void putObjectInFrame(OTObject otObject, OTViewEntry viewEntry, 
+			OTFrame otFrame, String viewMode) 
 	{
 		putObjectInFrame(otObject, viewEntry, otFrame, viewMode, 30, 30);
 	}
 	
-	public void putObjectInFrame(OTObject otObject, OTViewEntry viewEntry, OTFrame otFrame, String viewMode, 
-		int positionX, int positionY) 
+	public void putObjectInFrame(OTObject otObject, OTViewEntry viewEntry, 
+			OTFrame otFrame, String viewMode, int positionX, int positionY) 
+	{
+		putObjectInFrame(otObject, viewEntry, otFrame, viewMode, 
+				positionX, positionY, true); 
+	}
+	
+	public void putObjectInFrame(OTObject otObject, OTViewEntry viewEntry, 
+			OTFrame otFrame, String viewMode, int positionX, int positionY, 
+			boolean forceReloadOTObject) 
 	{
 		// look up view container with the frame.
 		FrameContainer frameContainer = 
@@ -102,8 +107,11 @@ public class OTFrameManagerImpl implements OTFrameManager
 		
 		// call setCurrentObject on that view container with a null
 		// frame
+		OTObject currenOTObject = frameContainer.container.getCurrentObject();
 		frameContainer.container.setViewMode(viewMode);
-		frameContainer.container.setCurrentObject(otObject, viewEntry);
+		if (forceReloadOTObject || currenOTObject != otObject){
+			frameContainer.container.setCurrentObject(otObject, viewEntry);
+		}
 		frameContainer.frame.setVisible(true);
 	}
 	
