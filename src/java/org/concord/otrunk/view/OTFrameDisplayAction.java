@@ -1,7 +1,7 @@
 /*
  * Last modification information:
- * $Revision: 1.1 $
- * $Date: 2007-09-26 18:39:32 $
+ * $Revision: 1.2 $
+ * $Date: 2007-10-18 23:07:37 $
  * $Author: imoncada $
  *
  * Licence Information
@@ -33,6 +33,12 @@ public class OTFrameDisplayAction extends DefaultOTObject
 	{
 		public OTFrame getFrame();
 		public OTObject getObjectToDisplay();
+		
+		public static final int DEFAULT_xPosition = 30;
+		public int getXPosition();
+		
+		public static final int DEFAULT_yPosition = 30;
+		public int getYPosition();
 	}
 	protected MyResourceSchema resources;
 
@@ -51,10 +57,11 @@ public class OTFrameDisplayAction extends DefaultOTObject
 		OTFrame frame = resources.getFrame();
 		OTObject otObject = resources.getObjectToDisplay();
 		
-		frameManager.putObjectInFrame(otObject, frame);
+		frameManager.putObjectInFrame(otObject, null, frame, null, 
+				resources.getXPosition(), resources.getYPosition(), false);
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see org.concord.framework.otrunk.view.OTAction#getActionText()
 	 */
 	public String getActionText()
