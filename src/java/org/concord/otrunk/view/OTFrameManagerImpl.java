@@ -107,7 +107,7 @@ public class OTFrameManagerImpl implements OTFrameManager
 		frameContainer.frame.setVisible(true);
 	}
 	
-	public void distroyFrame(){
+	public void destroyFrame(){
 		jFrame.dispose();
 	}
 }
