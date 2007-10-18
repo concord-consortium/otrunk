@@ -92,6 +92,9 @@ public class OTFrameManagerImpl implements OTFrameManager
 			if (otFrame.getBorderlessPopup()){
 				jFrame.setUndecorated(true);
 			}
+			if (otFrame.isResourceSet("alwaysOnTop")){
+				jFrame.setAlwaysOnTop(otFrame.getAlwaysOnTop());
+			}
 			
 			frameContainers.put(otFrame.getGlobalId(), frameContainer);
 		}
