@@ -29,11 +29,10 @@
  */
 package org.concord.otrunk.view.document;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.io.BufferedReader;
-
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Vector;
@@ -64,9 +63,7 @@ import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTXHTMLView;
-
 import org.concord.otrunk.OTrunkUtil;
-import org.concord.otrunk.view.OTObjectEditViewConfig;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -443,11 +440,16 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 				// here
 				AttributeSet tagAttribs = (AttributeSet) attribs
 						.getAttribute(HTML.Tag.A);
-				String target = (String) tagAttribs
-						.getAttribute(HTML.Attribute.TARGET);
-				String viewEntryId = (String) tagAttribs.getAttribute("viewid");
-				String modeStr = (String) tagAttribs.getAttribute("mode");
-
+				String target = null;
+				String viewEntryId = null;
+				String modeStr = null;
+				if(tagAttribs != null){
+					target = (String) tagAttribs
+					.getAttribute(HTML.Attribute.TARGET);
+					viewEntryId = (String) tagAttribs.getAttribute("viewid");
+					modeStr = (String) tagAttribs.getAttribute("mode");
+				}
+				
 				if (target == null) {
 					getViewContainer().setCurrentObject(linkObj);
 
@@ -477,8 +479,8 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 					} else if (modeStr == null) {
 						modeStr = getViewMode();
 					}
-					
-					getFrameManager().putObjectInFrame(linkObj, viewEntry,
+										
+					putObjectInFrame(linkObj, viewEntry,
 							targetFrame, modeStr);
 				}
 
@@ -488,6 +490,22 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		}
 	}
 
+	/**
+	 * This method is extracted from hyperlinkUpdate so subclasses
+	 * can override it.
+	 * 
+	 * @param linkObj
+	 * @param viewEntry
+	 * @param targetFrame
+	 * @param modeStr
+	 */
+	public void putObjectInFrame(OTObject linkObj, OTViewEntry viewEntry,
+		OTFrame targetFrame, String modeStr)
+	{
+		getFrameManager().putObjectInFrame(linkObj, viewEntry,
+				targetFrame, modeStr);		
+	}
+	
 	public String getXHTMLText(OTObject otObject) {
 		if (otObject == null) {
 			throw new IllegalArgumentException("otObject can't be null");
