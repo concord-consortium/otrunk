@@ -103,8 +103,8 @@ public class OTFrameManagerImpl implements OTFrameManager
 			// This is only available on Java 1.5
 			if (otFrame.isResourceSet("alwaysOnTop")){
 				try {
-					Method setAwaysOnTopMethod = jFrame.getClass().getMethod("setAlwaysOnTop", new Class []{Boolean.TYPE});
-					setAwaysOnTopMethod.invoke(jFrame, new Object[]{new Boolean(otFrame.getAlwaysOnTop())});
+					Method setAlwaysOnTopMethod = jFrame.getClass().getMethod("setAlwaysOnTop", new Class []{Boolean.TYPE});
+					setAlwaysOnTopMethod.invoke(jFrame, new Object[]{new Boolean(otFrame.getAlwaysOnTop())});
 				} catch (Exception e) {
 					System.err.println("alwaysOnTop property of OTFrame is only available on Java 1.5");
 					e.printStackTrace();
