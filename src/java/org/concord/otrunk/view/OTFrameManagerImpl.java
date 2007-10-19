@@ -4,6 +4,7 @@
 package org.concord.otrunk.view;
 
 import java.awt.BorderLayout;
+import java.lang.reflect.Method;
 import java.util.Hashtable;
 
 import javax.swing.JFrame;
@@ -98,8 +99,16 @@ public class OTFrameManagerImpl implements OTFrameManager
 			if (otFrame.getBorderlessPopup()){
 				jFrame.setUndecorated(true);
 			}
+			
+			// This is only available on Java 1.5
 			if (otFrame.isResourceSet("alwaysOnTop")){
-				jFrame.setAlwaysOnTop(otFrame.getAlwaysOnTop());
+				try {
+					Method setAwaysOnTopMethod = jFrame.getClass().getMethod("setAlwaysOnTop", new Class []{Boolean.TYPE});
+					setAwaysOnTopMethod.invoke(jFrame, new Object[]{new Boolean(otFrame.getAlwaysOnTop())});
+				} catch (Exception e) {
+					System.err.println("alwaysOnTop property of OTFrame is only available on Java 1.5");
+					e.printStackTrace();
+				} 
 			}
 			
 			frameContainers.put(otFrame.getGlobalId(), frameContainer);
