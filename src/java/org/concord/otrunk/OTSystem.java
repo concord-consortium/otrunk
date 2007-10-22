@@ -41,8 +41,14 @@ import org.concord.framework.otrunk.OTObjectList;
  */
 public interface OTSystem extends OTObjectInterface 
 {
+	/**
+	 * This is a list of other otml files that are needed by the current otml file. 
+	 * @return
+	 */
+	public OTObjectList getIncludes();
+	
 	public OTObject getRoot();
-	public void setRoot(OTObject root);
+	public void setRoot(OTObject root);	
 	
 	public OTObjectList getBundles();	
 

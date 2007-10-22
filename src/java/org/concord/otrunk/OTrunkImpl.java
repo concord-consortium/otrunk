@@ -31,6 +31,7 @@ package org.concord.otrunk;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -50,6 +51,7 @@ import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataObjectFinder;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
@@ -62,6 +64,7 @@ import org.concord.otrunk.overlay.OverlayImpl;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.OTViewerHelper;
+import org.concord.otrunk.xml.XMLDatabase;
 
 /**
  * @author scott
@@ -125,31 +128,22 @@ public class OTrunkImpl implements OTrunk
 		serviceContext.addService(OTControllerRegistry.class, 
 				new OTControllerRegistryImpl());
 
-		this.rootDb = db;
-		addDatabase(db);
-
-		rootObjectService = createObjectService(rootDb);
-
-		if(systemDb != null){
-			systemObjectService = createObjectService(systemDb);
-			addDatabase(systemDb);
-	        if(OTViewerHelper.isTrace()) {
-	        	systemObjectService.addObjectServiceListener(new TraceListener("system: " + db));
-	        }
-		} else {
-			// there is no real system db so just use the main db
-			systemDb = db;
-			systemObjectService = rootObjectService;
-		}
-		this.systemDb = systemDb;
-		
-
-        if(OTViewerHelper.isTrace()) {
-        	rootObjectService.addObjectServiceListener(new TraceListener("root: " + db));
-        }
-        
 		// We should look up if there are any sevices.
 		try {
+			if(systemDb != null){
+				this.systemDb = systemDb;
+				systemObjectService = initObjectService(systemDb, "system");
+			} 
+			
+			this.rootDb = db;
+			rootObjectService = initObjectService(rootDb, "root");        
+
+			if(systemObjectService == null){
+				// there is no real system db so just use the main db
+				this.systemDb = db;
+				systemObjectService = rootObjectService;			
+			}
+					
 			OTSystem otSystem = getSystem();
 			if(otSystem == null){
 				System.err.println("Warning: No OTSystem object found");
@@ -332,6 +326,58 @@ public class OTrunkImpl implements OTrunk
         return aUser;
     }
 
+    protected OTObjectServiceImpl initObjectService(OTDatabase db, String logLabel) 
+    	throws Exception
+    {
+		addDatabase(db);
+		OTObjectServiceImpl objectService = createObjectService(db);
+        if(OTViewerHelper.isTrace()) {
+        	objectService.addObjectServiceListener(new TraceListener(logLabel + ": " + db));
+        }
+        loadIncludes(objectService);
+        
+        return objectService;
+    }
+    
+    protected void loadIncludes(OTObjectServiceImpl objectService) 
+    	throws Exception
+    {
+    	OTDatabase db = objectService.getMainDb();    	
+		OTDataObject rootDO = db.getRoot();
+		OTID rootID = rootDO.getGlobalId();
+		OTObject otRoot = objectService.getOTObject(rootID);
+		if(!(otRoot instanceof OTSystem)){
+			return;
+		}
+				
+		OTSystem otSystem = (OTSystem) otRoot;
+		
+		OTObjectList includes = otSystem.getIncludes();
+		
+		for(int i=0; i<includes.size(); i++){
+			OTInclude include = (OTInclude) includes.get(i);
+			
+			URL hrefUrl = include.getHref();
+
+			// TODO need to check if this has an id that it hasn't already been loaded			
+			
+			XMLDatabase includeDb = new XMLDatabase(hrefUrl);
+
+			if(databases.contains(includeDb)){
+				// we've already added this database.
+				continue;
+			}
+			
+			
+			// well track the resource info to be safe here.
+			includeDb.setTrackResourceInfo(true);
+			includeDb.loadObjects();
+			
+			// FIXME the label used here needs to be shortened.
+			initObjectService(includeDb, hrefUrl.toExternalForm());
+		}
+    }
+    
     protected OTReferenceMap getReferenceMapFromUserDb(OTDatabase userDataDb) 
     	throws Exception
     {
@@ -374,7 +420,17 @@ public class OTrunkImpl implements OTrunk
     	OTObjectServiceImpl userObjService;
     	OTID userId = user.getUserId();
     	
-        CompositeDatabase userDb = new CompositeDatabase(rootDb, userStateMap);
+    	OTDataObjectFinder objectFinder = new OTDataObjectFinder()
+    	{
+			public OTDataObject findDataObject(OTID id)
+				throws Exception
+            {
+				OTDatabase db = getOTDatabase(id);
+				return db.getOTDataObject(null, id);
+            }    		
+    	};
+    	
+        CompositeDatabase userDb = new CompositeDatabase(objectFinder, userStateMap);
 
         addDatabase(userDb);
         userObjService = createObjectService(userDb);
