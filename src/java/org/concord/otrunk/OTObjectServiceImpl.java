@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.26 $
- * $Date: 2007-10-05 18:03:39 $
+ * $Revision: 1.27 $
+ * $Date: 2007-10-22 01:50:37 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -79,6 +79,11 @@ public class OTObjectServiceImpl
     public void setMainDb(OTDatabase mainDb)
     {
         this.mainDb = mainDb;
+    }
+    
+    public OTDatabase getMainDb()
+    {
+    	return mainDb;
     }
     
     public OTObject createObject(Class objectClass) 

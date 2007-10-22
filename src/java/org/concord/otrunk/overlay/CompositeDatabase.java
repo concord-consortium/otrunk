@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.2 $
- * $Date: 2007-08-06 19:04:14 $
+ * $Revision: 1.3 $
+ * $Date: 2007-10-22 01:50:38 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -40,6 +40,7 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataObjectFinder;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTTransientMapID;
@@ -64,15 +65,15 @@ public class CompositeDatabase
      */
 	protected Hashtable dataObjectMap = new Hashtable();
     
-	OTDatabase rootDb;
+	OTDataObjectFinder objectFinder;
 	OTDatabase activeOverlayDb;
 	Overlay activeOverlay;
 	ArrayList middleOverlays;
 	OTID databaseId;
 	
-	public CompositeDatabase(OTDatabase rootDb, Overlay activeOverlay)
+	public CompositeDatabase(OTDataObjectFinder objectFinder, Overlay activeOverlay)
 	{
-	    this.rootDb = rootDb;
+		this.objectFinder = objectFinder;
 	    this.activeOverlayDb = activeOverlay.getOverlayDatabase();
 	    this.activeOverlay = activeOverlay;
 	    
@@ -186,7 +187,10 @@ public class CompositeDatabase
         
         // this object isn't in the creationDb and we haven't accessed
         // it before so we need to make a new one
-        OTDataObject baseObject = rootDb.getOTDataObject(null, childId);
+        // We use the OTDataObjectFinder object for this.  The code that setup
+        // this composite database should pass in a objectFinder which only
+        // finds objects this composite database should compose.  
+        OTDataObject baseObject = objectFinder.findDataObject(childId);
         if(baseObject == null) {
             // we are in a bad state here.  there was a request for a child
             // object that we can't find.  Instead of making a bogus user

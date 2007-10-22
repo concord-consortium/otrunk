@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="304c0932-7d24-11dc-8314-0800200c9a66" >
+  <imports>
+    <import class="org.concord.otrunk.OTSystem"/>
+    <import class="org.concord.otrunk.OTInclude"/>
+    <import class="org.concord.otrunk.view.OTViewEntry"/>
+    <import class="org.concord.otrunk.view.OTViewBundle"/>
+    <import class="org.concord.otrunk.view.OTFolderObject"/>
+  </imports>
+  <objects>
+    <OTSystem>
+      <includes>
+        <OTInclude href="content1.otml"/>
+        <OTInclude href="content2.otml"/>
+        <OTInclude href="library.otml"/>
+      </includes>
+      <bundles>
+        <OTViewBundle> 
+          <viewEntries>
+            <object refid="00df4436-7d24-11dc-8314-0800200c9a66"/>
+          </viewEntries>
+        </OTViewBundle>
+      </bundles>
+      <root>
+        <OTFolderObject name="activity">
+          <children>
+            <object refid="0d96ec66-7d26-11dc-8314-0800200c9a66"/>
+            <object refid="7cba23ea-7d25-11dc-8314-0800200c9a66"/>
+          </children>
+        </OTFolderObject>
+      </root>
+    </OTSystem>
+  </objects>
+</otrunk>

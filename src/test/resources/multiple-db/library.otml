@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="7ec24dc2-7d23-11dc-8314-0800200c9a66" >
+  <imports>
+  	<import class="org.concord.otrunk.OTSystem" />
+    <import class="org.concord.otrunk.OTInclude"/>
+  	<import class="org.concord.otrunk.view.OTViewEntry" />
+  	<import class="org.concord.otrunk.view.OTViewBundle" />
+  	<import class="org.concord.otrunk.view.OTFolderObject" />  	
+  </imports>
+  <objects>
+  	<OTFolderObject name="root">
+  		<children>
+  			<OTViewEntry id="00df4436-7d24-11dc-8314-0800200c9a66"
+  				objectClass="org.concord.otrunk.view.OTFolderObject"
+  				viewClass="org.concord.otrunk.view.OTFolderObjectEditView" />
+  		</children>
+  	</OTFolderObject>
+  </objects>
+</otrunk>
