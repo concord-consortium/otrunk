@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.60 $
- * $Date: 2007-10-03 21:38:38 $
+ * $Revision: 1.61 $
+ * $Date: 2007-10-22 19:37:02 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -248,11 +248,13 @@ public class OTViewContainerPanel extends JPanel
 		
 		removeAll();
 		
-		if(otObject == null){
-			return;
-		}
+		// Even if if the object is null we want to show something on the screen
+		// so we should not give up if the object is null.
+		// if(otObject == null){
+		//	return;
+		// }
 		
-		if(isTopLevelContainer()){
+		if(isTopLevelContainer() && otObject != null){
 			controllerService = otObject.getOTObjectService().createControllerService();
 		}
 		

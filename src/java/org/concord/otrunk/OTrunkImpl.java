@@ -326,6 +326,68 @@ public class OTrunkImpl implements OTrunk
         return aUser;
     }
 
+    public OTObject getExternalObject(URL url) 
+    	throws Exception
+    {
+    	OTObjectServiceImpl externalObjectService = 
+    		loadDatabase(url);
+		
+    	// get the root object either the real root or the system root
+		return getRoot(externalObjectService);
+    }
+    
+    protected OTObjectServiceImpl loadDatabase(URL url) 
+    	throws Exception
+    {
+    	// load the data base
+		XMLDatabase includeDb = new XMLDatabase(url);
+
+		if(databases.contains(includeDb)){
+			// we've already loaded this database.
+			// It is nice to print an error here because the equals method of the databases
+			// just use the database id.  So if 2 databases have the same id then it will
+			// seem like the database has already been loaded.
+			// FIXME this should check the url of the database, and only print this message
+			// if the urls are different.
+			System.err.println("already loaded database with id: " + includeDb.getDatabaseId() + 
+					" database: " + url.toExternalForm() + " will not be loaded again");
+			
+			for(int i=0; i<objectServices.size(); i++){
+				OTObjectServiceImpl objectService = (OTObjectServiceImpl) objectServices.get(i);
+				OTDatabase db = objectService.getMainDb();
+				if(db.equals(includeDb)){
+					return objectService;
+				}
+			}
+			
+			System.err.println("Cannot find objectService for database: " + includeDb.getDatabaseId());
+			return null;			
+		}
+		
+    	// register it with the OTrunkImpl
+		// well track the resource info to be safe here.
+		includeDb.setTrackResourceInfo(true);
+		includeDb.loadObjects();
+    	
+		return initObjectService(includeDb, url.toExternalForm());
+    }
+    
+    protected OTObject getRoot(OTObjectServiceImpl objectService) 
+    	throws Exception
+    {
+    	OTDatabase db = objectService.getMainDb();
+
+    	OTDataObject rootDO = db.getRoot();
+
+    	OTObject root = objectService.getOTObject(rootDO.getGlobalId());
+    	
+		if(root instanceof OTSystem) {
+			return ((OTSystem)root).getRoot();
+		}
+		
+		return root;
+    }
+    
     protected OTObjectServiceImpl initObjectService(OTDatabase db, String logLabel) 
     	throws Exception
     {
@@ -359,22 +421,7 @@ public class OTrunkImpl implements OTrunk
 			
 			URL hrefUrl = include.getHref();
 
-			// TODO need to check if this has an id that it hasn't already been loaded			
-			
-			XMLDatabase includeDb = new XMLDatabase(hrefUrl);
-
-			if(databases.contains(includeDb)){
-				// we've already added this database.
-				continue;
-			}
-			
-			
-			// well track the resource info to be safe here.
-			includeDb.setTrackResourceInfo(true);
-			includeDb.loadObjects();
-			
-			// FIXME the label used here needs to be shortened.
-			initObjectService(includeDb, hrefUrl.toExternalForm());
+			loadDatabase(hrefUrl);			
 		}
     }
     
