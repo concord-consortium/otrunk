@@ -23,8 +23,8 @@
 
 /*
  * Last modification information:
- * $Revision: 1.42 $
- * $Date: 2007-10-09 14:58:18 $
+ * $Revision: 1.43 $
+ * $Date: 2007-10-22 01:20:28 $
  * $Author: scytacki $
  *
  * Licence Information
@@ -104,7 +104,15 @@ public class XMLDatabase
 	private JDOMDocument document;
 	private URL contextURL;
 	
+	String label;
 	
+	protected static String getLabel(URL contextURL)
+	{
+		if(contextURL == null){
+			return "unknown_name";
+		}
+		return contextURL.toExternalForm();
+	}
 	
 	public XMLDatabase()
 	{
@@ -132,40 +140,67 @@ public class XMLDatabase
 	public XMLDatabase(InputStream xmlStream, URL contextURL, PrintStream statusStream)
 	throws Exception
 	{
+		// The "" +  approach allows us to handle nulls.
+		this(xmlStream, contextURL, getLabel(contextURL), statusStream);
+	}
+	
+	public XMLDatabase(InputStream xmlStream, URL contextURL, String label, PrintStream statusStream)
+	throws Exception
+	{
 		this.statusStream = statusStream;
-
+		this.label = label;
+		
 		// create the database Id
 		// this might get overriden when the objects are loaded in.
 		databaseId = OTUUID.createOTUUID();
-
+		
+		// printStatus("Opening otml: " + label);
 		
 		// parse the xml file...
-		printStatus("Started Loading File...");
-		
 		document = new JDOMDocument(xmlStream);
+		initialize();
 		
-		printStatus("Finished Loading File...");
-
 		this.contextURL = contextURL;
 	}	
 	
 	public XMLDatabase(Reader xmlReader, URL contextURL, PrintStream statusStream)
 	throws Exception
 	{
+		this(xmlReader, contextURL, getLabel(contextURL), statusStream);		
+	}
+	
+	public XMLDatabase(Reader xmlReader, URL contextURL, String label, PrintStream statusStream)
+	throws Exception
+	{
 		this.statusStream = statusStream;
-
-		// parse the xml file...
-		printStatus("Started Loading File...");
+		this.label = label;
 		
+		// printStatus("Opening otml: " + label);
 		document = new JDOMDocument(xmlReader);
-		
-		printStatus("Finished Loading File...");
-
+		initialize();
+			
 		this.contextURL = contextURL;
 	}	
 	
-	public void loadObjects()
-		throws Exception
+	public boolean equals(Object object)
+	{
+		if(object == this){
+			return true;
+		}
+		
+		if(!(object instanceof XMLDatabase)){
+			return false;
+		}
+		
+		OTID id = getDatabaseId();
+		if(id == null){
+			return false;
+		}
+		
+		return id.equals(((XMLDatabase)object).getDatabaseId());
+	}
+	
+	protected void initialize()
 	{
 		OTXMLElement rootElement = document.getRootElement();
 		
@@ -194,15 +229,21 @@ public class XMLDatabase
 		    }
 		}
 		
+		String dbId = rootElement.getAttributeValue("id");
+		if(dbId != null && dbId.length() > 0) {
+		    databaseId = OTIDFactory.createOTID(dbId);
+		}       		
+	}
+	
+	public void loadObjects()
+		throws Exception
+	{
+		OTXMLElement rootElement = document.getRootElement();
+		
 		TypeService typeService = new TypeService(contextURL);
 		ObjectTypeHandler objectTypeHandler = new ObjectTypeHandler(typeService, this);
 		typeService.registerUserType("object", objectTypeHandler);
 
-		String dbId = rootElement.getAttributeValue("id");
-		if(dbId != null && dbId.length() > 0) {
-		    databaseId = OTIDFactory.createOTID(dbId);
-		}
-       		
 		OTXMLElement importsElement = rootElement.getChild("imports");
 		List imports = importsElement.getChildren();		
 		for(Iterator iterator=imports.iterator();iterator.hasNext();) {
@@ -248,7 +289,7 @@ public class XMLDatabase
 		}
 		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode, relativePath);
 		
-		statusStream.println("loaded all the objects");
+		statusStream.println("Loaded objects in: " + label);
 		
 		// Need to handle local_id this will be stored as XMLDataObjectRef with in the
 		// tree. this is what the objectReferences vector is for

@@ -114,6 +114,9 @@ public class JDOMElement extends JDOMContent
     public OTXMLElement getChild(String name)
     {
         Element child = element.getChild(name);
+        if(child == null){
+        	return null;
+        }
         
         return new JDOMElement(child);
     }
