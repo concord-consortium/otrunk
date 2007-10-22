@@ -326,14 +326,26 @@ public class OTrunkImpl implements OTrunk
         return aUser;
     }
 
-    public OTObject getExternalObject(URL url) 
+    /**
+     * the parentObjectService needs to be passed in so the returned object
+     * uses the correct layers based on the context in which this method is
+     * called.
+     * 
+     * @param url
+     * @param parentObjectService
+     * @return
+     * @throws Exception
+     */
+    public OTObject getExternalObject(URL url, OTObjectService parentObjectService) 
     	throws Exception
     {
     	OTObjectServiceImpl externalObjectService = 
     		loadDatabase(url);
 		
     	// get the root object either the real root or the system root
-		return getRoot(externalObjectService);
+    	OTObject root = getRoot(externalObjectService);
+    	
+    	return parentObjectService.getOTObject(root.getGlobalId());
     }
     
     protected OTObjectServiceImpl loadDatabase(URL url) 
