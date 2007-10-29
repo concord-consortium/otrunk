@@ -201,6 +201,9 @@ public class OTrunkImpl implements OTrunk
 	public OTSystem getSystem() throws Exception
 	{
 		OTDataObject systemDO = systemDb.getRoot();
+		if (systemDO == null) {
+			return null;
+		}
 		OTID systemID = systemDO.getGlobalId();
 		OTObject systemObject = systemObjectService.getOTObject(systemID);
 		if(systemObject instanceof OTSystem){
@@ -418,6 +421,9 @@ public class OTrunkImpl implements OTrunk
     {
     	OTDatabase db = objectService.getMainDb();    	
 		OTDataObject rootDO = db.getRoot();
+		if (rootDO == null) {
+			return;
+		}
 		OTID rootID = rootDO.getGlobalId();
 		OTObject otRoot = objectService.getOTObject(rootID);
 		if(!(otRoot instanceof OTSystem)){
