@@ -4,13 +4,13 @@
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/test/resources"/>
-	<classpathentry kind="src" path="/Framework"/>
-	<classpathentry kind="src" path="/FrameworkView"/>
-	<classpathentry kind="lib" path="/thirdparty/jdom-1.0.jar"/>
-	<classpathentry kind="lib" path="/thirdparty/jug-1.1.2.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Swing"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Loader"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/AppleSupport"/>
+	<classpathentry kind="src" path="/framework"/>
+	<classpathentry kind="src" path="/frameworkview"/>
+	<classpathentry kind="lib" path="/thirdparty-jars/jdom-1.0.jar"/>
+	<classpathentry kind="lib" path="/thirdparty-jars/jug-1.1.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/swing"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/loader"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/apple-support"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="output" path="lib"/>
 </classpath>
