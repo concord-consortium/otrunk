@@ -159,6 +159,10 @@ public class OTCompoundDoc extends OTFolderObject
 		}
 		return resources.getDocumentRefs().getVector();
 	}
+	
+	public OTObjectList getDocumentRefsAsObjectList(){
+		return resources.getDocumentRefs();
+	}
 
 	public void removeAllDocumentReference()
 	{
