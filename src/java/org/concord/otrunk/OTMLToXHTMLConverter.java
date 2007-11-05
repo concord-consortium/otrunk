@@ -55,6 +55,7 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 	private DefaultOTObject topLevelOTObject;
 	private OTViewContainer viewContainer;
 	private OTViewFactory viewFactory;
+	private String mode;
 	
     private int containerDisplayWidth;
     private int containerDisplayHeight;
@@ -69,6 +70,18 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 								OTViewContainer viewContainer) {
 		setViewContainer(viewContainer);			
 		setViewFactory(viewFactory);
+	}
+	
+	public OTMLToXHTMLConverter(OTViewFactory viewFactory, 
+			DefaultOTObject otObject) {
+		this(viewFactory, otObject, null);
+	}
+	
+	public OTMLToXHTMLConverter(OTViewFactory viewFactory, 
+								DefaultOTObject otObject, String mode) {
+		setViewFactory(viewFactory);
+		this.topLevelOTObject = otObject;
+		this.mode = mode;
 	}
 	  
 	public void setViewContainer(OTViewContainer viewContainer) {
@@ -97,12 +110,11 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
     }
     
     public void run() {
-		
         if(outputFile == null) return;
 
         String text = null;
 		if(topLevelOTObject != null) {
-			OTJComponentView objView = getOTJComponentView(topLevelOTObject);
+			OTJComponentView objView = getOTJComponentView(topLevelOTObject, mode);
 
             OTXHTMLView xhtmlView = null;
             String bodyText = "";
@@ -199,18 +211,23 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
 
     protected OTJComponentView getOTJComponentView(OTObject obj)
     {
+        return getOTJComponentView(obj, null);  	
+    }
+    
+    protected OTJComponentView getOTJComponentView(OTObject obj, String mode)
+    {
     	if(jComponentService == null){
             OTViewContext viewContext = viewFactory.getViewContext();
             OTJComponentServiceFactory serviceFactory = (OTJComponentServiceFactory)
             	viewContext.getViewService(OTJComponentServiceFactory.class);
 			jComponentService = serviceFactory.createOTJComponentService(viewFactory);
     	}
-        return jComponentService.getObjectView(obj, viewContainer);    	
+        return jComponentService.getObjectView(obj, viewContainer, mode);    	
     }
     
     protected JComponent getJComponent(OTObject obj)
     {
-        OTJComponentView objView = getOTJComponentView(obj);
+        OTJComponentView objView = getOTJComponentView(obj, mode);
         
         JComponent comp = objView.getComponent(obj);
         return comp;
@@ -218,7 +235,14 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
     
     public String embedOTObject(OTObject obj) {
         OTView view = viewFactory.getView(obj, OTPrintDimension.class);
-        if(view == null) view = (OTView)viewFactory.getView(obj, OTJComponentView.class);
+        if(view == null) view = (OTView)viewFactory.getView(obj, OTJComponentView.class, mode);
+        
+        System.out.println("checking... view = "+view);
+        if(view instanceof OTXHTMLView) {
+        	String objectText = ((OTXHTMLView)view).getXHTMLText(obj);
+        	System.out.println("text = "+objectText);
+        	return objectText;
+        }
         
         Dimension dim = null;
         if(view instanceof OTPrintDimension) {
