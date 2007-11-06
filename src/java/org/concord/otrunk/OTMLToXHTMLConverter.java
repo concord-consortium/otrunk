@@ -237,10 +237,8 @@ public class OTMLToXHTMLConverter implements Runnable, OTXHTMLHelper{
         OTView view = viewFactory.getView(obj, OTPrintDimension.class);
         if(view == null) view = (OTView)viewFactory.getView(obj, OTJComponentView.class, mode);
         
-        System.out.println("checking... view = "+view);
         if(view instanceof OTXHTMLView) {
         	String objectText = ((OTXHTMLView)view).getXHTMLText(obj);
-        	System.out.println("text = "+objectText);
         	return objectText;
         }
         
