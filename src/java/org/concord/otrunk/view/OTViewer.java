@@ -57,6 +57,7 @@ import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import javax.swing.AbstractAction;
@@ -247,6 +248,19 @@ public class OTViewer extends JFrame
 
 	private OTSystem userSystem;
 
+	private ArrayList services = new ArrayList();	
+	
+	public static class ServiceEntry {		
+		Object service;
+		Class serviceInterface;
+		
+		public ServiceEntry(Object service, Class serviceInterface)
+		{
+			this.service = service;
+			this.serviceInterface = serviceInterface;
+		}
+	}
+	
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
 		otViewFactory = factory;
@@ -344,6 +358,17 @@ public class OTViewer extends JFrame
 		Toolkit.getDefaultToolkit().addAWTEventListener(awtEventListener, AWTEvent.MOUSE_EVENT_MASK);
 	}
 
+	/**
+	 * this needs to be called before initialized.
+	 * @param serviceInterface
+	 * @param service
+	 */
+	public void addService(Class serviceInterface, Object service)
+	{
+		ServiceEntry entry = new ServiceEntry(service, serviceInterface);
+		services.add(entry);
+	}
+	
 	public void setUserMode(int mode)
 	{
 		userMode = mode;
@@ -655,11 +680,21 @@ public class OTViewer extends JFrame
 			throw e;
 		}
 
+		int servicesSize = services.size();
+		int numDefaultServices = 1;
+        Object [] serviceArray = new Object[servicesSize + numDefaultServices];
+        serviceArray[0] =  new SwingUserMessageHandler(this);        
+        Class [] serviceInterfaces =  new Class[servicesSize + numDefaultServices];
+        serviceInterfaces[0] =  UserMessageHandler.class;
 		
+        for(int i=0; i<services.size(); i++){
+        	ServiceEntry entry = (ServiceEntry) services.get(i);
+        	serviceArray[i+numDefaultServices] = entry.service;
+        	serviceInterfaces[i+numDefaultServices] = entry.serviceInterface;
+        }        
 		
 		otrunk = new OTrunkImpl(systemDB, xmlDB,
-		        new Object[] { new SwingUserMessageHandler(this) },
-		        new Class[] { UserMessageHandler.class });
+				serviceArray, serviceInterfaces);
 
 		OTViewFactory myViewFactory = (OTViewFactory) otrunk
 		        .getService(OTViewFactory.class);
