@@ -162,7 +162,14 @@ public class OTViewerHelper
 	{
 	}
 
-
+	public void loadOTrunkNoViewSystem(OTDatabase otDB)
+		throws Exception
+	{
+		this.otDB = otDB;
+		otrunk = new OTrunkImpl(otDB);
+		
+	}
+	
 	public void loadOTrunk(OTDatabase otDB, Component parentComponent)
 	throws Exception
 	{
