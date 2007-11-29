@@ -245,6 +245,10 @@ public class XMLDatabase
 		typeService.registerUserType("object", objectTypeHandler);
 
 		OTXMLElement importsElement = rootElement.getChild("imports");
+		if (importsElement == null) {
+			throw new RuntimeException("<imports> element is missing");
+		}
+		
 		List imports = importsElement.getChildren();		
 		for(Iterator iterator=imports.iterator();iterator.hasNext();) {
 		    OTXMLElement currentImport=(OTXMLElement)iterator.next();
