@@ -44,6 +44,7 @@ import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.AbstractOTJComponentView;
+import org.concord.otrunk.view.AbstractOTJComponentContainerView;
 
 /**
  * @author scott
@@ -51,7 +52,7 @@ import org.concord.framework.otrunk.view.AbstractOTJComponentView;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class OTTextObjectView extends AbstractOTJComponentView
+public class OTTextObjectView extends AbstractOTJComponentContainerView
 	implements DocumentListener, OTChangeListener
 {
 	protected OTDocument pfObject;

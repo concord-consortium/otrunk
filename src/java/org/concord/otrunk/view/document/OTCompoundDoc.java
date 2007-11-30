@@ -69,6 +69,10 @@ public class OTCompoundDoc extends OTFolderObject
 		public String getMarkupLanguage();
 
 		public void setMarkupLanguage(String lang);
+		
+		public void setShowEditBar(boolean showEditBar);
+		public boolean getShowEditBar();
+		public static boolean DEFAULT_showEditBar = true;
 	}
 
 	private ResourceSchema resources;
@@ -221,5 +225,15 @@ public class OTCompoundDoc extends OTFolderObject
 	public OTObjectService getOTObjectService()
 	{
 		return resources.getOTObjectService();
+	}
+	
+	public void setShowEditBar(boolean showEditBar)
+	{
+		resources.setShowEditBar(showEditBar);
+	}
+	
+	public boolean getShowEditBar()
+	{
+		return resources.getShowEditBar();
 	}
 }
