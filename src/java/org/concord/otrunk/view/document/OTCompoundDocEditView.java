@@ -62,6 +62,10 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 
 	private JPanel editPane;
 
+	private JButton addObjectButton;
+
+	private JButton updatePreviewButton;
+
 	/**
 	 * 
 	 */
@@ -176,12 +180,12 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 		// Create buttons and add to the bottom
 		JPanel buttonsPanel = new JPanel();
 
-		JButton addObjectButton = new JButton("Insert Object");
+		addObjectButton = new JButton("Insert Object");
 		buttonsPanel.add(addObjectButton);
 		addObjectButton.setActionCommand("insertObject");
 		addObjectButton.addActionListener(this);
 
-		JButton updatePreviewButton = new JButton("Update Preview");
+		updatePreviewButton = new JButton("Update Preview");
 		buttonsPanel.add(updatePreviewButton);
 		updatePreviewButton.setActionCommand("updatePreview");
 		updatePreviewButton.addActionListener(this);
@@ -305,6 +309,9 @@ public class OTCompoundDocEditView extends AbstractOTDocumentView
 	public void viewClosed()
 	{
 		super.viewClosed();
+		
+		addObjectButton.removeActionListener(this);
+		updatePreviewButton.removeActionListener(this);
 
 		if (previewView != null) {
 			previewView.viewClosed();

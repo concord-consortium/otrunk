@@ -1,17 +1,16 @@
-/**
- * 
- */
-package org.concord.otrunk.view.document;
+package org.concord.otrunk.view.document.edit;
 
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.view.OTViewEntry;
+import org.concord.otrunk.view.document.DocumentConfig;
+import org.concord.otrunk.view.document.OTDocumentViewConfig;
 
-/**
- * @author scott
- *
- */
-public interface OTDocumentViewConfig extends DocumentConfig, OTViewEntry 
+public interface OTDocumentEditViewConfig extends DocumentConfig, OTViewEntry
 {
+	public OTObjectList getObjectsToInsert();
+	
+	public OTDocumentViewConfig getDocumentViewConfig();
+	
 	// Methods duplicated here because reflection won't understand that these are indeed
 	// extended from DocumentConfig. These don't do anything, but must remain.
 	public String getMode();

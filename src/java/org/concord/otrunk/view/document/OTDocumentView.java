@@ -90,9 +90,11 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 	protected JTextArea parsedTextArea = null;
 
-	protected OTDocumentViewConfig viewEntry;
-
 	protected OTObject otObject;
+	
+	protected DocumentConfig documentConfig;
+	
+	protected OTViewEntry viewEntry;
 
 	public final static String XHTML_PREFIX_START =
 	// "<?xml version='1.0' encoding='UTF-8'?>\n" +
@@ -125,10 +127,10 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 		setReloadOnViewEntryChange(true);
 		
-		if (viewEntry instanceof OTDocumentViewConfig){
+		if (documentConfig != null){
 			OTViewContainer thisViewContainer = getViewContainer();
 			if (thisViewContainer != null){
-				getViewContainer().setUpdateable(((OTDocumentViewConfig)viewEntry).getViewContainerIsUpdateable());
+				getViewContainer().setUpdateable(documentConfig.getViewContainerIsUpdateable());
 			}
 		}
 
@@ -191,7 +193,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			}
 			bodyText = htmlizeText(bodyText);
 
-			if (viewEntry instanceof OTDocumentViewConfig) {
+			if (documentConfig != null) {
 				
 				String css = getCssText();
 				
@@ -516,7 +518,6 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		
 		String bodyText = pfObject.getDocumentText();
 		bodyText = substituteIncludables(bodyText);
-		
 		return bodyText;
 	}
 
@@ -527,9 +528,10 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	 */
 	public void setViewEntry(OTViewEntry viewEntry) {
 		super.setViewEntry(viewEntry);
-		if (viewEntry instanceof OTDocumentViewConfig) {
-			this.viewEntry = (OTDocumentViewConfig) viewEntry;
-			setViewMode(this.viewEntry.getMode());
+		this.viewEntry = viewEntry;
+		if (viewEntry instanceof DocumentConfig) {
+			documentConfig = (DocumentConfig) viewEntry;
+			setViewMode(documentConfig.getMode());
 		}
 	}
 
@@ -540,12 +542,12 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	protected String getCssText() {
 		String css = "";
 		
-		if (viewEntry.getCss() != null && viewEntry.getCss().length() > 0){
-			css += viewEntry.getCss();
+		if (documentConfig.getCss() != null && documentConfig.getCss().length() > 0){
+			css += documentConfig.getCss();
 		}
 		
-		if (viewEntry.getCssBlocks() != null && viewEntry.getCssBlocks().getVector().size() > 0){
-			Vector cssBlocks =  viewEntry.getCssBlocks().getVector();
+		if (documentConfig.getCssBlocks() != null && documentConfig.getCssBlocks().getVector().size() > 0){
+			Vector cssBlocks =  documentConfig.getCssBlocks().getVector();
 			
 			for (int i = 0; i < cssBlocks.size(); i++) {
                 OTCssText cssText = (OTCssText) cssBlocks.get(i);

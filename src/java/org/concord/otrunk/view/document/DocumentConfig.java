@@ -1,19 +1,14 @@
-/**
- * 
- */
 package org.concord.otrunk.view.document;
 
 import org.concord.framework.otrunk.OTObjectList;
-import org.concord.framework.otrunk.view.OTViewEntry;
 
-/**
- * @author scott
- *
- */
-public interface OTDocumentViewConfig extends DocumentConfig, OTViewEntry 
+public interface DocumentConfig
 {
-	// Methods duplicated here because reflection won't understand that these are indeed
-	// extended from DocumentConfig. These don't do anything, but must remain.
+	/**
+	 * The mode the document view uses to render embedded components
+	 * 
+	 * @return
+	 */
 	public String getMode();
 	public void setMode(String mode);
 	
