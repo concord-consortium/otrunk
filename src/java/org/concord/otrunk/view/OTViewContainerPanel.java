@@ -126,6 +126,8 @@ public class OTViewContainerPanel extends JPanel
 
 	private boolean scrollPanelHasBorder = true;
 	
+	private boolean showTempLoadingLabel = true;
+	
 	/**
 	 * 
 	 */
@@ -267,10 +269,12 @@ public class OTViewContainerPanel extends JPanel
 		// so instead of this:
         // JLabel loading = new JLabel("Loading...");
 		// we'll use this which is really short.
-		JLabel loading = new JLabel("...");
-		loading.setBorder(BorderFactory.createLineBorder(Color.black));
-		add(loading);
-
+		if (showTempLoadingLabel){
+    		JLabel loading = new JLabel("...");
+    		loading.setBorder(BorderFactory.createLineBorder(Color.black));
+    		add(loading);
+		}
+		
 		revalidate();				
 		
 		// By doing a double invokeLater we make sure this code doesn't get
@@ -624,5 +628,15 @@ public class OTViewContainerPanel extends JPanel
 	public void setTopLevelContainer(boolean topLevelContainer)
     {
     	this.topLevelContainer = topLevelContainer;
+    }
+
+	public boolean isShowTemporaryLoadingLabel()
+    {
+    	return showTempLoadingLabel;
+    }
+
+	public void setShowTemporaryLoadingLabel(boolean showTempLoadingLabel)
+    {
+    	this.showTempLoadingLabel = showTempLoadingLabel;
     }
 }
