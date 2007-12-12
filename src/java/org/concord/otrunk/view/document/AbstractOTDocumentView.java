@@ -33,6 +33,9 @@ public class AbstractOTDocumentView extends OTTextObjectView
 
 	public String getViewMode()
 	{
+		if (viewMode == null){
+			return myMode;
+		}
 		return viewMode;
 	}
 
