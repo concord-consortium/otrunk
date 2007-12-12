@@ -16,7 +16,7 @@ import org.concord.framework.otrunk.view.OTViewEntry;
 public abstract class AbstractOTJComponentContainerView extends AbstractOTJComponentView
 {
 	private OTJComponentContainerHelper containerHelper;
-	private String myMode;
+	protected String myMode;
 
 	/**
 	 * @see org.concord.framework.otrunk.view.OTJComponentView#viewClosed()
