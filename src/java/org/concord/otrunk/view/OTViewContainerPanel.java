@@ -632,4 +632,14 @@ public class OTViewContainerPanel extends JPanel
     {
     	this.topLevelContainer = topLevelContainer;
     }
+
+	public boolean isShowTemporaryLoadingLabel()
+    {
+    	return showTempLoadingLabel;
+    }
+
+	public void setShowTemporaryLoadingLabel(boolean showTempLoadingLabel)
+    {
+    	this.showTempLoadingLabel = showTempLoadingLabel;
+    }
 }
