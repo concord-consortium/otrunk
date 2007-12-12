@@ -407,6 +407,9 @@ public class OTViewContainerPanel extends JPanel
 		if(currentView == null) {
 			return new JLabel("No view for object: " + currentObject);
 		} 
+		if (currentView instanceof AbstractOTJComponentContainerView){
+			((AbstractOTJComponentContainerView)currentView).setMode(getViewMode());
+		}
 		
 		return jComponentService.getComponent(currentObject, currentView);
 	}
@@ -628,15 +631,5 @@ public class OTViewContainerPanel extends JPanel
 	public void setTopLevelContainer(boolean topLevelContainer)
     {
     	this.topLevelContainer = topLevelContainer;
-    }
-
-	public boolean isShowTemporaryLoadingLabel()
-    {
-    	return showTempLoadingLabel;
-    }
-
-	public void setShowTemporaryLoadingLabel(boolean showTempLoadingLabel)
-    {
-    	this.showTempLoadingLabel = showTempLoadingLabel;
     }
 }

@@ -16,6 +16,7 @@ import org.concord.framework.otrunk.view.OTViewEntry;
 public abstract class AbstractOTJComponentContainerView extends AbstractOTJComponentView
 {
 	private OTJComponentContainerHelper containerHelper;
+	private String myMode;
 
 	/**
 	 * @see org.concord.framework.otrunk.view.OTJComponentView#viewClosed()
@@ -23,6 +24,14 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 	public void viewClosed()
 	{
 		removeAllSubViews();
+	}
+	
+	public void setMode(String mode){
+		myMode = mode;
+	}
+	
+	public String getMode(){
+		return myMode;
 	}
 
 	protected OTViewContainerPanel createViewContainerPanel()
@@ -65,7 +74,7 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 	{
 		if(containerHelper == null){
 			containerHelper = new OTJComponentContainerHelper(getFrameManager(),
-					getJComponentService(), null);
+					getJComponentService(), getMode());
 
 		}
 		return containerHelper;
