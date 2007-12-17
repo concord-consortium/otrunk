@@ -56,6 +56,7 @@ import org.concord.framework.otrunk.view.OTJComponentService;
 import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewContainer;
+import org.concord.framework.otrunk.view.OTViewContainerChangeEvent;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewEntry;
@@ -127,6 +128,8 @@ public class OTViewContainerPanel extends JPanel
 	private boolean scrollPanelHasBorder = true;
 	
 	private boolean showTempLoadingLabel = true;
+
+	private OTObject previousObject;
 	
 	/**
 	 * 
@@ -225,6 +228,9 @@ public class OTViewContainerPanel extends JPanel
 			controllerService.dispose();
 		}
 		
+		if (currentObject != null){
+			previousObject = currentObject;
+		}
 		// FIXME There might already be an event queued to setup this current object
 		// We should compare the last queued event with this request and 
 		// have the option to not queue this event.
@@ -474,9 +480,20 @@ public class OTViewContainerPanel extends JPanel
 	
 	public void notifyListeners()
 	{
+		OTViewContainerChangeEvent evt;
+		if (currentObject == null){
+			evt = new OTViewContainerChangeEvent(viewContainer, OTViewContainerChangeEvent.DELETE_CURRENT_OBJECT_EVT);
+		} else if (previousObject == null){
+			evt = new OTViewContainerChangeEvent(viewContainer, OTViewContainerChangeEvent.NEW_CURRENT_OBJECT_EVT);
+		} else if (previousObject == currentObject){
+			evt = new OTViewContainerChangeEvent(viewContainer, OTViewContainerChangeEvent.CHANGE_CURRENT_OBJECT);
+		} else {
+			evt = new OTViewContainerChangeEvent(viewContainer, OTViewContainerChangeEvent.REPLACE_CURRENT_OBJECT_EVT, previousObject);
+		}
+		
 	    for(int i=0; i<containerListeners.size(); i++) {
 	        ((OTViewContainerListener)containerListeners.get(i)).
-	        	currentObjectChanged(viewContainer);
+	        	currentObjectChanged(evt);
 	        	
 	    }
 	}
