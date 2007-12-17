@@ -98,6 +98,7 @@ import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
 import org.concord.framework.otrunk.view.OTViewContainer;
+import org.concord.framework.otrunk.view.OTViewContainerChangeEvent;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
@@ -904,9 +905,9 @@ public class OTViewer extends JFrame
 	 * 
 	 * @see org.concord.otrunk.view.OTViewContainerListener#currentObjectChanged(org.concord.framework.otrunk.view.OTViewContainer)
 	 */
-	public void currentObjectChanged(OTViewContainer container)
+	public void currentObjectChanged(OTViewContainerChangeEvent evt)
 	{
-		final OTViewContainer myContainer = container;
+		final OTViewContainer myContainer = (OTViewContainer) evt.getSource();
 
 		// TODO Auto-generated method stub
 		SwingUtilities.invokeLater(new Runnable() {
