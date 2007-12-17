@@ -1,15 +1,19 @@
 package org.concord.otrunk.view.document;
 
+import java.awt.event.ContainerListener;
+
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
+import org.concord.framework.otrunk.view.OTViewContainerChangeEvent;
+import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.otrunk.view.OTJComponentContainerHelper;
 import org.concord.otrunk.view.OTViewContainerPanel;
 
 public class AbstractOTDocumentView extends OTTextObjectView
-    implements OTViewContainerAware
+    implements OTViewContainerAware, OTViewContainerListener
 {
 	private OTViewContainer viewContainer;
 
@@ -58,8 +62,11 @@ public class AbstractOTDocumentView extends OTTextObjectView
 			        getFrameManager(), getJComponentService(), getViewMode());
 			containerHelper.setParentContainer(viewContainer);
 		}
-
-		return containerHelper.createViewContainerPanel();
+		
+		OTViewContainerPanel viewContainerPanel = containerHelper.createViewContainerPanel();
+		viewContainerPanel.addViewContainerListener(this);
+		
+		return viewContainerPanel;
 	}
 
 	public void viewClosed()
@@ -91,4 +98,9 @@ public class AbstractOTDocumentView extends OTTextObjectView
 		}
 		return getReferencedObject(linkId);
 	}
+
+	public void currentObjectChanged(OTViewContainerChangeEvent evt)
+    {
+		// to be handled by OTDocumentView
+    }
 }
