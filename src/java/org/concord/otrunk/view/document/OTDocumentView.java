@@ -60,6 +60,7 @@ import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
+import org.concord.framework.otrunk.view.OTViewContainerChangeEvent;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTXHTMLView;
@@ -581,4 +582,29 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		}
 		return css;
 	}
+	
+	// If one of the child objects is replaced by another, we swap the old and new
+	// object in the documentRefs, and then change the object references in the
+	// html to refer to the new object.
+	public void currentObjectChanged(OTViewContainerChangeEvent evt)
+    {
+		if (evt.getEventType() == OTViewContainerChangeEvent.REPLACE_CURRENT_OBJECT_EVT){
+			System.out.println("evt: "+evt.getPreviousObject()+", "+evt.getValue());
+			OTObject oldObject = evt.getPreviousObject();
+			OTObject newObject = evt.getValue();
+			
+			if (otObject instanceof OTCompoundDoc){
+				OTCompoundDoc compoundDoc = (OTCompoundDoc) otObject;
+				compoundDoc.getDocumentRefsAsObjectList().remove(oldObject);
+				compoundDoc.getDocumentRefsAsObjectList().add(newObject);
+				
+				String newBodyText = compoundDoc.getBodyText().replaceAll(
+						otObject.getOTObjectService().getExternalID(oldObject), 
+						otObject.getOTObjectService().getExternalID(newObject));
+				compoundDoc.setBodyText(newBodyText);
+				updateFormatedView();
+				
+			}
+		}
+    }
 }
