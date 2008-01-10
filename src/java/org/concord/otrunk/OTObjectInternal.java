@@ -619,4 +619,9 @@ public class OTObjectInternal implements OTObjectInterface
     {
 		return objectService.getExternalID(changeEventSource);
     }
+
+	public ArrayList getOTChangeListeners()
+    {
+	    return changeListeners;
+    }
 }
