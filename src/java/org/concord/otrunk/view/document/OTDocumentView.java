@@ -440,6 +440,11 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 					// System.err.println("Invalid link: " + e.getDescription());
 					// System.err.print("Trying with codebase...");
 					URL codebase = otObject.getOTObjectService().getCodebase(otObject);
+					if (codebase == null) {
+						System.err.println("Invalid link: " + e.getDescription());
+						return;
+					}
+					
 					URL newTarget = null;
 					// if the link appears absolute
 					// then construct the url using only the host information (or file:// for local files)
