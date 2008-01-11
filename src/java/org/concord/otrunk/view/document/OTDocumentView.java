@@ -435,7 +435,36 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 				OTObject linkObj = getReferencedObject(linkTarget);
 				if (linkObj == null) {
-					System.err.println("Invalid link: " + e.getDescription());
+					// It wasn't an external link, and wasn't a reference to an OTObject
+					// lets assume it's a relative link to an external resource
+					// System.err.println("Invalid link: " + e.getDescription());
+					// System.err.print("Trying with codebase...");
+					URL codebase = otObject.getOTObjectService().getCodebase(otObject);
+					URL newTarget = null;
+					// if the link appears absolute
+					// then construct the url using only the host information (or file:// for local files)
+					if (linkTarget.charAt(0) == '/') {
+						// use just the protocol, port, host info from the codebase
+						if (codebase.getProtocol().startsWith("http")) {
+							newTarget = new URL(codebase.toExternalForm().substring(0,codebase.toExternalForm().indexOf('/', 8)) + linkTarget);
+						} else if (codebase.getProtocol().startsWith("file")) {
+							newTarget = new URL(codebase.getProtocol() + "://" + linkTarget);
+						}
+					} else {
+						// since the codebase url has the otml file at the end, strip it and append the relative url
+						newTarget = new URL(codebase.toExternalForm().substring(0,codebase.toExternalForm().lastIndexOf("/")+1) + linkTarget);
+					}
+					if (newTarget != null) {
+						// try to launch the url in a browser window
+    					OTExternalAppService extAppService = 
+    						(OTExternalAppService)getViewService(OTExternalAppService.class);
+    					if (extAppService.showDocument(newTarget)) {
+    						// System.err.println(" success!");
+    					} else {
+    						System.err.println("Invalid link: " + e.getDescription());
+    					}
+    					// System.err.println("New url was: " + newTarget.toExternalForm());
+					}
 					return;
 				}
 
