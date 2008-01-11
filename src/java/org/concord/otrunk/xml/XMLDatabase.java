@@ -739,4 +739,9 @@ public class XMLDatabase
     {
     	return importedOTObjectClasses;
     }
+
+	public URL getContextURL()
+    {
+		return contextURL;
+    }
 }

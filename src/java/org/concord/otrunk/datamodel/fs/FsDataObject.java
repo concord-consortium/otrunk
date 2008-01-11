@@ -33,6 +33,7 @@
 package org.concord.otrunk.datamodel.fs;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.Date;
 import java.util.Hashtable;
 
@@ -188,5 +189,11 @@ public class FsDataObject
 	public OTDataObjectType getType()
     {
 		return type;
+    }
+
+	public URL getCodebase()
+    {
+	    // TODO Auto-generated method stub
+	    return null;
     }
 }
