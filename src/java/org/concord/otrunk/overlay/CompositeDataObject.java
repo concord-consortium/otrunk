@@ -32,6 +32,7 @@
 */
 package org.concord.otrunk.overlay;
 
+import java.net.URL;
 import java.util.Hashtable;
 
 import org.concord.framework.otrunk.OTID;
@@ -316,5 +317,12 @@ public class CompositeDataObject
 	public OTDataObjectType getType()
     {
 		return baseObject.getType();
+    }
+
+	public URL getCodebase()
+    {
+		// FIXME For now return the codebase of the baseObject.
+		//  this needs to be through through more.
+		return baseObject.getCodebase();
     }
 }

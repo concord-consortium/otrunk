@@ -32,6 +32,7 @@
 */
 package org.concord.otrunk.xml;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -253,5 +254,10 @@ public class XMLDataObject
 	public void setContainerResourceKey(String containerResourceKey)
     {
     	this.containerResourceKey = containerResourceKey;
+    }
+
+	public URL getCodebase()
+    {
+		return database.getContextURL();
     }
 }

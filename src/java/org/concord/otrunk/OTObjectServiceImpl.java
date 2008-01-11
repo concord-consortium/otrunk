@@ -34,6 +34,7 @@ package org.concord.otrunk;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
+import java.net.URL;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTControllerRegistry;
@@ -407,6 +408,19 @@ public class OTObjectServiceImpl
 					" using this object service with mainDb: " + mainDb);
 		}
 		return globalId.toExternalForm();
+    }
+
+	public URL getCodebase(OTObject otObject)
+    {
+		OTID id = otObject.getGlobalId();
+		try {
+	        OTDataObject dataObject = getOTDataObject(id);
+	        return dataObject.getCodebase();
+        } catch (Exception e) {
+	        e.printStackTrace();
+        }
+		
+	    return null;
     }
 
 }

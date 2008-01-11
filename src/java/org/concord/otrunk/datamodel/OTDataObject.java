@@ -29,6 +29,8 @@
  */
 package org.concord.otrunk.datamodel;
 
+import java.net.URL;
+
 import org.concord.framework.otrunk.OTID;
 
 /**
@@ -74,4 +76,15 @@ public interface OTDataObject
 	public OTDatabase getDatabase();
 	
 	public OTDataObjectType getType();
+	
+	/**
+	 * There might be relative urls embedded in the content of this OTDataObject
+	 * This method should return the url that these are relative too.  This can
+	 * be used with the method: new URL(codebase, relative_url_string)  
+	 * 
+	 * This method can return null if there isn't anything appropriate to return.
+	 * 
+	 * @return
+	 */
+	public URL getCodebase();
 }
