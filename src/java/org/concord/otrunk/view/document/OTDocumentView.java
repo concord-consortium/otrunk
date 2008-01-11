@@ -51,6 +51,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Element;
 import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -208,6 +209,8 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			removeAllSubViews();
 
 			editorPane.setText(bodyText);
+			HTMLDocument doc = (HTMLDocument) editorPane.getDocument();
+			doc.setBase(otObject.getOTObjectService().getCodebase(otObject));
 
 			previewComponent = editorPane;
 
