@@ -269,6 +269,26 @@ public class XMLDatabase
 		ReflectionTypeDefinitions.registerTypes(importedOTObjectClasses, typeService,
 				this);		
 		
+		// Add local_ids listed in the otml's idMap to the localIdMap
+		// This way the objects with a defined uuid can be referred to
+		// by a human-readable local_id within the otml file
+		OTXMLElement idMapElement = rootElement.getChild("idMap");
+		if (idMapElement != null){
+			List idMappings = idMapElement.getChildren();
+			for(Iterator it = idMappings.iterator(); it.hasNext();) {
+				OTXMLElement mapping = (OTXMLElement)it.next();
+				String idStr = mapping.getAttributeValue("id");
+				String localIdStr = mapping.getAttributeValue("local_id");
+				OTID otid = OTIDFactory.createOTID(idStr);
+				
+				Object oldId = localIdMap.put(localIdStr, otid);
+    			if(oldId != null) {
+    				System.err.println("repeated local id: " + localIdStr);
+    			}
+		    }
+
+		}
+		
 		// Pass 1:
 		// Load all the xml data objects in the file
 		// This also makes a list of all these objects so we 
