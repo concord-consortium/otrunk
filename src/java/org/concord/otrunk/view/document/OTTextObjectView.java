@@ -62,12 +62,15 @@ public class OTTextObjectView extends AbstractOTJComponentContainerView
 
     JLabel labelView = null;
     private boolean changingText = false;
+
+	private boolean changeListenerAdded;
 	
 	protected void setup(OTObject pfTextObject)
 	{
 		this.pfObject = (OTDocument)pfTextObject;
 		if(pfTextObject instanceof OTChangeNotifying){
 		    ((OTChangeNotifying)pfTextObject).addOTChangeListener(this);
+		    changeListenerAdded = true;
 		}
 	}
 
@@ -184,7 +187,7 @@ public class OTTextObjectView extends AbstractOTJComponentContainerView
             textAreaModel.removeDocumentListener(this);
         }
 
-		if(pfObject instanceof OTChangeNotifying){
+		if(pfObject instanceof OTChangeNotifying && changeListenerAdded){
 		    ((OTChangeNotifying)pfObject).removeOTChangeListener(this);
 		}
 
