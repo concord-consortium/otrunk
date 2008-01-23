@@ -282,6 +282,11 @@ public class OTViewFactoryImpl implements OTViewFactory
 			}
 		}		
 		
+		if(mode == null){
+			System.err.println("Cannot find view mode: \"" + modeStr + "\"");
+			return null;
+		}
+		
 		OTObjectMap map = mode.getMap();
 
 		OTViewEntry modeViewEntry = 
