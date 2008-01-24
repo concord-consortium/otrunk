@@ -93,7 +93,7 @@ public class OTViewBundle extends DefaultOTObject
     public String getCurrentMode()
     {
     	String sysPropViewMode = OTViewerHelper.getStringProp(OTViewerHelper.VIEW_MODE_PROP);
-    	if(sysPropViewMode != null){
+    	if(sysPropViewMode != null && sysPropViewMode.length() > 0){
     		return sysPropViewMode;
     	}
     	return resources.getCurrentMode();
