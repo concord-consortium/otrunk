@@ -37,6 +37,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
@@ -59,6 +60,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -115,6 +118,7 @@ import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.swing.CustomDialog;
+import org.concord.swing.MemoryMonitorPanel;
 import org.concord.swing.MostRecentFileDialog;
 import org.concord.swing.StreamRecord;
 import org.concord.swing.StreamRecordView;
@@ -249,7 +253,13 @@ public class OTViewer extends JFrame
 
 	private OTSystem userSystem;
 
-	private ArrayList services = new ArrayList();	
+	private ArrayList services = new ArrayList();
+
+	private JPanel statusPanel;
+
+	private Timer timer;
+
+	private TimerTask repaintStatusTask;	
 	
 	public static class ServiceEntry {		
 		Object service;
@@ -490,6 +500,12 @@ public class OTViewer extends JFrame
 			getContentPane().add(splitPane);
 		} else {
 			getContentPane().add(bodyPanel);
+		}
+		
+		if (OTViewerHelper.isShowStatus()) {
+    		statusPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+    		statusPanel.add(new MemoryMonitorPanel());
+    		getContentPane().add(statusPanel, BorderLayout.SOUTH);
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {

@@ -68,6 +68,7 @@ public class OTViewerHelper
 	public final static String ROOT_OBJECT_PROP = "otrunk.root.localid";
 	public final static String VIEW_MODE_PROP = "otrunk.view.mode";
 	public final static String CODEBASE_PROP = "otrunk.codebase";
+	public final static String SHOW_STATUS_PROP = "otrunk.view.status";
 	
 	/**
 	 * This is yet another hack to support something like layers or mutliple files.
@@ -148,6 +149,11 @@ public class OTViewerHelper
 	public static boolean isRestEnabled()
 	{
 		return getBooleanProp(REST_ENABLED_PROP, true);
+	}
+	
+	public static boolean isShowStatus()
+	{
+		return getBooleanProp(SHOW_STATUS_PROP, false);
 	}
 	
 	public static OTUserObject createUser(String name, OTObjectService objService)
