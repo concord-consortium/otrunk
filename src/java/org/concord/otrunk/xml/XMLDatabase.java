@@ -104,6 +104,8 @@ public class XMLDatabase
 	private JDOMDocument document;
 	private URL contextURL;
 	
+	private ArrayList listeners;
+	
 	String label;
 	
 	protected static String getLabel(URL contextURL)
@@ -465,9 +467,39 @@ public class XMLDatabase
 	
 	public void setDirty(boolean dirty)
 	{
+		boolean oldValue = this.dirty;
 	    this.dirty = dirty;
+	    
+	    if (oldValue != this.dirty){
+			notifyListeners();
+		}
 	}
 	
+	private void notifyListeners()
+    {
+		if (listeners == null) return;
+		
+		XMLDatabaseChangeEvent changeEvent = new XMLDatabaseChangeEvent(this);
+		String status = dirty ? XMLDatabaseChangeEvent.STATE_DIRTY : XMLDatabaseChangeEvent.STATE_CLEAN;
+		changeEvent.setValue(status);
+		
+	    for (int i=0; i< listeners.size(); i++){
+	    	((XMLDatabaseChangeListener)listeners.get(i)).stateChanged(changeEvent);
+	    }
+    }
+	
+	public void addXMLDatabaseChangeListener(XMLDatabaseChangeListener listener){
+		if(listener == null){
+			throw new IllegalArgumentException("listener cannot be null");
+		}
+		
+		if (listeners == null){
+			listeners = new ArrayList();
+		}
+		
+		listeners.add(listener);
+	}
+
 	protected XMLDataObject createDataObject(OTXMLElement element, String idStr)
 		throws Exception
 	{
