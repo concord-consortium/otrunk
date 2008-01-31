@@ -29,9 +29,12 @@
  */
 package org.concord.otrunk;
 
+import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -115,7 +118,18 @@ public class OTrunkImpl implements OTrunk
 	
 	public OTrunkImpl(OTDatabase systemDb, OTDatabase db, Object [] services, Class [] serviceClasses)
 	{	
-
+		try {
+	        URL dummyURL = new URL("http://www.concord.org");
+	        URLConnection openConnection = dummyURL.openConnection();
+	        openConnection.setDefaultUseCaches(true);
+        } catch (MalformedURLException e1) {
+	        // TODO Auto-generated catch block
+	        e1.printStackTrace();
+        } catch (IOException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+		
 		// Setup the services this has to be done before addDatabase
 		// because addDatabase initializes the OTPackages loaded by that
 		// database
