@@ -512,7 +512,7 @@ public class OTViewer extends JFrame
 		}
 
 		if (OTViewerHelper.isShowStatus()) {
-			statusPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+			statusPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 1));
 
 			final JLabel saveStateLabel = new JLabel("File saved");
 			statusPanel.add(saveStateLabel);
