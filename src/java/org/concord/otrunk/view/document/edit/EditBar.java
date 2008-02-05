@@ -12,24 +12,15 @@ import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
 
-import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectService;
-
+import com.hexidec.ekit.Ekit;
 import com.hexidec.ekit.component.JButtonNoFocus;
 import com.hexidec.ekit.component.JComboBoxNoFocus;
 import com.hexidec.ekit.component.JToggleButtonNoFocus;
@@ -526,12 +517,12 @@ public class EditBar extends JToolBar implements ActionListener
 	 */
 	private ImageIcon getEkitIcon(String iconName)
 	{
-		URL imageURL = getClass().getResource(iconName + "HK.png");
+		URL imageURL = Ekit.class.getResource("icons/"+iconName + "HK.png");
 		if(imageURL != null)
 		{
 			return new ImageIcon(Toolkit.getDefaultToolkit().getImage(imageURL));
 		}
-		imageURL = getClass().getResource(iconName + "HK.gif");
+		imageURL = Ekit.class.getResource(iconName + "HK.gif");
 		if(imageURL != null)
 		{
 			return new ImageIcon(Toolkit.getDefaultToolkit().getImage(imageURL));
