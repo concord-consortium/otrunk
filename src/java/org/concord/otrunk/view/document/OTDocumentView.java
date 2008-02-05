@@ -616,7 +616,6 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	public void currentObjectChanged(OTViewContainerChangeEvent evt)
     {
 		if (evt.getEventType() == OTViewContainerChangeEvent.REPLACE_CURRENT_OBJECT_EVT){
-			System.out.println("evt: "+evt.getPreviousObject()+", "+evt.getValue());
 			OTObject oldObject = evt.getPreviousObject();
 			OTObject newObject = evt.getValue();
 			
