@@ -61,6 +61,11 @@ public class OTControllerServiceImpl implements OTControllerService
 	 */
 	Map controllerFromOTMap = new WeakHashMap();
 	
+	/**
+	 * A map of services that can be used by controller.
+	 */
+	Map serviceMap = new HashMap();
+	
 	OTObjectService objectService;
 	OTControllerRegistry registry;
 	
@@ -233,10 +238,8 @@ public class OTControllerServiceImpl implements OTControllerService
 
 			return controller;
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -329,16 +332,12 @@ public class OTControllerServiceImpl implements OTControllerService
 			Field field = controllerClass.getField("realObjectClasses");
 			return (Class [])field.get(null);
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -354,14 +353,11 @@ public class OTControllerServiceImpl implements OTControllerService
 			Field field = controllerClass.getField("otObjectClass");
 			return (Class)field.get(null);
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
 			System.err.println("invalid controller class: " + controllerClass);
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -561,4 +557,15 @@ public class OTControllerServiceImpl implements OTControllerService
 		subService.setSharedService(this);
 		return subService;
 	}
+
+	public void addService(Class serviceClass, Object service)
+    {
+		serviceMap.put(serviceClass, service);
+	    
+    }
+
+	public Object getService(Class serviceClass)
+    {
+		return serviceMap.get(serviceClass);
+    }
 }
