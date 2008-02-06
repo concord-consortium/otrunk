@@ -137,8 +137,7 @@ import org.concord.view.SwingUserMessageHandler;
  * 
  */
 public class OTViewer extends JFrame
-    implements TreeSelectionListener, OTViewContainerListener,
-    AppleApplicationAdapter
+    implements TreeSelectionListener, OTViewContainerListener, AppleApplicationAdapter
 {
 	/**
 	 * first version of this class
@@ -309,11 +308,8 @@ public class OTViewer extends JFrame
 		StreamRecord record = new StreamRecord(10000);
 		StreamRecordView view = new StreamRecordView(record);
 		consoleFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		System
-		        .setOut((PrintStream) view.addOutputStream(System.out,
-		                "Console"));
-		System.setErr((PrintStream) view
-		        .addOutputStream(System.err, System.out));
+		System.setOut((PrintStream) view.addOutputStream(System.out, "Console"));
+		System.setErr((PrintStream) view.addOutputStream(System.err, System.out));
 
 		consoleFrame.getContentPane().add(view);
 		consoleFrame.setSize(800, 600);
@@ -329,8 +325,8 @@ public class OTViewer extends JFrame
 		// the object you're currently focused on will be passed in here and you
 		// can
 		// start exploring the data structures, etc.
-		KeyboardFocusManager focusManager = KeyboardFocusManager
-		        .getCurrentKeyboardFocusManager();
+		KeyboardFocusManager focusManager =
+		    KeyboardFocusManager.getCurrentKeyboardFocusManager();
 
 		KeyEventDispatcher deleteDispatcher = new KeyEventDispatcher() {
 			public boolean dispatchKeyEvent(KeyEvent e)
@@ -371,7 +367,7 @@ public class OTViewer extends JFrame
 		};
 
 		Toolkit.getDefaultToolkit().addAWTEventListener(awtEventListener,
-		        AWTEvent.MOUSE_EVENT_MASK);
+		    AWTEvent.MOUSE_EVENT_MASK);
 	}
 
 	/**
@@ -435,8 +431,8 @@ public class OTViewer extends JFrame
 		}
 
 		if (splitPane == null) {
-			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-			        leftComponent, bodyPanel);
+			splitPane =
+			    new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftComponent, bodyPanel);
 		} else {
 			splitPane.setLeftComponent(leftComponent);
 		}
@@ -517,36 +513,40 @@ public class OTViewer extends JFrame
 			statusPanel.add(new MemoryMonitorPanel());
 			statusPanel.add(Box.createHorizontalStrut(5));
 			getContentPane().add(statusPanel, BorderLayout.SOUTH);
-			
+
 			// It takes a while for xmlDM to be initialized...
-			Thread waitForDB = new Thread(){
-				public void run(){
-					while (xmlDB == null){
-						try {sleep(1000);} catch (Exception e){};
+			Thread waitForDB = new Thread() {
+				public void run()
+				{
+					while (xmlDB == null) {
+						try {
+							sleep(1000);
+						} catch (Exception e) {
+						}
 					}
-					xmlDB.addXMLDatabaseChangeListener(new XMLDatabaseChangeListener(){
+					xmlDB.addXMLDatabaseChangeListener(new XMLDatabaseChangeListener() {
 
 						public void stateChanged(XMLDatabaseChangeEvent e)
-	                    {
+						{
 							if (xmlDB.isDirty()) {
 								saveStateLabel.setText("Unsaved changes");
 							} else {
 								saveStateLabel.setText("File saved");
 							}
 							statusPanel.repaint();
-	                    }});
+						}
+					});
 				}
 			};
 			waitForDB.start();
-			
+
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run()
 			{
 
-				Dimension screenSize = Toolkit.getDefaultToolkit()
-				        .getScreenSize();
+				Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 				if (screenSize.width < 1000 || screenSize.height < 700) {
 					setVisible(true);
 					int state = getExtendedState();
@@ -564,8 +564,7 @@ public class OTViewer extends JFrame
 
 					// OTViewService viewService = otViewFactory.
 
-					setBounds(cornerX, cornerY, cornerX + sizeX, cornerY
-					        + sizeY);
+					setBounds(cornerX, cornerY, cornerX + sizeX, cornerY + sizeY);
 					setVisible(true);
 				}
 
@@ -594,8 +593,7 @@ public class OTViewer extends JFrame
 	{
 		loadURL(url);
 
-		OTMainFrame mainFrame = (OTMainFrame) otrunk
-		        .getService(OTMainFrame.class);
+		OTMainFrame mainFrame = (OTMainFrame) otrunk.getService(OTMainFrame.class);
 
 		if (OTViewerHelper.getBooleanProp(HIDE_TREE_PROP, false)
 		        || !mainFrame.getShowLeftPanel()) {
@@ -693,8 +691,8 @@ public class OTViewer extends JFrame
 
 		try {
 			// try loading in the system object if there is one
-			String systemOtmlUrlStr = OTViewerHelper
-			        .getStringProp(OTViewerHelper.SYSTEM_OTML_PROP);
+			String systemOtmlUrlStr =
+			    OTViewerHelper.getStringProp(OTViewerHelper.SYSTEM_OTML_PROP);
 			if (systemOtmlUrlStr != null) {
 				URL systemOtmlUrl = new URL(systemOtmlUrlStr);
 				systemDB = new XMLDatabase(systemOtmlUrl, System.out);
@@ -724,11 +722,12 @@ public class OTViewer extends JFrame
 
 		} catch (org.jdom.input.JDOMParseException e) {
 			String xmlWarningTitle = "XML Decoding error";
-			String xmlWarningMessage = "There appears to a problem parsing the XML of this document. \n"
-			        + "Please show this error message to one of the workshop leaders. \n\n"
-			        + e.getMessage();
-			JOptionPane.showMessageDialog(null, xmlWarningMessage,
-			        xmlWarningTitle, JOptionPane.ERROR_MESSAGE);
+			String xmlWarningMessage =
+			    "There appears to a problem parsing the XML of this document. \n"
+			            + "Please show this error message to one of the workshop leaders. \n\n"
+			            + e.getMessage();
+			JOptionPane.showMessageDialog(null, xmlWarningMessage, xmlWarningTitle,
+			    JOptionPane.ERROR_MESSAGE);
 			throw e;
 		}
 
@@ -745,11 +744,10 @@ public class OTViewer extends JFrame
 			serviceInterfaces[i + numDefaultServices] = entry.serviceInterface;
 		}
 
-		otrunk = new OTrunkImpl(systemDB, xmlDB, serviceArray,
-		        serviceInterfaces);
+		otrunk = new OTrunkImpl(systemDB, xmlDB, serviceArray, serviceInterfaces);
 
-		OTViewFactory myViewFactory = (OTViewFactory) otrunk
-		        .getService(OTViewFactory.class);
+		OTViewFactory myViewFactory =
+		    (OTViewFactory) otrunk.getService(OTViewFactory.class);
 
 		if (myViewFactory != null) {
 			otViewFactory = myViewFactory;
@@ -759,9 +757,9 @@ public class OTViewer extends JFrame
 		factoryContext.addViewService(OTrunk.class, otrunk);
 		factoryContext.addViewService(OTFrameManager.class, frameManager);
 		factoryContext.addViewService(OTJComponentServiceFactory.class,
-		        new OTJComponentServiceFactoryImpl());
+		    new OTJComponentServiceFactoryImpl());
 		factoryContext.addViewService(OTExternalAppService.class,
-		        new OTExternalAppServiceImpl());
+		    new OTExternalAppServiceImpl());
 
 		currentURL = url;
 	}
@@ -788,8 +786,8 @@ public class OTViewer extends JFrame
 	protected OTObject getAuthoredRoot()
 	    throws Exception
 	{
-		String rootLocalId = OTViewerHelper
-		        .getStringProp(OTViewerHelper.ROOT_OBJECT_PROP);
+		String rootLocalId =
+		    OTViewerHelper.getStringProp(OTViewerHelper.ROOT_OBJECT_PROP);
 		if (rootLocalId != null) {
 			OTID rootID = xmlDB.getOTIDFromLocalID(rootLocalId);
 			return otrunk.getOTObject(rootID);
@@ -824,8 +822,8 @@ public class OTViewer extends JFrame
 				OTObject realRoot = otrunk.getRealRoot();
 				if (realRoot instanceof OTSystem) {
 
-					OTSystem localUserSystem = (OTSystem) otrunk
-					        .getUserRuntimeObject(realRoot, currentUser);
+					OTSystem localUserSystem =
+					    (OTSystem) otrunk.getUserRuntimeObject(realRoot, currentUser);
 
 					// FIXME there should be a better way than this because we
 					// have to handle
@@ -851,8 +849,7 @@ public class OTViewer extends JFrame
 
 		if (showTree && !overrideShowTree) {
 			OTDataObject rootDataObject = xmlDB.getRoot();
-			dataTreeModel.setRoot(new OTDataObjectNode("root", rootDataObject,
-			        otrunk));
+			dataTreeModel.setRoot(new OTDataObjectNode("root", rootDataObject, otrunk));
 
 			folderTreeModel.setRoot(new OTFolderNode(root));
 		}
@@ -861,9 +858,9 @@ public class OTViewer extends JFrame
 
 		if (showTree && !overrideShowTree) {
 			folderTreeModel.fireTreeStructureChanged(new TreePath(
-			        (SimpleTreeNode) folderTreeModel.getRoot()));
+			    (SimpleTreeNode) folderTreeModel.getRoot()));
 			dataTreeModel.fireTreeStructureChanged(new TreePath(
-			        (SimpleTreeNode) dataTreeModel.getRoot()));
+			    (SimpleTreeNode) dataTreeModel.getRoot()));
 		}
 
 		Frame frame = (Frame) SwingUtilities.getRoot(this);
@@ -878,8 +875,7 @@ public class OTViewer extends JFrame
 			break;
 		case OTViewerHelper.SINGLE_USER_MODE:
 			if (currentUserFile != null) {
-				frame.setTitle(baseFrameTitle + ": "
-				        + currentUserFile.toString());
+				frame.setTitle(baseFrameTitle + ": " + currentUserFile.toString());
 			} else if (System.getProperty(TITLE_PROP, null) != null) {
 				frame.setTitle(baseFrameTitle);
 			} else if (userDataDB != null) {
@@ -922,11 +918,9 @@ public class OTViewer extends JFrame
 
 		OTViewer viewer = new OTViewer();
 
-		if (OTViewerHelper.getBooleanProp(OTViewerHelper.SINGLE_USER_PROP,
-		        false)) {
+		if (OTViewerHelper.getBooleanProp(OTViewerHelper.SINGLE_USER_PROP, false)) {
 			viewer.setUserMode(OTViewerHelper.SINGLE_USER_MODE);
-		} else if (OTViewerHelper.getBooleanProp(OTViewerHelper.NO_USER_PROP,
-		        false)) {
+		} else if (OTViewerHelper.getBooleanProp(OTViewerHelper.NO_USER_PROP, false)) {
 			viewer.setUserMode(OTViewerHelper.NO_USER_MODE);
 		}
 
@@ -968,8 +962,8 @@ public class OTViewer extends JFrame
 			{
 				OTObject currentObject = myContainer.getCurrentObject();
 				if (folderTreeArea != null) {
-					OTFolderNode node = (OTFolderNode) folderTreeArea
-					        .getLastSelectedPathComponent();
+					OTFolderNode node =
+					    (OTFolderNode) folderTreeArea.getLastSelectedPathComponent();
 					if (node == null)
 						return;
 					if (node.getPfObject() != currentObject) {
@@ -988,8 +982,8 @@ public class OTViewer extends JFrame
 	public void valueChanged(TreeSelectionEvent event)
 	{
 		if (event.getSource() == folderTreeArea) {
-			OTFolderNode node = (OTFolderNode) folderTreeArea
-			        .getLastSelectedPathComponent();
+			OTFolderNode node =
+			    (OTFolderNode) folderTreeArea.getLastSelectedPathComponent();
 
 			if (node == null)
 				return;
@@ -1002,8 +996,8 @@ public class OTViewer extends JFrame
 				splitPane.setRightComponent(bodyPanel);
 			}
 		} else if (event.getSource() == dataTreeArea) {
-			SimpleTreeNode node = (SimpleTreeNode) dataTreeArea
-			        .getLastSelectedPathComponent();
+			SimpleTreeNode node =
+			    (SimpleTreeNode) dataTreeArea.getLastSelectedPathComponent();
 			Object resourceValue = null;
 			if (node != null) {
 				resourceValue = node.getObject();
@@ -1028,8 +1022,7 @@ public class OTViewer extends JFrame
 
 	private void updateRemoteURL(String defaultURL)
 	{
-		String remote = System
-		        .getProperty(OTViewerHelper.REMOTE_URL_PROP, null);
+		String remote = System.getProperty(OTViewerHelper.REMOTE_URL_PROP, null);
 
 		try {
 			if (remote == null) {
@@ -1054,8 +1047,7 @@ public class OTViewer extends JFrame
 		BufferedReader urlDataIn;
 
 		// If method isn't "POST" or "PUT", throw an exception
-		if (!(method.compareTo(OTViewer.HTTP_POST) == 0 || method
-		        .compareTo(OTViewer.HTTP_PUT) == 0)) {
+		if (!(method.compareTo(OTViewer.HTTP_POST) == 0 || method.compareTo(OTViewer.HTTP_PUT) == 0)) {
 			throw new Exception("Invalid HTTP Request method for data saving");
 		}
 
@@ -1073,8 +1065,9 @@ public class OTViewer extends JFrame
 		urlDataOut.close();
 
 		// Get response data.
-		urlDataIn = new BufferedReader(new InputStreamReader(
-		        new DataInputStream(urlConn.getInputStream())));
+		urlDataIn =
+		    new BufferedReader(new InputStreamReader(new DataInputStream(
+		        urlConn.getInputStream())));
 		String str;
 		String response = "";
 		while (null != ((str = urlDataIn.readLine()))) {
@@ -1085,8 +1078,8 @@ public class OTViewer extends JFrame
 		// exception isn't thrown already) and capture the exceptions upstream
 		int code = urlConn.getResponseCode();
 		if (code >= 400) {
-			throw new Exception("HTTP Response: "
-			        + urlConn.getResponseMessage() + "\n\n" + response);
+			throw new Exception("HTTP Response: " + urlConn.getResponseMessage() + "\n\n"
+			        + response);
 		}
 		urlConn.disconnect();
 		xmlDB.setDirty(false);
@@ -1141,8 +1134,8 @@ public class OTViewer extends JFrame
 			public void actionPerformed(ActionEvent arg0)
 			{
 				File fileToSave = getReportFile();
-				OTMLToXHTMLConverter otxc = new OTMLToXHTMLConverter(
-				        otViewFactory, bodyPanel.getViewContainer());
+				OTMLToXHTMLConverter otxc =
+				    new OTMLToXHTMLConverter(otViewFactory, bodyPanel.getViewContainer());
 				otxc.setXHTMLParams(fileToSave, 800, 600);
 
 				(new Thread(otxc)).start();
@@ -1172,8 +1165,8 @@ public class OTViewer extends JFrame
 
 				if (currentUserFile.exists()) {
 					try {
-						ExporterJDOM.export(currentUserFile, userDataDB
-						        .getRoot(), userDataDB);
+						ExporterJDOM.export(currentUserFile, userDataDB.getRoot(),
+						    userDataDB);
 						userDataDB.setDirty(false);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -1198,8 +1191,8 @@ public class OTViewer extends JFrame
 			{
 				Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
-				MostRecentFileDialog mrfd = new MostRecentFileDialog(
-				        "org.concord.otviewer.saveotml");
+				MostRecentFileDialog mrfd =
+				    new MostRecentFileDialog("org.concord.otviewer.saveotml");
 				mrfd.setFilenameFilter("otml");
 
 				if (currentUserFile != null) {
@@ -1217,17 +1210,15 @@ public class OTViewer extends JFrame
 					currentUserFile = file;
 
 					if (!fileName.toLowerCase().endsWith(".otml")) {
-						currentUserFile = new File(currentUserFile
-						        .getAbsolutePath()
-						        + ".otml");
+						currentUserFile =
+						    new File(currentUserFile.getAbsolutePath() + ".otml");
 					}
 
 					try {
-						ExporterJDOM.export(currentUserFile, userDataDB
-						        .getRoot(), userDataDB);
+						ExporterJDOM.export(currentUserFile, userDataDB.getRoot(),
+						    userDataDB);
 						userDataDB.setDirty(false);
-						setTitle(baseFrameTitle + ": "
-						        + currentUserFile.toString());
+						setTitle(baseFrameTitle + ": " + currentUserFile.toString());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -1255,8 +1246,8 @@ public class OTViewer extends JFrame
 			{
 				Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
-				MostRecentFileDialog mrfd = new MostRecentFileDialog(
-				        "org.concord.otviewer.openotml");
+				MostRecentFileDialog mrfd =
+				    new MostRecentFileDialog("org.concord.otviewer.openotml");
 				mrfd.setFilenameFilter("otml");
 
 				int retval = mrfd.showOpenDialog(frame);
@@ -1310,13 +1301,10 @@ public class OTViewer extends JFrame
 							remoteSaveData(OTViewer.HTTP_POST);
 						}
 					} catch (Exception e) {
-						JOptionPane
-						        .showMessageDialog(
-						                (Frame) SwingUtilities
-						                        .getRoot(OTViewer.this),
-						                "There was an error saving. Check your URL and try again.",
-						                "Error Saving",
-						                JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(
+						    (Frame) SwingUtilities.getRoot(OTViewer.this),
+						    "There was an error saving. Check your URL and try again.",
+						    "Error Saving", JOptionPane.ERROR_MESSAGE);
 						e.printStackTrace();
 					}
 				} else {
@@ -1327,8 +1315,8 @@ public class OTViewer extends JFrame
 
 					if (checkForReplace(currentAuthoredFile)) {
 						try {
-							ExporterJDOM.export(currentAuthoredFile, xmlDB
-							        .getRoot(), xmlDB);
+							ExporterJDOM.export(currentAuthoredFile, xmlDB.getRoot(),
+							    xmlDB);
 							xmlDB.setDirty(false);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -1354,13 +1342,12 @@ public class OTViewer extends JFrame
 			{
 				Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
-				MostRecentFileDialog mrfd = new MostRecentFileDialog(
-				        "org.concord.otviewer.saveotml");
+				MostRecentFileDialog mrfd =
+				    new MostRecentFileDialog("org.concord.otviewer.saveotml");
 				mrfd.setFilenameFilter("otml");
 
 				if (currentAuthoredFile != null) {
-					mrfd.setCurrentDirectory(currentAuthoredFile
-					        .getParentFile());
+					mrfd.setCurrentDirectory(currentAuthoredFile.getParentFile());
 					mrfd.setSelectedFile(currentAuthoredFile);
 				}
 
@@ -1415,8 +1402,8 @@ public class OTViewer extends JFrame
 				panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 				panel.setLayout(new BorderLayout());
 
-				JLabel prompt = new JLabel(
-				        "Please enter the URL to which you would like to save:");
+				JLabel prompt =
+				    new JLabel("Please enter the URL to which you would like to save:");
 				prompt.setBorder(new EmptyBorder(0, 0, 10, 0));
 				JTextField textField = new JTextField();
 				if (remoteURL == null) {
@@ -1435,13 +1422,14 @@ public class OTViewer extends JFrame
 				panel.add(textField, BorderLayout.CENTER);
 				panel.add(checkboxPanel, BorderLayout.SOUTH);
 
-				int returnVal = CustomDialog.showOKCancelDialog(
+				int returnVal =
+				    CustomDialog.showOKCancelDialog(
 				        (Frame) SwingUtilities.getRoot(OTViewer.this), // parent
 				        panel, // custom content
 				        "Save URL", // title
 				        false, // resizeable
 				        true // modal
-				        );
+				    );
 
 				if (returnVal == 0) {
 					try {
@@ -1450,18 +1438,15 @@ public class OTViewer extends JFrame
 						// are running in a applet or jnlp which
 						// has a security sandbox.
 						System.setProperty(OTViewerHelper.REST_ENABLED_PROP,
-						        Boolean.toString(restCheckbox.isSelected()));
+						    Boolean.toString(restCheckbox.isSelected()));
 						remoteSaveData(OTViewer.HTTP_POST);
 						updateMenuBar();
 					} catch (Exception e) {
 						System.err.println("Bad URL. Not saving.");
-						JOptionPane
-						        .showMessageDialog(
-						                (Frame) SwingUtilities
-						                        .getRoot(OTViewer.this),
-						                "There was an error saving. Check your URL and try again.",
-						                "Error Saving",
-						                JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(
+						    (Frame) SwingUtilities.getRoot(OTViewer.this),
+						    "There was an error saving. Check your URL and try again.",
+						    "Error Saving", JOptionPane.ERROR_MESSAGE);
 						e.printStackTrace();
 					}
 				} else {
@@ -1605,10 +1590,9 @@ public class OTViewer extends JFrame
 			if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
 				loadAction.putValue(Action.NAME, "Open Authored Content...");
 				saveAction.putValue(Action.NAME, "Save Authored Content");
-				saveAsAction.putValue(Action.NAME,
-				        "Save Authored Content As...");
+				saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
 				saveRemoteAsAction.putValue(Action.NAME,
-				        "Save Authored Content Remotely As...");
+				    "Save Authored Content Remotely As...");
 			} else {
 				loadAction.putValue(Action.NAME, "Open...");
 				saveAction.putValue(Action.NAME, "Save");
@@ -1625,8 +1609,7 @@ public class OTViewer extends JFrame
 			if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
 				loadAction.putValue(Action.NAME, "Open Authored Content...");
 				saveAction.putValue(Action.NAME, "Save Authored Content");
-				saveAsAction.putValue(Action.NAME,
-				        "Save Authored Content As...");
+				saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
 			} else {
 				loadAction.putValue(Action.NAME, "Open...");
 				saveAction.putValue(Action.NAME, "Save");
@@ -1670,19 +1653,16 @@ public class OTViewer extends JFrame
 			return true; // File doesn't exist, so go ahead and save
 		}
 
-		if (currentAuthoredFile != null
-		        && file.compareTo(currentAuthoredFile) == 0) {
+		if (currentAuthoredFile != null && file.compareTo(currentAuthoredFile) == 0) {
 			return true; // we're already authoring this file, so no need to
 			// prompt
 		}
 
 		final Object[] options = { "Yes", "No" };
 		return javax.swing.JOptionPane.showOptionDialog(null, "The file '"
-		        + file.getName() + "' already exists.  "
-		        + "Replace existing file?", "Warning",
-		        javax.swing.JOptionPane.YES_NO_OPTION,
-		        javax.swing.JOptionPane.WARNING_MESSAGE, null, options,
-		        options[1]) == javax.swing.JOptionPane.YES_OPTION;
+		        + file.getName() + "' already exists.  " + "Replace existing file?",
+		    "Warning", javax.swing.JOptionPane.YES_NO_OPTION,
+		    javax.swing.JOptionPane.WARNING_MESSAGE, null, options, options[1]) == javax.swing.JOptionPane.YES_OPTION;
 
 	}
 
@@ -1701,10 +1681,10 @@ public class OTViewer extends JFrame
 				// FIXME
 				String options[] = { "Don't Save", "Cancel", "Save" };
 				askedAboutSavingUserData = true;
-				int chosenOption = JOptionPane.showOptionDialog(this,
-				        "Save Changes?", "Save Changes?",
-				        JOptionPane.DEFAULT_OPTION,
-				        JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+				int chosenOption =
+				    JOptionPane.showOptionDialog(this, "Save Changes?", "Save Changes?",
+				        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
+				        options, options[2]);
 				switch (chosenOption) {
 				case 0:
 					System.err.println("Not saving work");
@@ -1738,10 +1718,10 @@ public class OTViewer extends JFrame
 				// saved their work
 				// FIXME
 				String options[] = { "Don't Save", "Cancel", "Save" };
-				int chosenOption = JOptionPane.showOptionDialog(this,
-				        "Save Changes?", "Save Changes?",
-				        JOptionPane.DEFAULT_OPTION,
-				        JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+				int chosenOption =
+				    JOptionPane.showOptionDialog(this, "Save Changes?", "Save Changes?",
+				        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
+				        options, options[2]);
 				switch (chosenOption) {
 				case 0:
 					System.err.println("Not saving authored data");
@@ -1777,16 +1757,16 @@ public class OTViewer extends JFrame
 			// userDataDB);
 			OTObjectService objService = otrunk.createObjectService(userDataDB);
 
-			OTStateRoot stateRoot = (OTStateRoot) objService
-			        .createObject(OTStateRoot.class);
+			OTStateRoot stateRoot =
+			    (OTStateRoot) objService.createObject(OTStateRoot.class);
 			userDataDB.setRoot(stateRoot.getGlobalId());
 			stateRoot.setFormatVersionString("1.0");
 
-			OTUserObject userObject = OTViewerHelper.createUser(
-			        "anon_single_user", objService);
+			OTUserObject userObject =
+			    OTViewerHelper.createUser("anon_single_user", objService);
 
-			otrunk.initUserObjectService((OTObjectServiceImpl) objService,
-			        userObject, stateRoot);
+			otrunk.initUserObjectService((OTObjectServiceImpl) objService, userObject,
+			    stateRoot);
 
 			userDataDB.setDirty(false);
 
@@ -1864,8 +1844,8 @@ public class OTViewer extends JFrame
 	{
 		Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
-		MostRecentFileDialog mrfd = new MostRecentFileDialog(
-		        "org.concord.otviewer.saveotml");
+		MostRecentFileDialog mrfd =
+		    new MostRecentFileDialog("org.concord.otviewer.saveotml");
 		mrfd.setFilenameFilter("html");
 
 		if (currentUserFile != null) {
@@ -1930,8 +1910,8 @@ public class OTViewer extends JFrame
 
 		Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
 
-		MostRecentFileDialog mrfd = new MostRecentFileDialog(
-		        "org.concord.otviewer.openotml");
+		MostRecentFileDialog mrfd =
+		    new MostRecentFileDialog("org.concord.otviewer.openotml");
 		mrfd.setFilenameFilter("otml");
 
 		int retval = mrfd.showOpenDialog(frame);
@@ -1955,10 +1935,8 @@ public class OTViewer extends JFrame
 		panel.setBackground(Color.WHITE);
 		panel.setLayout(null);
 
-		JLabel lNew = new JLabel(
-		        "Click the \"New\" button to create a new portfolio:");
-		JLabel lOpen = new JLabel(
-		        "Click the \"Open\" button to open a saved portfolio:");
+		JLabel lNew = new JLabel("Click the \"New\" button to create a new portfolio:");
+		JLabel lOpen = new JLabel("Click the \"Open\" button to open a saved portfolio:");
 		JButton bNew = new JButton("New");
 		JButton bOpen = new JButton("Open");
 
