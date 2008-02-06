@@ -12,5 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/loader"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/apple-support"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="lib" path="/thirdparty-jars/ekit-1.0.jar"/>
 	<classpathentry kind="output" path="lib"/>
 </classpath>
