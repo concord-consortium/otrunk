@@ -793,8 +793,8 @@ public class OTViewer extends JFrame
 			return otrunk.getOTObject(rootID);
 		}
 		return otrunk.getRoot();
-	}
-
+	}	
+	
 	private void reloadWindow()
 	    throws Exception
 	{

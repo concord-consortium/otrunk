@@ -248,8 +248,9 @@ public class OTViewContainerPanel extends JPanel
 			}
 			
 			// We save the currentViewChild so its settings can be used for the scroll pane
-			// The settings from the viewChild are simply set here because some views reuse their
-			// container panels, and set the scroll properties.  Those settings should be preserved
+			// The scroll settings from the viewChild are not simply set here because 
+			// some views reuse their container panels, and set the scroll properties 
+			// when the panel is created.  Those settings should be preserved
 			// even if a viewChild temporarily overrides them.
 			currentViewChild = viewChild;
 		}		
@@ -537,6 +538,10 @@ public class OTViewContainerPanel extends JPanel
 		public void reloadView(){
 			OTViewContainerPanel.this.reloadView();
 		}
+		public OTViewEntry getCurrentViewEntry()
+        {
+			return currentViewEntry;
+        }
 	}
 
 	/**
