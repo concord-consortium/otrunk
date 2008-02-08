@@ -46,6 +46,7 @@ import org.concord.framework.otrunk.view.OTPrintDimension;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContext;
+import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTXHTMLHelper;
 import org.concord.framework.otrunk.view.OTXHTMLView;
@@ -56,7 +57,8 @@ public class OTMLToXHTMLConverter
 {
 
 	private OTObject[] topLevelOTObjects;
-
+	private OTViewEntry [] topLevelViewEntries;
+	
 	private OTViewContainer viewContainer;
 
 	private OTViewFactory viewFactory;
@@ -93,7 +95,9 @@ public class OTMLToXHTMLConverter
 	{
 		setViewFactory(viewFactory);
 		this.topLevelOTObjects = new OTObject[1];
+		this.topLevelViewEntries = new OTViewEntry[1];
 		this.topLevelOTObjects[0] = otObject;
+		this.topLevelViewEntries[0] = null;
 		this.mode = mode;
 	}
 
@@ -102,6 +106,7 @@ public class OTMLToXHTMLConverter
 	{
 		setViewFactory(viewFactory);
 		this.topLevelOTObjects = otObjects;
+		this.topLevelViewEntries = new OTViewEntry[otObjects.length];
 		this.mode = mode;
 	}
 
@@ -111,6 +116,8 @@ public class OTMLToXHTMLConverter
 		if (viewContainer.getCurrentObject() != null) {
 			this.topLevelOTObjects = new OTObject[1];
 			this.topLevelOTObjects[0] = viewContainer.getCurrentObject();
+			this.topLevelViewEntries = new OTViewEntry[1];
+			this.topLevelViewEntries[0] = viewContainer.getCurrentViewEntry();
 		}
 	}
 
@@ -146,7 +153,7 @@ public class OTMLToXHTMLConverter
 			
 			String text = null;
 
-			OTJComponentView objView = getOTJComponentView(topLevelOTObjects[i], mode);
+			OTJComponentView objView = getOTJComponentView(topLevelOTObjects[i], mode, topLevelViewEntries[i]);
 
 			OTXHTMLView xhtmlView = null;
 			String bodyText = "";
@@ -170,7 +177,7 @@ public class OTMLToXHTMLConverter
 					} 
 
 					// System.out.println(referencedObject.getClass());
-					String url = embedOTObject(referencedObject);
+					String url = embedOTObject(referencedObject, null);
 					// String url = objView.getXHTMLText(folder,
 					// containerDisplayWidth, containerDisplayHeight);
 					if (url != null) {
@@ -185,7 +192,7 @@ public class OTMLToXHTMLConverter
 				m.appendTail(parsed);
 				text = "<div>" + parsed.toString() + "</div><hr>";
 			} else {
-				text = embedOTObject(topLevelOTObjects[i]);
+				text = embedOTObject(topLevelOTObjects[i], topLevelViewEntries[i]);
 			}
 
 			allTexts = allTexts + text;
@@ -252,32 +259,35 @@ public class OTMLToXHTMLConverter
 		return saver.getText();
 	}
 
-	protected OTJComponentView getOTJComponentView(OTObject obj)
+	protected OTJComponentView getOTJComponentView(OTObject obj, OTViewEntry viewEntry)
 	{
-		return getOTJComponentView(obj, null);
+		return getOTJComponentView(obj, null, viewEntry);
 	}
 
-	protected OTJComponentView getOTJComponentView(OTObject obj, String mode)
+	protected OTJComponentView getOTJComponentView(OTObject obj, String mode, OTViewEntry viewEntry)
 	{
 		if (jComponentService == null) {
 			OTViewContext viewContext = viewFactory.getViewContext();
-			OTJComponentServiceFactory serviceFactory = (OTJComponentServiceFactory) viewContext
-			        .getViewService(OTJComponentServiceFactory.class);
-			jComponentService = serviceFactory
-			        .createOTJComponentService(viewFactory);
+			OTJComponentServiceFactory serviceFactory =
+			    (OTJComponentServiceFactory) viewContext.getViewService(OTJComponentServiceFactory.class);
+			jComponentService = serviceFactory.createOTJComponentService(viewFactory);
 		}
-		return jComponentService.getObjectView(obj, viewContainer, mode);
+		if (viewEntry != null) {
+			return jComponentService.getObjectView(obj, viewContainer, mode, viewEntry);
+		} else {
+			return jComponentService.getObjectView(obj, viewContainer, mode);
+		}
 	}
 
-	protected JComponent getJComponent(OTObject obj)
+	protected JComponent getJComponent(OTObject obj, OTViewEntry viewEntry)
 	{
-		OTJComponentView objView = getOTJComponentView(obj, mode);
+		OTJComponentView objView = getOTJComponentView(obj, mode, viewEntry);
 
 		JComponent comp = objView.getComponent(obj);
 		return comp;
 	}
 
-	public String embedOTObject(OTObject obj)
+	public String embedOTObject(OTObject obj, OTViewEntry viewEntry)
 	{
 		OTView view = viewFactory.getView(obj, OTPrintDimension.class);
 		if (view == null) {
@@ -297,7 +307,7 @@ public class OTMLToXHTMLConverter
 			        containerDisplayHeight);
 		}
 
-		JComponent comp = getJComponent(obj);
+		JComponent comp = getJComponent(obj, viewEntry);
 		if (dim != null)
 			comp.setSize(dim);
 		else {
@@ -350,8 +360,9 @@ public class OTMLToXHTMLConverter
 			try {
 				String id = otObject.otExternalId();
 				id = id.replaceAll("/", "_");
+				id = id.replaceAll("'", "");
 				id = id.replaceAll("!", "") + ".png";
-
+				
 				if (!folder.isDirectory()) {
 					text = null;
 					return;

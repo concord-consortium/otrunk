@@ -22,7 +22,8 @@ public class OTXHTMLWrapperView extends OTDocumentView
 {
 	private OTXHTMLView xhtmlView;
 	private OTObject xhtmlObject;
-
+	OTDocument wrapperDoc;
+	
 	public OTXHTMLWrapperView(OTXHTMLView view, OTObject object)
 	{
 		if(view == null) {
@@ -34,19 +35,13 @@ public class OTXHTMLWrapperView extends OTDocumentView
 			throw new IllegalArgumentException("object can't be null");
 		}
 		this.xhtmlObject =object;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.concord.otrunk.view.document.OTDocumentView#getComponent(org.concord.framework.otrunk.OTObject, boolean)
-	 */
-	public JComponent getComponent(OTObject otObject) 
-	{
+		
 		// FIXME this should be replaced with something like the prototype view setup
 		// An actual OTCompoundDoc should be created and its properties set, and
 		// then listeners can be added to it, to monitor changes in both directions
 		// This concept of wrapping one view type with another should also be more generically
 		// controlled, so new view types can be added and wrappers can be made.		
-		OTDocument doc = new OTDocument() {
+		wrapperDoc = new OTDocument() {
 
 			public String getDocumentText() {
 				return xhtmlView.getXHTMLText(xhtmlObject);
@@ -117,7 +112,19 @@ public class OTXHTMLWrapperView extends OTDocumentView
 				throw new UnsupportedOperationException();
             }			
 		};
-		
-		return super.getComponent(doc);
+
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.concord.otrunk.view.document.OTDocumentView#getComponent(org.concord.framework.otrunk.OTObject, boolean)
+	 */
+	public JComponent getComponent(OTObject otObject) 
+	{
+		return super.getComponent(wrapperDoc);
+	}
+	
+	public String getXHTMLText(OTObject otObject) {
+		return super.getXHTMLText(wrapperDoc);
+	}
+
 }
