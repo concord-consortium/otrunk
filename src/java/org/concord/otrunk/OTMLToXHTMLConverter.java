@@ -36,8 +36,9 @@ import java.util.regex.Pattern;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import org.concord.framework.otrunk.DefaultOTObject;
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTJComponentService;
 import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
 import org.concord.framework.otrunk.view.OTJComponentView;
@@ -132,61 +133,59 @@ public class OTMLToXHTMLConverter
 
 	public void run()
 	{
-		if (outputFile == null)
+		if (outputFile == null) {
 			return;
-
+		}
+			
 		String allTexts = "";
 		for (int i = 0; i < topLevelOTObjects.length; i++) {
 
+			if (topLevelOTObjects[i] == null) {
+				continue;
+			}
+			
 			String text = null;
-			if (topLevelOTObjects[i] != null) {
 
-				OTJComponentView objView = getOTJComponentView(
-				        topLevelOTObjects[i], mode);
+			OTJComponentView objView = getOTJComponentView(topLevelOTObjects[i], mode);
 
-				OTXHTMLView xhtmlView = null;
-				String bodyText = "";
-				if (objView instanceof OTXHTMLView) {
-					xhtmlView = (OTXHTMLView) objView;
-					bodyText = xhtmlView.getXHTMLText(topLevelOTObjects[i]);
-				}
-				// System.out.println(bodyText);
+			OTXHTMLView xhtmlView = null;
+			String bodyText = "";
+			if (objView instanceof OTXHTMLView) {
+				xhtmlView = (OTXHTMLView) objView;
+				bodyText = xhtmlView.getXHTMLText(topLevelOTObjects[i]);
 
-				if (topLevelOTObjects[i] instanceof DefaultOTObject) {
-					Pattern p = Pattern
-					        .compile("<object refid=\"([^\"]*)\"[^>]*>");
-					Matcher m = p.matcher(bodyText);
-					StringBuffer parsed = new StringBuffer();
-					while (m.find()) {
-						String id = m.group(1);
-						OTObject referencedObject = ((DefaultOTObject) topLevelOTObjects[i])
-						        .getReferencedObject(id);
+				Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
+				Matcher m = p.matcher(bodyText);
+				StringBuffer parsed = new StringBuffer();
+				OTObjectService objectService = topLevelOTObjects[i].getOTObjectService();
+				while (m.find()) {
+					String id = m.group(1);
+					OTID otid = objectService.getOTID(id);
+					OTObject referencedObject = null;
+					try {
+						referencedObject = objectService.getOTObject(otid);
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} 
 
-						// System.out.println(referencedObject.getClass());
-						String url = embedOTObject(referencedObject);
-						// String url = objView.getXHTMLText(folder,
-						// containerDisplayWidth, containerDisplayHeight);
-						if (url != null) {
-							try {
-								m.appendReplacement(parsed, url);
-							} catch (IllegalArgumentException e) {
-								System.err.println("bad replacement: " + url);
-								e.printStackTrace();
-							}
+					// System.out.println(referencedObject.getClass());
+					String url = embedOTObject(referencedObject);
+					// String url = objView.getXHTMLText(folder,
+					// containerDisplayWidth, containerDisplayHeight);
+					if (url != null) {
+						try {
+							m.appendReplacement(parsed, url);
+						} catch (IllegalArgumentException e) {
+							System.err.println("bad replacement: " + url);
+							e.printStackTrace();
 						}
 					}
-					m.appendTail(parsed);
-					text = "<div>" + parsed.toString() + "</div><hr>";
-				} else {
-					text = bodyText;
 				}
+				m.appendTail(parsed);
+				text = "<div>" + parsed.toString() + "</div><hr>";
 			} else {
-				OTObject oto = (OTObject) viewContainer.getCurrentObject();
-				text = embedOTObject(oto);
-				// OTJComponentView objView = viewFactory.getObjectView(oto,
-				// viewContainer);
-				// text = objView.getXHTMLText(folder, containerDisplayWidth,
-				// containerDisplayHeight);
+				text = embedOTObject(topLevelOTObjects[i]);
 			}
 
 			allTexts = allTexts + text;
@@ -281,10 +280,11 @@ public class OTMLToXHTMLConverter
 	public String embedOTObject(OTObject obj)
 	{
 		OTView view = viewFactory.getView(obj, OTPrintDimension.class);
-		if (view == null)
+		if (view == null) {
 			view = (OTView) viewFactory.getView(obj, OTJComponentView.class,
 			        mode);
-
+		}
+		
 		if (view instanceof OTXHTMLView) {
 			String objectText = ((OTXHTMLView) view).getXHTMLText(obj);
 			return objectText;
