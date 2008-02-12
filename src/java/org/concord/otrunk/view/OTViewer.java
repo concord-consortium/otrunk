@@ -147,7 +147,7 @@ public class OTViewer extends JFrame
 	public final static String TITLE_PROP = "otrunk.view.frame_title";
 
 	public final static String HIDE_TREE_PROP = "otrunk.view.hide_tree";
-
+	
 	public final static String SHOW_CONSOLE_PROP = "otrunk.view.show_console";
 
 	public final static String HTTP_PUT = "PUT";
@@ -253,23 +253,22 @@ public class OTViewer extends JFrame
 
 	private OTSystem userSystem;
 
-	private ArrayList services = new ArrayList();
+	private ArrayList services = new ArrayList();	
 
 	private JPanel statusPanel;
-
+	
 	public static class ServiceEntry
 	{
 		Object service;
-
 		Class serviceInterface;
-
+		
 		public ServiceEntry(Object service, Class serviceInterface)
 		{
 			this.service = service;
 			this.serviceInterface = serviceInterface;
 		}
 	}
-
+	
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
 		otViewFactory = factory;
@@ -314,12 +313,12 @@ public class OTViewer extends JFrame
 		consoleFrame.getContentPane().add(view);
 		consoleFrame.setSize(800, 600);
 
-		if (OTViewerHelper.getBooleanProp(SHOW_CONSOLE_PROP, false)) {
+		if (OTViewerHelper.getBooleanProp(SHOW_CONSOLE_PROP, false)){
 			consoleFrame.setVisible(true);
 		}
-
+		
 		commDialog = new JDialog(this, true);
-
+		
 		// for debugging
 		// add a breakpoint below, run in debugging mode, and then hit Meta-B
 		// the object you're currently focused on will be passed in here and you
@@ -327,8 +326,9 @@ public class OTViewer extends JFrame
 		// start exploring the data structures, etc.
 		KeyboardFocusManager focusManager =
 		    KeyboardFocusManager.getCurrentKeyboardFocusManager();
-
-		KeyEventDispatcher deleteDispatcher = new KeyEventDispatcher() {
+		
+		
+		KeyEventDispatcher deleteDispatcher = new KeyEventDispatcher(){					
 			public boolean dispatchKeyEvent(KeyEvent e)
 			{
 				if ((e.getID() == java.awt.event.KeyEvent.KEY_RELEASED)
@@ -338,34 +338,34 @@ public class OTViewer extends JFrame
 					System.out.println(o.toString());
 					return true;
 				}
-
+				
 				return false;
 			}
-
+			
 		};
 
 		focusManager.addKeyEventDispatcher(deleteDispatcher);
-
+		
 		// If the mouse click is a real right click event and alt is pressed
 		// then this code will print
 		// out the toString method of the object which the mouse is over.
-		AWTEventListener awtEventListener = new AWTEventListener() {
+		AWTEventListener awtEventListener = new AWTEventListener(){
 			public void eventDispatched(AWTEvent event)
 			{
-				if (!(event instanceof MouseEvent)) {
+				if(!(event instanceof MouseEvent)){
 					return;
 				}
-
+				
 				MouseEvent mEvent = (MouseEvent) event;
-
+				
 				if (mEvent.getID() == MouseEvent.MOUSE_CLICKED
 				        && (mEvent.getButton() == MouseEvent.BUTTON3)
 				        && (mEvent.getModifiersEx() & MouseEvent.ALT_DOWN_MASK) != 0) {
-					System.out.println(event.getSource().toString());
+					System.out.println(event.getSource().toString());					
 				}
 			}
 		};
-
+		
 		Toolkit.getDefaultToolkit().addAWTEventListener(awtEventListener,
 		    AWTEvent.MOUSE_EVENT_MASK);
 	}
@@ -381,7 +381,7 @@ public class OTViewer extends JFrame
 		ServiceEntry entry = new ServiceEntry(service, serviceInterface);
 		services.add(entry);
 	}
-
+	
 	public void setUserMode(int mode)
 	{
 		userMode = mode;
@@ -391,7 +391,7 @@ public class OTViewer extends JFrame
 	{
 		return userMode;
 	}
-
+	
 	public void updateTreePane()
 	{
 		Dimension minimumSize = new Dimension(100, 50);
@@ -444,37 +444,44 @@ public class OTViewer extends JFrame
 
 	public void initArgs(String[] args)
 	{
-		if (args.length > 0) {
-			String urlStr = null;
-
-			if (args[0].equals("-f")) {
-				if (args.length > 1) {
-					File inFile = new File(args[1]);
-					currentAuthoredFile = inFile;
-					try {
-						URL url = inFile.toURL();
-						urlStr = url.toString();
-					} catch (Exception e) {
-						e.printStackTrace();
-						urlStr = null;
-					}
-				}
-			} else if (args[0].equals("-r")) {
-				if (args.length > 1) {
-					ClassLoader cl = OTViewer.class.getClassLoader();
-					URL url = cl.getResource(args[1]);
-					urlStr = url.toString();
-				}
-			} else {
-				urlStr = args[0];
-			}
-
-			initWithWizard(urlStr);
-		} else {
-			initWithWizard(null);
-		}
-
+		String urlStr = getURL(args);
+		initWithWizard(urlStr);
 	}
+
+	/**
+     * @param args
+     * @return
+     */
+    public String getURL(String[] args)
+    {
+		String urlStr = null;
+
+		if (args.length > 0) {
+    		if (args[0].equals("-f")) {
+    			if (args.length > 1) {
+    				File inFile = new File(args[1]);
+    				currentAuthoredFile = inFile;
+    				try {
+    					URL url = inFile.toURL();
+    					urlStr = url.toString();
+    				} catch (Exception e) {
+    					e.printStackTrace();
+    					urlStr = null;
+    				}
+    			}
+    		} else if (args[0].equals("-r")) {
+    			if (args.length > 1) {
+    				ClassLoader cl = OTViewer.class.getClassLoader();
+    				URL url = cl.getResource(args[1]);
+    				urlStr = url.toString();
+    			}
+    		} else {
+    			urlStr = args[0];
+    		}
+		}
+		
+		return urlStr;
+    }
 
 	public void init(String url)
 	{
@@ -576,7 +583,7 @@ public class OTViewer extends JFrame
 		}
 
 		try {
-			initializeURL(new URL(url));
+	        initializeURL(new URL(url));
 		} catch (MalformedURLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -603,7 +610,7 @@ public class OTViewer extends JFrame
 		useScrollPane = true;
 		if (mainFrame.getFrame() != null) {
 			if (mainFrame.getFrame().isResourceSet("width")
-			        && mainFrame.getFrame().isResourceSet("height")) {
+					&& mainFrame.getFrame().isResourceSet("height")) {
 				int cornerX = 100;
 				int cornerY = 100;
 				int sizeX = mainFrame.getFrame().getWidth();
@@ -619,7 +626,7 @@ public class OTViewer extends JFrame
 
 		setupBodyPanel();
 	}
-
+	
 	public void initWithWizard(String url)
 	{
 		justStarted = true;
@@ -684,7 +691,7 @@ public class OTViewer extends JFrame
 		}
 	}
 
-	private void loadURL(URL url)
+	public void loadURL(URL url)
 	    throws Exception
 	{
 		XMLDatabase systemDB = null;
@@ -693,7 +700,7 @@ public class OTViewer extends JFrame
 			// try loading in the system object if there is one
 			String systemOtmlUrlStr =
 			    OTViewerHelper.getStringProp(OTViewerHelper.SYSTEM_OTML_PROP);
-			if (systemOtmlUrlStr != null) {
+			if(systemOtmlUrlStr != null){
 				URL systemOtmlUrl = new URL(systemOtmlUrlStr);
 				systemDB = new XMLDatabase(systemOtmlUrl, System.out);
 
@@ -701,15 +708,16 @@ public class OTViewer extends JFrame
 
 				systemDB.loadObjects();
 			}
-		} catch (Exception e) {
+		} catch (Exception e){
 			e.printStackTrace();
 			systemDB = null;
 		}
 
+		
 		try {
-
+			
 			xmlDB = new XMLDatabase(url, System.out);
-
+			
 			// Only track the resource info when there isn't a user. Currently
 			// all classroom uses
 			// of OTViewer has NO_USER_MODE turned off, so using this setting
@@ -719,13 +727,14 @@ public class OTViewer extends JFrame
 				xmlDB.setTrackResourceInfo(true);
 			}
 			xmlDB.loadObjects();
-
+			
+			
 		} catch (org.jdom.input.JDOMParseException e) {
 			String xmlWarningTitle = "XML Decoding error";
 			String xmlWarningMessage =
 			    "There appears to a problem parsing the XML of this document. \n"
-			            + "Please show this error message to one of the workshop leaders. \n\n"
-			            + e.getMessage();
+			        + "Please show this error message to one of the workshop leaders. \n\n"
+			        + e.getMessage();
 			JOptionPane.showMessageDialog(null, xmlWarningMessage, xmlWarningTitle,
 			    JOptionPane.ERROR_MESSAGE);
 			throw e;
@@ -733,17 +742,17 @@ public class OTViewer extends JFrame
 
 		int servicesSize = services.size();
 		int numDefaultServices = 1;
-		Object[] serviceArray = new Object[servicesSize + numDefaultServices];
-		serviceArray[0] = new SwingUserMessageHandler(this);
-		Class[] serviceInterfaces = new Class[servicesSize + numDefaultServices];
-		serviceInterfaces[0] = UserMessageHandler.class;
-
-		for (int i = 0; i < services.size(); i++) {
-			ServiceEntry entry = (ServiceEntry) services.get(i);
-			serviceArray[i + numDefaultServices] = entry.service;
-			serviceInterfaces[i + numDefaultServices] = entry.serviceInterface;
-		}
-
+        Object [] serviceArray = new Object[servicesSize + numDefaultServices];
+        serviceArray[0] =  new SwingUserMessageHandler(this);        
+        Class [] serviceInterfaces =  new Class[servicesSize + numDefaultServices];
+        serviceInterfaces[0] =  UserMessageHandler.class;
+		
+        for(int i=0; i<services.size(); i++){
+        	ServiceEntry entry = (ServiceEntry) services.get(i);
+        	serviceArray[i+numDefaultServices] = entry.service;
+        	serviceInterfaces[i+numDefaultServices] = entry.serviceInterface;
+        }        
+		
 		otrunk = new OTrunkImpl(systemDB, xmlDB, serviceArray, serviceInterfaces);
 
 		OTViewFactory myViewFactory =
@@ -757,9 +766,9 @@ public class OTViewer extends JFrame
 		factoryContext.addViewService(OTrunk.class, otrunk);
 		factoryContext.addViewService(OTFrameManager.class, frameManager);
 		factoryContext.addViewService(OTJComponentServiceFactory.class,
-		    new OTJComponentServiceFactoryImpl());
+		        new OTJComponentServiceFactoryImpl());
 		factoryContext.addViewService(OTExternalAppService.class,
-		    new OTExternalAppServiceImpl());
+				new OTExternalAppServiceImpl());
 
 		currentURL = url;
 	}
@@ -773,7 +782,7 @@ public class OTViewer extends JFrame
 		bodyPanel.setOTViewFactory(otViewFactory);
 
 		// set the current mode from the viewservice to the main bodyPanel
-		// bodyPanel.setViewMode(otViewFactory.getDefaultMode());
+//		bodyPanel.setViewMode(otViewFactory.getDefaultMode());
 
 		// set the viewFactory of the frame manager
 		frameManager.setViewFactory(otViewFactory);
@@ -783,17 +792,17 @@ public class OTViewer extends JFrame
 		reloadWindow();
 	}
 
-	protected OTObject getAuthoredRoot()
+	public OTObject getAuthoredRoot()
 	    throws Exception
 	{
 		String rootLocalId =
 		    OTViewerHelper.getStringProp(OTViewerHelper.ROOT_OBJECT_PROP);
-		if (rootLocalId != null) {
+		if(rootLocalId != null){
 			OTID rootID = xmlDB.getOTIDFromLocalID(rootLocalId);
 			return otrunk.getOTObject(rootID);
 		}
 		return otrunk.getRoot();
-	}	
+	}
 	
 	private void reloadWindow()
 	    throws Exception
@@ -1166,7 +1175,7 @@ public class OTViewer extends JFrame
 				if (currentUserFile.exists()) {
 					try {
 						ExporterJDOM.export(currentUserFile, userDataDB.getRoot(),
-						    userDataDB);
+						        userDataDB);
 						userDataDB.setDirty(false);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -1216,7 +1225,7 @@ public class OTViewer extends JFrame
 
 					try {
 						ExporterJDOM.export(currentUserFile, userDataDB.getRoot(),
-						    userDataDB);
+						        userDataDB);
 						userDataDB.setDirty(false);
 						setTitle(baseFrameTitle + ": " + currentUserFile.toString());
 					} catch (Exception e) {
@@ -1268,8 +1277,8 @@ public class OTViewer extends JFrame
 					// try to save it again.
 					remoteURL = null;
 					loadFile(file);
-
-					exportToHtmlAction.setEnabled(true);
+					
+					exportToHtmlAction.setEnabled(true);										
 				}
 			}
 
@@ -1303,7 +1312,7 @@ public class OTViewer extends JFrame
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(
 						    (Frame) SwingUtilities.getRoot(OTViewer.this),
-						    "There was an error saving. Check your URL and try again.",
+						                "There was an error saving. Check your URL and try again.",
 						    "Error Saving", JOptionPane.ERROR_MESSAGE);
 						e.printStackTrace();
 					}
@@ -1429,23 +1438,23 @@ public class OTViewer extends JFrame
 				        "Save URL", // title
 				        false, // resizeable
 				        true // modal
-				    );
+				        );
 
 				if (returnVal == 0) {
 					try {
 						remoteURL = new URL(textField.getText());
 						// WARNING this will cause a security exception if we
 						// are running in a applet or jnlp which
-						// has a security sandbox.
+						//  has a security sandbox.
 						System.setProperty(OTViewerHelper.REST_ENABLED_PROP,
-						    Boolean.toString(restCheckbox.isSelected()));
+						        Boolean.toString(restCheckbox.isSelected()));
 						remoteSaveData(OTViewer.HTTP_POST);
 						updateMenuBar();
 					} catch (Exception e) {
 						System.err.println("Bad URL. Not saving.");
 						JOptionPane.showMessageDialog(
 						    (Frame) SwingUtilities.getRoot(OTViewer.this),
-						    "There was an error saving. Check your URL and try again.",
+						                "There was an error saving. Check your URL and try again.",
 						    "Error Saving", JOptionPane.ERROR_MESSAGE);
 						e.printStackTrace();
 					}
@@ -1592,7 +1601,7 @@ public class OTViewer extends JFrame
 				saveAction.putValue(Action.NAME, "Save Authored Content");
 				saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
 				saveRemoteAsAction.putValue(Action.NAME,
-				    "Save Authored Content Remotely As...");
+				        "Save Authored Content Remotely As...");
 			} else {
 				loadAction.putValue(Action.NAME, "Open...");
 				saveAction.putValue(Action.NAME, "Save");
@@ -1645,19 +1654,19 @@ public class OTViewer extends JFrame
 
 	boolean checkForReplace(File file)
 	{
-		if (file == null) {
+		if (file == null){
 			return false;
 		}
-
+		
 		if (!file.exists()) {
 			return true; // File doesn't exist, so go ahead and save
 		}
-
-		if (currentAuthoredFile != null && file.compareTo(currentAuthoredFile) == 0) {
+		
+		if (currentAuthoredFile != null && file.compareTo(currentAuthoredFile) == 0){
 			return true; // we're already authoring this file, so no need to
-			// prompt
+							// prompt
 		}
-
+		
 		final Object[] options = { "Yes", "No" };
 		return javax.swing.JOptionPane.showOptionDialog(null, "The file '"
 		        + file.getName() + "' already exists.  " + "Replace existing file?",
@@ -1780,8 +1789,8 @@ public class OTViewer extends JFrame
 			e.printStackTrace();
 		}
 
-	}
-
+	}	
+	
 	public boolean exit()
 	{
 		try {
@@ -2027,6 +2036,12 @@ public class OTViewer extends JFrame
 	{
 		exitAction.actionPerformed(null);
 	}
+	
+	public OTrunk getOTrunk()
+	{
+		return otrunk;
+	}
+	
 } // @jve:decl-index=0:visual-constraint="10,10"
 
 class HtmlFileFilter extends javax.swing.filechooser.FileFilter
