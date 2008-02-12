@@ -5,6 +5,7 @@ package org.concord.otrunk;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -17,6 +18,7 @@ import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTXMLString;
+import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.framework.otrunk.otcore.OTClassProperty;
 import org.concord.otrunk.datamodel.BlobResource;
 
@@ -288,4 +290,15 @@ public class OTrunkUtil
     
     	return replacement;
     }
+	
+	public static void printObject(OTObject otObject)
+	{
+		OTClass otClass = otObject.otClass();
+		ArrayList allClassProperties = otClass.getOTAllClassProperties();
+		for(int i=0; i<allClassProperties.size(); i++){
+			OTClassProperty property = (OTClassProperty) allClassProperties.get(i);
+			Object value = otObject.otGet(property);
+			System.out.println("  " + property.getName() + "=" + value);
+		}		
+	}
 }
