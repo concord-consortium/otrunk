@@ -56,7 +56,7 @@ public class OTViewFactoryImpl implements OTViewFactory
     OTViewFactoryImpl parent;
     Vector viewMap = new Vector();
     OTViewBundle viewBundle;
-    OTViewContext viewContext;
+    OTViewContextImpl viewContext;
 	private String mode;
     
     public OTViewFactoryImpl(OTViewBundle viewBundle)
@@ -95,10 +95,16 @@ public class OTViewFactoryImpl implements OTViewFactory
         Class objectClass;
         Class viewClass;
         OTID otEntryID;
-        
-        OTViewEntry getOTViewEntry(OTObject requestingObject)
+
+        /**
+         * The object service is used so the otview entry can be overridden by
+         * the layering system. 
+         * 
+         * @param objService
+         * @return
+         */
+        OTViewEntry getOTViewEntry(OTObjectService objService)
         {
-        	OTObjectService objService = requestingObject.getOTObjectService();
         	OTViewEntry otViewEntry;
             try {
 	            otViewEntry = (OTViewEntry) objService.getOTObject(otEntryID);
@@ -131,23 +137,40 @@ public class OTViewFactoryImpl implements OTViewFactory
 	{		
 		InternalViewEntry entry = getViewInternal(otObject, viewInterface);
 		if(entry == null) {
+			// we did not find the view using its specific viewInterface, but perhaps there is a view
+			// with a different interface and the mode provide a view with the correct interface
+			// for efficiency we should check if a view mode will be used.  
+			entry = getViewInternal(otObject, (Class)null);
+			if(entry == null) {
+				return null;
+			}
+		}
+
+		OTObjectService objService = otObject.getOTObjectService();
+
+		OTViewEntry viewEntry = entry.getOTViewEntry(objService);
+		OTView view = getView(otObject, viewEntry, modeStr);
+		
+		// We need to do a final check here because we might have ignored the passed in viewInterface
+		// above.
+		if(!viewInterface.isInstance(view)){
 			return null;
 		}
-		OTViewEntry viewEntry = entry.getOTViewEntry(otObject);
-		return getView(otObject, viewEntry, modeStr);
+		
+		return view; 
 	}
     
     protected void initView(OTView view, OTViewEntry viewEntry)
     {
-        if(view != null) { 
-        	if(view instanceof OTViewContextAware) {
-        		((OTViewContextAware)view).setViewContext(viewContext);
-        	}
-        	
-            if(view instanceof OTViewEntryAware) {
-                ((OTViewEntryAware)view).setViewEntry(viewEntry);
-            }            
-        }    	
+    	viewContext.putViewEntry(view, viewEntry);
+    	
+    	if(view instanceof OTViewContextAware) {
+    		((OTViewContextAware)view).setViewContext(viewContext);
+    	}
+
+    	if(view instanceof OTViewEntryAware) {
+    		((OTViewEntryAware)view).setViewEntry(viewEntry);
+    	}            
     }
     
 	public OTView getView(OTObject otObject, OTViewEntry viewEntry) 
@@ -197,27 +220,30 @@ public class OTViewFactoryImpl implements OTViewFactory
 		return null;
 	}
     
+	/**
+	 * null is allowed for the viewInterface.  
+	 * 
+	 * @param otObject
+	 * @param viewInterface
+	 * @return
+	 */
     private InternalViewEntry getViewInternal(OTObject otObject, Class viewInterface)
     {
-    	InternalViewEntry match = null;
         for(int i=0; i<viewMap.size(); i++) {
             InternalViewEntry entry = (InternalViewEntry)viewMap.get(i);
-            // FIXME this should map
-            // 
             if(entry.objectClass.isInstance(otObject) &&
-            		viewInterface.isAssignableFrom(entry.viewClass)) {
-            	match = entry;
-            	break;
+            		(viewInterface == null || viewInterface.isAssignableFrom(entry.viewClass))) {
+            	return entry;
             }
         }
 
         // can't find the view in our own list
         // check parent
-        if(match == null && parent != null) {
-            match = parent.getViewInternal(otObject, viewInterface);
+        if(parent != null) {
+            return parent.getViewInternal(otObject, viewInterface);
         }
         
-        return match;        
+        return null;        
     }
     
     /* (non-Javadoc)

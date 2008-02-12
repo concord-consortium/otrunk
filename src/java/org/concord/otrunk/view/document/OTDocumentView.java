@@ -290,10 +290,13 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		} else {
 			view = getViewFactory().getView(referencedObject,
 					OTXHTMLView.class, viewMode);
+			
 			// if there isnt' a xhtml view and there is a view mode, then see if
 			// that viewMode of the jcomponent view is an xhtmlview.
 			// this logic is really contorted. The mixing of viewmodes and
 			// renderings needs to be well defined.
+			// TODO scytacki Feb 12, 2008 - this logic has been moved into the getView method of the viewfactory 
+			//   so if nothing goes wrong we should remove it from here.
 			if (view == null && getViewMode() != null) {
 				view = getViewFactory().getView(referencedObject,
 						OTJComponentView.class, viewMode);

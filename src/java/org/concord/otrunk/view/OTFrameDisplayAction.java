@@ -34,6 +34,9 @@ public class OTFrameDisplayAction extends DefaultOTObject
 		public OTFrame getFrame();
 		public OTObject getObjectToDisplay();
 		
+		public String getViewMode();
+		public void setViewMode(String viewMode);
+		
 		public static final int DEFAULT_xPosition = 30;
 		public int getXPosition();
 		
@@ -57,7 +60,7 @@ public class OTFrameDisplayAction extends DefaultOTObject
 		OTFrame frame = resources.getFrame();
 		OTObject otObject = resources.getObjectToDisplay();
 		
-		frameManager.putObjectInFrame(otObject, null, frame, null, 
+		frameManager.putObjectInFrame(otObject, null, frame, resources.getViewMode(), 
 				resources.getXPosition(), resources.getYPosition(), false);
 	}
 
