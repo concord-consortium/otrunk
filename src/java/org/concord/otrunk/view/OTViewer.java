@@ -81,6 +81,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
@@ -1283,7 +1284,9 @@ public class OTViewer extends JFrame
 			}
 
 		};
-
+		loadAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O,
+			java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		
 		saveAction = new AbstractAction("Save Authored Content...") {
 
 			/**
@@ -1334,6 +1337,9 @@ public class OTViewer extends JFrame
 				} // end if (remoteUrl == null)
 			}
 		};
+		
+		saveAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S,
+			java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		saveAsAction = new AbstractAction("Save Authored Content As...") {
 
