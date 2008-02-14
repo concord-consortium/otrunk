@@ -25,12 +25,12 @@ import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
-import org.concord.otrunk.view.OTViewerHelper;
+import org.concord.otrunk.view.OTConfig;
 
 public class OTObjectInternal implements OTObjectInterface
 {
-	public final static boolean traceListeners = OTViewerHelper.getBooleanProp(
-            OTViewerHelper.TRACE_LISTENERS_PROP, false);
+	public final static boolean traceListeners = OTConfig.getBooleanProp(
+            OTConfig.TRACE_LISTENERS_PROP, false);
 
 	public final static String LISTENER_THROWABLE_MESSAGE =
 		"Throwable thrown by an OTObjecListener, other listeners might not be notified";
@@ -534,7 +534,7 @@ public class OTObjectInternal implements OTObjectInterface
 	protected void finalize()
 	throws Throwable
 	{
-		if(OTViewerHelper.isTrace()){
+		if(OTConfig.isTrace()){
 			System.out.println("finalizing object: " + internalToString());
 		}
 		if(traceListeners){

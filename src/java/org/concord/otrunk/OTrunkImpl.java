@@ -66,7 +66,7 @@ import org.concord.otrunk.overlay.Overlay;
 import org.concord.otrunk.overlay.OverlayImpl;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
-import org.concord.otrunk.view.OTViewerHelper;
+import org.concord.otrunk.view.OTConfig;
 import org.concord.otrunk.xml.XMLDatabase;
 
 /**
@@ -308,7 +308,7 @@ public class OTrunkImpl implements OTrunk
     {
         objectServices.add(objService);
 
-        if(OTViewerHelper.isTrace()){
+        if(OTConfig.isTrace()){
         	objService.addObjectServiceListener(new TraceListener(label));
         }    	
     }
@@ -422,7 +422,7 @@ public class OTrunkImpl implements OTrunk
     {
 		addDatabase(db);
 		OTObjectServiceImpl objectService = createObjectService(db);
-        if(OTViewerHelper.isTrace()) {
+        if(OTConfig.isTrace()) {
         	objectService.addObjectServiceListener(new TraceListener(logLabel + ": " + db));
         }
         loadIncludes(objectService);

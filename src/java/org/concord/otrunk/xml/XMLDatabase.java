@@ -59,7 +59,7 @@ import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
-import org.concord.otrunk.view.OTViewerHelper;
+import org.concord.otrunk.view.OTConfig;
 import org.concord.otrunk.xml.jdom.JDOMDocument;
 
 
@@ -76,7 +76,7 @@ public class XMLDatabase
 	implements OTDatabase
 {
 	public static boolean TRACE_PACKAGES = 
-		OTViewerHelper.getBooleanProp(OTViewerHelper.TRACE_PACKAGES_PROP, false);
+		OTConfig.getBooleanProp(OTConfig.TRACE_PACKAGES_PROP, false);
 	
 	OTID rootId = null;
 	
@@ -207,7 +207,7 @@ public class XMLDatabase
 		OTXMLElement rootElement = document.getRootElement();
 		
 		String dbCodeBase = rootElement.getAttributeValue("codebase");
-		String systemCodeBase = OTViewerHelper.getStringProp(OTViewerHelper.CODEBASE_PROP);
+		String systemCodeBase = OTConfig.getStringProp(OTConfig.CODEBASE_PROP);
 		if(systemCodeBase != null){
 			dbCodeBase = systemCodeBase;
 		}
