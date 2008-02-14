@@ -57,6 +57,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -159,7 +161,7 @@ public class OTViewer extends JFrame
 
 	private static OTViewFactory otViewFactory;
 
-	protected int userMode = OTViewerHelper.NO_USER_MODE;
+	protected int userMode = OTConfig.NO_USER_MODE;
 
 	OTUserObject currentUser = null;
 
@@ -314,7 +316,7 @@ public class OTViewer extends JFrame
 		consoleFrame.getContentPane().add(view);
 		consoleFrame.setSize(800, 600);
 
-		if (OTViewerHelper.getBooleanProp(SHOW_CONSOLE_PROP, false)){
+		if (OTConfig.getBooleanProp(SHOW_CONSOLE_PROP, false)) {
 			consoleFrame.setVisible(true);
 		}
 		
@@ -408,7 +410,7 @@ public class OTViewer extends JFrame
 
 		JScrollPane folderTreeScrollPane = new JScrollPane(folderTreeArea);
 
-		if (System.getProperty(OTViewerHelper.DEBUG_PROP, "").equals("true")) {
+		if (System.getProperty(OTConfig.DEBUG_PROP, "").equals("true")) {
 			// ViewFactory.getComponent(root);
 
 			dataTreeArea = new JTree(dataTreeModel);
@@ -445,44 +447,45 @@ public class OTViewer extends JFrame
 
 	public void initArgs(String[] args)
 	{
-		String urlStr = getURL(args);
+		URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
+
+		if ("file".equalsIgnoreCase(authorOTMLURL.getProtocol())) {
+			try {
+				URI authorOTMLURI = new URI(authorOTMLURL.toString());
+				currentAuthoredFile = new File(authorOTMLURI);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+		String urlStr = authorOTMLURL.toString();
+
 		initWithWizard(urlStr);
 	}
 
 	/**
-     * @param args
-     * @return
-     */
-    public String getURL(String[] args)
-    {
-		String urlStr = null;
+	 * @param args
+	 * @return
+	 */
+	public String getURL(String[] args)
+	{
+		URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
 
-		if (args.length > 0) {
-    		if (args[0].equals("-f")) {
-    			if (args.length > 1) {
-    				File inFile = new File(args[1]);
-    				currentAuthoredFile = inFile;
-    				try {
-    					URL url = inFile.toURL();
-    					urlStr = url.toString();
-    				} catch (Exception e) {
-    					e.printStackTrace();
-    					urlStr = null;
-    				}
-    			}
-    		} else if (args[0].equals("-r")) {
-    			if (args.length > 1) {
-    				ClassLoader cl = OTViewer.class.getClassLoader();
-    				URL url = cl.getResource(args[1]);
-    				urlStr = url.toString();
-    			}
-    		} else {
-    			urlStr = args[0];
-    		}
+		if ("file".equalsIgnoreCase(authorOTMLURL.getProtocol())) {
+			try {
+				URI authorOTMLURI = new URI(authorOTMLURL.toString());
+				currentAuthoredFile = new File(authorOTMLURI);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
-		
-		return urlStr;
-    }
+
+		return authorOTMLURL.toString();
+	}
 
 	public void init(String url)
 	{
@@ -512,7 +515,7 @@ public class OTViewer extends JFrame
 			getContentPane().add(bodyPanel);
 		}
 
-		if (OTViewerHelper.isShowStatus()) {
+		if (OTConfig.isShowStatus()) {
 			statusPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 1));
 
 			final JLabel saveStateLabel = new JLabel("File saved");
@@ -603,7 +606,7 @@ public class OTViewer extends JFrame
 
 		OTMainFrame mainFrame = (OTMainFrame) otrunk.getService(OTMainFrame.class);
 
-		if (OTViewerHelper.getBooleanProp(HIDE_TREE_PROP, false)
+		if (OTConfig.getBooleanProp(HIDE_TREE_PROP, false)
 		        || !mainFrame.getShowLeftPanel()) {
 			splitPane.getLeftComponent().setVisible(false);
 		}
@@ -634,7 +637,7 @@ public class OTViewer extends JFrame
 
 		init(url);
 
-		if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
+		if (userMode == OTConfig.SINGLE_USER_MODE) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run()
 				{
@@ -700,7 +703,7 @@ public class OTViewer extends JFrame
 		try {
 			// try loading in the system object if there is one
 			String systemOtmlUrlStr =
-			    OTViewerHelper.getStringProp(OTViewerHelper.SYSTEM_OTML_PROP);
+			    OTConfig.getStringProp(OTConfig.SYSTEM_OTML_PROP);
 			if(systemOtmlUrlStr != null){
 				URL systemOtmlUrl = new URL(systemOtmlUrlStr);
 				systemDB = new XMLDatabase(systemOtmlUrl, System.out);
@@ -724,7 +727,7 @@ public class OTViewer extends JFrame
 			// of OTViewer has NO_USER_MODE turned off, so using this setting
 			// safe to test
 			// the resource tracking without affecting real users.
-			if (userMode == OTViewerHelper.NO_USER_MODE) {
+			if (userMode == OTConfig.NO_USER_MODE) {
 				xmlDB.setTrackResourceInfo(true);
 			}
 			xmlDB.loadObjects();
@@ -797,38 +800,47 @@ public class OTViewer extends JFrame
 	    throws Exception
 	{
 		String rootLocalId =
-		    OTViewerHelper.getStringProp(OTViewerHelper.ROOT_OBJECT_PROP);
+		    OTConfig.getStringProp(OTConfig.ROOT_OBJECT_PROP);
 		if(rootLocalId != null){
 			OTID rootID = xmlDB.getOTIDFromLocalID(rootLocalId);
 			return otrunk.getOTObject(rootID);
 		}
 		return otrunk.getRoot();
 	}
-	
+
+	public OTObject getRoot()
+	    throws Exception
+	{
+		switch (userMode) {
+		case OTConfig.NO_USER_MODE:
+			return getAuthoredRoot();
+		case OTConfig.SINGLE_USER_MODE:
+			if (userDataDB == null) {
+				return null;
+			}
+			OTObject otRoot = getAuthoredRoot();
+			return otrunk.getUserRuntimeObject(otRoot, currentUser);
+		}
+
+		return null;
+	}
+
 	private void reloadWindow()
 	    throws Exception
 	{
-		OTObject root = null;
+		OTObject root = getRoot();
+
 		boolean overrideShowTree = false;
 
-		switch (userMode) {
-		case OTViewerHelper.NO_USER_MODE:
-			root = getAuthoredRoot();
-			break;
-		case OTViewerHelper.SINGLE_USER_MODE:
-			if (userDataDB == null) {
+		if (userMode == OTConfig.SINGLE_USER_MODE) {
+			if (root == null) {
 				// FIXME This is an error
 				// the newAnonUserData should have been called before this
 				// method is
 				// called
 				// no user file has been started yet
 				overrideShowTree = true;
-
-				root = null;
 			} else {
-				OTObject otRoot = getAuthoredRoot();
-				root = otrunk.getUserRuntimeObject(otRoot, currentUser);
-
 				OTObject realRoot = otrunk.getRealRoot();
 				if (realRoot instanceof OTSystem) {
 
@@ -876,14 +888,14 @@ public class OTViewer extends JFrame
 		Frame frame = (Frame) SwingUtilities.getRoot(this);
 
 		switch (userMode) {
-		case OTViewerHelper.NO_USER_MODE:
+		case OTConfig.NO_USER_MODE:
 			if (remoteURL != null) {
 				frame.setTitle(baseFrameTitle + ": " + remoteURL.toString());
 			} else {
 				frame.setTitle(baseFrameTitle + ": " + currentURL.toString());
 			}
 			break;
-		case OTViewerHelper.SINGLE_USER_MODE:
+		case OTConfig.SINGLE_USER_MODE:
 			if (currentUserFile != null) {
 				frame.setTitle(baseFrameTitle + ": " + currentUserFile.toString());
 			} else if (System.getProperty(TITLE_PROP, null) != null) {
@@ -928,10 +940,10 @@ public class OTViewer extends JFrame
 
 		OTViewer viewer = new OTViewer();
 
-		if (OTViewerHelper.getBooleanProp(OTViewerHelper.SINGLE_USER_PROP, false)) {
-			viewer.setUserMode(OTViewerHelper.SINGLE_USER_MODE);
-		} else if (OTViewerHelper.getBooleanProp(OTViewerHelper.NO_USER_PROP, false)) {
-			viewer.setUserMode(OTViewerHelper.NO_USER_MODE);
+		if (OTConfig.getBooleanProp(OTConfig.SINGLE_USER_PROP, false)) {
+			viewer.setUserMode(OTConfig.SINGLE_USER_MODE);
+		} else if (OTConfig.getBooleanProp(OTConfig.NO_USER_PROP, false)) {
+			viewer.setUserMode(OTConfig.NO_USER_MODE);
 		}
 
 		viewer.initArgs(args);
@@ -1032,7 +1044,7 @@ public class OTViewer extends JFrame
 
 	private void updateRemoteURL(String defaultURL)
 	{
-		String remote = System.getProperty(OTViewerHelper.REMOTE_URL_PROP, null);
+		String remote = System.getProperty(OTConfig.REMOTE_URL_PROP, null);
 
 		try {
 			if (remote == null) {
@@ -1303,7 +1315,7 @@ public class OTViewer extends JFrame
 			{
 				if (remoteURL != null) {
 					try {
-						if (OTViewerHelper.isRestEnabled()) {
+						if (OTConfig.isRestEnabled()) {
 							try {
 								remoteSaveData(OTViewer.HTTP_PUT);
 							} catch (Exception e) {
@@ -1429,7 +1441,7 @@ public class OTViewer extends JFrame
 
 				JPanel checkboxPanel = new JPanel();
 				JCheckBox restCheckbox = new JCheckBox("REST Enabled?");
-				restCheckbox.setSelected(OTViewerHelper.isRestEnabled());
+				restCheckbox.setSelected(OTConfig.isRestEnabled());
 				checkboxPanel.setBorder(new EmptyBorder(5, 5, 0, 0));
 				checkboxPanel.add(restCheckbox);
 
@@ -1452,7 +1464,7 @@ public class OTViewer extends JFrame
 						// WARNING this will cause a security exception if we
 						// are running in a applet or jnlp which
 						//  has a security sandbox.
-						System.setProperty(OTViewerHelper.REST_ENABLED_PROP,
+						System.setProperty(OTConfig.REST_ENABLED_PROP,
 						        Boolean.toString(restCheckbox.isSelected()));
 						remoteSaveData(OTViewer.HTTP_POST);
 						updateMenuBar();
@@ -1512,9 +1524,9 @@ public class OTViewer extends JFrame
 			{
 				Object source = e.getSource();
 				if (((JCheckBoxMenuItem) source).isSelected()) {
-					System.setProperty(OTViewerHelper.DEBUG_PROP, "true");
+					System.setProperty(OTConfig.DEBUG_PROP, "true");
 				} else {
-					System.setProperty(OTViewerHelper.DEBUG_PROP, "false");
+					System.setProperty(OTConfig.DEBUG_PROP, "false");
 				}
 
 				try {
@@ -1585,11 +1597,11 @@ public class OTViewer extends JFrame
 			fileMenu.removeAll();
 		}
 
-		if (OTViewerHelper.isAuthorMode()) {
-			userMode = OTViewerHelper.NO_USER_MODE;
+		if (OTConfig.isAuthorMode()) {
+			userMode = OTConfig.NO_USER_MODE;
 		}
 
-		if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
+		if (userMode == OTConfig.SINGLE_USER_MODE) {
 			fileMenu.setEnabled(!justStarted);
 
 			fileMenu.add(newUserDataAction);
@@ -1601,8 +1613,8 @@ public class OTViewer extends JFrame
 			fileMenu.add(saveUserDataAsAction);
 		}
 
-		if (OTViewerHelper.isDebug()) {
-			if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
+		if (OTConfig.isDebug()) {
+			if (userMode == OTConfig.SINGLE_USER_MODE) {
 				loadAction.putValue(Action.NAME, "Open Authored Content...");
 				saveAction.putValue(Action.NAME, "Save Authored Content");
 				saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
@@ -1620,8 +1632,8 @@ public class OTViewer extends JFrame
 			fileMenu.add(saveRemoteAsAction);
 		}
 
-		if (OTViewerHelper.isAuthorMode() && !OTViewerHelper.isDebug()) {
-			if (userMode == OTViewerHelper.SINGLE_USER_MODE) {
+		if (OTConfig.isAuthorMode() && !OTConfig.isDebug()) {
+			if (userMode == OTConfig.SINGLE_USER_MODE) {
 				loadAction.putValue(Action.NAME, "Open Authored Content...");
 				saveAction.putValue(Action.NAME, "Save Authored Content");
 				saveAsAction.putValue(Action.NAME, "Save Authored Content As...");
@@ -1635,7 +1647,7 @@ public class OTViewer extends JFrame
 			fileMenu.add(saveAsAction);
 		}
 
-		if (OTViewerHelper.getBooleanProp("otrunk.view.export_image", false)) {
+		if (OTConfig.getBooleanProp("otrunk.view.export_image", false)) {
 			fileMenu.add(exportImageAction);
 
 			fileMenu.add(exportHiResImageAction);
@@ -1645,12 +1657,12 @@ public class OTViewer extends JFrame
 
 		fileMenu.add(showConsoleAction);
 
-		if (OTViewerHelper.isAuthorMode() || OTViewerHelper.isDebug()) {
+		if (OTConfig.isAuthorMode() || OTConfig.isDebug()) {
 			fileMenu.add(reloadWindowAction);
 		}
 
 		JCheckBoxMenuItem debugItem = new JCheckBoxMenuItem(debugAction);
-		debugItem.setSelected(OTViewerHelper.isDebug());
+		debugItem.setSelected(OTConfig.isDebug());
 		fileMenu.add(debugItem);
 
 		fileMenu.add(exitAction);
@@ -1805,7 +1817,7 @@ public class OTViewer extends JFrame
 				return false;
 			}
 
-			if (OTViewerHelper.isAuthorMode() && !checkForUnsavedAuthorData()) {
+			if (OTConfig.isAuthorMode() && !checkForUnsavedAuthorData()) {
 				// the user canceled the operation
 				return false;
 			}
