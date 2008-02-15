@@ -20,6 +20,8 @@ public class OTConfig
 	public final static String VIEW_MODE_PROP = "otrunk.view.mode";
 	public final static String CODEBASE_PROP = "otrunk.codebase";
 	public final static String SHOW_STATUS_PROP = "otrunk.view.status";
+	public final static String USERDATA_URL_PROP = "otrunk.userdata_url";
+	
 	
 	/**
      * This is yet another hack to support something like layers or mutliple files.

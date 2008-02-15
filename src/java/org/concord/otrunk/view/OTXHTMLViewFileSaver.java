@@ -10,7 +10,6 @@
 package org.concord.otrunk.view;
 
 import java.io.File;
-import java.net.URL;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTViewFactory;
@@ -50,9 +49,7 @@ public class OTXHTMLViewFileSaver
 		viewerHelper = new OTViewerHelper();
 				
 		try{
-			URL url = OTViewerHelper.getURLFromArgs(args);
-			
-			viewerHelper.loadAuthoredContentURL(url);
+			viewerHelper.init(args);
 			
 			initFields();
 			
@@ -86,7 +83,7 @@ public class OTXHTMLViewFileSaver
     private void initFields()
     	throws Exception
     {
-    	rootObject = viewerHelper.getAuthoredRoot();
+    	rootObject = viewerHelper.getRootObject();
     	
     	if(rootObject instanceof OTViewChild){
     		rootViewEntry = ((OTViewChild)rootObject).getViewid();

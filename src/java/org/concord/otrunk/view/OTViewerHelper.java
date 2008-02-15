@@ -211,6 +211,23 @@ public class OTViewerHelper
 		}
 	}
 
+	public void init(String [] args) throws Exception
+	{
+		URL url = OTViewerHelper.getURLFromArgs(args);
+		
+		loadAuthoredContentURL(url);
+		
+		String userDataUrlStr = OTConfig.getStringProp(OTConfig.USERDATA_URL_PROP);
+		if(getUserMode() == OTConfig.SINGLE_USER_MODE &&
+				 userDataUrlStr != null){
+			URL userDataUrl = new URL(userDataUrlStr);
+			OTDatabase otDB = loadOTDatabase(userDataUrl.openStream(), userDataUrl, 
+				System.out, false);
+			loadUserData(otDB, null);
+		}
+
+	}
+	
 	public void loadOTrunkNoViewSystem(OTDatabase otDB)
 		throws Exception
 	{
@@ -312,32 +329,34 @@ public class OTViewerHelper
 		boolean trackResources)
 	throws Exception
 	{
+		OTDatabase localOtDB;
 		try {
-			otDB = new XMLDatabase(input, url, loggingStream);
-			((XMLDatabase)otDB).setTrackResourceInfo(trackResources);
-			((XMLDatabase)otDB).loadObjects();
+			localOtDB = new XMLDatabase(input, url, loggingStream);
+			((XMLDatabase)localOtDB).setTrackResourceInfo(trackResources);
+			((XMLDatabase)localOtDB).loadObjects();
 			
 		} catch (org.jdom.input.JDOMParseException e) {
 			showParseException(e);
 			throw e;
 		}		
 		
-		return otDB;
+		return localOtDB;
 	}
 
 	public OTDatabase loadOTDatabase(Reader reader, URL url)
 	throws Exception
 	{
+		OTDatabase localOtDB;
 		try {
-			otDB = new XMLDatabase(reader, url, System.err);
-			((XMLDatabase)otDB).loadObjects();
+			localOtDB = new XMLDatabase(reader, url, System.err);
+			((XMLDatabase)localOtDB).loadObjects();
 			
 		} catch (org.jdom.input.JDOMParseException e) {
 			showParseException(e);
 			throw e;
 		}		
 		
-		return otDB;
+		return localOtDB;
 	}
 
 	public void saveOTDatabase(OTDatabase otDB, OutputStream output)
@@ -532,7 +551,7 @@ public class OTViewerHelper
 	public OTObject getRootObject() 
 	throws Exception
 	{
-		OTObject root = getOtrunk().getRoot();
+		OTObject root = getAuthoredRoot();
 		if(currentUser != null){
 			return getOtrunk().getUserRuntimeObject(root, currentUser);
 		}
