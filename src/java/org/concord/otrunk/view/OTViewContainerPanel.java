@@ -291,77 +291,7 @@ public class OTViewContainerPanel extends JPanel
 		// For some reason this allows popups to incrementally draw them selves
 		// without it, the popup blocks until the inside content is rendered
 		// before showing anything
-		final Runnable createComponentTask = new Runnable(){
-		    public void run()
-		    {
-		    	JComponent myComponent = createJComponent(); 
-
-		    	boolean localUseScrollPane = isUseScrollPane();
-		    	if(currentViewChild != null){
-		    		localUseScrollPane = currentViewChild.getUseScrollPane();
-		    	}
-
-				if(localUseScrollPane) {
-					JScrollPane scrollPane = new JScrollPane();
-					scrollPane.setOpaque(false);
-					
-					scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-					
-					scrollPane.setViewport(new JViewport(){
-						/**
-						 * Not intended to be serialized, just added remove compile warning
-						 */
-						private static final long serialVersionUID = 1L;
-						
-						public void scrollRectToVisible(Rectangle contentRect) {
-							// disabling this removes the flicker that occurs during the loading of the page.
-							// if we could 
-							if(!isScrollingAllowed()){
-								return;
-							}
-
-							super.scrollRectToVisible(contentRect);							
-						}
-					});
-					scrollPane.setViewportView(myComponent);
-					
-					scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-					
-			    	boolean localScrollPanelHasBorder = scrollPanelHasBorder;
-			    	if(currentViewChild != null){
-			    		localScrollPanelHasBorder = currentViewChild.getScrollPanelHasBorder();
-			    	}
-					if (!localScrollPanelHasBorder){
-						scrollPane.setBorder(BorderFactory.createEmptyBorder());
-					}
-					
-					myComponent = scrollPane;
-				}
-				removeAll();
-				add(myComponent, BorderLayout.CENTER);
-				
-				revalidate();
-				notifyListeners();
-				if(isAutoRequestFocus()){
-					myComponent.requestFocus();
-				}
-				
-				// We have to queue this up, because during the setup of this
-				// component other things might be queued, that cause scrolling
-				// to happen. 
-				// this way the scrolling should remain disabled until all 
-				// of them are complete.
-				SwingUtilities.invokeLater(new Runnable(){
-					/* (non-Javadoc)
-					 * @see java.lang.Runnable#run()
-					 */
-					public void run() {
-						// TODO Auto-generated method stub
-						enableScrolling();
-					}
-				});
-		    }
-		};
+		final Runnable createComponentTask = new CreateComponentTask(currentObject);
 
 		/**
 		 * This is disabled for now but we might have to come back to it it
@@ -499,6 +429,94 @@ public class OTViewContainerPanel extends JPanel
 	    }
 	}
 	
+	private final class CreateComponentTask
+        implements Runnable
+    {
+		private OTObject componentObject;
+
+		public CreateComponentTask(OTObject otObject)
+		{
+			this.componentObject = otObject;
+		}
+		
+	    public void run()
+	    {
+	    	if(currentObject != componentObject) {
+	    		// the object has been updated since this task started.  
+	    		// so we don't need to do anything here, because there will
+	    		// be another task happening later.
+	    		return;
+	    	}
+	    	
+	    	JComponent myComponent = createJComponent(); 
+
+	    	boolean localUseScrollPane = isUseScrollPane();
+	    	if(currentViewChild != null){
+	    		localUseScrollPane = currentViewChild.getUseScrollPane();
+	    	}
+
+	    	if(localUseScrollPane) {
+	    		JScrollPane scrollPane = new JScrollPane();
+	    		scrollPane.setOpaque(false);
+	    		
+	    		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	    		
+	    		scrollPane.setViewport(new JViewport(){
+	    			/**
+	    			 * Not intended to be serialized, just added remove compile warning
+	    			 */
+	    			private static final long serialVersionUID = 1L;
+	    			
+	    			public void scrollRectToVisible(Rectangle contentRect) {
+	    				// disabling this removes the flicker that occurs during the loading of the page.
+	    				// if we could 
+	    				if(!isScrollingAllowed()){
+	    					return;
+	    				}
+
+	    				super.scrollRectToVisible(contentRect);							
+	    			}
+	    		});
+	    		scrollPane.setViewportView(myComponent);
+	    		
+	    		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	    		
+	        	boolean localScrollPanelHasBorder = scrollPanelHasBorder;
+	        	if(currentViewChild != null){
+	        		localScrollPanelHasBorder = currentViewChild.getScrollPanelHasBorder();
+	        	}
+	    		if (!localScrollPanelHasBorder){
+	    			scrollPane.setBorder(BorderFactory.createEmptyBorder());
+	    		}
+	    		
+	    		myComponent = scrollPane;
+	    	}
+	    	removeAll();
+	    	add(myComponent, BorderLayout.CENTER);
+	    	
+	    	revalidate();
+	    	notifyListeners();
+	    	if(isAutoRequestFocus()){
+	    		myComponent.requestFocus();
+	    	}
+	    	
+	    	// We have to queue this up, because during the setup of this
+	    	// component other things might be queued, that cause scrolling
+	    	// to happen. 
+	    	// this way the scrolling should remain disabled until all 
+	    	// of them are complete.
+	    	SwingUtilities.invokeLater(new Runnable(){
+	    		/* (non-Javadoc)
+	    		 * @see java.lang.Runnable#run()
+	    		 */
+	    		public void run() {
+	    			// TODO Auto-generated method stub
+	    			enableScrolling();
+	    		}
+	    	});
+	    }
+    }
+
 	/**
 	 * Internal class so views which get passed a view container do not
 	 * have direct access to the viewcontainer panel.  This also makes it
