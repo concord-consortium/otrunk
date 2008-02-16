@@ -36,9 +36,11 @@ import java.util.regex.Pattern;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.view.OTControllerServiceFactory;
 import org.concord.framework.otrunk.view.OTJComponentService;
 import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
 import org.concord.framework.otrunk.view.OTJComponentView;
@@ -72,6 +74,7 @@ public class OTMLToXHTMLConverter
 	private File outputFile;
 
 	OTJComponentService jComponentService;
+	private OTControllerService controllerService;
 
 	public OTMLToXHTMLConverter()
 	{
@@ -149,7 +152,28 @@ public class OTMLToXHTMLConverter
 		if (outputFile == null) {
 			return;
 		}
+
+		// FIXME: only the first object is used here it is not clear how to 
+		// handle this. It is possible a collection of objects could be converted
+		// with different object services, so they should have different controller
+		// services.
+		if(topLevelOTObjects[0] != null){
+			controllerService = topLevelOTObjects[0].getOTObjectService().createControllerService();
 			
+			OTControllerServiceFactory controllerServiceFactory = new OTControllerServiceFactory(){
+
+				public OTControllerService createControllerService()
+                {
+					OTControllerService subControllerService = 
+						((OTControllerServiceImpl) controllerService).createSubControllerService();						
+					return subControllerService;
+                }
+				
+			};
+			OTViewContext factoryContext = viewFactory.getViewContext();
+			factoryContext.addViewService(OTControllerServiceFactory.class, controllerServiceFactory);
+		}
+
 		String allTexts = "";
 		for (int i = 0; i < topLevelOTObjects.length; i++) {
 
