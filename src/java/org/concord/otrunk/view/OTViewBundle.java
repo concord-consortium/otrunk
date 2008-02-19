@@ -32,12 +32,16 @@
 */
 package org.concord.otrunk.view;
 
+import java.util.Iterator;
+import java.util.Vector;
+
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTBundle;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.view.OTFrame;
+import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 
 /**
@@ -70,6 +74,7 @@ public class OTViewBundle extends DefaultOTObject
     }
     
     ResourceSchema resources;
+	private boolean viewFactoryServiceAlreadyExisted;
     
     public OTViewBundle(ResourceSchema resources)
     {
@@ -109,31 +114,54 @@ public class OTViewBundle extends DefaultOTObject
      */
     public void registerServices(OTServiceContext serviceContext)
     {
-        OTViewFactoryImpl factory =  new OTViewFactoryImpl(this);
-        factory.setDefaultViewMode(getCurrentMode());
-        serviceContext.addService(OTViewFactory.class, factory);
-        
-        OTMainFrame mainFrame = new OTMainFrame(){
+    	if (serviceContext.getService(OTViewFactory.class) == null) {
+			OTViewFactoryImpl factory = new OTViewFactoryImpl(this);
+			factory.setDefaultViewMode(getCurrentMode());
+			serviceContext.addService(OTViewFactory.class, factory);
+		} else {
+			viewFactoryServiceAlreadyExisted = true;
+		}
+		if (serviceContext.getService(OTMainFrame.class) == null) {
+			OTMainFrame mainFrame = new OTMainFrame() {
 
-			public OTFrame getFrame()
-            {
-				return resources.getFrame();
-            }
+				public OTFrame getFrame()
+				{
+					return resources.getFrame();
+				}
 
-			public boolean getShowLeftPanel()
-            {
-				return resources.getShowLeftPanel();
-            }        	
-        };
-        serviceContext.addService(OTMainFrame.class, mainFrame);
+				public boolean getShowLeftPanel()
+				{
+					return resources.getShowLeftPanel();
+				}
+			};
+			serviceContext.addService(OTMainFrame.class, mainFrame);
+		}
     }
 
-    /* (non-Javadoc)
-     * @see org.concord.framework.otrunk.OTBundle#initializeBundle(org.concord.framework.otrunk.OTServiceContext)
-     */
+    /*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.concord.framework.otrunk.OTBundle#initializeBundle(org.concord.framework.otrunk.OTServiceContext)
+	 */
     public void initializeBundle(OTServiceContext serviceContext)
     {
-    	// Don't need to do anything here
+    	// If there already exists a view factory, add own view entries to the top of its list
+    	// and override other properties
+    	if (viewFactoryServiceAlreadyExisted){
+    		OTViewFactory factory = (OTViewFactory) serviceContext.getService(OTViewFactory.class);
+    		
+    		// Add view entries
+    		Vector viewEntries = getViewEntries().getVector();
+    		Iterator it = viewEntries.iterator();
+    		while (it.hasNext()){
+    			factory.addViewEntry((OTViewEntry)it.next(), true);
+    		}
+    		
+    		// Override currentMode
+    		if (getCurrentMode() != null){
+    			factory.setDefaultViewMode(getCurrentMode());
+    		}
+    	}
     }
 
 }

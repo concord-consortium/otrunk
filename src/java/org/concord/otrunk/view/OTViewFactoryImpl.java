@@ -246,10 +246,15 @@ public class OTViewFactoryImpl implements OTViewFactory
         return null;        
     }
     
+    public void addViewEntry(OTViewEntry entry)
+    {
+    	addViewEntry(entry, false);
+    }
+    
     /* (non-Javadoc)
 	 * @see org.concord.otrunk.view.OTViewFactory#addViewEntry(java.lang.Class, java.lang.Class)
 	 */
-    public void addViewEntry(OTViewEntry entry)
+    public void addViewEntry(OTViewEntry entry, boolean addToTop)
     {
         String objClassStr = entry.getObjectClass();
         String viewClassStr = entry.getViewClass();
@@ -265,7 +270,11 @@ public class OTViewFactoryImpl implements OTViewFactory
             }
 
             internalEntry.otEntryID = entry.getGlobalId();
-            viewMap.add(internalEntry);
+            if (addToTop){
+            	viewMap.add(0, internalEntry);
+            } else {
+            	viewMap.add(internalEntry);
+            }
             
         } catch (ClassNotFoundException e) {
             System.err.println("Can't find view: " + viewClassStr + 
