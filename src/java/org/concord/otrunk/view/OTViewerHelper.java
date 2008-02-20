@@ -329,6 +329,8 @@ public class OTViewerHelper
 		boolean trackResources)
 	throws Exception
 	{
+		setupMessageHandler();
+		
 		OTDatabase localOtDB;
 		try {
 			localOtDB = new XMLDatabase(input, url, loggingStream);
@@ -346,6 +348,8 @@ public class OTViewerHelper
 	public OTDatabase loadOTDatabase(Reader reader, URL url)
 	throws Exception
 	{
+		setupMessageHandler();
+		
 		OTDatabase localOtDB;
 		try {
 			localOtDB = new XMLDatabase(reader, url, System.err);
@@ -505,12 +509,7 @@ public class OTViewerHelper
 		authoredContentURL = url;		
 	}	
 	
-	/**
-	 * Find the registered message handler, add a PrintUserMessageHandler.  
-	 * 
-	 * @return
-	 */
-	public UserMessageHandler getMessageHander()
+	protected UserMessageHandler setupMessageHandler()
 	{
 		// Check to see if we need to add a user message handler ourselves
 		UserMessageHandler messageHandler = 
@@ -520,8 +519,17 @@ public class OTViewerHelper
 			messageHandler = new PrintUserMessageHandler();
 			addService(UserMessageHandler.class, messageHandler);
 		}
-
 		return messageHandler;
+	}
+	
+	/**
+	 * Find the registered message handler, add a PrintUserMessageHandler.  
+	 * 
+	 * @return
+	 */
+	public UserMessageHandler getMessageHander()
+	{	
+		return setupMessageHandler();
 	}
 
 	public Object findService(Class serviceInterface)
