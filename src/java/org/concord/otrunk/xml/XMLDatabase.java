@@ -337,7 +337,7 @@ public class XMLDatabase
 	 * org.concord.datagraph.state.OTDatagraphPackage
 	 * 
 	 * This is figured out by 
-	 * Taking of the classname
+	 * Taking off the classname
 	 *    org.concord.datagraph.state
 	 * striping off the .state (if there is one)
 	 *    org.concord.datagraph
