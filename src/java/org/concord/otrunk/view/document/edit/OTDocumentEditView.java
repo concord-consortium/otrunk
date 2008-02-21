@@ -177,7 +177,7 @@ public class OTDocumentEditView extends OTDocumentView implements
 				|| markupLanguage.equals(OTDocument.MARKUP_PFHTML)
 				|| markupLanguage.equals(OTDocument.MARKUP_PLAIN)) {
 			if (editorPane == null) {
-				editorPane = new JEditorPane();
+				editorPane = new MyJEditorPane();
 				OTHTMLFactory kitViewFactory = new OTHTMLFactory(this);
 				editorKit = new OTDocumentEditorKit(
 						kitViewFactory);
@@ -229,7 +229,6 @@ public class OTDocumentEditView extends OTDocumentView implements
 	{
 		OTObject otObj = null;
 		
-		System.out.println(documentEditConfig);
 		otObj = OTObjectListViewer.showDialog(previewComponent,
 		        "Choose object to add", getFrameManager(), getViewFactory(),
 		        documentEditConfig.getObjectsToInsert(), otObject
