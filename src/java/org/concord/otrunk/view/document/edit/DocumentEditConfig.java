@@ -54,4 +54,9 @@ public class DocumentEditConfig
 		documentViewConfig.setViewContainerIsUpdateable(viewContainerIsUpdateable);
 	}
 
+	public String getCssText()
+    {
+	    return documentViewConfig.getCssText();
+    }
+
 }
