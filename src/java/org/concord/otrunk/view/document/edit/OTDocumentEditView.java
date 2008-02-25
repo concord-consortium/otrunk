@@ -290,6 +290,8 @@ public class OTDocumentEditView extends OTDocumentView implements
             m.find();
             htmlDoc = m.group(1);
             
+            htmlDoc = cleanHTML(htmlDoc);
+            
 			pfObject.setDocumentText(htmlDoc);
             
 		} else if (e.getActionCommand().equalsIgnoreCase("viewSrc")){
@@ -361,6 +363,23 @@ public class OTDocumentEditView extends OTDocumentView implements
 		}
 		
     }
+	
+	private String cleanHTML(String text){
+		Pattern allHead = Pattern.compile("<head>.*</head>", Pattern.DOTALL);
+		text = allHead.matcher(text).replaceAll("");
+		text = text.replaceAll("</?html.*>", "");
+		text = text.replaceAll("</?body.*>", "");
+		text = text.replaceAll("</object>","");
+		text = text.replaceAll("<object(.*?)/>", "<object$1>");
+		text = text.replaceAll("<object(.*?)>", "<object$1></object>");
+		text = text.replaceAll("</img>","");
+		text = text.replaceAll("<img(.*?)/>", "<img$1>");
+		text = text.replaceAll("<img(.*?)>", "<img$1></img>");
+		text = text.replaceAll("<br>", "<br/>");
+		text = text.replaceAll("</br>", "");
+		
+		return text;
+	}
 
 
 
@@ -368,14 +387,7 @@ public class OTDocumentEditView extends OTDocumentView implements
     {
 		try {
 			String text = editorPane.getText();
-			Pattern allHead = Pattern.compile("<head>.*</head>", Pattern.DOTALL);
-			text = allHead.matcher(text).replaceAll("");
-			text = text.replaceAll("</?html.*>", "");
-			text = text.replaceAll("</?body.*>", "");
-			text = text.replaceAll("<object(.*)>", "<object$1></object>");
-			text = text.replaceAll("<img(.*)>", "<img$1></img>");
-			text = text.replaceAll("<br>", "<br/>");
-			text = text.replaceAll("</br>", "");
+			text = cleanHTML(text);
 			
 			pfObject.setDocumentText(text);
 		} catch (Exception exc) {
