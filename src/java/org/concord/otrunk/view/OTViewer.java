@@ -450,14 +450,7 @@ public class OTViewer extends JFrame
 		URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
 
 		if ("file".equalsIgnoreCase(authorOTMLURL.getProtocol())) {
-			try {
-				URI authorOTMLURI = new URI(authorOTMLURL.toString());
-				currentAuthoredFile = new File(authorOTMLURI);
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
+			currentAuthoredFile = new File(authorOTMLURL.getPath());
 		}
 
 		String urlStr = authorOTMLURL.toString();
