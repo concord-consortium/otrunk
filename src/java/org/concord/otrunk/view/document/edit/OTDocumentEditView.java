@@ -194,7 +194,7 @@ public class OTDocumentEditView extends OTDocumentView implements
 
 			if (documentConfig != null) {
 				
-				String css = getCssText();
+				String css = documentConfig.getCssText();
 				
 				String XHTML_PREFIX = XHTML_PREFIX_START + css
 						+ XHTML_PREFIX_END;

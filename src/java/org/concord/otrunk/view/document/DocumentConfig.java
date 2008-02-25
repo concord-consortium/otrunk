@@ -20,4 +20,6 @@ public interface DocumentConfig
 	public boolean getViewContainerIsUpdateable();
 	public void setViewContainerIsUpdateable(boolean viewContainerIsUpdateable);
 	public static boolean DEFAULT_viewContainerIsUpdateable = true;
+	
+	public String getCssText();
 }

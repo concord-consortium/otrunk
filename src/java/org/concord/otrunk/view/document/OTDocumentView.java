@@ -197,7 +197,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 			if (documentConfig != null) {
 				
-				String css = getCssText();
+				String css = documentConfig.getCssText();
 				
 				String XHTML_PREFIX = XHTML_PREFIX_START + css
 						+ XHTML_PREFIX_END;
@@ -570,6 +570,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	 * Retrieves the CSS style text used for the document view.
 	 * @return String containing (raw) CSS definitions, or a blank string.
 	 */
+	/**
 	protected String getCssText() {
 		String css = "";
 		
@@ -612,6 +613,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		}
 		return css;
 	}
+	*/
 	
 	// If one of the child objects is replaced by another, we swap the old and new
 	// object in the documentRefs, and then change the object references in the
