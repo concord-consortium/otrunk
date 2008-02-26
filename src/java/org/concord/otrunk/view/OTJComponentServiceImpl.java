@@ -16,6 +16,7 @@ import org.concord.framework.otrunk.view.OTJComponentViewContextAware;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
+import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTXHTMLView;
@@ -68,12 +69,18 @@ public class OTJComponentServiceImpl implements OTJComponentService
 	{
 		return getObjectView(otObject, container, mode, null);
 	}
+	
+	public OTJComponentView getObjectView(OTObject otObject, OTViewContainer container, 
+        String mode, OTViewEntry viewEntry)
+    {
+    		return getObjectView(otObject, container, mode, viewEntry, null);
+    }
 
 	/* (non-Javadoc)
      * @see org.concord.framework.otrunk.view.OTJComponentService#getObjectView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, java.lang.String, org.concord.framework.otrunk.view.OTViewEntry)
      */
     public OTJComponentView getObjectView(OTObject otObject, OTViewContainer container, 
-                                          String mode, OTViewEntry viewEntry)
+                                          String mode, OTViewEntry viewEntry, OTViewContext passedViewContext)
     {
     	OTView genericView = null;
     	if(viewEntry != null) {
@@ -113,11 +120,15 @@ public class OTJComponentServiceImpl implements OTJComponentService
     			OTXHTMLView xhtmlView = (OTXHTMLView) genericView;
 
     			view = new OTXHTMLWrapperView(xhtmlView, otObject);
-
-    			// Because we are making this view ourselves we need to do the
-    			// initialization normally done by the viewFactory
-    			((OTXHTMLWrapperView)view).setViewContext(
-    					viewFactory.getViewContext());					
+    			
+    			if (passedViewContext == null){
+        			// Because we are making this view ourselves we need to do the
+        			// initialization normally done by the viewFactory
+        			((OTXHTMLWrapperView)view).setViewContext(
+        					viewFactory.getViewContext());		
+    			} else {
+    				((OTXHTMLWrapperView)view).setViewContext(passedViewContext);		
+    			}
     			
     		}
 
