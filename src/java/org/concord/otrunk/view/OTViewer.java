@@ -62,6 +62,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -102,6 +103,7 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
+import org.concord.framework.otrunk.view.OTUserListService;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerChangeEvent;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
@@ -766,6 +768,11 @@ public class OTViewer extends JFrame
 		        new OTJComponentServiceFactoryImpl());
 		factoryContext.addViewService(OTExternalAppService.class,
 				new OTExternalAppServiceImpl());
+		factoryContext.addViewService(OTUserListService.class, new OTUserListService() {
+			public Vector getUserList() {
+	            return otrunk.getUsers();
+            }
+		});
 
 		currentURL = url;
 	}
