@@ -505,6 +505,8 @@ public class OTrunkImpl implements OTrunk
 				throws Exception
             {
 				OTDatabase db = getOTDatabase(id);
+				if (db == null)
+					System.out.println("********** "+id);
 				return db.getOTDataObject(null, id);
             }    		
     	};
@@ -526,7 +528,8 @@ public class OTrunkImpl implements OTrunk
 	        	for(int i=0; i<otOverlays.size(); i++){
 	        		OTOverlay otOverlay = (OTOverlay) otOverlays.get(i);
 	        		Overlay overlay = new OverlayImpl(otOverlay);
-	        		overlays.add(overlay);
+	        		if (overlay != null)
+	        			overlays.add(overlay);
 	        	}
 	        }
 	        userDb.setOverlays(overlays);
