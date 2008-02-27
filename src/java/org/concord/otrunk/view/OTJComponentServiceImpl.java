@@ -9,6 +9,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.AbstractOTView;
 import org.concord.framework.otrunk.view.OTJComponentService;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTJComponentViewContext;
@@ -73,14 +74,15 @@ public class OTJComponentServiceImpl implements OTJComponentService
 	public OTJComponentView getObjectView(OTObject otObject, OTViewContainer container, 
         String mode, OTViewEntry viewEntry)
     {
-    		return getObjectView(otObject, container, mode, viewEntry, null);
+    		return getObjectView(otObject, container, mode, viewEntry, null, null);
     }
 
 	/* (non-Javadoc)
      * @see org.concord.framework.otrunk.view.OTJComponentService#getObjectView(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.view.OTViewContainer, java.lang.String, org.concord.framework.otrunk.view.OTViewEntry)
      */
     public OTJComponentView getObjectView(OTObject otObject, OTViewContainer container, 
-                                          String mode, OTViewEntry viewEntry, OTViewContext passedViewContext)
+                                          String mode, OTViewEntry viewEntry, OTViewContext passedViewContext,
+                                          OTJComponentViewContext passedJComponentViewContext)
     {
     	OTView genericView = null;
     	if(viewEntry != null) {
@@ -149,8 +151,18 @@ public class OTJComponentServiceImpl implements OTJComponentService
         }
         
         if(view instanceof OTJComponentViewContextAware){
-        	((OTJComponentViewContextAware)view).setOTJComponentViewContext(viewContext);
-        }        	
+        	if (passedJComponentViewContext == null){
+        		((OTJComponentViewContextAware)view).setOTJComponentViewContext(viewContext);
+        	} else {
+        		((OTJComponentViewContextAware)view).setOTJComponentViewContext(passedJComponentViewContext);
+        	}
+        }
+        
+        if (view instanceof AbstractOTView){
+        	if (passedViewContext != null){
+        		((AbstractOTView)view).setViewContext(passedViewContext);
+        	}
+        }
         
         objToView.put(otObject, view);
         
