@@ -32,6 +32,6 @@ import org.concord.framework.otrunk.OTObjectList;
 
 public interface OTMultiUserRoot extends OTObjectInterface 
 {
-	OTObjectList getUserDatabases();
+	OTObject getUserList();
 	OTObject getReportTemplate();
 }
