@@ -49,7 +49,9 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 		OTrunkImpl otrunkImpl = (OTrunkImpl) otrunk;
 		
 	    OTMultiUserRoot root = (OTMultiUserRoot) otObject;
-	    OTObjectList userDatabases = root.getUserDatabases();
+	    OTUserList userList = (OTUserList) root.getUserList();
+	    OTObjectList userDatabases = userList.getUserDatabases();
+	    
 	    for (int i = 0; i < userDatabases.size(); i++) {
 	    	OTUserDatabaseRef ref = (OTUserDatabaseRef) userDatabases.get(i);
 	    	URL url = ref.getUrl();
