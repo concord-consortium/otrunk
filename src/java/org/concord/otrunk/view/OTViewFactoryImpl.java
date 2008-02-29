@@ -78,6 +78,7 @@ public class OTViewFactoryImpl implements OTViewFactory
     protected OTViewFactoryImpl(OTViewFactoryImpl parent)
     {
         this.parent = parent;
+        this.viewBundle = parent.viewBundle;
         
         initServices();
     }
@@ -421,6 +422,11 @@ public class OTViewFactoryImpl implements OTViewFactory
 	public void setDefaultViewMode(String mode)
     {
 	    this.mode = mode;
+    }
+
+	public OTObjectList getModes()
+    {
+	    return viewBundle.getModes();
     }
 	
 }
