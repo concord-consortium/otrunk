@@ -133,6 +133,10 @@ public class OTrunkImpl implements OTrunk
 		// Setup the services this has to be done before addDatabase
 		// because addDatabase initializes the OTPackages loaded by that
 		// database
+        
+        // Add ourself as a service, this is needed so 
+        serviceContext.addService(OTrunk.class, this);
+        
 		if(services != null) {
 			for(int i=0; i<services.length; i++){
 				serviceContext.addService(serviceClasses[i], services[i]);
