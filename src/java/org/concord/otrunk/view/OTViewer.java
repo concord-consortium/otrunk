@@ -1318,18 +1318,23 @@ public class OTViewer extends JFrame
 			 */
 			public void actionPerformed(ActionEvent arg0)
 			{
+				System.out.println("trying to save authored content");
 				if (remoteURL != null) {
+					System.out.println("  remote url = "+remoteURL);
 					try {
 						if (OTConfig.isRestEnabled()) {
+							System.out.println("   is rest enabled");
 							try {
 								remoteSaveData(OTViewer.HTTP_PUT);
 							} catch (Exception e) {
 								remoteSaveData(OTViewer.HTTP_POST);
 							}
 						} else {
+							System.out.println("     not rest enabled, posting");
 							remoteSaveData(OTViewer.HTTP_POST);
 						}
 					} catch (Exception e) {
+						System.out.println("    caught");
 						JOptionPane.showMessageDialog(
 						    (Frame) SwingUtilities.getRoot(OTViewer.this),
 						                "There was an error saving. Check your URL and try again.",
@@ -1337,17 +1342,22 @@ public class OTViewer extends JFrame
 						e.printStackTrace();
 					}
 				} else {
+					System.out.println("   no remote url");
 					if (currentAuthoredFile == null) {
+						System.out.println("   currentAuthoredFile = null");
 						saveAsAction.actionPerformed(arg0);
 						return;
 					}
 
 					if (checkForReplace(currentAuthoredFile)) {
+						System.out.println("  check for replace");
 						try {
+							System.out.println("   exporting");
 							ExporterJDOM.export(currentAuthoredFile, xmlDB.getRoot(),
 							    xmlDB);
 							xmlDB.setDirty(false);
 						} catch (Exception e) {
+							System.out.println("   caught export exception");
 							e.printStackTrace();
 						}
 					}
