@@ -1180,12 +1180,16 @@ public class OTViewer extends JFrame
 			 */
 			public void actionPerformed(ActionEvent arg0)
 			{
+				System.out.println("saving");
 				if (currentUserFile == null || !currentUserFile.exists()) {
+					System.out.println("saving as");
 					saveUserDataAsAction.actionPerformed(arg0);
 					return;
 				}
 
 				if (currentUserFile.exists()) {
+					System.out.println("  file exists");
+					System.out.println("  "+currentUserFile);
 					try {
 						ExporterJDOM.export(currentUserFile, userDataDB.getRoot(),
 						        userDataDB);
@@ -1194,6 +1198,7 @@ public class OTViewer extends JFrame
 						e.printStackTrace();
 					}
 				}
+				System.out.println("finished saving");
 			}
 		};
 
