@@ -21,6 +21,7 @@ public class OTConfig
 	public final static String CODEBASE_PROP = "otrunk.codebase";
 	public final static String SHOW_STATUS_PROP = "otrunk.view.status";
 	public final static String USERDATA_URL_PROP = "otrunk.userdata_url";
+	public final static String REMOTE_SAVE_DATA_PROP = "otrunk.remote_save_data";
 	
 	
 	/**
@@ -105,6 +106,11 @@ public class OTConfig
 	public static String getSystemPropertyViewMode()
     {
     	return getStringProp(VIEW_MODE_PROP);
+    }
+	
+	public static boolean isRemoteSaveData()
+    {
+    	return getBooleanProp(REMOTE_SAVE_DATA_PROP, false);
     }
 
 }
