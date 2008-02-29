@@ -62,7 +62,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -103,7 +102,6 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
-import org.concord.framework.otrunk.view.OTUserListService;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerChangeEvent;
 import org.concord.framework.otrunk.view.OTViewContainerListener;
@@ -452,7 +450,14 @@ public class OTViewer extends JFrame
 		URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
 
 		if ("file".equalsIgnoreCase(authorOTMLURL.getProtocol())) {
-			currentAuthoredFile = new File(authorOTMLURL.getPath());
+			try {
+				URI authorOTMLURI = new URI(authorOTMLURL.toString());
+				currentAuthoredFile = new File(authorOTMLURI);
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 
 		String urlStr = authorOTMLURL.toString();
@@ -768,11 +773,6 @@ public class OTViewer extends JFrame
 		        new OTJComponentServiceFactoryImpl());
 		factoryContext.addViewService(OTExternalAppService.class,
 				new OTExternalAppServiceImpl());
-		factoryContext.addViewService(OTUserListService.class, new OTUserListService() {
-			public Vector getUserList() {
-	            return otrunk.getUsers();
-            }
-		});
 
 		currentURL = url;
 	}
@@ -1099,7 +1099,6 @@ public class OTViewer extends JFrame
 		// Need to trap non-HTTP 200/300 responses and throw an exception (if an
 		// exception isn't thrown already) and capture the exceptions upstream
 		int code = urlConn.getResponseCode();
-		System.out.println("   url connection response code: "+code);
 		if (code >= 400) {
 			throw new Exception("HTTP Response: " + urlConn.getResponseMessage() + "\n\n"
 			        + response);
@@ -1181,16 +1180,12 @@ public class OTViewer extends JFrame
 			 */
 			public void actionPerformed(ActionEvent arg0)
 			{
-				System.out.println("saving");
 				if (currentUserFile == null || !currentUserFile.exists()) {
-					System.out.println("saving as");
 					saveUserDataAsAction.actionPerformed(arg0);
 					return;
 				}
 
 				if (currentUserFile.exists()) {
-					System.out.println("  file exists");
-					System.out.println("  "+currentUserFile);
 					try {
 						ExporterJDOM.export(currentUserFile, userDataDB.getRoot(),
 						        userDataDB);
@@ -1199,7 +1194,6 @@ public class OTViewer extends JFrame
 						e.printStackTrace();
 					}
 				}
-				System.out.println("finished saving");
 			}
 		};
 
@@ -1319,23 +1313,18 @@ public class OTViewer extends JFrame
 			 */
 			public void actionPerformed(ActionEvent arg0)
 			{
-				System.out.println("trying to save authored content");
-				if (remoteURL != null) {
-					System.out.println("  remote url = "+remoteURL);
+				if (OTConfig.isRemoteSaveData() && remoteURL != null) {
 					try {
 						if (OTConfig.isRestEnabled()) {
-							System.out.println("   is rest enabled");
 							try {
 								remoteSaveData(OTViewer.HTTP_PUT);
 							} catch (Exception e) {
 								remoteSaveData(OTViewer.HTTP_POST);
 							}
 						} else {
-							System.out.println("     not rest enabled, posting");
 							remoteSaveData(OTViewer.HTTP_POST);
 						}
 					} catch (Exception e) {
-						System.out.println("    caught");
 						JOptionPane.showMessageDialog(
 						    (Frame) SwingUtilities.getRoot(OTViewer.this),
 						                "There was an error saving. Check your URL and try again.",
@@ -1343,22 +1332,17 @@ public class OTViewer extends JFrame
 						e.printStackTrace();
 					}
 				} else {
-					System.out.println("   no remote url");
 					if (currentAuthoredFile == null) {
-						System.out.println("   currentAuthoredFile = null");
 						saveAsAction.actionPerformed(arg0);
 						return;
 					}
 
 					if (checkForReplace(currentAuthoredFile)) {
-						System.out.println("  check for replace");
 						try {
-							System.out.println("   exporting");
 							ExporterJDOM.export(currentAuthoredFile, xmlDB.getRoot(),
 							    xmlDB);
 							xmlDB.setDirty(false);
 						} catch (Exception e) {
-							System.out.println("   caught export exception");
 							e.printStackTrace();
 						}
 					}
