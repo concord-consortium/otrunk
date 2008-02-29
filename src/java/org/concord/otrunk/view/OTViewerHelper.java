@@ -261,6 +261,13 @@ public class OTViewerHelper
 
 		otrunk = new OTrunkImpl(systemDB, otDB, serviceArray, serviceInterfaces);
 
+		initOTrunk(otrunk);		
+	}
+
+	public void initOTrunk(OTrunk otrunk)
+	{
+		this.otrunk = otrunk;
+		
 		// only update the instance field if there is a valid view factory
 		OTViewFactory myViewFactory =
 		    (OTViewFactory) otrunk.getService(OTViewFactory.class);
