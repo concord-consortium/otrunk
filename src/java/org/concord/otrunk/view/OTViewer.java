@@ -1099,6 +1099,7 @@ public class OTViewer extends JFrame
 		// Need to trap non-HTTP 200/300 responses and throw an exception (if an
 		// exception isn't thrown already) and capture the exceptions upstream
 		int code = urlConn.getResponseCode();
+		System.out.println("   url connection response code: "+code);
 		if (code >= 400) {
 			throw new Exception("HTTP Response: " + urlConn.getResponseMessage() + "\n\n"
 			        + response);
