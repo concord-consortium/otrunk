@@ -116,6 +116,7 @@ import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTSystem;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.OTrunkServiceEntry;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
@@ -262,18 +263,6 @@ public class OTViewer extends JFrame
 
 	private JPanel statusPanel;
 	
-	public static class ServiceEntry
-	{
-		Object service;
-		Class serviceInterface;
-		
-		public ServiceEntry(Object service, Class serviceInterface)
-		{
-			this.service = service;
-			this.serviceInterface = serviceInterface;
-		}
-	}
-	
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
 		otViewFactory = factory;
@@ -383,7 +372,7 @@ public class OTViewer extends JFrame
 	 */
 	public void addService(Class serviceInterface, Object service)
 	{
-		ServiceEntry entry = new ServiceEntry(service, serviceInterface);
+		OTrunkServiceEntry entry = new OTrunkServiceEntry(service, serviceInterface);
 		services.add(entry);
 	}
 	
@@ -739,20 +728,9 @@ public class OTViewer extends JFrame
 			throw e;
 		}
 
-		int servicesSize = services.size();
-		int numDefaultServices = 1;
-        Object [] serviceArray = new Object[servicesSize + numDefaultServices];
-        serviceArray[0] =  new SwingUserMessageHandler(this);        
-        Class [] serviceInterfaces =  new Class[servicesSize + numDefaultServices];
-        serviceInterfaces[0] =  UserMessageHandler.class;
+		addService(UserMessageHandler.class, new SwingUserMessageHandler(this));		
 		
-        for(int i=0; i<services.size(); i++){
-        	ServiceEntry entry = (ServiceEntry) services.get(i);
-        	serviceArray[i+numDefaultServices] = entry.service;
-        	serviceInterfaces[i+numDefaultServices] = entry.serviceInterface;
-        }        
-		
-		otrunk = new OTrunkImpl(systemDB, xmlDB, serviceArray, serviceInterfaces);
+		otrunk = new OTrunkImpl(systemDB, xmlDB, services);
 
 		OTViewFactory myViewFactory =
 		    (OTViewFactory) otrunk.getService(OTViewFactory.class);

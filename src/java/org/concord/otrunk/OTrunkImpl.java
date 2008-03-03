@@ -111,12 +111,12 @@ public class OTrunkImpl implements OTrunk
 		this(db, null, null);
 	}
 
-	public OTrunkImpl(OTDatabase db, Object [] services, Class [] serviceClasses)
+	public OTrunkImpl(OTDatabase db, ArrayList services)
 	{	
-		this(null, db, services, serviceClasses);
+		this(null, db, services);
 	}
 	
-	public OTrunkImpl(OTDatabase systemDb, OTDatabase db, Object [] services, Class [] serviceClasses)
+	public OTrunkImpl(OTDatabase systemDb, OTDatabase db, ArrayList services) 
 	{	
 		try {
 	        URL dummyURL = new URL("http://www.concord.org");
@@ -138,8 +138,9 @@ public class OTrunkImpl implements OTrunk
         serviceContext.addService(OTrunk.class, this);
         
 		if(services != null) {
-			for(int i=0; i<services.length; i++){
-				serviceContext.addService(serviceClasses[i], services[i]);
+			for(int i=0; i<services.size(); i++){
+				OTrunkServiceEntry entry = (OTrunkServiceEntry) services.get(i);
+				serviceContext.addService(entry.serviceInterface, entry.service);
 			}
 		}
 		
