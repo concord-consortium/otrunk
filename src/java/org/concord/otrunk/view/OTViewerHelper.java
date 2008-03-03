@@ -51,9 +51,9 @@ import org.concord.framework.text.UserMessageHandler;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.OTrunkServiceEntry;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
-import org.concord.otrunk.view.OTViewer.ServiceEntry;
 import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.view.PrintUserMessageHandler;
@@ -249,17 +249,7 @@ public class OTViewerHelper
 	{
 		this.otDB = otDB;
 		
-		int servicesSize = services.size();
-		Object [] serviceArray = new Object[servicesSize];
-		Class [] serviceInterfaces =  new Class[servicesSize];
-		
-		for(int i=0; i<services.size(); i++){
-			ServiceEntry entry = (ServiceEntry) services.get(i);
-			serviceArray[i] = entry.service;
-			serviceInterfaces[i] = entry.serviceInterface;
-		}        
-
-		otrunk = new OTrunkImpl(systemDB, otDB, serviceArray, serviceInterfaces);
+		otrunk = new OTrunkImpl(systemDB, otDB, services);
 
 		initOTrunk(otrunk);		
 	}
@@ -542,7 +532,7 @@ public class OTViewerHelper
 	public Object findService(Class serviceInterface)
 	{
 		for(int i=0; i<services.size(); i++){
-			ServiceEntry entry = (ServiceEntry) services.get(i);
+			OTrunkServiceEntry entry = (OTrunkServiceEntry) services.get(i);
 			if(serviceInterface.equals(entry.serviceInterface)){
 				return entry.service;
 			}
@@ -617,7 +607,7 @@ public class OTViewerHelper
 	 */
 	public void addService(Class serviceInterface, Object service)
 	{
-		ServiceEntry entry = new ServiceEntry(service, serviceInterface);
+		OTrunkServiceEntry entry = new OTrunkServiceEntry(service, serviceInterface);
 		services.add(entry);
 	}
 }
