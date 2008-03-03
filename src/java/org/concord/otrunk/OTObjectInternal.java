@@ -131,7 +131,7 @@ public class OTObjectInternal implements OTObjectInterface
     		for(int i=0;i<changeListeners.size(); i++){
     			WeakReference ref = (WeakReference)changeListeners.get(i);
     			Object listener = ref.get();
-    			if(traceListeners && !(listener instanceof TraceListener)){
+    			if(traceListeners && !(listener instanceof InternalListener)){
     				System.out.println("sending stateChanged " + changeEvent.getDescription() +
     						" to " + listener);
     			}
@@ -201,7 +201,7 @@ public class OTObjectInternal implements OTObjectInterface
 	    // debugging instrumentation
 	    // ignore instances of the tracelistener
 	    if(traceListeners &&
-	    		!(changeListener instanceof TraceListener)){
+	    		!(changeListener instanceof InternalListener)){
 	    	System.out.println("addOTChangeListener(obj:" + changeEventSource + ","); 
 	    	System.out.println("   listener:" + changeListener+")");
 
@@ -543,7 +543,7 @@ public class OTObjectInternal implements OTObjectInterface
 				if(changeListeners.size() == 1){
 					WeakReference ref = (WeakReference)changeListeners.get(0);
 					Object listener = ref.get();
-					if(listener instanceof TraceListener){
+					if(listener instanceof InternalListener){
 						// don't print anything here
 						return;
 					}
@@ -553,7 +553,7 @@ public class OTObjectInternal implements OTObjectInterface
 				for(int i=0; i<changeListeners.size(); i++){
 					WeakReference ref = (WeakReference)changeListeners.get(i);
 					Object listener = ref.get();
-					if(listener instanceof TraceListener){
+					if(listener instanceof InternalListener){
 						// skip the trace listener
 						continue;
 					}
