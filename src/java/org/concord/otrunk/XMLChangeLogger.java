@@ -5,6 +5,8 @@ package org.concord.otrunk;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -15,10 +17,16 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
+import org.concord.framework.otrunk.OTChangeLogger;
 import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.framework.otrunk.otcore.OTClassProperty;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXHandler;
+import org.jdom.xpath.XPath;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -35,6 +43,7 @@ implements OTObjectServiceListener, OTChangeListener, InternalListener
 {
 	private ContentHandler saxContentHandler;
 	private PrintWriter writer;
+	private SAXHandler saxHandler;
 	
 	/**
 	 * @param label
@@ -142,4 +151,67 @@ implements OTObjectServiceListener, OTChangeListener, InternalListener
         	writer.flush();
         }
 	}
+	
+	/**
+	 * This is a temporary test method.  Using its implementation of OTChangeLogger requires Jaxen on 
+	 * the classpath. 
+	 */
+	public OTChangeLogger tryQueriableLog(OTObjectService objectService)
+	{
+		saxHandler = new SAXHandler();
+		try {
+	        XMLChangeLogger changeLogger = new XMLChangeLogger(saxHandler);
+	        ((OTObjectServiceImpl)objectService).addObjectServiceListener(changeLogger);
+        } catch (SAXException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+
+        OTChangeLogger changeLoggerService = new OTChangeLogger()
+        {
+
+			public Iterator getPreviousValues(OTObject otObject, OTClassProperty property)
+            {
+				Document document = saxHandler.getDocument();
+				XPath xpath;
+                try {
+                	// /log/*[@id='33754150-b594-11d9-9669-0800200c9a66!/normal_choice']/currentChoice[@op='set']/node()
+                	// this code is not complete has not been tested, 
+                    xpath = XPath.newInstance("/log/*[@id='"+ otObject.otExternalId() + "']/" + 
+                    	property.getName() + "[@op='set']/node()");
+	                List selectNodes = xpath.selectNodes(document);
+	                for(Iterator it = selectNodes.iterator();it.hasNext();){
+	                	Object node = it.next();
+	                }
+                } catch (JDOMException e) {
+	                // TODO Auto-generated catch block
+	                e.printStackTrace();
+                }				
+                
+	            // TODO Auto-generated method stub
+	            return null;
+            }
+        	
+        };
+		return changeLoggerService;
+	}
+	
+	/**
+	 * This is a temporary test method.  It is specific to a particular otml file.   Using
+	 * it requires jaxen on the classapth.
+	 */
+	public void testXPathQuery()
+	{
+		Document document = saxHandler.getDocument();
+		try {
+            XPath xpath  = XPath.newInstance("/log/*[@id='33754150-b594-11d9-9669-0800200c9a66!/normal_choice']/" + 
+            	"currentChoice[@op='set']/node()");
+            List selectNodes = xpath.selectNodes(document);
+            System.out.println("found:" + selectNodes);
+        } catch (JDOMException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+	}
+
 }
