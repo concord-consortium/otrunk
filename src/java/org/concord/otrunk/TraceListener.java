@@ -12,7 +12,8 @@ import org.concord.framework.otrunk.OTObject;
  * @author scott
  *
  */
-public class TraceListener implements OTObjectServiceListener, OTChangeListener 
+public class TraceListener 
+	implements OTObjectServiceListener, OTChangeListener, InternalListener 
 {
 	String label;
 	
