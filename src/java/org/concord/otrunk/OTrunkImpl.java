@@ -108,7 +108,7 @@ public class OTrunkImpl implements OTrunk
     
     public OTrunkImpl(OTDatabase db)
 	{
-		this(db, null, null);
+		this((OTDatabase)null, db, (ArrayList)null);
 	}
 
 	public OTrunkImpl(OTDatabase db, ArrayList services)
