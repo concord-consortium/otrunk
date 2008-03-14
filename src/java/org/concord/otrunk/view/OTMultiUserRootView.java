@@ -32,6 +32,7 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.AbstractOTView;
+import org.concord.framework.otrunk.view.OTUserListService;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -39,39 +40,39 @@ import org.concord.otrunk.xml.XMLDatabase;
 
 public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView 
 {
-	private HashMap dbMap = new HashMap(); // key: url, value: database
+	private boolean firstRun = true;
 	
 	
 	public String getXHTMLText(OTObject otObject) {
-		System.out.println("OTMultiUserRootView.getXHTMLText()");
-		
+		System.out.println("ENTER: OTMultiUserRootView.getXHTMLText()");
+	    OTMultiUserRoot root = (OTMultiUserRoot) otObject;
+		if (firstRun) { //why is this method called twice?
+			loadUserDatabases(root);
+			firstRun = false;
+		}
+	    OTObject reportTemplate = root.getReportTemplate();
+	    return "<object refid=\"" + reportTemplate.otExternalId() + "\"/>";
+    }
+	
+	private void loadUserDatabases(OTMultiUserRoot root) {
 		OTrunk otrunk = (OTrunk) getViewService(OTrunk.class);
 		OTrunkImpl otrunkImpl = (OTrunkImpl) otrunk;
 		
-	    OTMultiUserRoot root = (OTMultiUserRoot) otObject;
 	    OTUserList userList = (OTUserList) root.getUserList();
 	    OTObjectList userDatabases = userList.getUserDatabases();
 	    
-	    for (int i = 0; i < userDatabases.size(); i++) {
+	    for (int i = 0; i < userDatabases.size(); ++i) {
 	    	OTUserDatabaseRef ref = (OTUserDatabaseRef) userDatabases.get(i);
 	    	URL url = ref.getUrl();
-	    	
-	    	if (dbMap.containsKey(url)) {
-	    		continue;
-	    	}
 	    	
 	    	try {
 	    		XMLDatabase db = new XMLDatabase(url);
 	    		db.loadObjects();
 	    		otrunkImpl.registerUserDataDatabase(db, null);
-	    		dbMap.put(url, db);
 	    	}
 	    	catch (Exception e) {
 	    		e.printStackTrace();
 	    	}
 	    }
-	    OTObject reportTemplate = (OTObject) root.getReportTemplate();
-	    return "<object refid=\"" + reportTemplate.otExternalId() + "\"/>";
-    }
-
+	}
 }
