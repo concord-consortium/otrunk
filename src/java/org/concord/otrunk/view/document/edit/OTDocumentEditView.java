@@ -267,6 +267,7 @@ public class OTDocumentEditView extends OTDocumentView implements
 			String strObjText = "<object refid=\"" + strObjID + "\"></object>";
 
 			int pos = editorPane.getSelectionStart();
+			System.out.println("pos = "+pos);
 			HTMLDocument doc = (HTMLDocument) editorPane.getDocument();
 			
 			try {
@@ -274,7 +275,7 @@ public class OTDocumentEditView extends OTDocumentView implements
 			//	editorKit.read(read, doc, pos);
 				editorKit.insertHTML(doc, pos, strObjText, 0, 0, HTML.Tag.OBJECT);
 				editorKit.insertHTML(doc, pos, "<br></br>", 0, 0, HTML.Tag.BR);
-				
+				System.out.println(editorPane.getText());
             } catch (BadLocationException e1) {
 	            // TODO Auto-generated catch block
 	            e1.printStackTrace();
@@ -285,14 +286,32 @@ public class OTDocumentEditView extends OTDocumentView implements
             
             String htmlDoc = editorPane.getText();
             
-            Pattern bodyPattern = Pattern.compile("(?s)<body>(.*)</body>");
-            Matcher m = bodyPattern.matcher(htmlDoc);
+            // if there is an object in the head, move it to the body
+            Pattern headPattern = Pattern.compile("(?s)<head>(.*)</head>");
+            Matcher m = headPattern.matcher(htmlDoc);
             m.find();
-            htmlDoc = m.group(1);
+            String headDoc = m.group(1);
+            Pattern objectPattern = Pattern.compile("(?s)<object(.*?)>");
+            m = objectPattern.matcher(headDoc);
+            m.find();
+            String objectText = m.group();
+            
+            Pattern bodyPattern = Pattern.compile("(?s)<body>(.*)</body>");
+            Matcher m2 = bodyPattern.matcher(htmlDoc);
+            m2.find();
+            htmlDoc = m2.group(1);
+            
+            if (objectText != null){
+            	htmlDoc = objectText + "<br/>" + htmlDoc;
+            }
             
             htmlDoc = cleanHTML(htmlDoc);
             
 			pfObject.setDocumentText(htmlDoc);
+			
+			if (objectText != null){
+				updateFormatedView();
+            }
             
 		} else if (e.getActionCommand().equalsIgnoreCase("viewSrc")){
 			final JFrame popupEditor = new JFrame();
