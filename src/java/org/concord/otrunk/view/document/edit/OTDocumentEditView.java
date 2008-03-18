@@ -285,14 +285,15 @@ public class OTDocumentEditView extends OTDocumentView implements
             String htmlDoc = editorPane.getText();
             
             // if there is an object in the head, move it to the body
+            String objectText = null;
             Pattern headPattern = Pattern.compile("(?s)<head>(.*)</head>");
             Matcher m = headPattern.matcher(htmlDoc);
             m.find();
             String headDoc = m.group(1);
             Pattern objectPattern = Pattern.compile("(?s)<object(.*?)>");
             m = objectPattern.matcher(headDoc);
-            m.find();
-            String objectText = m.group();
+            if (m.find())
+            	objectText = m.group();
             
             Pattern bodyPattern = Pattern.compile("(?s)<body>(.*)</body>");
             Matcher m2 = bodyPattern.matcher(htmlDoc);
