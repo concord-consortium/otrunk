@@ -44,6 +44,8 @@ public class OTSharingManagerImpl implements OTSharingManager
 	}
 	
 	/**
+	 * This will add the object to the list, if it isn't already there.
+	 * 
 	 * This should really only add the reference to this
 	 * object, but as it stands, it might move the object
 	 * from its original location to the shared objects
@@ -52,7 +54,9 @@ public class OTSharingManagerImpl implements OTSharingManager
 	 * @param obj The OTObject to be shared
 	 */
 	public void share(OTObject obj){
-		registry.getSharedObjects().add(obj);
+		if (!registry.getSharedObjects().getVector().contains(obj)){
+			registry.getSharedObjects().add(obj);
+		}
 	}
 	
 	public void remove(OTObject obj)
