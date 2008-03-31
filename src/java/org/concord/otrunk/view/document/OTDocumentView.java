@@ -303,7 +303,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			}
 		}
 		
-		if (view instanceof OTXHTMLView) {
+		if (view instanceof OTXHTMLView && ((OTXHTMLView)view).getEmbedXHTMLView()) {
 			OTXHTMLView xhtmlView = (OTXHTMLView) view;
 			try {
 				String replacement = xhtmlView.getXHTMLText(referencedObject);
@@ -637,5 +637,10 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 				
 			}
 		}
+    }
+
+	public boolean getEmbedXHTMLView()
+    {
+	    return true;
     }
 }

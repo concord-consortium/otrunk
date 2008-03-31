@@ -78,4 +78,9 @@ public class OTAuthorEmbedDefaultView
 		requestedViewEntry = viewEntry;
 	}
 
+	public boolean getEmbedXHTMLView()
+    {
+	    return true;
+    }
+
 }
