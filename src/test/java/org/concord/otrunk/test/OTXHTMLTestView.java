@@ -17,4 +17,9 @@ public class OTXHTMLTestView
 	    return text;
     }
 
+	public boolean getEmbedXHTMLView()
+    {
+	    return true;
+    }
+
 }
