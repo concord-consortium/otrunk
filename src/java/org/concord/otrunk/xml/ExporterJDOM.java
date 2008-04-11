@@ -63,6 +63,7 @@ import org.concord.otrunk.datamodel.OTUUID;
 import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.IllegalDataException;
 import org.jdom.input.JDOMParseException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -900,12 +901,17 @@ public class ExporterJDOM
 			writeElement = true;
 		}		
 		
-		if(writeElement){
-			Element resourceEl = new Element(resourceName);
-			objectEl.addContent(resourceEl);
-			resourceEl.setText(resourceValue);
-		} else {
-			objectEl.setAttribute(resourceName, resourceValue);					
+		try {
+			if(writeElement){
+				Element resourceEl = new Element(resourceName);
+				objectEl.addContent(resourceEl);
+				resourceEl.setText(resourceValue);
+			} else {
+				objectEl.setAttribute(resourceName, resourceValue);					
+			}
+		} catch (IllegalDataException e) {
+			System.err.println("Tried to write: \"" + resourceValue + "\" into \"" + resourceName +"\"");
+			System.err.println("skiping this property");
 		}
 	}
 
