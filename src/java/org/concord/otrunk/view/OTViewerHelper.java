@@ -266,18 +266,20 @@ public class OTViewerHelper
 			viewFactory = myViewFactory;
 		}
 
-		// Maybe this shouldn't happen here
-		frameManager = new OTFrameManagerImpl();
-		frameManager.setViewFactory(viewFactory);
+		if(viewFactory != null){
+			// Maybe this shouldn't happen here
+			frameManager = new OTFrameManagerImpl();
+			frameManager.setViewFactory(viewFactory);
 
-		OTViewContext factoryContext = viewFactory.getViewContext();
+			OTViewContext factoryContext = viewFactory.getViewContext();
 
-		factoryContext.addViewService(OTrunk.class, otrunk);
-		factoryContext.addViewService(OTFrameManager.class, frameManager);
-		factoryContext.addViewService(OTJComponentServiceFactory.class,
-		    new OTJComponentServiceFactoryImpl());
-		factoryContext.addViewService(OTExternalAppService.class,
-		    new OTExternalAppServiceImpl());
+			factoryContext.addViewService(OTrunk.class, otrunk);
+			factoryContext.addViewService(OTFrameManager.class, frameManager);
+			factoryContext.addViewService(OTJComponentServiceFactory.class,
+				new OTJComponentServiceFactoryImpl());
+			factoryContext.addViewService(OTExternalAppService.class,
+				new OTExternalAppServiceImpl());
+		}
 		
 	}
 	
