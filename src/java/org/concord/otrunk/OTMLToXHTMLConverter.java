@@ -109,6 +109,11 @@ public class OTMLToXHTMLConverter
 		this.topLevelViewEntries[0] = viewEntry;
 		this.mode = mode;
 	}
+	
+	public OTMLToXHTMLConverter(OTViewFactory viewFactory, OTObject[] otObjects)
+{
+	this(viewFactory, otObjects, OTViewFactory.NO_VIEW_MODE);
+}
 
 	public OTMLToXHTMLConverter(OTViewFactory viewFactory, OTObject[] otObjects,
 	        String mode)
