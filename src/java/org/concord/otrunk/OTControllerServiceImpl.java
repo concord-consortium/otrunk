@@ -115,7 +115,10 @@ public class OTControllerServiceImpl implements OTControllerService
 	private OTController getExistingControllerFromRealObject(Object realObject)
 	{
 		// check if we already have a controller, if so then return its otObject
-		OTController controller = (OTController)controllerFromRealMap.get(realObject);
+		OTController controller;
+		synchronized(controllerFromRealMap){
+			controller = (OTController)controllerFromRealMap.get(realObject);
+		}
 		
 		if(controller != null) {
 			return controller;
@@ -459,7 +462,9 @@ public class OTControllerServiceImpl implements OTControllerService
 		// this should be done before methods on the controller are called
 		// this should prevent infinite loops if there is a circular reference
 		realObjectFromOTMap.put(otObject, new WeakReference(realObject));
-		controllerFromRealMap.put(realObject, controller);
+		synchronized(controllerFromRealMap){
+			controllerFromRealMap.put(realObject, controller);
+		}
 		controllerFromOTMap.put(otObject, controller);
 		
 		return realObject;
@@ -523,17 +528,19 @@ public class OTControllerServiceImpl implements OTControllerService
     	// There are 2 maps that contain references to controllers.
     	// They should be in sync so we only have to search one
     	// we won't dispose controllers in our shared service that is its job not ours
-		Set entries = controllerFromRealMap.entrySet();
-		Iterator iterator = entries.iterator();
-		while(iterator.hasNext()){
-			Entry entry = (Entry) iterator.next();
-			OTController controller = (OTController) entry.getValue();
-			if(disposedControllers.contains(controller)){
-				continue;
-			}
-			controller.dispose(entry.getKey());
-			disposedControllers.add(controller);
-		}    	    	
+    	synchronized(controllerFromRealMap){
+    		Set entries = controllerFromRealMap.entrySet();
+    		Iterator iterator = entries.iterator();
+    		while(iterator.hasNext()){
+    			Entry entry = (Entry) iterator.next();
+    			OTController controller = (OTController) entry.getValue();
+    			if(disposedControllers.contains(controller)){
+    				continue;
+    			}
+    			controller.dispose(entry.getKey());
+    			disposedControllers.add(controller);
+    		}    
+    	}
     }
     
     protected void disposeValues(Map map, Vector disposedControllers)
