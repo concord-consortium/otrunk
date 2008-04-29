@@ -44,30 +44,28 @@ public class DataObjectUtil
     public static void copyInto(OTDataObject original, OTDataObject copy)
     {
     	try {
-			copyInto(original, copy, null, 0);
+			copyInto(original, copy, null, 0, null);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
-     
+    
     public static void copyInto(OTDataObject source, OTDataObject dest,
-                                OTDataList orphanDataList, int maxDepth) 
-    	throws Exception
-    {
-    	Copier.copyInto(source, dest, orphanDataList, maxDepth);
-    }
-
+	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider)
+	    throws Exception
+	{
+		Copier.copyInto(source, dest, orphanDataList, maxDepth, idProvider);
+	}
     
-    
-    public static OTDataObject copy(OTDataObject original, OTDatabase otDb, 
-                                    OTDataList orphanDataList, int maxDepth) 
-    	throws Exception
-    {
-    	OTDataObject copy = otDb.createDataObject(original.getType());
+    public static OTDataObject copy(OTDataObject original, OTDatabase otDb,
+	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider)
+	    throws Exception
+	{
+		OTDataObject copy = otDb.createDataObject(original.getType());
 
-    	copyInto(original, copy, orphanDataList, maxDepth);
-    	
-    	return copy;
-    }    
+		copyInto(original, copy, orphanDataList, maxDepth, idProvider);
+
+		return copy;
+	}    
 }
