@@ -22,6 +22,7 @@ public class Copier
 	
 	Vector toBeCopied;
 	private OTDataList orphanList;
+	private OTExternalIDProvider idProvider;
 
     private static class CopyEntry
     {    	
@@ -36,20 +37,42 @@ public class Copier
     		this.copy = copy;
     	}    	
     }
-    
-	public Copier(OTDatabase sourceDb, OTDatabase destinationDb, OTDataList orphanDataList)
+	
+	public Copier(OTDatabase sourceDb, OTDatabase destinationDb, OTDataList orphanDataList, 
+		OTExternalIDProvider idProvider)
 	{
 		this.destinationDb = destinationDb;
 		this.sourceDb = sourceDb;
 		this.toBeCopied = new Vector();
 		this.orphanList = orphanDataList;
+		this.idProvider = idProvider;
 	}
 	
+	/**
+	 * This returns any object in the toBeCopiedList which has the same
+	 * otid as the one we're passing in. If idProvider == null, this may
+	 * fail to return an object because it will be comparing a globalid to
+	 * a transient id.
+	 * 
+	 * @param originalId
+	 * @return
+	 */
     private CopyEntry getCopyEntry(OTID originalId)
     {
     	for(int i=0; i<toBeCopied.size(); i++){
     		CopyEntry entry = (CopyEntry)toBeCopied.get(i);
-    		if(entry.original.getGlobalId().equals(originalId)){
+    		String entryObjectExternalID;
+    		String originalExternalID;
+    		
+    		if (idProvider != null){
+        		entryObjectExternalID = idProvider.getExternalID(entry.original.getGlobalId());
+        		originalExternalID = idProvider.getExternalID(originalId);
+    		} else {
+    			entryObjectExternalID = entry.original.getGlobalId().toString();
+    			originalExternalID = originalId.toString();
+    		}
+    		
+    		if(entryObjectExternalID.equals(originalExternalID)){
     			return entry;
     		}
     	}
@@ -79,6 +102,8 @@ public class Copier
 				itemCopyEntry = new CopyEntry(itemObj, copyMaxDepth, itemCopy);
 				toBeCopied.add(itemCopyEntry);
 				
+			} else {
+				return child;
 			}
 
 			// put this new list object 
@@ -89,12 +114,13 @@ public class Copier
     }
     
     public static void copyInto(OTDataObject source, OTDataObject dest,
-    		OTDataList orphanDataList, int maxDepth) 
-    throws Exception
-    {
-    	Copier copier = new Copier(source.getDatabase(), dest.getDatabase(), orphanDataList);
-    	copier.internalCopyInto(source, dest, maxDepth);    	
-    }
+	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider)
+	    throws Exception
+	{
+		Copier copier =
+		    new Copier(source.getDatabase(), dest.getDatabase(), orphanDataList, idProvider);
+		copier.internalCopyInto(source, dest, maxDepth);
+	}
     
     public void internalCopyInto(OTDataObject source, OTDataObject dest,
     		int maxDepth) throws Exception
@@ -106,6 +132,7 @@ public class Copier
     	while(currentIndex < toBeCopied.size()){
     		CopyEntry entry = (CopyEntry)toBeCopied.get(currentIndex);
     		OTDataObject original = entry.original; 
+    	//	System.out.println(original+" ; "+original.getType());
     		OTDataObject copy = entry.copy;
     		if(copy == null) {
     			copy = otDb.createDataObject(original.getType());
@@ -152,6 +179,7 @@ public class Copier
     		}
     		
     		for(int i=0; i<secondPassKeys.size(); i++){
+    			System.out.println("loop secondpass");
     			String key = (String)secondPassKeys.get(i);
     			Object resource = original.getResource(key);
 
