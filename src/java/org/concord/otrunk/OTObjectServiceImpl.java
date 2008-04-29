@@ -50,12 +50,13 @@ import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.datamodel.OTExternalIDProvider;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.otcore.impl.ReflectiveOTClassFactory;
 import org.concord.otrunk.overlay.CompositeDatabase;
 
 public class OTObjectServiceImpl
-    implements OTObjectService
+    implements OTObjectService, OTExternalIDProvider
 {
     protected OTrunkImpl otrunk;
     protected OTDatabase creationDb;
@@ -362,7 +363,7 @@ public class OTObjectServiceImpl
 		
 		OTDataObject copyDataObject = 
 			DataObjectUtil.copy(originalDataObject, creationDb, 
-					orphanDataList, maxDepth);
+					orphanDataList, maxDepth, this);
 
 		return getOTObject(copyDataObject.getGlobalId());		
 	}
@@ -399,15 +400,20 @@ public class OTObjectServiceImpl
 	public String getExternalID(OTObject object)
     {
 		OTID globalId = object.getGlobalId();
+		return getExternalID(globalId);
+    }
+	
+	public String getExternalID(OTID otid)
+    {
 		if(mainDb instanceof CompositeDatabase){
-			return ((CompositeDatabase)mainDb).resolveID(globalId).toExternalForm();
+			return ((CompositeDatabase)mainDb).resolveID(otid).toExternalForm();
 		}
 		
-		if(globalId instanceof OTTransientMapID){
-			throw new RuntimeException("Cannot get an external id for " + globalId +
+		if(otid instanceof OTTransientMapID){
+			throw new RuntimeException("Cannot get an external id for " + otid +
 					" using this object service with mainDb: " + mainDb);
 		}
-		return globalId.toExternalForm();
+		return otid.toExternalForm();
     }
 
 	public URL getCodebase(OTObject otObject)
