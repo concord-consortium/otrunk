@@ -167,10 +167,10 @@ public class OTObjectInternal implements OTObjectInterface
     		for(int i=0; i<toBeRemoved.size(); i++) {
     			changeListeners.remove(toBeRemoved.get(i));
     		}
-    		if(changeListeners.size() == 0){
-    			changeListeners = null;
-    		}
     	}
+		if(changeListeners.size() == 0){
+			changeListeners = null;
+		}
     }
 
 	/* (non-Javadoc)
@@ -233,8 +233,9 @@ public class OTObjectInternal implements OTObjectInterface
 	        WeakReference ref = (WeakReference)changeListeners.get(i);
 	        if(changeListener == ref.get()) {
 	            changeListeners.remove(i);
-
-	            return;
+	            // if we don't break right away then the "i" variable will skip over the 
+	            // the next value of the list. 
+	            break;
 	        }
 	    }
 	    if(changeListeners.size() == 0) {

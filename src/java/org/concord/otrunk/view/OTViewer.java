@@ -263,6 +263,8 @@ public class OTViewer extends JFrame
 	private ArrayList services = new ArrayList();	
 
 	private JPanel statusPanel;
+
+	public final static String ANON_SINGLE_USER_NAME = "anon_single_user";
 	
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
@@ -1758,6 +1760,15 @@ public class OTViewer extends JFrame
 	 */
 	public void newAnonUserData()
 	{
+		newUserData(ANON_SINGLE_USER_NAME);
+	}
+	
+	/**
+	 * This does not check for unsaved user data
+	 * 
+	 */
+	public void newUserData(String userName)
+	{
 		// call some new method for creating a new un-saved user state
 		// this should set the currentUserFile to null, so the save check
 		// prompts
@@ -1775,7 +1786,7 @@ public class OTViewer extends JFrame
 			stateRoot.setFormatVersionString("1.0");
 
 			OTUserObject userObject =
-			    OTViewerHelper.createUser("anon_single_user", objService);
+			    OTViewerHelper.createUser(userName, objService);
 
 			otrunk.initUserObjectService((OTObjectServiceImpl) objService, userObject,
 			    stateRoot);
