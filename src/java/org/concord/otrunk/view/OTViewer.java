@@ -305,7 +305,7 @@ public class OTViewer extends JFrame
 		});
 
 		consoleFrame = new JFrame("Console");
-		StreamRecord record = new StreamRecord(10000);
+		StreamRecord record = new StreamRecord(50000);
 		StreamRecordView view = new StreamRecordView(record);
 		consoleFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		System.setOut((PrintStream) view.addOutputStream(System.out, "Console"));
