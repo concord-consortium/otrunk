@@ -65,7 +65,8 @@ public class XMLDataObject
 	private XMLDatabase database = null;
 	private OTXMLElement element;
 	private String localId = null;
-			
+	private boolean preserveUUID = false;		
+	
 	HashMap resources = new LinkedHashMap();
 	HashMap referenceInfoMap = new HashMap();
 	XMLDataObject container = null;
@@ -259,5 +260,15 @@ public class XMLDataObject
 	public URL getCodebase()
     {
 		return database.getContextURL();
+    }
+
+	public boolean isPreserveUUID()
+    {
+    	return preserveUUID;
+    }
+
+	public void setPreserveUUID(boolean preserveUUID)
+    {
+    	this.preserveUUID = preserveUUID;
     }
 }

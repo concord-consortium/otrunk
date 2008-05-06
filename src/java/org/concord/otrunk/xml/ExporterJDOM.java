@@ -581,7 +581,8 @@ public class ExporterJDOM
 			// in that case it should be written out anyhow.  I'm not sure how to 
 			// do that yet.
 			ArrayList incomingReferences = (ArrayList) incomingReferenceMap.get(id);
-			if(incomingReferences != null && incomingReferences.size() > 1){
+			if((xmlDO != null && xmlDO.isPreserveUUID() && id instanceof OTUUID) ||
+					(incomingReferences != null && incomingReferences.size() > 1)){
 				objectEl.setAttribute("id", id.toExternalForm());
 			}
 		}
