@@ -37,8 +37,10 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -159,7 +161,20 @@ public class XMLDatabase
 		// printStatus("Opening otml: " + label);
 		
 		// parse the xml file...
-		document = new JDOMDocument(xmlStream);
+		try {
+	        document = new JDOMDocument(xmlStream);
+        } catch (Exception e) {
+        	
+	        URLConnection connection = contextURL.openConnection();
+	        if (connection instanceof HttpURLConnection){
+	        	System.err.println("*** Response code for "+contextURL+":");
+		        System.err.println("   "+((HttpURLConnection)connection).getResponseCode());
+	        }
+	        System.err.println("*** Length of xmlstream from "+contextURL+":");
+	        System.err.println("   "+connection.getInputStream().available());
+	        
+	        throw e;
+        }
 		initialize();
 		
 		this.contextURL = contextURL;
