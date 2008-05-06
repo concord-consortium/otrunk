@@ -67,6 +67,6 @@ public class OTTransientMapID
 
 	public String toExternalForm()
     {
-		throw new RuntimeException("Transient IDs do not have a direct external form, OTObjectImpl.getExternalID should used instead.\n");
+		throw new RuntimeException("Transient IDs do not have a direct external form, OTObjectService.getExternalID should used instead.\n");
     }
 }
