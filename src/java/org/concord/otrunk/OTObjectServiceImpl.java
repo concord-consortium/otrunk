@@ -52,8 +52,10 @@ import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTExternalIDProvider;
 import org.concord.otrunk.datamodel.OTTransientMapID;
+import org.concord.otrunk.datamodel.OTUUID;
 import org.concord.otrunk.otcore.impl.ReflectiveOTClassFactory;
 import org.concord.otrunk.overlay.CompositeDatabase;
+import org.concord.otrunk.xml.XMLDataObject;
 
 public class OTObjectServiceImpl
     implements OTObjectService, OTExternalIDProvider
@@ -427,6 +429,26 @@ public class OTObjectServiceImpl
         }
 		
 	    return null;
+    }
+
+	public void preserveUUID(OTObject otObject)
+    {
+		OTID id = otObject.getGlobalId();
+
+		if(!(id instanceof OTUUID)){
+			throw new IllegalArgumentException("object does not have a UUID " + otObject);
+		}
+				
+		try {
+	        OTDataObject dataObject = getOTDataObject(id);
+	        if(!(dataObject instanceof XMLDataObject)){
+				throw new IllegalArgumentException("object is not backed by a XMLDatabase " + otObject);	        	
+	        }
+	        
+	        ((XMLDataObject)dataObject).setPreserveUUID(true);
+        } catch (Exception e) {
+	        e.printStackTrace();
+        }
     }
 
 }
