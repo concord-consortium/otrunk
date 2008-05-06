@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="96100de9-1b9e-11dd-97ee-8be3087d8525">
+  <imports>
+    <import class="org.concord.otrunk.test.OTBasicTestObject" />
+  </imports>
+  <objects>
+    <OTBasicTestObject id="96075b58-1b9e-11dd-97ee-8be3087d8525" />
+  </objects>
+</otrunk>

@@ -42,6 +42,7 @@ import org.concord.framework.otrunk.otcore.OTType;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTIDFactory;
+import org.concord.otrunk.datamodel.OTUUID;
 
 /**
  * ObjectTypeHandler
@@ -133,6 +134,11 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		        obj = xmlDB.createDataObject(element, id);
 		    } else {
 		        obj = xmlDB.createDataObject(element, idStr);
+		        
+		        // if this object has an UUID idStr then mark it to be preserved
+		        if(idStr != null && obj.getGlobalId() instanceof OTUUID){
+		        	obj.setPreserveUUID(true);
+		        }
 		    }
 		} catch (Exception e) {
 			e.printStackTrace();

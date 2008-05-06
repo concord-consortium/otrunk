@@ -60,7 +60,7 @@ public class OTMapTestView implements OTJComponentView {
 				return new JLabel("Map entries doen't match");				
 			}
 		}
-		
+				
 		return new JLabel("Map passes test");
 	}
 
