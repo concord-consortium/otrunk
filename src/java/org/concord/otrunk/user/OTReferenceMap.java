@@ -113,13 +113,6 @@ public class OTReferenceMap extends DefaultOTObject
             OTResourceMap stateMap = resources.getMap();
             stateMap.put(template.getGlobalId().toExternalForm(), 
                     stateObject.getGlobalId());
-
-            // store some special resources in this object
-			// so we know where it came from:
-            // TODO add a resource that points to the map that created
-            // this object something like:
-			// stateObject.setResource("user-id", user.getUserId());
-			stateObject.setResource("template-id", template.getGlobalId());
 			
             return stateObject;
         } catch (Exception e) {
