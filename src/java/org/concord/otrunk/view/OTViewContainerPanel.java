@@ -220,7 +220,16 @@ public class OTViewContainerPanel extends JPanel
 	public void setCurrentObject(OTObject otObject, OTViewEntry viewEntry)
 	{
 		if(currentView != null) {
-		    currentView.viewClosed();
+			try {
+				currentView.viewClosed();
+			} catch (Throwable t) {
+				// attempting to close the view caused some form of exception
+				// print the exception and keep going.  This might cause later
+				// instability.  So this type of event should trigger a message
+				// back to developers, so we can track down the problem.
+				System.err.println("Exception while closing view: " + currentView);
+				t.printStackTrace();
+			}
 		    currentView = null;
 		}
 		
