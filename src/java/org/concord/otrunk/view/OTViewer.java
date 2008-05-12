@@ -1563,6 +1563,9 @@ public class OTViewer extends JFrame
 				}
 			}
 		};
+		
+		reloadWindowAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R,
+			java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
 		exitAction = new ExitAction();
 
