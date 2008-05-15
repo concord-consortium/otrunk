@@ -43,6 +43,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -109,6 +110,8 @@ public class XMLDatabase
 	private ArrayList listeners;
 	
 	String label;
+	
+	private HashMap reverseReferences = new HashMap();
 	
 	protected static String getLabel(URL contextURL)
 	{
@@ -330,7 +333,7 @@ public class XMLDatabase
 		}
 		XMLDataObject rootDataObject = (XMLDataObject)typeService.handleLiteralElement(rootObjectNode, relativePath);
 		
-		statusStream.println("Loaded objects in: " + label);
+		statusStream.println("Loaded " + dataObjects.size() + " objects in: " + label);
 		
 		// Need to handle local_id this will be stored as XMLDataObjectRef with in the
 		// tree. this is what the objectReferences vector is for
@@ -811,4 +814,14 @@ public class XMLDatabase
     {
 		return contextURL;
     }
+	
+	public void recordReference(OTID parent, OTID child)
+	{
+		ArrayList refs = (ArrayList) reverseReferences.get(parent);
+		if(refs == null){
+			// it is probably better to use a link list here instead because we are going
+			// to want a custom object to record which property is making this reference
+			refs = new ArrayList();
+		}
+	}
 }
