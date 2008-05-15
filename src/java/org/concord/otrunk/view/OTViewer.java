@@ -319,7 +319,6 @@ public class OTViewer extends JFrame
 		if (OTConfig.getBooleanProp(SHOW_CONSOLE_PROP, false)) {
 			consoleFrame.setVisible(true);
 		}
-		
 		commDialog = new JDialog(this, true);
 		
 		// for debugging
@@ -561,9 +560,9 @@ public class OTViewer extends JFrame
 					// Maximize the frame
 					setExtendedState(state);
 				} else {
-					int cornerX = 100;
-					int cornerY = 100;
-					int sizeX = 725;
+					int cornerX = 50;
+					int cornerY = 50;
+					int sizeX = 800;
 					int sizeY = 500;
 
 					// OTViewService viewService = otViewFactory.
@@ -608,8 +607,8 @@ public class OTViewer extends JFrame
 		if (mainFrame.getFrame() != null) {
 			if (mainFrame.getFrame().isResourceSet("width")
 					&& mainFrame.getFrame().isResourceSet("height")) {
-				int cornerX = 100;
-				int cornerY = 100;
+				int cornerX = mainFrame.getFrame().getPositionX();
+				int cornerY = mainFrame.getFrame().getPositionY();
 				int sizeX = mainFrame.getFrame().getWidth();
 				int sizeY = mainFrame.getFrame().getHeight();
 
