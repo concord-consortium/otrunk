@@ -266,6 +266,11 @@ public class OTViewer extends JFrame
 
 	public final static String ANON_SINGLE_USER_NAME = "anon_single_user";
 	
+	/**
+	 * This is true if the SailOTViewer created this OTViewer
+	 */
+	private boolean launchedBySailOTViewer = false;
+	
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
 		otViewFactory = factory;
@@ -2041,6 +2046,14 @@ public class OTViewer extends JFrame
 	{
 		// TODO Auto-generated method stub
 
+	}
+	
+	public void setLaunchedBySailOTViewer(boolean launchedBySailOTViewer){
+		this.launchedBySailOTViewer = launchedBySailOTViewer;
+	}
+	
+	public boolean isLaunchedBySailOTViewer(){
+		return launchedBySailOTViewer;
 	}
 
 	/*
