@@ -22,6 +22,7 @@ public class OTConfig
 	public final static String SHOW_STATUS_PROP = "otrunk.view.status";
 	public final static String USERDATA_URL_PROP = "otrunk.userdata_url";
 	public final static String REMOTE_SAVE_DATA_PROP = "otrunk.remote_save_data";
+	public final static String SHOW_DESTRUCTIVE_MENU_ITEMS = "otrunk.view.destructive_menu";	// "New" and "Open"
 	
 	
 	/**
@@ -112,5 +113,9 @@ public class OTConfig
     {
     	return getBooleanProp(REMOTE_SAVE_DATA_PROP, false);
     }
-
+	
+	public static boolean isShowDestructiveMenuItems()
+	{
+		return getBooleanProp(SHOW_DESTRUCTIVE_MENU_ITEMS, false);
+	}
 }

@@ -1598,9 +1598,12 @@ public class OTViewer extends JFrame
 		if (userMode == OTConfig.SINGLE_USER_MODE) {
 			fileMenu.setEnabled(!justStarted);
 
-			fileMenu.add(newUserDataAction);
-
-			fileMenu.add(loadUserDataAction);
+			// we add new and load ("open") menu items only if this is NOT launched 
+			// by sail or if otrunk.view.destructive_menu is set to true
+			if (!isLaunchedBySailOTViewer() || (OTConfig.isShowDestructiveMenuItems())){
+				fileMenu.add(newUserDataAction);
+				fileMenu.add(loadUserDataAction);
+			}
 
 			fileMenu.add(saveUserDataAction);
 
