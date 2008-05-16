@@ -167,15 +167,17 @@ public class XMLDatabase
 		try {
 	        document = new JDOMDocument(xmlStream);
         } catch (Exception e) {
+
+        	if(contextURL != null){
+        		URLConnection connection = contextURL.openConnection();
+        		if (connection instanceof HttpURLConnection){
+        			System.err.println("*** Response code for "+contextURL+":");
+        			System.err.println("   "+((HttpURLConnection)connection).getResponseCode());
+        		}
+        		System.err.println("*** Length of xmlstream from "+contextURL+":");
+        		System.err.println("   "+connection.getInputStream().available());
+        	}
         	
-	        URLConnection connection = contextURL.openConnection();
-	        if (connection instanceof HttpURLConnection){
-	        	System.err.println("*** Response code for "+contextURL+":");
-		        System.err.println("   "+((HttpURLConnection)connection).getResponseCode());
-	        }
-	        System.err.println("*** Length of xmlstream from "+contextURL+":");
-	        System.err.println("   "+connection.getInputStream().available());
-	        
 	        throw e;
         }
 		initialize();
