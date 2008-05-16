@@ -232,7 +232,8 @@ public class OTViewerHelper
 		throws Exception
 	{
 		this.otDB = otDB;
-		otrunk = new OTrunkImpl(otDB);
+		addService(UserMessageHandler.class, new PrintUserMessageHandler());
+		otrunk = new OTrunkImpl(null, otDB, services);
 		
 	}
 		
