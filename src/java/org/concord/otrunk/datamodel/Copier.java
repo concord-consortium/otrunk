@@ -23,6 +23,7 @@ public class Copier
 	Vector toBeCopied;
 	private OTDataList orphanList;
 	private OTExternalIDProvider idProvider;
+	private OTDataObjectFinder dataObjectFinder;
 
     private static class CopyEntry
     {    	
@@ -39,13 +40,14 @@ public class Copier
     }
 	
 	public Copier(OTDatabase sourceDb, OTDatabase destinationDb, OTDataList orphanDataList, 
-		OTExternalIDProvider idProvider)
+		OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder)
 	{
 		this.destinationDb = destinationDb;
 		this.sourceDb = sourceDb;
 		this.toBeCopied = new Vector();
 		this.orphanList = orphanDataList;
 		this.idProvider = idProvider;
+		this.dataObjectFinder = dataObjectFinder;
 	}
 	
 	/**
@@ -91,7 +93,10 @@ public class Copier
 				OTDataObject itemObj = 
 					sourceDb.getOTDataObject(root, (OTID)child);
 				if(itemObj == null){
-					throw new IllegalStateException("Can't find child id: " + child);
+					itemObj = dataObjectFinder.findDataObject((OTID)child);
+					if(itemObj == null) {
+						throw new IllegalStateException("Can't find child id: " + child);
+					}
 				}
 				OTDataObject itemCopy = 
 					destinationDb.createDataObject(itemObj.getType());
@@ -103,7 +108,7 @@ public class Copier
 				toBeCopied.add(itemCopyEntry);
 				
 			} else {
-				return child;
+				// we should not return here, it should just use the copy's global id
 			}
 
 			// put this new list object 
@@ -114,11 +119,11 @@ public class Copier
     }
     
     public static void copyInto(OTDataObject source, OTDataObject dest,
-	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider)
+	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder)
 	    throws Exception
 	{
 		Copier copier =
-		    new Copier(source.getDatabase(), dest.getDatabase(), orphanDataList, idProvider);
+		    new Copier(source.getDatabase(), dest.getDatabase(), orphanDataList, idProvider, dataObjectFinder);
 		copier.internalCopyInto(source, dest, maxDepth);
 	}
     
