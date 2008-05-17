@@ -67,6 +67,7 @@ import org.concord.otrunk.overlay.OverlayImpl;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.OTConfig;
+import org.concord.otrunk.view.OTUserSession;
 import org.concord.otrunk.xml.XMLDatabase;
 
 /**
@@ -100,6 +101,19 @@ public class OTrunkImpl implements OTrunk
 
 	private static HashMap otClassMap = new HashMap(); 
 	
+	OTDataObjectFinder dataObjectFinder = new OTDataObjectFinder()
+	{
+		public OTDataObject findDataObject(OTID id)
+			throws Exception
+        {
+			OTDatabase db = getOTDatabase(id);
+			if(db == null){
+				return null;
+			}
+			return db.getOTDataObject(null, id);
+        }    		
+	};
+
     public final static String getClassName(OTDataObject dataObject)
     {
     	OTDataObjectType type = dataObject.getType();
@@ -335,19 +349,30 @@ public class OTrunkImpl implements OTrunk
     	addDatabase(userDataDb);
         
     	OTReferenceMap refMap = getReferenceMapFromUserDb(userDataDb);
-
+    	
+    	// Set the username
     	OTUser user = refMap.getUser();
         OTUserObject aUser = (OTUserObject)user;
         if(name != null){
         	aUser.setName(name);
         }
-        users.add(aUser);
-
-        setupUserDatabase(user, refMap);
-
-        return aUser;
+        
+        // register the map
+        return registerReferenceMap(refMap);
     }
 
+    public OTUserObject registerReferenceMap(OTReferenceMap refMap)
+    throws Exception
+    {
+    	OTUserObject user = refMap.getUser();
+    	users.add(user);
+
+    	setupUserDatabase(user, refMap);
+
+    	return user;
+    }
+    
+    
     /**
      * the parentObjectService needs to be passed in so the returned object
      * uses the correct layers based on the context in which this method is
@@ -421,8 +446,13 @@ public class OTrunkImpl implements OTrunk
 		
 		return root;
     }
+
+    public OTObjectServiceImpl initObjectService(OTDatabase db, String logLabel) throws Exception 
+    {
+    	return initObjectService(db, logLabel, true);
+    }
     
-    protected OTObjectServiceImpl initObjectService(OTDatabase db, String logLabel) 
+    public OTObjectServiceImpl initObjectService(OTDatabase db, String logLabel, boolean loadIncludes) 
     	throws Exception
     {
 		addDatabase(db);
@@ -430,7 +460,10 @@ public class OTrunkImpl implements OTrunk
         if(OTConfig.isTrace()) {
         	objectService.addObjectServiceListener(new TraceListener(logLabel + ": " + db));
         }
-        loadIncludes(objectService);
+        
+        if(loadIncludes){
+        	loadIncludes(objectService);
+        }
         
         return objectService;
     }
@@ -482,6 +515,25 @@ public class OTrunkImpl implements OTrunk
         return refMap;
     }
     
+    public void reloadOverlays(OTUserSession userSession) 
+    	throws Exception
+    {
+    	OTUserObject userObject = userSession.getUserObject();
+    	OTID userId = userObject.getUserId();
+    	
+    	OTReferenceMap refMap = userSession.getReferenceMap();
+    		
+    	// need to make a new composite database.
+    	// the user database should remain the same.
+        OTDatabase oldCompositeDB = (OTDatabase) compositeDatabases.remove(userId);	
+        userObjectServices.remove(userId);
+        
+        databases.remove(oldCompositeDB);
+
+        setupUserDatabase(userObject, refMap);
+    	
+    }
+    
     public void reloadOverlays(OTUserObject user, OTDatabase userDataDb) 
     	throws Exception
     {
@@ -503,18 +555,8 @@ public class OTrunkImpl implements OTrunk
     {
     	OTObjectServiceImpl userObjService;
     	OTID userId = user.getUserId();
-    	
-    	OTDataObjectFinder objectFinder = new OTDataObjectFinder()
-    	{
-			public OTDataObject findDataObject(OTID id)
-				throws Exception
-            {
-				OTDatabase db = getOTDatabase(id);
-				return db.getOTDataObject(null, id);
-            }    		
-    	};
-    	
-        CompositeDatabase userDb = new CompositeDatabase(objectFinder, userStateMap);
+    	    	
+        CompositeDatabase userDb = new CompositeDatabase(dataObjectFinder, userStateMap);
 
         addDatabase(userDb);
         userObjService = createObjectService(userDb);
@@ -605,7 +647,7 @@ public class OTrunkImpl implements OTrunk
         
     }
     
-    protected void addDatabase(OTDatabase db)
+    public void addDatabase(OTDatabase db)
     {
         if(!databases.contains(db)) {
             databases.add(db);
@@ -810,4 +852,9 @@ public class OTrunkImpl implements OTrunk
 	{
 		otClassMap.put(className, otClass);
 	}
+
+	public OTDataObjectFinder getDataObjectFinder()
+    {
+    	return dataObjectFinder;
+    }
 }

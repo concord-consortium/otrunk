@@ -103,8 +103,6 @@ public class OTObjectServiceImpl
     	throws Exception
     {
     	String className = objectClass.getName();
-    	OTDataObjectType type = new OTDataObjectType(objectClass.getName());
-        OTDataObject dataObject = createDataObject(type); 
         OTClass otClass = OTrunkImpl.getOTClass(className);
         if(otClass == null){
         	// Can't find existing otClass for this class try to make one
@@ -118,6 +116,8 @@ public class OTObjectServiceImpl
         	// were registered at the same time.
         	ReflectiveOTClassFactory.singleton.processAllNewlyRegisteredClasses();
         }
+    	OTDataObjectType type = new OTDataObjectType(objectClass.getName());
+        OTDataObject dataObject = createDataObject(type); 
     	OTObjectInternal otObjectImpl = 
     		new OTObjectInternal(dataObject, this, otClass);
     	return otObjectImpl;
@@ -365,7 +365,7 @@ public class OTObjectServiceImpl
 		
 		OTDataObject copyDataObject = 
 			DataObjectUtil.copy(originalDataObject, creationDb, 
-					orphanDataList, maxDepth, this);
+					orphanDataList, maxDepth, this, otrunk.getDataObjectFinder());
 
 		return getOTObject(copyDataObject.getGlobalId());		
 	}

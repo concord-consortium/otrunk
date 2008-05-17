@@ -99,7 +99,6 @@ import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrameManager;
@@ -113,13 +112,10 @@ import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.text.UserMessageHandler;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTMLToXHTMLConverter;
-import org.concord.otrunk.OTObjectServiceImpl;
-import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTSystem;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkServiceEntry;
 import org.concord.otrunk.datamodel.OTDataObject;
-import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -167,8 +163,6 @@ public class OTViewer extends JFrame
 
 	protected int userMode = OTConfig.NO_USER_MODE;
 
-	OTUserObject currentUser = null;
-
 	URL currentURL = null;
 
 	String baseFrameTitle = "OTrunk Viewer";
@@ -198,11 +192,9 @@ public class OTViewer extends JFrame
 
 	XMLDatabase xmlDB;
 
-	XMLDatabase userDataDB;
-
+	OTUserSession userSession;
+	
 	File currentAuthoredFile = null;
-
-	File currentUserFile = null;
 
 	Hashtable otContainers = new Hashtable();
 
@@ -646,27 +638,19 @@ public class OTViewer extends JFrame
 
 	public void loadUserDataFile(File file)
 	{
-		currentUserFile = file;
 		try {
-			loadUserDataURL(file.toURL(), file.getName());
+			OTMLUserSession xmlUserSession = new OTMLUserSession(otrunk);
+			xmlUserSession.load(file, null);
+			loadUserSession(xmlUserSession);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void loadUserDataURL(URL url, String name)
-	    throws Exception
+	public void loadUserSession(OTUserSession userSession)
+	throws Exception
 	{
-		XMLDatabase db = new XMLDatabase(url);
-		db.loadObjects();
-		loadUserDataDb(db, name);
-	}
-
-	public void loadUserDataDb(XMLDatabase db, String name)
-	    throws Exception
-	{
-		userDataDB = db;
-		currentUser = otrunk.registerUserDataDatabase(userDataDB, name);
+		this.userSession = userSession;
 
 		reloadWindow();
 	}
@@ -674,7 +658,7 @@ public class OTViewer extends JFrame
 	public void reloadOverlays()
 	{
 		try {
-			otrunk.reloadOverlays(currentUser, userDataDB);
+			otrunk.reloadOverlays(userSession);
 			reloadWindow();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -806,17 +790,17 @@ public class OTViewer extends JFrame
 		case OTConfig.NO_USER_MODE:
 			return getAuthoredRoot();
 		case OTConfig.SINGLE_USER_MODE:
-			if (userDataDB == null) {
+			if (userSession  == null) {
 				return null;
 			}
 			OTObject otRoot = getAuthoredRoot();
-			return otrunk.getUserRuntimeObject(otRoot, currentUser);
+			return otrunk.getUserRuntimeObject(otRoot, getCurrentUser());
 		}
 
 		return null;
 	}
 
-	private void reloadWindow()
+	public void reloadWindow()
 	    throws Exception
 	{
 		OTObject root = getRoot();
@@ -836,7 +820,7 @@ public class OTViewer extends JFrame
 				if (realRoot instanceof OTSystem) {
 
 					OTSystem localUserSystem =
-					    (OTSystem) otrunk.getUserRuntimeObject(realRoot, currentUser);
+					    (OTSystem) otrunk.getUserRuntimeObject(realRoot, getCurrentUser());
 
 					// FIXME there should be a better way than this because we
 					// have to handle
@@ -887,20 +871,26 @@ public class OTViewer extends JFrame
 			}
 			break;
 		case OTConfig.SINGLE_USER_MODE:
-			if (currentUserFile != null) {
-				frame.setTitle(baseFrameTitle + ": " + currentUserFile.toString());
-			} else if (System.getProperty(TITLE_PROP, null) != null) {
-				frame.setTitle(baseFrameTitle);
-			} else if (userDataDB != null) {
-				frame.setTitle(baseFrameTitle + ": Untitled");
+			String userSessionLabel = null;			
+			if (userSession != null) {
+				userSessionLabel = userSession.getLabel();
+			} 
+			
+			if(userSessionLabel != null){
+				frame.setTitle(baseFrameTitle + ": " + userSessionLabel);
 			} else {
 				frame.setTitle(baseFrameTitle);
 			}
 			break;
 		}
 
-		saveUserDataAction.setEnabled(userDataDB != null);
-		saveUserDataAsAction.setEnabled(userDataDB != null);
+		if(userSession == null){
+			saveUserDataAction.setEnabled(false);
+			saveUserDataAsAction.setEnabled(false);
+		} else {
+			saveUserDataAction.setEnabled(userSession.allowSave());
+			saveUserDataAsAction.setEnabled(userSession.allowSaveAs());
+		}
 	}
 
 	public void reload()
@@ -909,20 +899,17 @@ public class OTViewer extends JFrame
 		initializeURL(currentURL);
 	}
 
-	public OTDatabase getUserDataDb()
+	public OTUserSession getUserSession()
 	{
-		return userDataDB;
+		return userSession;
 	}
-
-	/**
-	 * You should call reloadWindow after calling this method to make sure the
-	 * display reflects this change
-	 * 
-	 * @param userObject
-	 */
-	public void setCurrentUser(OTUserObject userObject)
+	
+	public OTUserObject getCurrentUser()
 	{
-		currentUser = userObject;
+		if(userSession == null){
+			return null;
+		}
+		return userSession.getUserObject();
 	}
 
 	public static void main(String[] args)
@@ -1133,7 +1120,7 @@ public class OTViewer extends JFrame
 			 */
 			public void actionPerformed(ActionEvent arg0)
 			{
-				openUserData();
+				openUserData(true);
 			}
 
 		};
@@ -1171,20 +1158,10 @@ public class OTViewer extends JFrame
 			 */
 			public void actionPerformed(ActionEvent arg0)
 			{
-				if (currentUserFile == null || !currentUserFile.exists()) {
-					saveUserDataAsAction.actionPerformed(arg0);
-					return;
-				}
-
-				if (currentUserFile.exists()) {
-					try {
-						ExporterJDOM.export(currentUserFile, userDataDB.getRoot(),
-						        userDataDB);
-						userDataDB.setDirty(false);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
+				userSession.save();
+				
+				// the save operation might change the label used by the session
+				setTitle(baseFrameTitle + ": " + userSession.getLabel());
 			}
 		};
 
@@ -1202,45 +1179,12 @@ public class OTViewer extends JFrame
 			 */
 			public void actionPerformed(ActionEvent arg0)
 			{
-				Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
-
-				MostRecentFileDialog mrfd =
-				    new MostRecentFileDialog("org.concord.otviewer.saveotml");
-				mrfd.setFilenameFilter("otml");
-
-				if (currentUserFile != null) {
-					mrfd.setCurrentDirectory(currentUserFile.getParentFile());
-					mrfd.setSelectedFile(currentUserFile);
+				if(userSession instanceof OTMLUserSession){
+					((OTMLUserSession)userSession).setDialogParent(SwingUtilities.getRoot(OTViewer.this));
 				}
-
-				int retval = mrfd.showSaveDialog(frame);
-
-				File file = null;
-				if (retval == MostRecentFileDialog.APPROVE_OPTION) {
-					file = mrfd.getSelectedFile();
-
-					String fileName = file.getPath();
-					currentUserFile = file;
-
-					if (!fileName.toLowerCase().endsWith(".otml")) {
-						currentUserFile =
-						    new File(currentUserFile.getAbsolutePath() + ".otml");
-					}
-
-					try {
-						ExporterJDOM.export(currentUserFile, userDataDB.getRoot(),
-						        userDataDB);
-						userDataDB.setDirty(false);
-						setTitle(baseFrameTitle + ": " + currentUserFile.toString());
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					frame.setTitle(fileName);
-
-				}
+				
+				userSession.saveAs();
 			}
-
 		};
 
 		loadAction = new AbstractAction("Open Authored Content...") {
@@ -1691,40 +1635,43 @@ public class OTViewer extends JFrame
 	}
 
 	/**
-	 * Checks if the user has unsaved work. If they do then it prompts them to
-	 * confirm what they are doing. If they cancel then it returns false.
+	 * FIXME This method name is confusing.  The method first checks for unsaved
+	 * changes, and if there are unsaved changes it asks the user if they want to 
+	 * "don't save", "cancel" or "save" 
 	 * 
 	 * @return
 	 */
 	public boolean checkForUnsavedUserData()
 	{
-		if (currentUser != null && userDataDB != null) {
-			if (userDataDB.isDirty()) {
-				// show dialog message telling them they haven't
-				// saved their work
-				// FIXME
-				String options[] = { "Don't Save", "Cancel", "Save" };
-				askedAboutSavingUserData = true;
-				int chosenOption =
-				    JOptionPane.showOptionDialog(this, "Save Changes?", "Save Changes?",
-				        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
-				        options, options[2]);
-				switch (chosenOption) {
-				case 0:
-					System.err.println("Not saving work");
-					break;
-				case 1:
-					System.err.println("Canceling close");
-					return false;
-				case 2:
-					System.err.println("Set needToSaveUserData true");
-					needToSaveUserData = true;
-					break;
-				}
-			}
+		if(userSession == null){
+			return true;
+		}
+		
+		if(userSession.hasUnsavedChanges()) {
+			// show dialog message telling them they haven't
+			// saved their work
+			// FIXME
+			String options[] = { "Don't Save", "Cancel", "Save" };
+			askedAboutSavingUserData = true;
+			int chosenOption =
+			    JOptionPane.showOptionDialog(this, "Save Changes?", "Save Changes?",
+			        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
+			        options, options[2]);
+			switch (chosenOption) {
+			case 0:
+				System.err.println("Not saving work");
+				break;
+			case 1:
+				System.err.println("Canceling close");
+				return false;
+			case 2:
+				System.err.println("Set needToSaveUserData true");
+				needToSaveUserData = true;
+				break;
+			}			
 		}
 
-		return true;
+		return true;	
 	}
 
 	/**
@@ -1774,7 +1721,9 @@ public class OTViewer extends JFrame
 	}
 	
 	/**
-	 * This does not check for unsaved user data
+	 * This does not check for unsaved user data, it uses the current OTUserSession object
+	 * to create the new user data.  If there is no OTUserSession object it will throw an
+	 * IllegalStateException
 	 * 
 	 */
 	public void newUserData(String userName)
@@ -1783,30 +1732,19 @@ public class OTViewer extends JFrame
 		// this should set the currentUserFile to null, so the save check
 		// prompts
 		// for a file name
+		if(userSession == null) {
+			throw new IllegalStateException("a OTUserSession must be supplied before newUserData can be called");
+		}
+		
 		try {
-			// need to make a brand new stateDB
-			userDataDB = new XMLDatabase();
-			// System.out.println("otrunk: " + otrunk + " userDatabase: " +
-			// userDataDB);
-			OTObjectService objService = otrunk.createObjectService(userDataDB);
-
-			OTStateRoot stateRoot =
-			    (OTStateRoot) objService.createObject(OTStateRoot.class);
-			userDataDB.setRoot(stateRoot.getGlobalId());
-			stateRoot.setFormatVersionString("1.0");
-
-			OTUserObject userObject =
-			    OTViewerHelper.createUser(userName, objService);
-
-			otrunk.initUserObjectService((OTObjectServiceImpl) objService, userObject,
-			    stateRoot);
-
-			userDataDB.setDirty(false);
-
-			currentUserFile = null;
-
-			setCurrentUser(userObject);
-
+			userSession.newLayer();
+			
+			OTUserObject userObject = userSession.getUserObject();
+			if(userName != null){
+				userObject.setName(userName);
+			}
+			
+			// This will request the label from the userSession
 			reloadWindow();
 
 		} catch (Exception e) {
@@ -1881,8 +1819,11 @@ public class OTViewer extends JFrame
 		    new MostRecentFileDialog("org.concord.otviewer.saveotml");
 		mrfd.setFilenameFilter("html");
 
-		if (currentUserFile != null) {
-			mrfd.setCurrentDirectory(currentUserFile.getParentFile());
+		if (userSession instanceof OTMLUserSession){
+			OTMLUserSession otmlUserSession = (OTMLUserSession) userSession;
+			if(otmlUserSession.currentUserFile != null){
+				mrfd.setCurrentDirectory(otmlUserSession.currentUserFile.getParentFile());				
+			}
 		}
 
 		int retval = mrfd.showSaveDialog(frame);
@@ -1923,41 +1864,42 @@ public class OTViewer extends JFrame
 		exportToHtmlAction.setEnabled(true);
 	}
 
-	public void openUserData()
+	public void openUserData(boolean saveCurrentData)
 	{
-		if (!checkForUnsavedUserData()) {
-			// the user canceled the operation
-			return;
+		if(saveCurrentData){
+			if (!checkForUnsavedUserData()) {
+				// the user canceled the operation
+				return;
+			}
+
+			// FIXME Calling the method below would insure the view is closed, and
+			// that any data that is
+			// is modified in that view closed operation will get saved, however if
+			// the user
+			// cancels the open dialog then we would be left in an unknown
+			// state. The current view would be closed which they would want to see
+			// again.
+			// bodyPanel.setCurrentObject(null);
+
+			conditionalSaveUserData();
 		}
-
-		// FIXME Calling the method below would insure the view is closed, and
-		// that any data that is
-		// is modified in that view closed operation will get saved, however if
-		// the user
-		// cancels the open dialog then we would be left in an unknown
-		// state. The current view would be closed which they would want to see
-		// again.
-		// bodyPanel.setCurrentObject(null);
-
-		conditionalSaveUserData();
-
-		Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
-
-		MostRecentFileDialog mrfd =
-		    new MostRecentFileDialog("org.concord.otviewer.openotml");
-		mrfd.setFilenameFilter("otml");
-
-		int retval = mrfd.showOpenDialog(frame);
-
-		File file = null;
-		if (retval == MostRecentFileDialog.APPROVE_OPTION) {
-			file = mrfd.getSelectedFile();
+		
+		if(userSession == null){
+			throw new IllegalStateException("can't open user data without a userSession");
 		}
+		
+		boolean success = userSession.open();
 
-		if (file != null && file.exists()) {
-			loadUserDataFile(file);
-			exportToHtmlAction.setEnabled(true);
-		}
+		try {
+	        reloadWindow();
+        } catch (Exception e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+        
+		if(success){
+			exportToHtmlAction.setEnabled(true);			
+		}				
 	}
 
 	public void instructionPanel()
@@ -1991,11 +1933,14 @@ public class OTViewer extends JFrame
 		bNew.setOpaque(false);
 		bOpen.setOpaque(false);
 
+		userSession = new OTMLUserSession(otrunk);
+		
 		bNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
 				commDialog.setVisible(false);
-				createNewUser();
+				newAnonUserData();
+				exportToHtmlAction.setEnabled(true);
 			}
 		});
 
@@ -2003,7 +1948,7 @@ public class OTViewer extends JFrame
 			public void actionPerformed(ActionEvent e)
 			{
 				commDialog.setVisible(false);
-				openUserData();
+				openUserData(false);
 			}
 		});
 
