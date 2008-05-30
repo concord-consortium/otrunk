@@ -32,6 +32,17 @@
             <text />
           </optional>
         </element>
+        <element name="OTObjectInterface">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTObject">
           <optional>
             <attribute name="local_id">
@@ -65,22 +76,15 @@
             <text />
           </optional>
         </element>
-        <element name="OTObjectInterface">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
         <element name="OTSex">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
+          </optional>
+          <optional>
+            <attribute name="replayButtonEnabled" />
+            <data type="boolean" />
           </optional>
           <element name="fatherOrganism">
             <ref name="otObject" />
@@ -141,6 +145,10 @@
             <text />
           </optional>
           <optional>
+            <attribute name="description" />
+            <text />
+          </optional>
+          <optional>
             <attribute name="name" />
             <text />
           </optional>
@@ -158,51 +166,13 @@
             <attribute name="isPredefined" />
             <data type="boolean" />
           </optional>
-          <element name="symbol">
+          <element name="value">
             <ref name="otObject" />
           </element>
           <optional>
-            <attribute name="name" />
+            <attribute name="symbol" />
             <text />
           </optional>
-        </element>
-        <element name="OTExpressionConstantList">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="expressionConstants">
-            <ref name="listContents" />
-          </element>
-          <element name="currentConstant">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="width" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="height" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTExpressionList">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="expressions">
-            <ref name="listContents" />
-          </element>
-          <element name="currentExpression">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -226,18 +196,97 @@
             <text />
           </optional>
         </element>
+        <element name="OTExpressionConstantList">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="listTitle" />
+            <text />
+          </optional>
+          <element name="currentSymbol">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
+          <element name="symbols">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTExpressionSymbolList">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
-          <element name="expressionSymbols">
-            <ref name="listContents" />
-          </element>
+          <optional>
+            <attribute name="listTitle" />
+            <text />
+          </optional>
           <element name="currentSymbol">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
+          <element name="symbols">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTExpressionList">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="expressions">
+            <ref name="listContents" />
+          </element>
+          <element name="currentExpression">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTExpressionResult">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="formula">
+            <ref name="otObject" />
+          </element>
+          <element name="value">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="symbol" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -267,27 +316,46 @@
               <text />
             </attribute>
           </optional>
-          <element name="expressionSymbols">
-            <ref name="listContents" />
-          </element>
-          <element name="expressionList">
+          <element name="formulas">
             <ref name="otObject" />
           </element>
+          <element name="constants">
+            <ref name="otObject" />
+          </element>
+          <element name="variables">
+            <ref name="otObject" />
+          </element>
+          <element name="resultValues">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="showResultsSeparate" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="showResultsInTable" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
           </optional>
         </element>
-        <element name="OTProgrammableCalculatorTest">
+        <element name="OTProgrammableCalculatorNotebook">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
           <element name="notebook">
-            <ref name="otObject" />
-          </element>
-          <element name="constants">
             <ref name="otObject" />
           </element>
           <element name="calculator">
@@ -298,13 +366,41 @@
             <text />
           </optional>
         </element>
-        <element name="OTProgrammableCalculatorViewEntry">
+        <element name="OTProgrammableCalculatorResultChooser">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
-          <element name="resultViewEntry">
+          <element name="calculator">
+            <ref name="otObject" />
+          </element>
+          <element name="selectedAnswer">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="selectionButtonText" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="closeFrameAfterSelection" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTExpressionVariableViewConfig">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="unitsConversionList">
+            <ref name="listContents" />
+          </element>
+          <element name="variableValueViewEntry">
             <ref name="otObject" />
           </element>
           <optional>
@@ -315,12 +411,6 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -340,12 +430,31 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTProgrammableCalculatorViewConfig">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="unitsConversionList">
+            <ref name="listContents" />
+          </element>
+          <element name="resultsTableViewEntry">
             <ref name="otObject" />
           </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
+          <optional>
+            <attribute name="objectClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="viewClass" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -380,6 +489,14 @@
           <optional>
             <attribute name="recommendMax" />
             <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="numericData" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="locked" />
+            <data type="boolean" />
           </optional>
           <optional>
             <attribute name="name" />
@@ -436,6 +553,31 @@
             <text />
           </optional>
         </element>
+        <element name="OTDataInput">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="dataProducer">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="inputVariable" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="inputChannel" />
+            <text />
+          </optional>
+          <element name="target">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTDataStore">
           <optional>
             <attribute name="local_id">
@@ -461,6 +603,10 @@
             <text />
           </optional>
           <optional>
+            <attribute name="virtualChannels" />
+            <data type="boolean" />
+          </optional>
+          <optional>
             <attribute name="name" />
             <text />
           </optional>
@@ -474,6 +620,10 @@
           <element name="dataStore">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="showLastRowForAddingNew" />
+            <data type="boolean" />
+          </optional>
           <element name="columns">
             <ref name="listContents" />
           </element>
@@ -643,6 +793,20 @@
             <text />
           </optional>
         </element>
+        <element name="OTMultiWaveGenerator">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="waves">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTPropertyDataProducer">
           <optional>
             <attribute name="local_id">
@@ -710,12 +874,25 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTWave">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="wavelength" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="amplitude" />
+            <data type="float" />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -831,6 +1008,10 @@
             <attribute name="maxBarsToSelect" />
             <text />
           </optional>
+          <optional>
+            <attribute name="locked" />
+            <data type="boolean" />
+          </optional>
           <element name="dataProducer">
             <ref name="otObject" />
           </element>
@@ -864,10 +1045,6 @@
           <optional>
             <attribute name="yColumn" />
             <text />
-          </optional>
-          <optional>
-            <attribute name="locked" />
-            <data type="boolean" />
           </optional>
           <optional>
             <attribute name="color" />
@@ -888,6 +1065,10 @@
               <text />
             </attribute>
           </optional>
+          <optional>
+            <attribute name="locked" />
+            <data type="boolean" />
+          </optional>
           <element name="dataProducer">
             <ref name="otObject" />
           </element>
@@ -921,10 +1102,6 @@
           <optional>
             <attribute name="yColumn" />
             <text />
-          </optional>
-          <optional>
-            <attribute name="locked" />
-            <data type="boolean" />
           </optional>
           <optional>
             <attribute name="color" />
@@ -998,6 +1175,14 @@
             <data type="boolean" />
           </optional>
           <optional>
+            <attribute name="aspectRatio" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="showGraphableList" />
+            <data type="boolean" />
+          </optional>
+          <optional>
             <attribute name="name" />
             <text />
           </optional>
@@ -1025,6 +1210,54 @@
           </element>
           <optional>
             <attribute name="showToolbar" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="aspectRatio" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="showGraphableList" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTDataCollectorDataStore">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="dataCollector">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="dataType" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="numberChannels" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="dt" />
+            <data type="float" />
+          </optional>
+          <element name="values">
+            <ref name="listContents" />
+          </element>
+          <element name="channelDescriptions">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="valuesString" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="virtualChannels" />
             <data type="boolean" />
           </optional>
           <optional>
@@ -1087,6 +1320,10 @@
             <text />
           </optional>
           <optional>
+            <attribute name="fontSize" />
+            <text />
+          </optional>
+          <optional>
             <attribute name="name" />
             <text />
           </optional>
@@ -1129,6 +1366,10 @@
             <text />
           </optional>
           <optional>
+            <attribute name="fontSize" />
+            <text />
+          </optional>
+          <optional>
             <attribute name="name" />
             <text />
           </optional>
@@ -1165,6 +1406,10 @@
           </optional>
           <optional>
             <attribute name="text" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="fontSize" />
             <text />
           </optional>
           <optional>
@@ -1207,6 +1452,10 @@
           </optional>
           <optional>
             <attribute name="text" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="fontSize" />
             <text />
           </optional>
           <optional>
@@ -1329,6 +1578,96 @@
             <text />
           </optional>
         </element>
+        <element name="OTDataFilterScript">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="filterScript">
+            <ref name="otObject" />
+          </element>
+          <element name="filterProviderScript">
+            <ref name="otObject" />
+          </element>
+          <element name="inputDataStore">
+            <ref name="otObject" />
+          </element>
+          <element name="inputDataGraphable">
+            <ref name="otObject" />
+          </element>
+          <element name="description">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="numberChannels" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="dt" />
+            <data type="float" />
+          </optional>
+          <element name="values">
+            <ref name="listContents" />
+          </element>
+          <element name="channelDescriptions">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="valuesString" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="virtualChannels" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTDataFilter">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="inputDataStore">
+            <ref name="otObject" />
+          </element>
+          <element name="inputDataGraphable">
+            <ref name="otObject" />
+          </element>
+          <element name="description">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="numberChannels" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="dt" />
+            <data type="float" />
+          </optional>
+          <element name="values">
+            <ref name="listContents" />
+          </element>
+          <element name="channelDescriptions">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="valuesString" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="virtualChannels" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTFrame">
           <optional>
             <attribute name="local_id">
@@ -1336,11 +1675,23 @@
             </attribute>
           </optional>
           <optional>
+            <attribute name="positionX" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="positionY" />
+            <text />
+          </optional>
+          <optional>
             <attribute name="borderlessPopup" />
             <data type="boolean" />
           </optional>
           <optional>
             <attribute name="useScrollPane" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="alwaysOnTop" />
             <data type="boolean" />
           </optional>
           <optional>
@@ -1353,6 +1704,21 @@
           </optional>
           <optional>
             <attribute name="title" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTBlob">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="src" />
             <text />
           </optional>
           <optional>
@@ -1405,6 +1771,10 @@
             <text />
           </optional>
           <optional>
+            <attribute name="strokeWidth" />
+            <data type="float" />
+          </optional>
+          <optional>
             <attribute name="type" />
             <text />
           </optional>
@@ -1443,6 +1813,13 @@
             <attribute name="src" />
             <text />
           </optional>
+          <element name="imageSrc">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="imageURL" />
+            <text />
+          </optional>
           <optional>
             <attribute name="alwaysOn" />
             <data type="boolean" />
@@ -1465,8 +1842,15 @@
           <element name="graphables">
             <ref name="listContents" />
           </element>
+          <element name="backgroundSrc">
+            <ref name="otObject" />
+          </element>
           <optional>
             <attribute name="backgroundImage" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="backgroundImageURL" />
             <text />
           </optional>
           <element name="stamps">
@@ -1484,6 +1868,17 @@
             <attribute name="preferredHeight" />
             <text />
           </optional>
+          <optional>
+            <attribute name="lineWidthButtonVisible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="largeTextButtonVisible" />
+            <data type="boolean" />
+          </optional>
+          <element name="customButtons">
+            <ref name="listContents" />
+          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -1498,8 +1893,15 @@
           <element name="graphables">
             <ref name="listContents" />
           </element>
+          <element name="backgroundSrc">
+            <ref name="otObject" />
+          </element>
           <optional>
             <attribute name="backgroundImage" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="backgroundImageURL" />
             <text />
           </optional>
           <element name="stamps">
@@ -1517,6 +1919,17 @@
             <attribute name="preferredHeight" />
             <text />
           </optional>
+          <optional>
+            <attribute name="lineWidthButtonVisible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="largeTextButtonVisible" />
+            <data type="boolean" />
+          </optional>
+          <element name="customButtons">
+            <ref name="listContents" />
+          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -2017,6 +2430,145 @@
             <text />
           </optional>
         </element>
+        <element name="OTSoundDataCollector">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="graphables">
+            <ref name="listContents" />
+          </element>
+          <element name="yDataAxis">
+            <ref name="otObject" />
+          </element>
+          <element name="xDataAxis">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="singleValue" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="showTare" />
+            <data type="boolean" />
+          </optional>
+          <element name="singleDataStore">
+            <ref name="otObject" />
+          </element>
+          <element name="dataSetFolder">
+            <ref name="otObject" />
+          </element>
+          <element name="labels">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="multipleGraphableEnabled" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="rulerEnabled" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="autoScaleEnabled" />
+            <data type="boolean" />
+          </optional>
+          <element name="source">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="title" />
+            <text />
+          </optional>
+          <element name="prototypeGraphables">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="showToolbar" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="aspectRatio" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="showGraphableList" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSoundDataProducer">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="sampleRate" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="timeWindow" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="isFFT" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSoundGrapherModel">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTInclude">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="href" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="otmlId" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTIncludeRootObject">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="href" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTProperty">
           <optional>
             <attribute name="local_id">
@@ -2056,6 +2608,9 @@
               <text />
             </attribute>
           </optional>
+          <element name="includes">
+            <ref name="listContents" />
+          </element>
           <element name="bundles">
             <ref name="listContents" />
           </element>
@@ -2077,6 +2632,33 @@
           <element name="services">
             <ref name="listContents" />
           </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMozSwing">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="showToolbar" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="preferredHeight" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="url" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="showStatusBar" />
+            <data type="boolean" />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -2153,6 +2735,81 @@
             <text />
           </optional>
         </element>
+        <element name="OTDIYExternalRef">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="authoredDataURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTDataCollectorViewConfig">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="predefinedGraphs">
+            <ref name="otObject" />
+          </element>
+          <element name="sharedGraphs">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="objectClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="viewClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTLabviewMonitor">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="portNum" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="viPath" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="monitorPath" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="exclusionPath" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="dummyReportPath" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="label" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTOverlay">
           <optional>
             <attribute name="local_id">
@@ -2165,6 +2822,25 @@
           <element name="nonDeltaObjects">
             <ref name="listContents" />
           </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTScript">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="src" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="script" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -2222,12 +2898,15 @@
             <text />
           </optional>
         </element>
-        <element name="OTScript">
+        <element name="OTJavascript">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
+          <element name="scripts">
+            <ref name="listContents" />
+          </element>
           <optional>
             <attribute name="src" />
             <text />
@@ -2241,7 +2920,7 @@
             <text />
           </optional>
         </element>
-        <element name="OTJavascript">
+        <element name="OTJython">
           <optional>
             <attribute name="local_id">
               <text />
@@ -2266,6 +2945,9 @@
               <text />
             </attribute>
           </optional>
+          <element name="scriptVariables">
+            <ref name="listContents" />
+          </element>
           <optional>
             <attribute name="text" />
             <text />
@@ -2284,11 +2966,14 @@
               <text />
             </attribute>
           </optional>
+          <element name="variables">
+            <ref name="listContents" />
+          </element>
           <element name="referenceObjects">
             <ref name="listContents" />
           </element>
-          <element name="variables">
-            <ref name="listContents" />
+          <element name="scriptState">
+            <ref name="mapContents" />
           </element>
           <element name="contents">
             <ref name="listContents" />
@@ -2329,6 +3014,20 @@
             <text />
           </optional>
         </element>
+        <element name="OTScriptVariableRealObject">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="reference">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTScriptVariableView">
           <optional>
             <attribute name="local_id">
@@ -2336,6 +3035,23 @@
             </attribute>
           </optional>
           <element name="reference">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTXHTMLScript">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="variables">
+            <ref name="listContents" />
+          </element>
+          <element name="script">
             <ref name="otObject" />
           </element>
           <optional>
@@ -2432,18 +3148,17 @@
             <text />
           </optional>
         </element>
-        <element name="OTUDLCharacter">
+        <element name="OTAuthorNote">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
+          <element name="note">
+            <ref name="otObject" />
+          </element>
           <optional>
-            <attribute name="inactiveImageURL" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="activeImageURL" />
+            <attribute name="color" />
             <text />
           </optional>
           <optional>
@@ -2451,22 +3166,13 @@
             <text />
           </optional>
         </element>
-        <element name="OTUDLCharacterGroup">
+        <element name="OTTip">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
-          <element name="characters">
-            <ref name="listContents" />
-          </element>
-          <element name="coachStatements">
-            <ref name="listContents" />
-          </element>
-          <element name="topLevelCardContainer">
-            <ref name="otObject" />
-          </element>
-          <element name="speechFrame">
+          <element name="tip">
             <ref name="otObject" />
           </element>
           <optional>
@@ -2474,16 +3180,19 @@
             <text />
           </optional>
         </element>
-        <element name="OTUDLCoachStatement">
+        <element name="OTUDLLabPage">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
-          <element name="coach">
+          <element name="backgroundImage">
             <ref name="otObject" />
           </element>
-          <element name="statement">
+          <element name="cardContainer">
+            <ref name="otObject" />
+          </element>
+          <element name="map">
             <ref name="otObject" />
           </element>
           <optional>
@@ -2536,6 +3245,65 @@
             <text />
           </optional>
         </element>
+        <element name="OTUDLVersionContainer">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="versions">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="currentVersion" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTUDLVersionContainerViewConfig">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="currentVersion" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="viewClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTUDLVersionedObject">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="otObject">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="version" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTZoom">
           <optional>
             <attribute name="local_id">
@@ -2555,6 +3323,10 @@
           <optional>
             <attribute name="numberTransformSteps" />
             <text />
+          </optional>
+          <optional>
+            <attribute name="onlyZoomIn" />
+            <data type="boolean" />
           </optional>
           <optional>
             <attribute name="name" />
@@ -2587,6 +3359,69 @@
             <text />
           </optional>
         </element>
+        <element name="OTUDLCoach">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="inactiveImageURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="activeImageURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTUDLCoachGroup">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="characters">
+            <ref name="listContents" />
+          </element>
+          <element name="coachStatements">
+            <ref name="listContents" />
+          </element>
+          <element name="topLevelCardContainer">
+            <ref name="otObject" />
+          </element>
+          <element name="speechFrame">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTUDLCoachStatement">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="coach">
+            <ref name="otObject" />
+          </element>
+          <element name="statement">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="timesClicked" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTDefinition">
           <optional>
             <attribute name="local_id">
@@ -2600,6 +3435,21 @@
           <element name="definition">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTDefinitionList">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="src" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -2625,40 +3475,6 @@
             <text />
           </optional>
         </element>
-        <element name="OTUDLCSSGroup">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="cssTexts">
-            <ref name="listContents" />
-          </element>
-          <element name="currentCssText">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLCSSModifier">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="documentView">
-            <ref name="otObject" />
-          </element>
-          <element name="cssGroups">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
         <element name="OTUDLComment">
           <optional>
             <attribute name="local_id">
@@ -2676,6 +3492,10 @@
           <optional>
             <attribute name="isPassword" />
             <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="rows" />
+            <text />
           </optional>
           <optional>
             <attribute name="name" />
@@ -2697,6 +3517,10 @@
             <text />
           </optional>
           <optional>
+            <attribute name="rows" />
+            <text />
+          </optional>
+          <optional>
             <attribute name="name" />
             <text />
           </optional>
@@ -2710,38 +3534,6 @@
           <element name="coachStatements">
             <ref name="listContents" />
           </element>
-          <optional>
-            <attribute name="isPreTest" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isPostTest" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isIntroduction" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isWrapup" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isExploration" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isComputerBased" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isLiterature" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isMath" />
-            <data type="boolean" />
-          </optional>
           <element name="bodyText">
             <ref name="anyXMLFragment" />
           </element>
@@ -2756,9 +3548,10 @@
             <attribute name="markupLanguage" />
             <text />
           </optional>
-          <element name="definitionManager">
-            <ref name="otObject" />
-          </element>
+          <optional>
+            <attribute name="showEditBar" />
+            <data type="boolean" />
+          </optional>
           <optional>
             <attribute name="documentText" />
             <text />
@@ -2790,6 +3583,10 @@
           <optional>
             <attribute name="markupLanguage" />
             <text />
+          </optional>
+          <optional>
+            <attribute name="showEditBar" />
+            <data type="boolean" />
           </optional>
           <optional>
             <attribute name="documentText" />
@@ -2849,13 +3646,6 @@
           <element name="definitionManager">
             <ref name="otObject" />
           </element>
-          <element name="characterGroup">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="mode" />
-            <text />
-          </optional>
           <optional>
             <attribute name="css" />
             <text />
@@ -2864,6 +3654,14 @@
             <ref name="listContents" />
           </element>
           <optional>
+            <attribute name="mode" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="viewContainerIsUpdateable" />
+            <data type="boolean" />
+          </optional>
+          <optional>
             <attribute name="objectClass" />
             <text />
           </optional>
@@ -2871,12 +3669,6 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -2889,16 +3681,20 @@
             </attribute>
           </optional>
           <optional>
-            <attribute name="mode" />
-            <text />
-          </optional>
-          <optional>
             <attribute name="css" />
             <text />
           </optional>
           <element name="cssBlocks">
             <ref name="listContents" />
           </element>
+          <optional>
+            <attribute name="mode" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="viewContainerIsUpdateable" />
+            <data type="boolean" />
+          </optional>
           <optional>
             <attribute name="objectClass" />
             <text />
@@ -2907,12 +3703,6 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -2945,52 +3735,19 @@
             <data type="boolean" />
           </optional>
           <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTObjectTransferer">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
+            <attribute name="showMaterialButtons" />
+            <data type="boolean" />
           </optional>
           <optional>
-            <attribute name="buttonText" />
-            <text />
+            <attribute name="isSlideSimulation" />
+            <data type="boolean" />
           </optional>
           <optional>
-            <attribute name="doneButtonText" />
-            <text />
+            <attribute name="isEnergySimulation" />
+            <data type="boolean" />
           </optional>
-          <element name="sendTo">
-            <ref name="otObject" />
-          </element>
-          <element name="object">
-            <ref name="otObject" />
-          </element>
           <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLActivity">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="experiences">
-            <ref name="listContents" />
-          </element>
-          <element name="question">
-            <ref name="otObject" />
-          </element>
-          <element name="labBook">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="title" />
+            <attribute name="startMaterial" />
             <text />
           </optional>
           <optional>
@@ -2998,128 +3755,23 @@
             <text />
           </optional>
         </element>
-        <element name="OTUDLActivityPage">
+        <element name="OTUDLLeveledQuestions">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
-          <element name="sidebar">
-            <ref name="otObject" />
-          </element>
-          <element name="backpack">
-            <ref name="otObject" />
-          </element>
           <optional>
-            <attribute name="title" />
+            <attribute name="timesClicked" />
             <text />
           </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLBackpack">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="items">
+          <element name="questions">
             <ref name="listContents" />
           </element>
           <optional>
-            <attribute name="title" />
+            <attribute name="currentIndex" />
             <text />
           </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLBackpackItem">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="otobject">
-            <ref name="otObject" />
-          </element>
-          <element name="icon">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLExperience">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="preview">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="r" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="g" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="b" />
-            <text />
-          </optional>
-          <element name="content">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLLabBook">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="mode" />
-            <text />
-          </optional>
-          <element name="sendTo">
-            <ref name="otObject" />
-          </element>
-          <element name="sendTo2">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="title" />
-            <text />
-          </optional>
-          <element name="items">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTObjectAddable">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="items">
-            <ref name="listContents" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -3131,388 +3783,46 @@
               <text />
             </attribute>
           </optional>
-          <element name="questions">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLQuestionEditViewEntry">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="viewMode" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="objectClass" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="viewClass" />
-            <text />
-          </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
+          <element name="scaffolding">
             <ref name="otObject" />
           </element>
           <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLQuestionPath">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="questionMap">
-            <ref name="mapContents" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLQuestionViewEntry">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="currentPath">
-            <ref name="otObject" />
-          </element>
-          <element name="paths">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="objectClass" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="viewClass" />
-            <text />
-          </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLReport">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="mode" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="addDirectlyToText" />
+            <attribute name="showScaffolding" />
             <data type="boolean" />
           </optional>
           <optional>
-            <attribute name="title" />
-            <text />
+            <attribute name="showConvertButton" />
+            <data type="boolean" />
           </optional>
-          <element name="document">
+          <element name="input">
             <ref name="otObject" />
           </element>
-          <element name="items">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLSidebar">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="items">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="title" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLSidebarItem">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="backpack">
+          <element name="prompt">
             <ref name="otObject" />
           </element>
-          <element name="preview">
+          <element name="correctAnswer">
             <ref name="otObject" />
           </element>
           <optional>
-            <attribute name="r" />
+            <attribute name="reasoning" />
             <text />
           </optional>
           <optional>
-            <attribute name="g" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="b" />
-            <text />
-          </optional>
-          <element name="backpackItem">
-            <ref name="otObject" />
-          </element>
-          <element name="content">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTSection">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="totalImageHeight" />
-            <text />
-          </optional>
-          <element name="content">
-            <ref name="otObject" />
-          </element>
-          <element name="title">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTSoundObject">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="soundURL" />
-            <text />
-          </optional>
-          <element name="object">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="string" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLActivity">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="definitionManager">
-            <ref name="otObject" />
-          </element>
-          <element name="question">
-            <ref name="listContents" />
-          </element>
-          <element name="versions">
-            <ref name="listContents" />
-          </element>
-          <element name="exploringTheQuestion">
-            <ref name="listContents" />
-          </element>
-          <element name="explorations">
-            <ref name="listContents" />
-          </element>
-          <element name="preTest">
-            <ref name="otObject" />
-          </element>
-          <element name="postTest">
-            <ref name="otObject" />
-          </element>
-          <element name="wrapup">
-            <ref name="otObject" />
-          </element>
-          <element name="compoundDocsView">
-            <ref name="otObject" />
-          </element>
-          <element name="title">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLExploration">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="r" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="g" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="b" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="computerBased" />
+            <attribute name="showCheckAnswersButton" />
             <data type="boolean" />
           </optional>
           <optional>
-            <attribute name="workInGroup" />
+            <attribute name="showImmediateFeedback" />
             <data type="boolean" />
           </optional>
           <optional>
-            <attribute name="math" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="literacy" />
-            <data type="boolean" />
-          </optional>
-          <element name="content">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="title" />
+            <attribute name="correctAnswerFeedback" />
             <text />
           </optional>
           <optional>
-            <attribute name="name" />
+            <attribute name="incorrectAnswerFeedback" />
             <text />
           </optional>
-        </element>
-        <element name="OTUDLQuestions">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="questions">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="title" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTVersion">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="isDefault" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="version" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTVersionedObject">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="string" />
-            <text />
-          </optional>
-          <element name="version">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTDefinition">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="word" />
-            <text />
-          </optional>
-          <element name="definition">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTDefinitionManager">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="definitions">
-            <ref name="listContents" />
-          </element>
-          <element name="compoundDoc">
-            <ref name="otObject" />
-          </element>
-          <element name="frame">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -3558,167 +3868,6 @@
             <text />
           </optional>
         </element>
-        <element name="OTQuestionList">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="questions">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLCSSGroup">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="cssTexts">
-            <ref name="listContents" />
-          </element>
-          <element name="currentCssText">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLCSSModifier">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="documentView">
-            <ref name="otObject" />
-          </element>
-          <element name="cssGroups">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLCompoundDoc">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="coachStatements">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="isPreTest" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isPostTest" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isIntroduction" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isWrapup" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isExploration" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isComputerBased" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isLiterature" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isMath" />
-            <data type="boolean" />
-          </optional>
-          <element name="bodyText">
-            <ref name="anyXMLFragment" />
-          </element>
-          <optional>
-            <attribute name="input" />
-            <data type="boolean" />
-          </optional>
-          <element name="documentRefs">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="markupLanguage" />
-            <text />
-          </optional>
-          <element name="definitionManager">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="documentText" />
-            <text />
-          </optional>
-          <element name="children">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLContainer">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="characters">
-            <ref name="otObject" />
-          </element>
-          <element name="topBar">
-            <ref name="otObject" />
-          </element>
-          <element name="content">
-            <ref name="otObject" />
-          </element>
-          <element name="title">
-            <ref name="otObject" />
-          </element>
-          <element name="menu">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTUDLMenu">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="cardContainer">
-            <ref name="otObject" />
-          </element>
-          <element name="menuRule">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
         <element name="OTUDLQuestionViewConfig">
           <optional>
             <attribute name="local_id">
@@ -3741,10 +3890,18 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTUDLReport">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="sectionContainer">
             <ref name="otObject" />
           </element>
           <optional>
@@ -3752,22 +3909,59 @@
             <text />
           </optional>
         </element>
-        <element name="OTUDLQuestions">
+        <element name="OTUDLContainer">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
-          <element name="questions">
+          <element name="characters">
+            <ref name="otObject" />
+          </element>
+          <element name="topBar">
+            <ref name="otObject" />
+          </element>
+          <element name="cssColor">
+            <ref name="otObject" />
+          </element>
+          <element name="allowedModes">
             <ref name="listContents" />
           </element>
+          <element name="content">
+            <ref name="otObject" />
+          </element>
+          <element name="title">
+            <ref name="otObject" />
+          </element>
+          <element name="menu">
+            <ref name="otObject" />
+          </element>
+          <element name="script">
+            <ref name="otObject" />
+          </element>
           <optional>
-            <attribute name="timesClicked" />
+            <attribute name="name" />
             <text />
           </optional>
+        </element>
+        <element name="OTUDLMenu">
           <optional>
-            <attribute name="currentIndex" />
-            <text />
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="cardContainer">
+            <ref name="otObject" />
+          </element>
+          <element name="css">
+            <ref name="otObject" />
+          </element>
+          <element name="menuRule">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="showBorder" />
+            <data type="boolean" />
           </optional>
           <optional>
             <attribute name="name" />
@@ -3781,33 +3975,16 @@
             </attribute>
           </optional>
           <optional>
-            <attribute name="isIntroduction" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isWrapup" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isExploration" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isComputerBased" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isLiterature" />
-            <data type="boolean" />
-          </optional>
-          <optional>
-            <attribute name="isMath" />
+            <attribute name="viewContainerIsUpdateable" />
             <data type="boolean" />
           </optional>
           <element name="header">
             <ref name="otObject" />
           </element>
           <element name="footer">
+            <ref name="otObject" />
+          </element>
+          <element name="questionView">
             <ref name="otObject" />
           </element>
           <optional>
@@ -3818,9 +3995,41 @@
             <attribute name="isPosttest" />
             <data type="boolean" />
           </optional>
+          <optional>
+            <attribute name="isIntroduction" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="isWrapup" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="isComputerBased" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="isReading" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="isMath" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="isProbes" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="isModel" />
+            <data type="boolean" />
+          </optional>
           <element name="content">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="description" />
+            <text />
+          </optional>
           <element name="south">
             <ref name="otObject" />
           </element>
@@ -3891,6 +4100,10 @@
             <data type="boolean" />
           </optional>
           <optional>
+            <attribute name="closeViewOnExit" />
+            <data type="boolean" />
+          </optional>
+          <optional>
             <attribute name="width" />
             <text />
           </optional>
@@ -3915,6 +4128,73 @@
           <element name="currentChoice">
             <ref name="otObject" />
           </element>
+          <element name="currentChoices">
+            <ref name="listContents" />
+          </element>
+          <element name="correctChoice">
+            <ref name="otObject" />
+          </element>
+          <element name="correctChoices">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="alignContent" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="selectionUI" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="horizontal" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="immediateFeedback" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTChoiceMultiple">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="choices">
+            <ref name="listContents" />
+          </element>
+          <element name="currentChoice">
+            <ref name="otObject" />
+          </element>
+          <element name="currentChoices">
+            <ref name="listContents" />
+          </element>
+          <element name="correctChoice">
+            <ref name="otObject" />
+          </element>
+          <element name="correctChoices">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="alignContent" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="selectionUI" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="horizontal" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="immediateFeedback" />
+            <data type="boolean" />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -3926,19 +4206,37 @@
               <text />
             </attribute>
           </optional>
-          <element name="correctChoice">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="immediateFeedback" />
-            <data type="boolean" />
-          </optional>
           <element name="choices">
             <ref name="listContents" />
           </element>
           <element name="currentChoice">
             <ref name="otObject" />
           </element>
+          <element name="currentChoices">
+            <ref name="listContents" />
+          </element>
+          <element name="correctChoice">
+            <ref name="otObject" />
+          </element>
+          <element name="correctChoices">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="alignContent" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="selectionUI" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="horizontal" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="immediateFeedback" />
+            <data type="boolean" />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -3964,6 +4262,36 @@
           </optional>
           <optional>
             <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTImageMap">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="contents">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="x1" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="y1" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="x2" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="y2" />
             <text />
           </optional>
           <optional>
@@ -3997,12 +4325,6 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -4018,6 +4340,23 @@
             <ref name="listContents" />
           </element>
           <element name="selectedItems">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTModeSwitcher">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="otObject">
+            <ref name="otObject" />
+          </element>
+          <element name="allowedModes">
             <ref name="listContents" />
           </element>
           <optional>
@@ -4047,9 +4386,20 @@
             <attribute name="height" />
             <text />
           </optional>
+          <element name="components">
+            <ref name="listContents" />
+          </element>
           <element name="component">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="layer" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="position" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -4071,6 +4421,108 @@
           <optional>
             <attribute name="height" />
             <text />
+          </optional>
+          <optional>
+            <attribute name="backgroundColor" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTScrollContainer">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="content">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSlider">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="labels">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="vertical" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="numTicks" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="showTickMarks" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="snapToMarks" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="value" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="maximum" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="minimum" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSliderLabel">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="value" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="label" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSoundPlayer">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="src" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="timesClicked" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="streamSound" />
+            <data type="boolean" />
           </optional>
           <optional>
             <attribute name="name" />
@@ -4197,6 +4649,9 @@
               <text />
             </attribute>
           </optional>
+          <element name="oTObject">
+            <ref name="otObject" />
+          </element>
           <optional>
             <attribute name="notes" />
             <text />
@@ -4267,6 +4722,35 @@
             <text />
           </optional>
         </element>
+        <element name="OTSnapshotChooser">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="album">
+            <ref name="otObject" />
+          </element>
+          <element name="embeddedSnapshots">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="allowMultipleSelections" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="showNotes" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="showDrawTool" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTChoiceViewConfig">
           <optional>
             <attribute name="local_id">
@@ -4277,6 +4761,15 @@
             <attribute name="useViewsAsChoices" />
             <data type="boolean" />
           </optional>
+          <element name="radioButtonViewEntry">
+            <ref name="otObject" />
+          </element>
+          <element name="checkBoxViewEntry">
+            <ref name="otObject" />
+          </element>
+          <element name="comboBoxViewEntry">
+            <ref name="otObject" />
+          </element>
           <optional>
             <attribute name="objectClass" />
             <text />
@@ -4285,12 +4778,6 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -4366,6 +4853,20 @@
             <text />
           </optional>
         </element>
+        <element name="OTSharingBundle">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="sharedObjects">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTVelocityTemplate">
           <optional>
             <attribute name="local_id">
@@ -4419,12 +4920,6 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -4451,12 +4946,6 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -4484,10 +4973,54 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTFrameDisplayAction">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="objectToDisplay">
             <ref name="otObject" />
           </element>
-          <element name="authorEntry">
+          <optional>
+            <attribute name="viewMode" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="xPosition" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="yPosition" />
+            <text />
+          </optional>
+          <element name="frame">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="actionText" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMultiUserRoot">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="userList">
+            <ref name="otObject" />
+          </element>
+          <element name="reportTemplate">
             <ref name="otObject" />
           </element>
           <optional>
@@ -4505,9 +5038,25 @@
             <attribute name="mode" />
             <text />
           </optional>
+          <optional>
+            <attribute name="viewContainerIsUpdateable" />
+            <data type="boolean" />
+          </optional>
           <element name="objectsToInsert">
             <ref name="listContents" />
           </element>
+          <optional>
+            <attribute name="usePopupEditWindows" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="copyNewObjectsByDefault" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="addParagraphAfterObject" />
+            <data type="boolean" />
+          </optional>
           <optional>
             <attribute name="objectClass" />
             <text />
@@ -4516,12 +5065,6 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -4597,12 +5140,6 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
-            <ref name="otObject" />
-          </element>
-          <element name="authorEntry">
-            <ref name="otObject" />
-          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -4663,6 +5200,10 @@
             </attribute>
           </optional>
           <optional>
+            <attribute name="src" />
+            <text />
+          </optional>
+          <optional>
             <attribute name="cssText" />
             <text />
           </optional>
@@ -4696,6 +5237,46 @@
           <element name="children">
             <ref name="listContents" />
           </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTDocumentEditViewConfig">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="css" />
+            <text />
+          </optional>
+          <element name="cssBlocks">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="mode" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="viewContainerIsUpdateable" />
+            <data type="boolean" />
+          </optional>
+          <element name="objectsToInsert">
+            <ref name="listContents" />
+          </element>
+          <element name="documentViewConfig">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="objectClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="viewClass" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -4761,6 +5342,10 @@
           <element name="viewEntry">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="viewMode" />
+            <text />
+          </optional>
           <element name="prototype">
             <ref name="otObject" />
           </element>
@@ -4786,12 +5371,346 @@
             <attribute name="viewClass" />
             <text />
           </optional>
-          <element name="viewConfig">
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTCAPAReportTemplate">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="rubric">
             <ref name="otObject" />
           </element>
-          <element name="authorEntry">
+          <element name="activityScript">
             <ref name="otObject" />
           </element>
+          <element name="reportScript">
+            <ref name="otObject" />
+          </element>
+          <element name="users">
+            <ref name="listContents" />
+          </element>
+          <element name="contentsMap">
+            <ref name="mapContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMultimeterAnswerAssessment">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="answerType" />
+            <text />
+          </optional>
+          <element name="answerValue">
+            <ref name="otObject" />
+          </element>
+          <element name="correctValue">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="notes" />
+            <text />
+          </optional>
+          <element name="indicatorValues">
+            <ref name="mapContents" />
+          </element>
+          <element name="inventory">
+            <ref name="mapContents" />
+          </element>
+          <optional>
+            <attribute name="time" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="title" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="label" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="userName" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTAssessment">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="notes" />
+            <text />
+          </optional>
+          <element name="indicatorValues">
+            <ref name="mapContents" />
+          </element>
+          <element name="inventory">
+            <ref name="mapContents" />
+          </element>
+          <optional>
+            <attribute name="time" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="title" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="label" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="userName" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMultimeterAssessment">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="answers">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="time" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="title" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="userName" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMultimeterRubric">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="voltageRubric">
+            <ref name="otObject" />
+          </element>
+          <element name="currentRubric">
+            <ref name="otObject" />
+          </element>
+          <element name="resistanceRubric">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTUnit">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="abbreviation" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTAssessmentViewConfig">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="rubric">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="showQualitative" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="objectClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="viewClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTRubric">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="indicators">
+            <ref name="listContents" />
+          </element>
+          <element name="defaultIndicatorValues">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTRubricIndicator">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="showValue" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="enabled" />
+            <data type="boolean" />
+          </optional>
+          <element name="possibleValues">
+            <ref name="listContents" />
+          </element>
+          <element name="possibleRanges">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="label" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="description" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTRubricIndicatorRange">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="minValue" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="maxValue" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="category" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="points" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="label" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="description" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTRubricIndicatorGrade">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="category" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="points" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="label" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="description" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTRubricIndicatorValue">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="value" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="category" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="points" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="label" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="description" />
+            <text />
+          </optional>
           <optional>
             <attribute name="name" />
             <text />
@@ -4811,7 +5730,35 @@
             <ref name="anyXMLFragment" />
           </element>
           <optional>
+            <attribute name="loadSavedCircuitAtStartup" />
+            <data type="boolean" />
+          </optional>
+          <optional>
             <attribute name="useDCandAC" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="showElectrons" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="showMultimeter" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="grabBagEnabled" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="toolboxVisible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="lifelike" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="showMenus" />
             <data type="boolean" />
           </optional>
           <optional>
@@ -4852,8 +5799,22 @@
             <attribute name="authoredDataURL" />
             <text />
           </optional>
+          <element name="questions">
+            <ref name="listContents" />
+          </element>
+          <element name="dataInput">
+            <ref name="otObject" />
+          </element>
           <optional>
             <attribute name="authoredBytes" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
             <text />
           </optional>
           <optional>
@@ -4861,18 +5822,120 @@
             <text />
           </optional>
         </element>
-        <element name="OTModelerPageEditable">
+        <element name="OTModelerPageViewConfig">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
           <optional>
-            <attribute name="authoredDataURL" />
+            <attribute name="objectClass" />
             <text />
           </optional>
           <optional>
-            <attribute name="authoredBytes" />
+            <attribute name="viewClass" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMwAction">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="targets">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="actionText" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMwChannelData">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="channel" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMwDataProducer">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="model">
+            <ref name="otObject" />
+          </element>
+          <element name="data">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMultipleDataProducer">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="data">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMwModelData">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="property" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMwObjectData">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="property" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="type" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="index" />
             <text />
           </optional>
           <optional>
@@ -4889,6 +5952,59 @@
           <optional>
             <attribute name="authoredDataURL" />
             <text />
+          </optional>
+          <optional>
+            <attribute name="objectWidth" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTNLogoModel">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="authoredDataURL" />
+            <text />
+          </optional>
+          <element name="input">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="objectWidth" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="authoredDataLocalURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="externalImageURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTPhetBalloonsModel">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
           </optional>
           <optional>
             <attribute name="objectWidth" />
@@ -4927,6 +6043,29 @@
           </optional>
         </element>
         <element name="OTPhetFaradayModel">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="authoredDataURL" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectWidth" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="objectHeight" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTPhetSkateParkModel">
           <optional>
             <attribute name="local_id">
               <text />
@@ -5082,6 +6221,10 @@
             <text />
           </optional>
           <optional>
+            <attribute name="showEditBar" />
+            <data type="boolean" />
+          </optional>
+          <optional>
             <attribute name="documentText" />
             <text />
           </optional>
@@ -5226,29 +6369,6 @@
           </element>
           <optional>
             <attribute name="rows" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="PfSlider">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="value" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="maximum" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="minimum" />
             <text />
           </optional>
           <optional>
@@ -5616,6 +6736,14 @@
             </attribute>
           </optional>
           <optional>
+            <attribute name="deviceId" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="configString" />
+            <text />
+          </optional>
+          <optional>
             <attribute name="name" />
             <text />
           </optional>
@@ -5707,6 +6835,10 @@
             <attribute name="local_id">
               <text />
             </attribute>
+          </optional>
+          <optional>
+            <attribute name="sharable" />
+            <data type="boolean" />
           </optional>
           <element name="request">
             <ref name="otObject" />
@@ -5826,41 +6958,6 @@
             <text />
           </optional>
         </element>
-        <element name="OTDataFilter">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="inputDataStore">
-            <ref name="otObject" />
-          </element>
-          <element name="description">
-            <ref name="otObject" />
-          </element>
-          <optional>
-            <attribute name="numberChannels" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="dt" />
-            <data type="float" />
-          </optional>
-          <element name="values">
-            <ref name="listContents" />
-          </element>
-          <element name="channelDescriptions">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="valuesString" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
         <element name="OTDataFilterDescription">
           <optional>
             <attribute name="local_id">
@@ -5879,75 +6976,13 @@
             <attribute name="channelY" />
             <text />
           </optional>
+          <optional>
+            <attribute name="filterClass" />
+            <text />
+          </optional>
           <element name="properties">
             <ref name="listContents" />
           </element>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTPasActivity">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="steps">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="title" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTPasEntity">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="title" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTPasProject">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <element name="activities">
-            <ref name="listContents" />
-          </element>
-          <optional>
-            <attribute name="title" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="name" />
-            <text />
-          </optional>
-        </element>
-        <element name="OTPasStep">
-          <optional>
-            <attribute name="local_id">
-              <text />
-            </attribute>
-          </optional>
-          <optional>
-            <attribute name="title" />
-            <text />
-          </optional>
           <optional>
             <attribute name="name" />
             <text />
