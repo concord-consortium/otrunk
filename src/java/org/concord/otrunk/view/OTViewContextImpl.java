@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.view.OTJComponentViewContextAware;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
@@ -72,8 +73,11 @@ class OTViewContextImpl implements OTViewContext
 		viewEntryMap.put(view, viewEntry);
 	}
 	
-	/**
+	/** 
 	 * FIXME
+	 * Although this is not implemented here yet, you can probably get around this by 
+	 * making your View implement OTJComponentViewContextAware, and then using
+	 * OTJComponentViewContext.getViewByObject(OTObject) instead.
 	 */
 	public OTView getViewByObject(OTObject obj)
     {
