@@ -10,13 +10,19 @@
             </attribute>
           </optional>
         </element>
-        <element name="OTChromosome">
+        <element name="OTBreedOffspring">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
-          <element name="organism">
+          <element name="fatherOrganism">
+            <ref name="otObject" />
+          </element>
+          <element name="motherOrganism">
+            <ref name="otObject" />
+          </element>
+          <element name="childOrganism">
             <ref name="otObject" />
           </element>
           <optional>
@@ -54,6 +60,42 @@
             <text />
           </optional>
         </element>
+        <element name="OTChromosome">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="organism">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTDna">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="chromosome">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTOrganism">
           <optional>
             <attribute name="local_id">
@@ -76,15 +118,25 @@
             <text />
           </optional>
         </element>
-        <element name="OTSex">
+        <element name="OTPedigree">
           <optional>
             <attribute name="local_id">
               <text />
             </attribute>
           </optional>
+          <element name="organisms">
+            <ref name="listContents" />
+          </element>
           <optional>
-            <attribute name="replayButtonEnabled" />
-            <data type="boolean" />
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSex">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
           </optional>
           <element name="fatherOrganism">
             <ref name="otObject" />
@@ -92,6 +144,10 @@
           <element name="motherOrganism">
             <ref name="otObject" />
           </element>
+          <optional>
+            <attribute name="replayButtonEnabled" />
+            <data type="boolean" />
+          </optional>
           <optional>
             <attribute name="width" />
             <text />
@@ -5422,6 +5478,10 @@
             <attribute name="notes" />
             <text />
           </optional>
+          <optional>
+            <attribute name="activityName" />
+            <text />
+          </optional>
           <element name="indicatorValues">
             <ref name="mapContents" />
           </element>
@@ -5430,10 +5490,6 @@
           </element>
           <optional>
             <attribute name="time" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="title" />
             <text />
           </optional>
           <optional>
@@ -5459,6 +5515,10 @@
             <attribute name="notes" />
             <text />
           </optional>
+          <optional>
+            <attribute name="activityName" />
+            <text />
+          </optional>
           <element name="indicatorValues">
             <ref name="mapContents" />
           </element>
@@ -5467,10 +5527,6 @@
           </element>
           <optional>
             <attribute name="time" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="title" />
             <text />
           </optional>
           <optional>
@@ -5492,15 +5548,15 @@
               <text />
             </attribute>
           </optional>
+          <optional>
+            <attribute name="activityName" />
+            <text />
+          </optional>
           <element name="answers">
             <ref name="listContents" />
           </element>
           <optional>
             <attribute name="time" />
-            <text />
-          </optional>
-          <optional>
-            <attribute name="title" />
             <text />
           </optional>
           <optional>
