@@ -256,8 +256,6 @@ public class OTViewer extends JFrame
 
 	private JPanel statusPanel;
 
-	public final static String ANON_SINGLE_USER_NAME = "anon_single_user";
-	
 	/**
 	 * This is true if the SailOTViewer created this OTViewer
 	 */
@@ -639,18 +637,25 @@ public class OTViewer extends JFrame
 	public void loadUserDataFile(File file)
 	{
 		try {
-			OTMLUserSession xmlUserSession = new OTMLUserSession(otrunk);
-			xmlUserSession.load(file, null);
+			OTMLUserSession xmlUserSession = new OTMLUserSession(file, null);
 			loadUserSession(xmlUserSession);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	public void setUserSession(OTUserSession userSession)
+	{
+		this.userSession = userSession;
+		userSession.setOTrunk(otrunk);
+	}
+	
 	public void loadUserSession(OTUserSession userSession)
 	throws Exception
 	{
-		this.userSession = userSession;
+		setUserSession(userSession);
+
+		userSession.load();
 
 		reloadWindow();
 	}
@@ -1717,7 +1722,7 @@ public class OTViewer extends JFrame
 	 */
 	public void newAnonUserData()
 	{
-		newUserData(ANON_SINGLE_USER_NAME);
+		newUserData(OTViewerHelper.ANON_SINGLE_USER_NAME);
 	}
 	
 	/**
@@ -1933,7 +1938,7 @@ public class OTViewer extends JFrame
 		bNew.setOpaque(false);
 		bOpen.setOpaque(false);
 
-		userSession = new OTMLUserSession(otrunk);
+		setUserSession(new OTMLUserSession());
 		
 		bNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)

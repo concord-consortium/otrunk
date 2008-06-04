@@ -1,5 +1,6 @@
 package org.concord.otrunk.view;
 
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 
@@ -16,6 +17,23 @@ import org.concord.otrunk.user.OTUserObject;
  */
 public interface OTUserSession
 {
+	/**
+	 * This will be called before any of the other lifecycle methods. 
+	 * 
+	 * @param otrunk
+	 */
+	public void setOTrunk(OTrunk otrunk);
+
+	/**
+	 * This will be called by the loadUserSession method of OTViewer.  
+	 * It is similar to newLayer() and open() but this method does not
+	 * show any gui to the user.  It just uses the current state of the 
+	 * userSession to load in the data.  After this method is called 
+	 * getUserObject and getReferenceMap should work.  setOTrunk will 
+	 * be called before this method.
+	 */
+	public void load() throws Exception;
+	
 	/**
 	 * This will return if the session has any unsaved changes.
 	 * 
@@ -113,4 +131,12 @@ public interface OTUserSession
 	 */
 	public OTUserObject getUserObject();
 
+	/**
+	 * This should only return true if it is ok to call the load method.
+	 * Some user session implementations require a few properties to be setup before
+	 * load can be called.  Objects using OTUserSession can use this method to make
+	 * sure the user session is really setup.
+	 * @return
+	 */
+	public boolean isInitialized();
 }
