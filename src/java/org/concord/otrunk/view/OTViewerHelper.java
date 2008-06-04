@@ -34,7 +34,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.AccessControlException;
 import java.util.ArrayList;
 
 import org.concord.framework.otrunk.OTID;
@@ -48,8 +47,6 @@ import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.text.UserMessageHandler;
-import org.concord.otrunk.OTObjectServiceImpl;
-import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkServiceEntry;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -61,27 +58,11 @@ import org.concord.view.SwingUserMessageHandler;
 
 public class OTViewerHelper 
 {
-	/**
-	 * @deprecated
-	 */
-	public final static String NO_USER_PROP = OTConfig.NO_USER_PROP;
-	
-	/**
-	 * @deprecated
-	 */
-	public final static int NO_USER_MODE = OTConfig.NO_USER_MODE;
-
-	/**
-	 * @deprecated
-	 */
-	public final static int SINGLE_USER_MODE = OTConfig.SINGLE_USER_MODE;
-
-	
 	private OTrunk otrunk;
 	private OTViewFactory viewFactory;
 	private OTDatabase otDB;
+	OTUserSession userSession;
 	private OTDatabase userOtDB;	
-	private OTUser currentUser;
 	OTFrameManagerImpl frameManager; 
 
 	private int userMode = OTConfig.NO_USER_MODE;
@@ -90,78 +71,8 @@ public class OTViewerHelper
 	
 	URL authoredContentURL = null;
 
-	/**
-     * @deprecated Use {@link OTConfig#getBooleanProp(String,boolean)} instead
-     */
-    public static boolean getBooleanProp(String property, boolean defaultValue)
-    {
-		return OTConfig.getBooleanProp(property, defaultValue);
-    }
-	
-	/**
-     * @deprecated Use {@link OTConfig#getStringProp(String)} instead
-     */
-    public static String getStringProp(String property)
-    {
-        return OTConfig.getStringProp(property);
-    }
+	public final static String ANON_SINGLE_USER_NAME = "anon_single_user";
 
-	/**
-     * @deprecated Use {@link OTConfig#handlePropertyReadException(AccessControlException)} instead
-     */
-    protected static void handlePropertyReadException(AccessControlException e)
-    {
-        OTConfig.handlePropertyReadException(e);
-    }
-
-	/**
-     * @deprecated Use {@link OTConfig#isDebug()} instead
-     */
-    public static boolean isDebug()
-    {
-        return OTConfig.isDebug();
-    }
-
-	/**
-     * @deprecated Use {@link OTConfig#isTrace()} instead
-     */
-    public static boolean isTrace()
-    {
-        return OTConfig.isTrace();
-    }
-
-	/**
-     * @deprecated Use {@link OTConfig#isAuthorMode()} instead
-     */
-    public static boolean isAuthorMode()
-    {
-        return OTConfig.isAuthorMode();
-    }
-	
-	/**
-     * @deprecated Use {@link OTConfig#isRestEnabled()} instead
-     */
-    public static boolean isRestEnabled()
-    {
-        return OTConfig.isRestEnabled();
-    }
-	
-	/**
-     * @deprecated Use {@link OTConfig#isShowStatus()} instead
-     */
-    public static boolean isShowStatus()
-    {
-        return OTConfig.isShowStatus();
-    }
-
-	/**
-     * @deprecated Use {@link OTConfig#getSystemPropertyViewMode()} instead
-     */
-    public static String getSystemPropertyViewMode()
-    {
-        return OTConfig.getSystemPropertyViewMode();
-    }
-	
 	public static OTUserObject createUser(String name, OTObjectService objService)
 	throws Exception
 	{
@@ -448,37 +359,54 @@ public class OTViewerHelper
 	public void loadUserData(OTDatabase userOtDB, String name)
 	throws Exception
 	{
-		this.userOtDB = userOtDB;
-		currentUser = ((OTrunkImpl)otrunk).registerUserDataDatabase(userOtDB, name);
+		loadUserSession(new OTMLUserSession((XMLDatabase)userOtDB, name));
 	}
 
+	public void loadUserSession(OTUserSession userSession) throws Exception
+	{
+		this.userSession = userSession;
+		userSession.setOTrunk(otrunk);
+		userSession.load();		 
+	}
+	
 	/**
-	 * This does not check for unsaved user data.  So if you call this before saving
-	 * a previous userOtDB then that work will be lost
-	 *
+	 * This does not check for unsaved user data
+	 * 
 	 */
 	public void newAnonUserData()
 	{
+		newUserData(ANON_SINGLE_USER_NAME);
+	}
+	
+	/**
+	 * This does not check for unsaved user data, it uses the current OTUserSession object
+	 * to create the new user data.  If there is no OTUserSession object it will throw an
+	 * IllegalStateException
+	 * 
+	 */
+	public void newUserData(String userName)
+	{
+		// call some new method for creating a new un-saved user state
+		// this should set the currentUserFile to null, so the save check
+		// prompts
+		// for a file name
+		if(userSession == null) {
+			throw new IllegalStateException("a OTUserSession must be supplied before newUserData can be called");
+		}
+		
 		try {
-			// make a brand new userDB
-			userOtDB = new XMLDatabase();
-
-			OTObjectService objService = ((OTrunkImpl)otrunk).createObjectService(userOtDB);
-
-			OTStateRoot stateRoot = (OTStateRoot)objService.createObject(OTStateRoot.class);
-			userOtDB.setRoot(stateRoot.getGlobalId());
-			stateRoot.setFormatVersionString("1.0");		
-			((XMLDatabase)userOtDB).setDirty(false);
-
-			OTUserObject userObject = createUser("anon_single_user", objService);
-
-			((OTrunkImpl)otrunk).initUserObjectService((OTObjectServiceImpl)objService, userObject, stateRoot);
-
-			currentUser = userObject;
+			userSession.newLayer();
+			
+			OTUserObject userObject = userSession.getUserObject();
+			if(userName != null){
+				userObject.setName(userName);
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+
+	}	
 
 	public void loadAuthoredContentURL(URL url)
 	throws Exception
@@ -560,8 +488,9 @@ public class OTViewerHelper
 	throws Exception
 	{
 		OTObject root = getAuthoredRoot();
-		if(currentUser != null){
-			return getOtrunk().getUserRuntimeObject(root, currentUser);
+		OTUser user = getCurrentUser();
+		if(user != null){
+			return getOtrunk().getUserRuntimeObject(root, user);
 		}
 
 		return root;
@@ -587,9 +516,17 @@ public class OTViewerHelper
 		return userOtDB;
 	}
 
+	public OTUserSession getUserSession()
+	{
+		return userSession;
+	}
+	
 	public OTUser getCurrentUser()
 	{
-		return currentUser;
+		if(userSession == null) {
+			return null;
+		}
+		return userSession.getUserObject();
 	}
 
 	public void setUserMode(int userMode)

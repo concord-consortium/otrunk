@@ -10,6 +10,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTUser;
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.OTStateRoot;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
@@ -23,9 +24,11 @@ import org.concord.swing.MostRecentFileDialog;
 public class OTMLUserSession
     implements OTUserSession
 {
+	File currentUserFile;
+	URL currentUserUrl;
 	XMLDatabase userDataDB;
-
-	File currentUserFile = null;
+	
+	String userName;	
 
 	Component dialogParent;
 
@@ -33,40 +36,90 @@ public class OTMLUserSession
 	
 	OTReferenceMap refMap;
 	
-	public OTMLUserSession(OTrunkImpl otrunk)
-    {
-		this.otrunk = otrunk;
-    }
-
-	public void initSession(XMLDatabase db, String name) throws Exception
+	public OTMLUserSession()
+	{		
+	}
+	
+	public OTMLUserSession(File dbFile, String name)
 	{
-		if(db != null){
-			load(db, name);
+		this.currentUserFile = dbFile;
+		this.userName = name;
+	}
+	
+	public OTMLUserSession(URL dbUrl, String name)
+	{		
+		this.currentUserUrl = dbUrl;
+		this.userName = name;
+	}
+	
+	public OTMLUserSession(XMLDatabase db, String name)
+	{
+		this.userDataDB = db;
+		this.userName = name;
+	}
+	
+	public void setOTrunk(OTrunk otrunk)
+	{
+		this.otrunk = (OTrunkImpl)otrunk;
+	}
+	
+	public void load() throws Exception
+	{
+		// This will be the case if we were initialized with a file
+		if(currentUserFile != null && currentUserUrl == null && userDataDB == null){
+			load(currentUserFile);
+			return;
+		}
+
+		// This will be the case if we were initialized with a url
+		if(currentUserUrl != null && userDataDB == null){
+			load(currentUserUrl);
+			return;
+		}
+		
+		if(userDataDB != null){
+			load(userDataDB);
 		} else {
 			newLayer();
-			if(name != null){
-				getUserObject().setName(name);
+			if(userName != null){
+				getUserObject().setName(userName);
 			}
-		}
+		}		
 	}
-	
-	public void load(URL url, String name) throws Exception
-	{
-		XMLDatabase db = new XMLDatabase(url);
-		db.loadObjects();
 		
-		load(db, name);
+	
+	protected void load(URL url) throws Exception
+	{
+		currentUserUrl = url;		
+		userDataDB = new XMLDatabase(currentUserUrl);
+		userDataDB.loadObjects();			
+
+		load(userDataDB);		
 	}
 	
-	public void load(XMLDatabase db, String name) throws Exception
+	protected void load(File file) throws Exception
+	{
+		currentUserFile = file;
+		URL fileUrl  = file.toURL();			
+		
+		load(fileUrl);
+		if(userName == null){
+			OTUserObject userObject = getUserObject();
+			if(userObject.getName() == null){
+				userObject.setName(currentUserFile.getName());
+			}			
+		}						
+	}
+	
+	protected void load(XMLDatabase db) throws Exception
 	{
     	initUserDb(db);
     	
     	// Set the username
     	OTUser user = refMap.getUser();
         OTUserObject aUser = (OTUserObject)user;
-        if(name != null){
-        	aUser.setName(name);
+        if(userName != null){
+        	aUser.setName(userName);
         }
         
 		otrunk.registerReferenceMap(getReferenceMap());
@@ -76,19 +129,6 @@ public class OTMLUserSession
 		userDataDB.setDirty(false);
 	}
 	
-	public void load(File file, String name) throws MalformedURLException, Exception
-    {
-		currentUserFile = file;
-		load(file.toURL(), name);	
-		
-		if(name == null){
-			OTUserObject userObject = getUserObject();
-			if(userObject.getName() == null){
-				userObject.setName(file.getName());
-			}			
-		}
-    }
-
 	public boolean allowNewLayer()
 	{
 		return true;
@@ -188,9 +228,11 @@ public class OTMLUserSession
 		if (file == null || !file.exists()){
 			return false;
 		}
+				
+		// CHECKME it isn't clear if the userName should be cleared here or not 
 		
 		try {
-	        load(file, null);
+			load(file);
 	        return true;
         } catch (MalformedURLException e) {
 	        e.printStackTrace();
@@ -289,6 +331,13 @@ public class OTMLUserSession
 		Vector keys = userMap.getObjectKeys();
 		refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));
 	}
+
+	public boolean isInitialized()
+    {
+		// This implementation is always initialized.  Because it will 
+		// just create a new database.
+		return true;
+    }
 
 
 
