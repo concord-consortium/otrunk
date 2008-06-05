@@ -193,81 +193,95 @@ public class Copier
     			// This is a hack, if we had namespaces it wouldn't be as
 				// much of a hack.
 				OTXMLString xmlString = (OTXMLString) resource;
+				
 				// search for the refid="" in the string and copy all the 
 				// referenced objects.
-				Pattern pattern = Pattern.compile("refid=\"([^\"]*)\"");
-				Matcher matcher = pattern.matcher(xmlString.getContent());
-				StringBuffer copiedStringBuf = new StringBuffer();
-				while(matcher.find()){
-					String otidStr = matcher.group(1);
-					// create an OTID from this id
-					OTID otid = OTIDFactory.createOTID(otidStr);
-					
-					// check if this id has aready been copied
-					CopyEntry copyEntry = getCopyEntry(otid);
-					
-					OTID copiedId = null;
-					if(copyEntry != null){
-						copiedId = copyEntry.copy.getGlobalId();
-					} else {
-						// If we are here it is because we didn't already store this 
-						// copied object somewhere.  
-						
-						// We should first check if the otid is a valid id, if not then it is
-						// an invalid match
-						OTDataObject matchedDataObject = otDb.getOTDataObject(root, otid);
-						if(matchedDataObject == null){
-							// this id isn't in our database or it is invalid
-							// print a warning and continue
-							System.err.println("Can't find object to copy: " + otid + " skipping object");
-							
-							// put the same string back in. 
-							matcher.appendReplacement(copiedStringBuf, "$0");
-							
-							continue;
-							
-						}
-
-						
-						// If we have an orphanList then the object can be stored there
-						// if we not then print a warning message and use the original
-						// object.
-						
-						
-						
-						if(orphanList == null){
-							System.err.println("Cannot copy objects referenced from " +
-							"xml strings, that are not stored somewhere else");
-							System.err.println("  original object: " + otid);
-							System.err.println("  object referencing it: " + original);
-							System.err.println("  string property: " + key);
-							
-							// Just use the original id
-							copiedId = otid;							
-						} else {
-							copiedId = (OTID)handleChild(otid, entry.maxDepth);							
-							orphanList.add(copiedId);
-						}						
-					}
-										
-					// replace the id with the new id
-					matcher.appendReplacement(copiedStringBuf, 
-							"refid=\"" + copiedId.toExternalForm() + "\"");
-					
-					// now the next problem is where to store this copied object
-					// if it was already handled we don't need to figure out 
-					// where to store it.  If we had a record of the containment
-					// we could use that figure out where to store this copy
-				}
-				matcher.appendTail(copiedStringBuf);
+				String copiedString = updateXMLString("refid", xmlString.getContent(), otDb, key, entry);
 				
-				OTXMLString copiedXmlString = 
-					new OTXMLString(copiedStringBuf.toString());
+				// search for the refid="" in the string and copy all the 
+				// referenced objects.
+				copiedString = updateXMLString("href", copiedString, otDb, key, entry);
+				    	
+				OTXMLString copiedXmlString = new OTXMLString(copiedString);
 				copy.setResource(key, copiedXmlString);
-    			
+
     		}
     		currentIndex++;
     	}
     }
 
+    public String updateXMLString(String attributeName, String xmlStringContent, OTDatabase otDb,
+    	String key, CopyEntry entry) throws Exception
+    {
+    	OTDataObject original = entry.original;
+    	OTDataObject copy = entry.copy;
+		Pattern pattern = Pattern.compile(attributeName + "=\"([^\"]*)\"");
+		Matcher matcher = pattern.matcher(xmlStringContent);
+		StringBuffer copiedStringBuf = new StringBuffer();
+		while(matcher.find()){
+			String otidStr = matcher.group(1);
+			// create an OTID from this id
+			OTID otid = OTIDFactory.createOTID(otidStr);
+			
+			// check if this id has aready been copied
+			CopyEntry copyEntry = getCopyEntry(otid);
+			
+			OTID copiedId = null;
+			if(copyEntry != null){
+				copiedId = copyEntry.copy.getGlobalId();
+			} else {
+				// If we are here it is because we didn't already store this 
+				// copied object somewhere.  
+				
+				// We should first check if the otid is a valid id, if not then it is
+				// an invalid match
+				OTDataObject matchedDataObject = otDb.getOTDataObject(root, otid);
+				if(matchedDataObject == null){
+					// this id isn't in our database or it is invalid
+					// print a warning and continue
+					System.err.println("Can't find object to copy: " + otid + " skipping object");
+					
+					// put the same string back in. 
+					matcher.appendReplacement(copiedStringBuf, "$0");
+					
+					continue;
+					
+				}
+
+				
+				// If we have an orphanList then the object can be stored there
+				// if we not then print a warning message and use the original
+				// object.
+				
+				
+				
+				if(orphanList == null){
+					System.err.println("Cannot copy objects referenced from " +
+					"xml strings, that are not stored somewhere else");
+					System.err.println("  original object: " + otid);
+					System.err.println("  object referencing it: " + original);
+					System.err.println("  string property: " + key);
+					
+					// Just use the original id
+					copiedId = otid;							
+				} else {
+					copiedId = (OTID)handleChild(otid, entry.maxDepth);							
+					orphanList.add(copiedId);
+				}						
+			}
+								
+			// replace the id with the new id
+			matcher.appendReplacement(copiedStringBuf, 
+				  attributeName + "=\"" + copiedId.toExternalForm() + "\"");
+			
+			// now the next problem is where to store this copied object
+			// if it was already handled we don't need to figure out 
+			// where to store it.  If we had a record of the containment
+			// we could use that figure out where to store this copy
+		}
+		matcher.appendTail(copiedStringBuf);
+
+		return copiedStringBuf.toString();
+    }
+    
 }
