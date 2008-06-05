@@ -30,7 +30,8 @@
             My TextBox <object editable="true" refid="${textbox1}"/><br/>
             My Image <object refid="${image1}" /><br/>
             External TextBox <object refid="${external_text}"/><br/>
-            More text below
+            More text below<br/>
+            <a href="${external_text}">link to the external textbox</a>
           </bodyText>
           <documentRefs>
             <OTTextObject local_id="textbox1">
