@@ -206,7 +206,7 @@ public class Copier
 					// check if this id has aready been copied
 					CopyEntry copyEntry = getCopyEntry(otid);
 					
-					Object copiedId = null;
+					OTID copiedId = null;
 					if(copyEntry != null){
 						copiedId = copyEntry.copy.getGlobalId();
 					} else {
@@ -245,14 +245,14 @@ public class Copier
 							// Just use the original id
 							copiedId = otid;							
 						} else {
-							copiedId = handleChild(otid, entry.maxDepth);							
+							copiedId = (OTID)handleChild(otid, entry.maxDepth);							
 							orphanList.add(copiedId);
 						}						
 					}
 										
 					// replace the id with the new id
 					matcher.appendReplacement(copiedStringBuf, 
-							"refid=\"" + copiedId + "\"");
+							"refid=\"" + copiedId.toExternalForm() + "\"");
 					
 					// now the next problem is where to store this copied object
 					// if it was already handled we don't need to figure out 
