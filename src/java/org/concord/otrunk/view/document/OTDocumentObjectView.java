@@ -42,7 +42,11 @@ import javax.swing.text.ComponentView;
 import javax.swing.text.Element;
 import javax.swing.text.Position;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTUser;
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.otrunk.view.OTViewContainerPanel;
 
@@ -69,14 +73,15 @@ public class OTDocumentObjectView extends ComponentView
     	this.docView = docView;
         viewContainerPanel = docView.createViewContainerPanel();
     }
-
+    
     protected Component createComponent() 
     {
     	AttributeSet attr = getElement().getAttributes();
     	String refId = (String) attr.getAttribute("refid");
     	String editStr = (String) attr.getAttribute("editable");
     	String viewId = (String) attr.getAttribute("viewid");
-
+    	String userId = (String) attr.getAttribute("user");
+    	
     	// By convention this attribute should only be used by OTXHTMLViews
     	// which need to change the mode of view.  If this is used in the 
     	// actual text of a document it will prevent the mode abstraction
@@ -90,7 +95,8 @@ public class OTDocumentObjectView extends ComponentView
     	}
     	
     	if(refId != null && refId.length() > 0) {
-        	OTObject childObject = docView.getReferencedObject(refId);        	
+        	OTObject childObject = getRuntimeObject(docView.getReferencedObject(refId), userId);
+        	
         	if(childObject == null) {
         		return new JLabel("Bad OTID: " + refId);
         	}
@@ -118,7 +124,20 @@ public class OTDocumentObjectView extends ComponentView
     	
     	return null;       	
     }
-
+    
+	protected OTObject getRuntimeObject(OTObject object, String userStr) {
+		try {
+			OTrunk otrunk = docView.getOTrunk();
+			OTObjectService objectService = object.getOTObjectService();
+			OTID userId = objectService.getOTID(userStr);
+			OTUser user = (OTUser) objectService.getOTObject(userId);
+			return otrunk.getUserRuntimeObject(object, user);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
     
     /**
      * This method is to fix a bug in the HTMLEditorKit
