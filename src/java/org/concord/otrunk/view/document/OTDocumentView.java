@@ -29,13 +29,8 @@
  */
 package org.concord.otrunk.view.document;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,7 +50,11 @@ import javax.swing.text.html.HTMLDocument;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTUser;
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTJComponentView;
@@ -114,7 +113,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		// inneccesarily
 		pfObject = (OTDocument) doc;
 	}
-
+	
 	public JComponent getComponent(OTObject otObject) {
 		this.otObject = otObject;
 		setup(otObject);
@@ -252,11 +251,14 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	 * 
 	 */
 	public String getIncludableReplacement(String idStr, String viewIdStr,
-			String modeStr) {
+			String modeStr, String userStr) {
 		// lookup the object at this id
 		OTObject referencedObject = getReferencedObject(idStr);
 		if (referencedObject == null) {
 			return "$0";
+		}
+		if (userStr != null) {
+			referencedObject = getRuntimeObject(referencedObject, userStr);
 		}
 
 		OTViewEntry viewEntry = null;
@@ -319,7 +321,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 				e.printStackTrace();
 			}
 		}
-
+		
 		return "$0";
 	}
 
@@ -331,6 +333,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
 		Pattern pViewId = Pattern.compile("viewid=\"([^\"]*)\"");
 		Pattern pMode = Pattern.compile("mode=\"([^\"]*)\"");
+		Pattern pUser = Pattern.compile("user=\"([^\"]*)\"");
 		Matcher m = p.matcher(inText);
 		StringBuffer parsed = new StringBuffer();
 		while (m.find()) {
@@ -349,14 +352,21 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 				modeStr = mMode.group(1);
 			}
 
+			Matcher mUser = pUser.matcher(element);
+			String userStr = null;
+			if (mUser.find()) {
+				userStr = mUser.group(1);
+			}
+			
 			String replacement = getIncludableReplacement(id, viewIdStr,
-					modeStr);
+					modeStr, userStr);
 			try {
 				m.appendReplacement(parsed, replacement);
 			} catch (IllegalArgumentException e) {
 				System.err.println("bad replacement: " + replacement);
 				e.printStackTrace();
 			}
+			
 		}
 		m.appendTail(parsed);
 		return parsed.toString();
@@ -643,4 +653,17 @@ public class OTDocumentView extends AbstractOTDocumentView implements
     {
 	    return true;
     }
+
+	public OTObject getRuntimeObject(OTObject object, String userStr) {
+		try {
+			OTObjectService objectService = otObject.getOTObjectService();
+			OTID userId = objectService.getOTID(userStr);
+			OTUser user = (OTUser) objectService.getOTObject(userId);
+			return getOTrunk().getUserRuntimeObject(object, user);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }
