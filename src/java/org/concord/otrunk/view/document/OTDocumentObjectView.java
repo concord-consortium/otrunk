@@ -95,7 +95,10 @@ public class OTDocumentObjectView extends ComponentView
     	}
     	
     	if(refId != null && refId.length() > 0) {
-        	OTObject childObject = getRuntimeObject(docView.getReferencedObject(refId), userId);
+        	OTObject childObject = docView.getReferencedObject(refId);
+        	if (userId != null) {
+        		childObject = getRuntimeObject(childObject, userId);
+        	}
         	
         	if(childObject == null) {
         		return new JLabel("Bad OTID: " + refId);
