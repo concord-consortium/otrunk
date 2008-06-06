@@ -5,6 +5,7 @@ import java.awt.event.ContainerListener;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewContainerChangeEvent;
@@ -103,4 +104,8 @@ public class AbstractOTDocumentView extends OTTextObjectView
     {
 		// to be handled by OTDocumentView
     }
+	
+	public OTrunk getOTrunk() {
+		return (OTrunk) getViewService(OTrunk.class);
+	}
 }
