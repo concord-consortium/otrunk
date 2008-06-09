@@ -171,11 +171,12 @@ public class XMLDatabase
         	if(contextURL != null){
         		URLConnection connection = contextURL.openConnection();
         		if (connection instanceof HttpURLConnection){
-        			System.err.println("*** Response code for "+contextURL+":");
-        			System.err.println("   "+((HttpURLConnection)connection).getResponseCode());
+        			System.err.println("Error created xml document");
+	        		System.err.println("Response code for "+contextURL+":");
+		        	System.err.println("   "+((HttpURLConnection)connection).getResponseCode());
         		}
-        		System.err.println("*** Length of xmlstream from "+contextURL+":");
-        		System.err.println("   "+connection.getInputStream().available());
+        		System.err.println("Length of xmlstream from "+contextURL+":");
+	        	System.err.println("   "+connection.getInputStream().available());
         	}
         	
 	        throw e;
