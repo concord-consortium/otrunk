@@ -35,6 +35,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
@@ -44,6 +45,7 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
+import org.concord.framework.otrunk.view.OTUserListService;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.text.UserMessageHandler;
@@ -166,13 +168,13 @@ public class OTViewerHelper
 		initOTrunk(otrunk);		
 	}
 
-	public void initOTrunk(OTrunk otrunk)
+	public void initOTrunk(OTrunk ot)
 	{
-		this.otrunk = otrunk;
+		this.otrunk = ot;
 		
 		// only update the instance field if there is a valid view factory
 		OTViewFactory myViewFactory =
-		    (OTViewFactory) otrunk.getService(OTViewFactory.class);
+		    (OTViewFactory) ot.getService(OTViewFactory.class);
 
 		if(myViewFactory != null){
 			viewFactory = myViewFactory;
@@ -185,12 +187,17 @@ public class OTViewerHelper
 
 			OTViewContext factoryContext = viewFactory.getViewContext();
 
-			factoryContext.addViewService(OTrunk.class, otrunk);
+			factoryContext.addViewService(OTrunk.class, ot);
 			factoryContext.addViewService(OTFrameManager.class, frameManager);
 			factoryContext.addViewService(OTJComponentServiceFactory.class,
 				new OTJComponentServiceFactoryImpl());
 			factoryContext.addViewService(OTExternalAppService.class,
 				new OTExternalAppServiceImpl());
+			factoryContext.addViewService(OTUserListService.class, new OTUserListService() {
+				public Vector getUserList() {
+		            return ((OTrunkImpl)otrunk).getUsers();
+	            }
+			});
 		}
 		
 	}
