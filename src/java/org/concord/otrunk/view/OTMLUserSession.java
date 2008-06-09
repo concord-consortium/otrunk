@@ -20,6 +20,7 @@ import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.swing.MostRecentFileDialog;
+import org.doomdark.uuid.UUID;
 
 public class OTMLUserSession
     implements OTUserSession
@@ -35,6 +36,8 @@ public class OTMLUserSession
 	private OTrunkImpl otrunk;
 	
 	OTReferenceMap refMap;
+	protected String workgroupName;
+	private UUID workgroupId;
 	
 	public OTMLUserSession()
 	{		
@@ -339,6 +342,35 @@ public class OTMLUserSession
 		return true;
     }
 
+	public void saveAndClose()
+    {	    
+		// allow subclasses to do things like shut down timers before the final save.
+		preSaveAndClose();
+		
+		if(hasUnsavedChanges()){
+			save();
+		}
+		
+		close();
+    }
 
-
+	public void close()
+	{
+		// there is nothing to do on close		
+	}
+	
+	public void setWorkgroup(String workgroupName, UUID workgroupId)
+    {
+		this.workgroupName = workgroupName;
+		this.workgroupId = workgroupId;	    
+    }
+	
+	/**
+	 * This method can be overriden if something needs to be done before
+	 * a final save.
+	 */
+	protected void preSaveAndClose()
+	{
+		
+	}
 }

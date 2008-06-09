@@ -3,6 +3,7 @@ package org.concord.otrunk.view;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
+import org.doomdark.uuid.UUID;
 
 /**
  * OTUserSession <br>
@@ -63,6 +64,28 @@ public interface OTUserSession
 	 * 
 	 */
 	public void save();
+	
+	/**
+	 * This should do a final save and then close down any resources the session is 
+	 * using.  The session might have a timer that is saving automatically.  Or it 
+	 * might have a connection open to database.  These things should be closed
+	 * when this method is called.
+	 * 
+	 * If there are no unsaved changes then this should be the same as close()
+	 * 
+	 * This interface has a single method for saving and close instead of a separate 
+	 * close method, because the interaction between a final save and the close is usually
+	 * intertwined.  For example if a timer is running then it should be shut down before
+	 * the final save.  And then if a database is open it needs to be shut down after the
+	 * final save.
+	 */
+	public void saveAndClose();
+
+	/**
+	 * This method can be used instead of saveAndClose if the data should not be saved
+	 * but the user session is being closed.
+	 */
+	public void close();
 	
 	/**
 	 * This should return true if this user session has the ability to do save as
@@ -139,4 +162,12 @@ public interface OTUserSession
 	 * @return
 	 */
 	public boolean isInitialized();
+	
+	/**
+	 * This might be called before load.  This can be used by the OTUserSession instance to look up
+	 * the correct user data.  It can also be used when a new set of learner data is created, so it
+	 * is assigned to this workgroup.  
+	 * 
+	 */
+	public void setWorkgroup(String combinedName, UUID workgroupId);
 }
