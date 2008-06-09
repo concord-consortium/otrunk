@@ -1,6 +1,7 @@
 package org.concord.otrunk.util;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectInterface;
 
 /**
  * An OTReference object can be used to store meta-information about a link
@@ -11,7 +12,7 @@ import org.concord.framework.otrunk.OTObject;
  * @author sfentress
  *
  */
-public interface OTReference
+public interface OTReference extends OTObjectInterface
 {
 	public OTObject getReferencedObject();
 	public void setReferencedObject(OTObject referencedObject);
@@ -20,11 +21,14 @@ public interface OTReference
 	 * A description of the type of link. Possible annotations include:
 	 * 
 	 * * CONTEXT				// e.g. the model that a question is asking about
-	 * * ACTIVITY-REFERENCE		// the activity an object relates to
+	 * * ACTIVITY_REFERENCE		// the activity an object relates to
 	 * * ...
 	 * 
 	 * @return
 	 */
 	public String getAnnotation();
 	public void setAnnotation(String annotation);
+	
+	public static String CONTEXT = "CONTEXT";
+	public static String ACTIVITY_REFERENCE = "ACTIVITY_REFERENCE";
 }
