@@ -33,4 +33,6 @@ import org.concord.framework.otrunk.OTObjectInterface;
 public interface OTUserDatabaseRef extends OTObjectInterface
 {
 	URL getUrl();
+	
+	String getWorkgroupUuid();
 }
