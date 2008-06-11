@@ -38,6 +38,7 @@ public class OTMLUserSession
 	OTReferenceMap refMap;
 	protected String workgroupName;
 	private UUID workgroupId;
+	private String workgroupToken;
 	
 	public OTMLUserSession()
 	{		
@@ -359,9 +360,10 @@ public class OTMLUserSession
 		// there is nothing to do on close		
 	}
 	
-	public void setWorkgroup(String workgroupName, UUID workgroupId)
+	public void setWorkgroup(String workgroupName, String workgroupToken, UUID workgroupId)
     {
 		this.workgroupName = workgroupName;
+		this.workgroupToken = workgroupToken;
 		this.workgroupId = workgroupId;	    
     }
 	
