@@ -167,7 +167,10 @@ public interface OTUserSession
 	 * This might be called before load.  This can be used by the OTUserSession instance to look up
 	 * the correct user data.  It can also be used when a new set of learner data is created, so it
 	 * is assigned to this workgroup.  
-	 * 
+	 * @param combinedName the names of the users in the workgroup
+	 * @param workgroupToken a token that should be persisted so a portal implementation that doesn't
+	 * use uuids can still match up this data.  These should really be scoped to the portal.
+	 * @param workgroupId a uuid to identify this set of data.
 	 */
-	public void setWorkgroup(String combinedName, UUID workgroupId);
+	public void setWorkgroup(String combinedName, String workgroupToken, UUID workgroupId);
 }
