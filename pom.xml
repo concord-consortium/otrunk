@@ -70,7 +70,12 @@
   <!--  if we have resources we will need to fix the resource directory too -->
   <build>
     <sourceDirectory>src/java</sourceDirectory>
-  	<plugins>
+	<resources>
+	   <resource>
+	      <directory>src/resources</directory>
+	   </resource>
+	</resources>
+	<plugins>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
