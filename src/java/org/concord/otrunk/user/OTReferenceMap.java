@@ -59,7 +59,13 @@ public class OTReferenceMap extends DefaultOTObject
         public OTUserObject getUser();
         public void setUser(OTUserObject user);
 
-        public OTResourceMap getMap();        
+        public OTResourceMap getMap();
+        
+        public String getWorkgroupId();
+        public void setWorkgroupId(String id);
+        
+        public String getWorkgroupToken();
+        public void setWorkgroupToken(String token);
     }
 
     private OTDatabase stateDb;
@@ -86,7 +92,29 @@ public class OTReferenceMap extends DefaultOTObject
         return resources.getUser();
     }
     
-    public OTDataObject getStateObject(OTDataObject template, 
+    
+    
+    public String getWorkgroupId()
+    {
+	    return resources.getWorkgroupId();
+    }
+
+	public String getWorkgroupToken()
+    {
+	    return resources.getWorkgroupToken();
+    }
+
+	public void setWorkgroupId(String id)
+    {
+	    resources.setWorkgroupId(id);
+    }
+
+	public void setWorkgroupToken(String token)
+    {
+	    resources.setWorkgroupToken(token);
+    }
+
+	public OTDataObject getStateObject(OTDataObject template, 
             OTDatabase stateDb)
     {
 		OTResourceMap stateMap = resources.getMap();
