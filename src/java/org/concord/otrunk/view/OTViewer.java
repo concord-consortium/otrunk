@@ -443,6 +443,10 @@ public class OTViewer extends JFrame
 	{
 		URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
 
+		if (authorOTMLURL == null) {
+			authorOTMLURL = OTViewer.class.getResource("no-arguments-page.otml");
+		}
+		
 		if ("file".equalsIgnoreCase(authorOTMLURL.getProtocol())) {
 			currentAuthoredFile = new File(authorOTMLURL.getPath());
 		}
@@ -1031,7 +1035,7 @@ public class OTViewer extends JFrame
 
 		try {
 			if (remote == null) {
-				if (defaultURL.startsWith("http:")) {
+				if (defaultURL != null && defaultURL.startsWith("http:")) {
 					remoteURL = new URL(defaultURL);
 				}
 			} else {

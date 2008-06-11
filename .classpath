@@ -4,6 +4,7 @@
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="src" path="src/test/resources"/>
+	<classpathentry kind="src" path="src/resources"/>
 	<classpathentry kind="src" path="/framework"/>
 	<classpathentry kind="src" path="/frameworkview"/>
 	<classpathentry kind="lib" path="/thirdparty-jars/jdom-1.0.jar"/>
