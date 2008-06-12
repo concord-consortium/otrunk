@@ -648,18 +648,31 @@ public class OTViewer extends JFrame
 		}
 	}
 
+	/**
+	 * This method just sets the viewers userSession without loading it.
+	 * This is useful if a user needs to select the data they want to use 
+	 * when the load method is called.  Currently this is used by the "wizard" in 
+	 * the ot viewer.
+	 * 
+	 * @param userSession
+	 */
 	public void setUserSession(OTUserSession userSession)
 	{
 		this.userSession = userSession;
 		userSession.setOTrunk(otrunk);
 	}
-	
+
+	/**
+	 * This method loads in a user session, and reloads the window.
+	 * 
+	 * @param userSession
+	 * @throws Exception
+	 */
 	public void loadUserSession(OTUserSession userSession)
 	throws Exception
 	{
-		setUserSession(userSession);
-
-		userSession.load();
+		this.userSession = userSession;
+		otrunk.registerUserSession(userSession);
 
 		reloadWindow();
 	}
