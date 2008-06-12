@@ -46,7 +46,6 @@ import org.concord.framework.otrunk.OTControllerRegistry;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
-import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTPackage;
 import org.concord.framework.otrunk.OTServiceContext;
@@ -91,7 +90,7 @@ public class OTrunkImpl implements OTrunk
 	
     protected OTObjectServiceImpl rootObjectService;
     
-	Vector databases = new Vector();
+	ArrayList databases = new ArrayList();
 	Vector users = new Vector();
 	
     Vector objectServices = new Vector();
@@ -332,46 +331,11 @@ public class OTrunkImpl implements OTrunk
         }    	
     }
     
-    /**
-     * This is a temporary method.  It works for files that
-     * represent a single user.  This method finds that user and registers
-     * them.  It could be modified to register all the users referenced in
-     * the passed in database and in which case it should check if the user
-     * is already registered with another database.  
-     * 
-     * @param userDataDb
-     * @throws Exception
-     */
-    public OTUserObject registerUserDataDatabase(OTDatabase userDataDb, String name)
-        throws Exception
+    public void registerUserSession(OTUserSession userSession) throws Exception
     {
-        // add this database as one of our databases
-    	addDatabase(userDataDb);
-        
-    	OTReferenceMap refMap = getReferenceMapFromUserDb(userDataDb);
-    	
-    	// Set the username
-    	OTUser user = refMap.getUser();
-        OTUserObject aUser = (OTUserObject)user;
-        if(name != null){
-        	aUser.setName(name);
-        }
-        
-        // register the map
-        return registerReferenceMap(refMap);
+    	userSession.setOTrunk(this);
+    	userSession.load();
     }
-
-    public OTUserObject registerReferenceMap(OTReferenceMap refMap)
-    throws Exception
-    {
-    	OTUserObject user = refMap.getUser();
-    	users.add(user);
-
-    	setupUserDatabase(user, refMap);
-
-    	return user;
-    }
-    
     
     /**
      * the parentObjectService needs to be passed in so the returned object
@@ -495,26 +459,6 @@ public class OTrunkImpl implements OTrunk
 		}
     }
     
-    protected OTReferenceMap getReferenceMapFromUserDb(OTDatabase userDataDb) 
-    	throws Exception
-    {
-        OTObjectService objService = createObjectService(userDataDb);
-
-        OTDataObject rootDO = userDataDb.getRoot();
-        
-        OTStateRoot stateRoot = 
-            (OTStateRoot)objService.getOTObject(rootDO.getGlobalId());
-
-        OTObjectMap userMap = stateRoot.getUserMap();
-        
-        // find the user from this database.
-        // this currently is the first user in the userMap
-        Vector keys = userMap.getObjectKeys();
-        OTReferenceMap refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));        
-    	
-        return refMap;
-    }
-    
     public void reloadOverlays(OTUserSession userSession) 
     	throws Exception
     {
@@ -530,30 +474,20 @@ public class OTrunkImpl implements OTrunk
         
         databases.remove(oldCompositeDB);
 
-        setupUserDatabase(userObject, refMap);
+        registerReferenceMap(refMap);
     	
     }
     
-    public void reloadOverlays(OTUserObject user, OTDatabase userDataDb) 
-    	throws Exception
-    {
-    	OTID userId = user.getUserId();
-    	
-    	OTReferenceMap refMap = getReferenceMapFromUserDb(userDataDb);
-    		
-    	// need to make a new composite database.
-    	// the user database should remain the same.
-        OTDatabase oldCompositeDB = (OTDatabase) compositeDatabases.remove(userId);	
-        userObjectServices.remove(userId);
-        
-        databases.remove(oldCompositeDB);
-
-        setupUserDatabase(user, refMap);
-    }
-    
-    protected OTObjectService setupUserDatabase(OTUser user, OTReferenceMap userStateMap)
+    public OTObjectService registerReferenceMap(OTReferenceMap userStateMap)
+    throws Exception
     {
     	OTObjectServiceImpl userObjService;
+    	OTUser user = userStateMap.getUser();
+
+    	if(!users.contains(user)){
+    		users.add(user);
+    	}
+    	
     	OTID userId = user.getUserId();
     	    	
         CompositeDatabase userDb = new CompositeDatabase(dataObjectFinder, userStateMap);
@@ -616,37 +550,6 @@ public class OTrunkImpl implements OTrunk
         return false;
     }
 
-    public OTObjectService initUserObjectService(OTObjectServiceImpl objService, OTUser user, OTStateRoot stateRoot)
-    throws Exception
-    {
-        OTID userId = user.getUserId();
-        
-        // this should probably look for the user object service instead
-        // of the template database
-        OTObjectService userObjService = 
-            (OTObjectService)userObjectServices.get(userId);
-        
-        if(userObjService != null){
-        	return userObjService;
-        }
-                
-        OTObjectMap userStateMapMap = stateRoot.getUserMap();
-
-        OTReferenceMap userStateMap = (OTReferenceMap)userStateMapMap.getObject(userId.toExternalForm());
-        if(userStateMap == null) {
-        	// this is inferring that the createObject method will
-        	// create the object in the correct database.  
-        	userStateMap = 
-        		(OTReferenceMap)objService.createObject(OTReferenceMap.class);
-        	userStateMapMap.putObject(userId.toExternalForm(), userStateMap);
-        	userStateMap.setUser((OTUserObject)user);
-        }
-
-        userObjService = setupUserDatabase(user, userStateMap);
-    	return userObjService;
-        
-    }
-    
     public void addDatabase(OTDatabase db)
     {
         if(!databases.contains(db)) {

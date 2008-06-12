@@ -26,16 +26,13 @@ package org.concord.otrunk.view;
 
 
 import java.net.URL;
-import java.util.HashMap;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.AbstractOTView;
-import org.concord.framework.otrunk.view.OTUserListService;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.xml.XMLDatabase;
 
 
 public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView 
@@ -54,7 +51,7 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 	    return "<object refid=\"" + reportTemplate.otExternalId() + "\"/>";
     }
 	
-	private void loadUserDatabases(OTMultiUserRoot root) {
+	protected void loadUserDatabases(OTMultiUserRoot root) {
 		OTrunk otrunk = (OTrunk) getViewService(OTrunk.class);
 		OTrunkImpl otrunkImpl = (OTrunkImpl) otrunk;
 		
@@ -66,9 +63,8 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 	    	URL url = ref.getUrl();
 	    	
 	    	try {
-	    		XMLDatabase db = new XMLDatabase(url);
-	    		db.loadObjects();
-	    		otrunkImpl.registerUserDataDatabase(db, null);
+	    		OTMLUserSession userSession = new OTMLUserSession(url, null);
+	    		otrunkImpl.registerUserSession(userSession);
 	    	}
 	    	catch (Exception e) {
 	    		e.printStackTrace();
