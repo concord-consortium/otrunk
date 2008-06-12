@@ -32,7 +32,7 @@ public class OTExternalAppServiceImpl
 		if(osName.startsWith("Windows")){
 			// on windows the start command can be used
 			try {
-	            Runtime.getRuntime().exec(new String []{"start", url.toExternalForm()});
+	            Runtime.getRuntime().exec(new String []{"cmd", "/c", "start", url.toExternalForm()});
 	            return true;
             } catch (IOException e1) {
 	            // TODO Auto-generated catch block
