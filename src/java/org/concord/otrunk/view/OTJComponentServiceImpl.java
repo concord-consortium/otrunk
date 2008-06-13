@@ -4,6 +4,7 @@
 package org.concord.otrunk.view;
 
 import java.util.HashMap;
+import java.util.Vector;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -180,6 +181,11 @@ public class OTJComponentServiceImpl implements OTJComponentService
 		public OTView getViewByObject(OTObject obj)
         {
 			return (OTView)objToView.get(obj);
+        }
+
+		public Object[] getAllObjects()
+        {
+	        return  objToView.keySet().toArray();
         }
     	
     };
