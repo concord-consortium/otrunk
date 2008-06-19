@@ -41,7 +41,7 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 	
 	
 	public String getXHTMLText(OTObject otObject) {
-		System.out.println("ENTER: OTMultiUserRootView.getXHTMLText()");
+		//System.out.println("ENTER: OTMultiUserRootView#getXHTMLText()");
 	    OTMultiUserRoot root = (OTMultiUserRoot) otObject;
 		if (firstRun) { //why is this method called twice?
 			loadUserDatabases(root);
