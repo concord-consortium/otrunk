@@ -220,6 +220,15 @@ public class Copier
 		StringBuffer copiedStringBuf = new StringBuffer();
 		while(matcher.find()){
 			String otidStr = matcher.group(1);
+
+			// FIXME this is hack to handle external urls
+			if("href".equals(attributeName) && 
+					(otidStr.startsWith("http")
+						|| otidStr.startsWith("file"))){
+				matcher.appendReplacement(copiedStringBuf, "$0");
+				continue;
+			}
+
 			// create an OTID from this id
 			OTID otid = OTIDFactory.createOTID(otidStr);
 			
