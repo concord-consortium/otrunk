@@ -193,12 +193,16 @@ public class OTrunkImpl implements OTrunk
 			
 			for(int i=0; i<combined.size(); i++){
 				OTBundle bundle = (OTBundle)combined.get(i);
-				bundle.registerServices(serviceContext);
+				if(bundle != null){
+					bundle.registerServices(serviceContext);
+				}
 			}
 			
 			for(int i=0; i<combined.size(); i++){
 				OTBundle bundle = (OTBundle)combined.get(i);
-				bundle.initializeBundle(serviceContext);
+				if(bundle != null){
+					bundle.initializeBundle(serviceContext);
+				}
 			}			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -454,8 +458,14 @@ public class OTrunkImpl implements OTrunk
 			OTInclude include = (OTInclude) includes.get(i);
 			
 			URL hrefUrl = include.getHref();
-
-			loadDatabase(hrefUrl);			
+			
+			try {
+				loadDatabase(hrefUrl);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.err.println("trying to continue");
+				continue;
+			}
 		}
     }
     
