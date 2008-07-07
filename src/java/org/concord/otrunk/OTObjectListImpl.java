@@ -69,16 +69,26 @@ public class OTObjectListImpl extends OTCollectionImpl
 		super(property, objectInternal);
 		this.list = resList;
 	}
+
+	protected OTID getId(int index)
+	{
+		OTID id = (OTID)list.get(index);
+		if(id == null) {
+			System.err.println("Null item in object list: \n" + 
+					"   " + objectInternal.getGlobalId() + "." +
+					property + "[" + index + "]");
+			
+			return null;
+		}
+		
+		return id;
+	}
 	
 	public OTObject get(int index)
 	{
 		try {
-			OTID id = (OTID)list.get(index);
+			OTID id = getId(index);
 			if(id == null) {
-				System.err.println("Null item in object list: \n" + 
-						"   " + objectInternal.getGlobalId() + "." +
-						property + "[" + index + "]");
-				
 				return null;
 			}
 			OTObject otObject = objectInternal.getOTObject(id);
@@ -100,8 +110,12 @@ public class OTObjectListImpl extends OTCollectionImpl
 
 		for(int i=0; i<list.size(); i++) {
 			try {	
-				OTID childID = (OTID)list.get(i);
-				childVector.add(objectInternal.getOTObject(childID));
+				OTID childID = getId(i);
+				if(childID == null){
+					childVector.add(null);
+				} else {
+					childVector.add(objectInternal.getOTObject(childID));					
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -228,21 +242,27 @@ public class OTObjectListImpl extends OTCollectionImpl
 	 */
 	public void remove(int index)
 	{
-		OTID id = (OTID)list.get(index);
+		OTID id = getId(index);
 		list.remove(index);
 
+		
 		OTObject obj = null;
-        try {
-	        obj = objectInternal.getOTObject(id);
-        } catch (Exception e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-        }
-        
-		list.remove(id);
-		if(referenceMap != null){
-			referenceMap.put(id, null);
+		if(id != null){
+			try {
+				obj = objectInternal.getOTObject(id);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			// this is odd that we are removing the object twice
+	        // but this will remove any duplicates I suppose.
+			list.remove(id);
+			if(referenceMap != null){
+				referenceMap.put(id, null);
+			}
 		}
+		
 
 		notifyOTChange(OTChangeEvent.OP_REMOVE, obj, null);		
 	}
