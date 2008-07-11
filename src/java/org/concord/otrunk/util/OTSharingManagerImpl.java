@@ -29,10 +29,13 @@ public class OTSharingManagerImpl implements OTSharingManager
 	/**
 	 * 
 	 * @param clazz specific class of object
-	 * @return all shared objects of type clazz
+	 * @return all shared objects of type clazz. If null, all shared objects are returned
 	 */
 	public Vector getAllSharedObjects(Class clazz){
 		Vector allObjects = getAllSharedObjects();
+		if (clazz == null){
+			return allObjects;
+		}
 		Vector clazzObjects = new Vector();
 		for (int i = 0; i < allObjects.size(); i++) {
 			Object obj = allObjects.get(i);
