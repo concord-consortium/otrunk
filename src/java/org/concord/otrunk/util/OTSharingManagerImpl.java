@@ -3,6 +3,7 @@ package org.concord.otrunk.util;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectFilter;
 
 /**
  * 
@@ -32,18 +33,29 @@ public class OTSharingManagerImpl implements OTSharingManager
 	 * @return all shared objects of type clazz. If null, all shared objects are returned
 	 */
 	public Vector getAllSharedObjects(Class clazz){
-		Vector allObjects = getAllSharedObjects();
-		if (clazz == null){
-			return allObjects;
+		final Class myClazz = clazz;
+		
+		if (myClazz == null) {
+			return getAllSharedObjects();
 		}
-		Vector clazzObjects = new Vector();
-		for (int i = 0; i < allObjects.size(); i++) {
-			Object obj = allObjects.get(i);
-	        if (clazz.isAssignableFrom(obj.getClass())){
-	        	clazzObjects.add(obj);
-	        }
-        }
-		return clazzObjects;
+		
+		OTObjectFilter filter = new OTObjectFilter() {
+			public boolean keepObject(OTObject obj)
+			{
+				return myClazz.isAssignableFrom(obj.getClass());
+			}
+		};
+		
+		return getAllSharedObjects(filter);
+	}
+	
+	/**
+	 * 
+	 * @param filter an OTObjectFilter implementation
+	 * @return all shared objects matching OTObjectFilter filter
+	 */
+	public Vector getAllSharedObjects(OTObjectFilter filter) {
+		return filter.filterList(getAllSharedObjects());
 	}
 	
 	/**
