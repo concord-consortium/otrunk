@@ -3,6 +3,7 @@ package org.concord.otrunk.util;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectFilter;
 
 public interface OTSharingManager
 {
@@ -18,6 +19,13 @@ public interface OTSharingManager
 	 * @return all shared objects of type clazz
 	 */
 	public Vector getAllSharedObjects(Class clazz);
+	
+	/**
+	 * 
+	 * @param filter OTObjectFilter
+	 * @return all shared objects matching the OTObjectFilter
+	 */
+	public Vector getAllSharedObjects(OTObjectFilter filter);
 	
 	/**
 	 * 
