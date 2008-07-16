@@ -1,5 +1,6 @@
 package org.concord.otrunk.util;
 
+import java.util.Enumeration;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTObject;
@@ -13,6 +14,7 @@ import org.concord.framework.otrunk.OTObjectFilter;
 public class OTSharingManagerImpl implements OTSharingManager
 {
 	private OTSharingBundle.ResourceSchema registry;
+	private Vector listeners;
 	
 	public OTSharingManagerImpl(OTSharingBundle.ResourceSchema registry)
 	{
@@ -69,14 +71,55 @@ public class OTSharingManagerImpl implements OTSharingManager
 	 * @param obj The OTObject to be shared
 	 */
 	public void share(OTObject obj){
-		if (!registry.getSharedObjects().getVector().contains(obj)){
+		if (! isShared(obj)){
 			registry.getSharedObjects().add(obj);
+			notifyListeners(new OTSharingEvent(OTSharingEvent.SHARED, obj));
 		}
 	}
 	
 	public void remove(OTObject obj)
     {
 	    registry.getSharedObjects().remove(obj);
+	    notifyListeners(new OTSharingEvent(OTSharingEvent.REMOVED, obj));
     }
+	
+	public boolean isShared(OTObject obj)
+    {
+	    return registry.getSharedObjects().getVector().contains(obj);
+    }
+
+	public void addOTSharingListener(OTSharingListener listener)
+    {
+		if (listeners == null) {
+			listeners = new Vector();
+		}
+		
+	    listeners.add(listener);
+    }
+
+	public void removeOTSharingListener(OTSharingListener listener)
+    {
+		if (listeners == null) {
+			listeners = new Vector();
+		}
+		
+	    listeners.remove(listener);
+    }
+	
+	private void notifyListeners(OTSharingEvent event) {
+		if (listeners == null) {
+			listeners = new Vector();
+		}
+		
+		Enumeration ls = listeners.elements();
+		while (ls.hasMoreElements()) {
+			OTSharingListener lis = (OTSharingListener) ls.nextElement();
+    		if (event.getType() == OTSharingEvent.SHARED) {
+    			lis.objectShared(event);
+    		} else if (event.getType() == OTSharingEvent.REMOVED) {
+    			lis.objectRemoved(event);
+    		}
+		}
+	}
 
 }
