@@ -71,9 +71,16 @@ public class ReflectionTypeDefinitions
 		    try {
 		        Class typeClass = classloader.loadClass(className);
 		        typeClasses.add(typeClass);
-		    } catch (Exception e) {
+		    } catch (ClassNotFoundException e) {
 		        System.err.println("Error importing class: " + className);
                 System.err.println("  this class was listed as an import in the otml file");
+		    } catch (Throwable e){
+		    	// if we get something other than a class not found exception 
+		    	// then the problem is more complex so the whole stack trace is
+		    	// useful. 
+		        System.err.println("Error importing class: " + className);
+                System.err.println("  this class was listed as an import in the otml file");
+                e.printStackTrace();
 		    }
 		}		
 		
