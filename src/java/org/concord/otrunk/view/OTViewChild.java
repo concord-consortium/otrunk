@@ -10,6 +10,7 @@ public interface OTViewChild extends OTObjectInterface {
 	public void setObject(OTObject object);
 	
 	public OTViewEntry getViewid();
+	public void setViewid(OTViewEntry viewid);
 	
 	public boolean getUseScrollPane();
 	
