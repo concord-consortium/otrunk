@@ -80,6 +80,10 @@ public class ObjectChooserUtil
 	}
 	
 	private static boolean contains(Object[] objectsAndClasses, Object obj){
+		if (objectsAndClasses == null){
+			return false;
+		}
+		
 		for (int i = 0; i < objectsAndClasses.length; i++) {
 	        if (objectsAndClasses[i] instanceof Class){
 	        	if (((Class)objectsAndClasses[i]).isInstance(obj) ||
