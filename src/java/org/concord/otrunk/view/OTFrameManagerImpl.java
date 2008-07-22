@@ -91,7 +91,8 @@ public class OTFrameManagerImpl implements OTFrameManager
 	
 			jFrame.getContentPane().add(otContainer, BorderLayout.CENTER);
 			
-			jFrame.setBounds(otFrame.getPositionX(), otFrame.getPositionY(), otFrame.getWidth(), otFrame.getHeight());
+			
+			jFrame.setBounds(positionX, positionY, otFrame.getWidth(), otFrame.getHeight());
 			
 			oldX = positionX;
 			oldY = positionY;
