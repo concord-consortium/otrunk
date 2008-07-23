@@ -32,16 +32,12 @@
 */
 package org.concord.otrunk.view;
 
-import java.util.Iterator;
-import java.util.Vector;
-
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTBundle;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.view.OTFrame;
-import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 
 /**
@@ -148,19 +144,9 @@ public class OTViewBundle extends DefaultOTObject
     	// If there already exists a view factory, add own view entries to the top of its list
     	// and override other properties
     	if (viewFactoryServiceAlreadyExisted){
-    		OTViewFactory factory = (OTViewFactory) serviceContext.getService(OTViewFactory.class);
+    		OTViewFactoryImpl factory = (OTViewFactoryImpl) serviceContext.getService(OTViewFactory.class);
     		
-    		// Add view entries
-    		Vector viewEntries = getViewEntries().getVector();
-    		Iterator it = viewEntries.iterator();
-    		while (it.hasNext()){
-    			factory.addViewEntry((OTViewEntry)it.next(), true);
-    		}
-    		
-    		// Override currentMode
-    		if (getCurrentMode() != null){
-    			factory.setDefaultViewMode(getCurrentMode());
-    		}
+    		factory.addViewBundle(this);    		
     	}
     }
 
