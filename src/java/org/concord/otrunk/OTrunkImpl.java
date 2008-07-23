@@ -187,6 +187,10 @@ public class OTrunkImpl implements OTrunk
 			
 			OTObjectList bundleList = otSystem.getBundles();
 			
+			if(serviceList.size() > 0 && bundleList.size() > 0){
+				System.err.println("Warning: both OTSystem.services and OTSystem.bundles are being used.  OTSystem.services is deprecated");
+			}
+			
 			Vector combined = new Vector();
 			combined.addAll(serviceList.getVector());
 			combined.addAll(bundleList.getVector());
