@@ -29,6 +29,9 @@
  */
 package org.concord.otrunk.view;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
@@ -55,13 +58,13 @@ public class OTViewFactoryImpl implements OTViewFactory
 {
     OTViewFactoryImpl parent;
     Vector viewMap = new Vector();
-    OTViewBundle viewBundle;
+    ArrayList viewBundles = new ArrayList();
     OTViewContextImpl viewContext;
 	private String mode;
     
     public OTViewFactoryImpl(OTViewBundle viewBundle)
     {
-        this.viewBundle = viewBundle;
+        this.viewBundles.add(viewBundle);
         
         // read in all the viewEntries and create a vector 
         // of class entries.
@@ -78,7 +81,6 @@ public class OTViewFactoryImpl implements OTViewFactory
     protected OTViewFactoryImpl(OTViewFactoryImpl parent)
     {
         this.parent = parent;
-        this.viewBundle = parent.viewBundle;
         
         initServices();
     }
@@ -307,29 +309,35 @@ public class OTViewFactoryImpl implements OTViewFactory
     		return null;
     	}
 
-		OTViewBundle viewBundle = getViewBundle();
-		OTViewMode mode = null;
-		OTObjectList modes = viewBundle.getModes();
-		for(int i=0; i<viewBundle.getModes().size(); i++){
-			OTViewMode curMode = (OTViewMode)modes.get(i);
-			if(curMode.getName().equals(modeStr)){
-				mode = curMode;
-				break;
-			}
-		}		
+		OTViewMode firstMode = null;
+		OTViewEntry modeViewEntry = null;
 		
-		if(mode == null){
+		List allViewBundles = getViewBundles();
+    	for(int j=0; j<allViewBundles.size() && modeViewEntry == null; j++){
+    		OTViewBundle viewBundle = (OTViewBundle) allViewBundles.get(j);
+    		OTObjectList modes = viewBundle.getModes();
+    		for(int i=0; i<modes.size(); i++){
+    			OTViewMode curMode = (OTViewMode)modes.get(i);
+    			if(curMode.getName().equals(modeStr)){
+    				if(firstMode == null) {
+    					firstMode = curMode;
+    				}
+    				OTObjectMap map = curMode.getMap();
+
+    				modeViewEntry = 
+    					(OTViewEntry)OTrunkUtil.getObjectFromMapWithIdKeys(map, viewEntry);
+    				break;
+    			}
+    		}
+    	}
+		
+		if(firstMode == null){
 			System.err.println("Cannot find view mode: \"" + modeStr + "\"");
 			return null;
 		}
 		
-		OTObjectMap map = mode.getMap();
-
-		OTViewEntry modeViewEntry = 
-			(OTViewEntry)OTrunkUtil.getObjectFromMapWithIdKeys(map, viewEntry);
-
 		if(modeViewEntry == null){
-			modeViewEntry = mode.getDefault();
+			modeViewEntry = firstMode.getDefault();
 		}
 
 		return modeViewEntry;
@@ -365,15 +373,21 @@ public class OTViewFactoryImpl implements OTViewFactory
 		
 	}
 	
-	public OTViewBundle getViewBundle()
+	/**
+	 * Return a combined list of view bundles.
+	 * @return
+	 */
+	public List getViewBundles()
 	{
-		if (!(viewBundle == null)){
-			return viewBundle;
-		} else if (!(parent == null)){
-			return parent.getViewBundle();
+		ArrayList combinedBundles = new ArrayList();
+		combinedBundles.addAll(viewBundles);
+		if (!(parent == null)){
+			combinedBundles.addAll(parent.getViewBundles());
 		}
-		else return null;
+		
+		return combinedBundles;
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.view.OTViewFactory#getViewServiceProvider()
 	 */
@@ -424,9 +438,41 @@ public class OTViewFactoryImpl implements OTViewFactory
 	    this.mode = mode;
     }
 
-	public OTObjectList getModes()
+	public String [] getModeNames()
     {
-	    return viewBundle.getModes();
+		ArrayList names = new ArrayList();
+		for(int i=0; i<viewBundles.size(); i++){
+			OTViewBundle bundle = (OTViewBundle) viewBundles.get(i);
+			if(!names.contains(bundle.getName())){
+				names.add(bundle.getName());
+			}
+		}
+
+		return (String[]) names.toArray(new String[names.size()]);
+    }
+
+	/**
+	 * Adds all the viewEntries from the bundle 
+	 * Overrides the default view mode.
+	 * Adds the bundle to the beginning of the list of bundles which is used to find view mode view entries.
+	 * 
+	 * @param viewBundle
+	 */
+	public void addViewBundle(OTViewBundle viewBundle)
+    {
+		// Add view entries
+		Vector viewEntries = viewBundle.getViewEntries().getVector();
+		Iterator it = viewEntries.iterator();
+		while (it.hasNext()){
+			addViewEntry((OTViewEntry)it.next(), true);
+		}
+		
+		// Override currentMode
+		if (viewBundle.getCurrentMode() != null){
+			setDefaultViewMode(viewBundle.getCurrentMode());
+		}
+
+		viewBundles.add(0, viewBundle);			
     }
 	
 }
