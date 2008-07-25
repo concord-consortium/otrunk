@@ -441,10 +441,15 @@ public class OTViewFactoryImpl implements OTViewFactory
 	public String [] getModeNames()
     {
 		ArrayList names = new ArrayList();
-		for(int i=0; i<viewBundles.size(); i++){
-			OTViewBundle bundle = (OTViewBundle) viewBundles.get(i);
-			if(!names.contains(bundle.getName())){
-				names.add(bundle.getName());
+		List allViewBundles = getViewBundles();
+		for(int i=0; i<allViewBundles.size(); i++){
+			OTViewBundle bundle = (OTViewBundle) allViewBundles.get(i);
+			OTObjectList modes = bundle.getModes();
+			for(int j=0; j<modes.size(); j++){
+				OTObject curMode = modes.get(j);
+				if(!names.contains(curMode.getName())){
+					names.add(curMode.getName());
+				}				
 			}
 		}
 
