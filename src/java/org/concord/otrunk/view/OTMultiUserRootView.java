@@ -32,6 +32,7 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.AbstractOTView;
 import org.concord.framework.otrunk.view.OTXHTMLView;
+import org.concord.otrunk.OTIncludeRootObject;
 import org.concord.otrunk.OTrunkImpl;
 
 
@@ -55,7 +56,14 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 		OTrunk otrunk = (OTrunk) getViewService(OTrunk.class);
 		OTrunkImpl otrunkImpl = (OTrunkImpl) otrunk;
 		
-	    OTUserList userList = (OTUserList) root.getUserList();
+		OTUserList userList = null;
+		OTObject userListOrig = root.getUserList();
+		if(userListOrig instanceof OTIncludeRootObject){
+			userList = (OTUserList) ((OTIncludeRootObject)userListOrig).getReference();
+		} else {
+			userList = (OTUserList) userListOrig;
+		}
+		
 	    OTObjectList userDatabases = userList.getUserDatabases();
 	    
 	    for (int i = 0; i < userDatabases.size(); ++i) {
