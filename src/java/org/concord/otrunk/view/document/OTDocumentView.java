@@ -29,16 +29,28 @@
  */
 package org.concord.otrunk.view.document;
 
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.HyperlinkEvent;
@@ -54,7 +66,6 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTUser;
-import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTJComponentView;
@@ -97,6 +108,8 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	
 	protected OTViewEntry viewEntry;
 
+	private KeyEventDispatcher sourceViewDispatcher;
+
 	public final static String XHTML_PREFIX_START =
 	// "<?xml version='1.0' encoding='UTF-8'?>\n" +
 	"<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>\n"
@@ -113,6 +126,31 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		// inneccesarily
 		pfObject = (OTDocument) doc;
 	}
+	
+	protected Action viewSourceAction = new AbstractAction("View Source.."){
+
+		public void actionPerformed(ActionEvent e)
+        {
+			tabbedPane = new JTabbedPane();
+
+			textArea = new JTextArea(textAreaModel);
+			textArea.setEnabled(false);
+			JScrollPane scrollPane = new JScrollPane(textArea);
+			tabbedPane.add("Source", scrollPane);
+
+			parsedTextArea.setEnabled(false);
+			scrollPane = new JScrollPane(parsedTextArea);
+			tabbedPane.add("Parsed", scrollPane);
+			
+			JFrame frame = new JFrame("Source");
+			frame.getContentPane().add(tabbedPane);
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			
+			frame.setSize(600, 600);
+			frame.setVisible(true);
+        }
+		
+	};
 	
 	public JComponent getComponent(OTObject otObject) {
 		this.otObject = otObject;
@@ -137,7 +175,69 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 		// JScrollPane renderedScrollPane = new JScrollPane(previewComponent);
 		// renderedScrollPane.getViewport().setViewPosition(new Point(0,0));
+		
+		previewComponent.addMouseListener(new MouseAdapter(){
+			private void showPopup(MouseEvent e)
+			{
+		        JPopupMenu menu = new JPopupMenu(); 
+		        menu.add(viewSourceAction);
+		 
+		        Point pt = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), previewComponent);
+		        menu.show(previewComponent, pt.x, pt.y);				
+			}
+			
+			public void mousePressed(MouseEvent e)
+			{
+				if(!e.isPopupTrigger()){
+					return;
+				}
+				showPopup(e);
+			}
+			
+			public void mouseReleased(MouseEvent e)
+			{
+				if(!e.isPopupTrigger()){
+					return;
+				}
+				showPopup(e);
+			}
+		});
+		
+		KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		sourceViewDispatcher = new KeyEventDispatcher(){					
+			public boolean dispatchKeyEvent(KeyEvent e) {
+				if(previewComponent.isAncestorOf(e.getComponent()) &&
+						((e.getModifiers() | KeyEvent.KEY_RELEASED) != 0) &&
+				        ((e.getModifiersEx() & java.awt.event.InputEvent.CTRL_DOWN_MASK) != 0) &&
+				        (e.getKeyCode() == java.awt.event.KeyEvent.VK_U)) {
+					tabbedPane = new JTabbedPane();
 
+					textArea = new JTextArea(textAreaModel);
+					textArea.setEnabled(false);
+					JScrollPane scrollPane = new JScrollPane(textArea);
+					tabbedPane.add("Source", scrollPane);
+
+					parsedTextArea.setEnabled(false);
+					scrollPane = new JScrollPane(parsedTextArea);
+					tabbedPane.add("Parsed", scrollPane);
+					
+					JFrame frame = new JFrame("Source");
+					frame.getContentPane().add(tabbedPane);
+					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					
+					frame.setSize(600, 600);
+					frame.setVisible(true);
+					return true;
+				}
+				
+				return false;
+			}
+			
+		};
+
+		focusManager.addKeyEventDispatcher(sourceViewDispatcher);
+
+		
 		if (System.getProperty("otrunk.view.debug", "").equals("true")) {
 			tabbedPane = new JTabbedPane();
 
@@ -665,5 +765,13 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public void viewClosed()
+	{
+		super.viewClosed();
+		
+		KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		focusManager.removeKeyEventDispatcher(sourceViewDispatcher);
 	}
 }
