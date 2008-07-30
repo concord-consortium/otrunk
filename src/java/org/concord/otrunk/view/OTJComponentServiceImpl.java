@@ -4,7 +4,6 @@
 package org.concord.otrunk.view;
 
 import java.util.HashMap;
-import java.util.Vector;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -36,6 +35,10 @@ public class OTJComponentServiceImpl implements OTJComponentService
 	HashMap objToView = new HashMap();
 	HashMap objToComponent = new HashMap();
 	
+	// This hash is used to keep track of special views were created to 
+	// wrap translated objects.
+	HashMap viewToWrapperObj = new HashMap();
+	
 	public OTJComponentServiceImpl(OTViewFactory viewFactory)
 	{
 		this.viewFactory = viewFactory;
@@ -53,9 +56,15 @@ public class OTJComponentServiceImpl implements OTJComponentService
         return getComponent(otObject, view);
 	}
 	
-	public JComponent getComponent(OTObject otObject, OTJComponentView view)
+	public JComponent getComponent(OTObject otObject, OTJComponentView view)	
 	{
+		OTObject wrapperObj = (OTObject) viewToWrapperObj.get(view);
+		if(wrapperObj != null){
+			otObject = wrapperObj;
+		}
 		JComponent component = view.getComponent(otObject);
+		
+		// CHECKME it isn't clear if the wrapperObj or the original object should be used here
 		objToComponent.put(otObject, component);
 		return component;
 	}
@@ -91,11 +100,15 @@ public class OTJComponentServiceImpl implements OTJComponentService
     	} else {
     		genericView = viewFactory.getView(otObject, OTJComponentView.class, mode);
         	if(genericView == null) {
-        		// we couldn't find the OTJComponentView, look for any type of view
-        		System.err.println("No OTJComponentView for object, will try for any view");
-        		System.err.println("  obj: " + otObject);
-        		System.err.println("  mode: " + mode);
         		genericView = viewFactory.getView(otObject, OTView.class, mode);
+        		
+        		// check if we can handle translating this to a OTJComponentView
+        		// currently only OTXHTMLViews can be translated
+        		if(!(genericView instanceof OTXHTMLView)){
+        			System.err.println("No OTJComponentView or compatible view for the object");
+        			System.err.println("  obj: " + otObject);
+        			System.err.println("  mode: " + mode);
+        		}
         	}
     	}
 
@@ -112,8 +125,7 @@ public class OTJComponentServiceImpl implements OTJComponentService
     	if(genericView instanceof OTJComponentView){
     		view = (OTJComponentView) genericView;
     	} else {
-    		// FIXME this should abstracted so this code isn't dependent on a particular
-    		// XHTML component.  Also it should be abstracted so new translations can
+    		// FIXME this should abstracted so new translations can
     		// be plugged in for example a SWT translation.
     		if(genericView instanceof OTXHTMLView){
     			// make an OTDocumentView with this as the text
@@ -122,17 +134,17 @@ public class OTJComponentServiceImpl implements OTJComponentService
     			// so a wrapper view is used which does this on the getComponent method    			
     			OTXHTMLView xhtmlView = (OTXHTMLView) genericView;
 
-    			view = new OTXHTMLWrapperView(xhtmlView, otObject);
+    			OTXHTMLWrapperDoc wrapperDoc = new OTXHTMLWrapperDoc(xhtmlView, otObject);
     			
-    			if (passedViewContext == null){
-        			// Because we are making this view ourselves we need to do the
-        			// initialization normally done by the viewFactory
-        			((OTXHTMLWrapperView)view).setViewContext(
-        					viewFactory.getViewContext());		
-    			} else {
-    				((OTXHTMLWrapperView)view).setViewContext(passedViewContext);		
-    			}
+    			// we look up a view for the wrapper doc in the default view entries 
+    			view = (OTJComponentView) viewFactory.getView(wrapperDoc, OTJComponentView.class, OTViewFactory.NO_VIEW_MODE);
+    			if(view == null){
+    				System.err.println("No view entry found for OTDocument this is required to use a OTXHTMLView");
+    			}   
     			
+    			// store this view instance in our special hash, so when the component is requested
+    			// we can correctly use the wrapperDoc instead of the actual otObject
+    			viewToWrapperObj.put(view, wrapperDoc);
     		}
 
     	}
@@ -140,8 +152,9 @@ public class OTJComponentServiceImpl implements OTJComponentService
     	
     	if(view == null){
     		// We could not translate the genericView to a OTJComponentView
-    		System.err.println("Could not translate view to OTJComponentView");
+    		System.err.println("Could not translate genericView to OTJComponentView");
     		System.err.println("  obj: " + otObject);
+    		System.err.println("  genericView: " + genericView);
     		System.err.println("  mode: " + mode);
     		System.err.println("  viewEntry: " + viewEntry);
     		return null;
