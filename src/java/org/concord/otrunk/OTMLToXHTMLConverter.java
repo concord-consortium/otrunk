@@ -225,7 +225,7 @@ public class OTMLToXHTMLConverter
 					}
 				}
 				m.appendTail(parsed);
-				text = "<div>" + parsed.toString() + "</div><hr>";
+				text = "<div>" + parsed.toString() + "</div><hr/>";
 			} else {
 				text = embedOTObject(topLevelOTObjects[i], topLevelViewEntries[i]);
 			}
@@ -235,7 +235,7 @@ public class OTMLToXHTMLConverter
 
 		try {
 			FileWriter fos = new FileWriter(outputFile);
-			fos.write(allTexts);
+			fos.write("<html><body>" + allTexts + "</body></html>");
 			fos.close();
 		} catch (FileNotFoundException exp) {
 			exp.printStackTrace();
@@ -355,7 +355,7 @@ public class OTMLToXHTMLConverter
 		}
 
 		String url = embedComponent(comp, 1, 1, obj);
-		url = "<img src='" + url + "'>";
+		url = "<img src='" + url + "' />";
 
 		return url;
 		// return null;
