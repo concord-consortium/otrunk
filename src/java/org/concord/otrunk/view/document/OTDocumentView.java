@@ -593,36 +593,38 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 					modeStr = (String) tagAttribs.getAttribute("mode");
 				}
 				
-				if (target == null) {
-					getViewContainer().setCurrentObject(linkObj);
-
-				} else {
-					// they want to use a frame
-					OTFrame targetFrame = null;
-
-					// get the frame object
-					// modify setCurrentObject to take a frame object
-					// then at the top level view container deal with this
-					// object
-					targetFrame = (OTFrame) getReferencedObject(target);
-
-					OTViewEntry viewEntry = null;
-					if (viewEntryId != null) {
-						viewEntry = (OTViewEntry) getReferencedObject(viewEntryId);
+				OTViewEntry viewEntry = null;
+				if (viewEntryId != null) {
+					viewEntry = (OTViewEntry) getReferencedObject(viewEntryId);
+					if (viewEntry == null) {
+						System.err.println("Invalid link viewid attrib: "
+								+ viewEntryId);
+						return;
 					}
+				}
 
+				OTFrame targetFrame = null;
+				if (target != null){
+					// they want to use a frame
+					targetFrame = (OTFrame) getReferencedObject(target);					
 					if (targetFrame == null) {
 						System.err.println("Invalid link target attrib: "
 								+ target);
 						return;
 					}
-
-					if (modeStr != null && modeStr.length() == 0) {
-						modeStr = null;
-					} else if (modeStr == null) {
-						modeStr = getViewMode();
-					}
-										
+				}
+				
+				// mode used for switching viewmodes
+				if (modeStr != null && modeStr.length() == 0) {
+					modeStr = null;
+				} else if (modeStr == null) {
+					modeStr = getViewMode();
+				}
+									
+				if (target == null) {
+					// FIXME deal with the mode
+					getViewContainer().setCurrentObject(linkObj, viewEntry);
+				} else {					
 					putObjectInFrame(linkObj, viewEntry,
 							targetFrame, modeStr);
 				}
