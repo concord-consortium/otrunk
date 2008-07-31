@@ -457,7 +457,7 @@ public class OTViewContainerPanel extends JPanel
 	    		return;
 	    	}
 	    	
-	    	JComponent myComponent = createJComponent(); 
+	    	JComponent myComponent = createJComponent() ; 
 
 	    	boolean localUseScrollPane = isUseScrollPane();
 	    	if(currentViewChild != null){
@@ -543,6 +543,10 @@ public class OTViewContainerPanel extends JPanel
 			OTViewContainerPanel.this.setCurrentObject(pfObject);
 		}
 		
+		public void setCurrentObject(OTObject otObject, OTViewEntry viewEntry){
+			OTViewContainerPanel.this.setCurrentObject(otObject, viewEntry);
+		}
+
 		public boolean isUpdateable() {
 	        return OTViewContainerPanel.this.isUpdateable();
         }
