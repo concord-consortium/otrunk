@@ -27,6 +27,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -70,6 +71,9 @@ public class OTControllerServiceImpl implements OTControllerService
 	OTControllerRegistry registry;
 	
 	OTControllerServiceImpl sharedService;
+
+	// Track if we are disposing
+	private boolean disposing = false;
 	
 	public OTControllerServiceImpl(OTObjectService objectService, 
 		OTControllerRegistry registry)
@@ -449,6 +453,14 @@ public class OTControllerServiceImpl implements OTControllerService
 
 	private Object initializeAndStoreRelationships(OTController controller, OTObject otObject, Object realObject)
 	{
+		// check if we are in the middle of disposing I'm not sure what to do here so for now
+		// just print a stacktrace and keep going
+		if(disposing){
+			Exception exception = 
+				new Exception("Initiializing a controller while in the middle of disposing this service");
+			exception.printStackTrace();
+		}
+		
 		// initialize it
 		controller.initialize(otObject, this);
 					
@@ -523,14 +535,26 @@ public class OTControllerServiceImpl implements OTControllerService
      */
     public void dispose()
     {
+    	disposing  = true;
     	Vector disposedControllers = new Vector();
 
     	// There are 2 maps that contain references to controllers.
     	// They should be in sync so we only have to search one
     	// we won't dispose controllers in our shared service that is its job not ours
     	synchronized(controllerFromRealMap){
-    		Set entries = controllerFromRealMap.entrySet();
+    		Set entries = controllerFromRealMap.entrySet();    		
     		Iterator iterator = entries.iterator();
+    		
+    		// Copy the entries so if any of the controller.dispose
+    		// calls cause changes to the list a concurrency exception
+    		// wouldn't be thrown.
+    		ArrayList entriesCopy = new ArrayList();
+    		while(iterator.hasNext()){
+    			Entry entry = (Entry) iterator.next();
+    			entriesCopy.add(entry);
+    		}
+
+    		iterator = entriesCopy.iterator();
     		while(iterator.hasNext()){
     			Entry entry = (Entry) iterator.next();
     			OTController controller = (OTController) entry.getValue();
