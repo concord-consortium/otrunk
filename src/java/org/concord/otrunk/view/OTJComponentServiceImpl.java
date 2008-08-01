@@ -9,7 +9,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.view.AbstractOTView;
 import org.concord.framework.otrunk.view.OTJComponentService;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTJComponentViewContext;
@@ -18,9 +17,11 @@ import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewContext;
+import org.concord.framework.otrunk.view.OTViewContextAware;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTXHTMLView;
+import org.concord.otrunk.view.document.OTDocumentView;
 
 /**
  * @author scott
@@ -34,10 +35,6 @@ public class OTJComponentServiceImpl implements OTJComponentService
 	// some weak referenceing here
 	HashMap objToView = new HashMap();
 	HashMap objToComponent = new HashMap();
-	
-	// This hash is used to keep track of special views were created to 
-	// wrap translated objects.
-	HashMap viewToWrapperObj = new HashMap();
 	
 	public OTJComponentServiceImpl(OTViewFactory viewFactory)
 	{
@@ -58,14 +55,8 @@ public class OTJComponentServiceImpl implements OTJComponentService
 	
 	public JComponent getComponent(OTObject otObject, OTJComponentView view)	
 	{
-		OTObject wrapperObj = (OTObject) viewToWrapperObj.get(view);
-		if(wrapperObj != null){
-			otObject = wrapperObj;
-		}
 		JComponent component = view.getComponent(otObject);
 		
-		// CHECKME it isn't clear if the wrapperObj or the original object should be used here
-		objToComponent.put(otObject, component);
 		return component;
 	}
 
@@ -142,9 +133,8 @@ public class OTJComponentServiceImpl implements OTJComponentService
     				System.err.println("No view entry found for OTDocument this is required to use a OTXHTMLView");
     			}   
     			
-    			// store this view instance in our special hash, so when the component is requested
-    			// we can correctly use the wrapperDoc instead of the actual otObject
-    			viewToWrapperObj.put(view, wrapperDoc);
+    			// FIXME by having to cast to this to OTDocumentView we are breaking the abstraction 
+    			view = new OTXHTMLWrapperView((OTDocumentView)view, wrapperDoc);    			
     		}
 
     	}
@@ -172,9 +162,10 @@ public class OTJComponentServiceImpl implements OTJComponentService
         	}
         }
         
-        if (view instanceof AbstractOTView){
+        // This will actually override the viewContext that was set by the view factory.
+        if (view instanceof OTViewContextAware){
         	if (passedViewContext != null){
-        		((AbstractOTView)view).setViewContext(passedViewContext);
+        		((OTViewContextAware)view).setViewContext(passedViewContext);
         	}
         }
         
