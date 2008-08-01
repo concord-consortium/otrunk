@@ -613,7 +613,7 @@ public class OTObjectInternal implements OTObjectInterface
 
 	public void otUnSet(OTClassProperty property)
     {
-		throw new UnsupportedOperationException("not implemented yet");
+		setResource(property.getName(), null);
     }
 
 	public String otExternalId()
