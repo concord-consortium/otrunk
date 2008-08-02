@@ -57,6 +57,7 @@ public class OTJComponentServiceImpl implements OTJComponentService
 	{
 		JComponent component = view.getComponent(otObject);
 		
+		objToComponent.put(otObject, component);
 		return component;
 	}
 
