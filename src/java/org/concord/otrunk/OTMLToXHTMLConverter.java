@@ -335,17 +335,18 @@ public class OTMLToXHTMLConverter
 			return objectText;
 		}
 
+		JComponent comp = getJComponent(obj, viewEntry);
+
 		Dimension dim = null;
 		if (view instanceof OTPrintDimension) {
 			OTPrintDimension dimView = (OTPrintDimension) view;
-			dim = dimView.getPrintDimention(containerDisplayWidth,
+			dim = dimView.getPrintDimension(obj, containerDisplayWidth,
 			        containerDisplayHeight);
 		}
 
-		JComponent comp = getJComponent(obj, viewEntry);
-		if (dim != null)
+		if (dim != null) {
 			comp.setSize(dim);
-		else {
+		} else {
 			Dimension dim2 = comp.getPreferredSize();
 			if (dim2.width == 0)
 				dim2.width = 1;
