@@ -27,11 +27,13 @@ package org.concord.otrunk.view;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectInterface;
-import org.concord.framework.otrunk.OTObjectList;
 
 
 public interface OTMultiUserRoot extends OTObjectInterface 
 {
 	OTObject getUserList();
+	
 	OTObject getReportTemplate();
+	
+	OTObject getReportTemplateViewEntry();
 }
