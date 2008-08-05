@@ -255,14 +255,10 @@ public class OTObjectListImpl extends OTCollectionImpl
 				e.printStackTrace();
 			}
 
-			// this is odd that we are removing the object twice
-	        // but this will remove any duplicates I suppose.
-			list.remove(id);
 			if(referenceMap != null){
 				referenceMap.put(id, null);
 			}
-		}
-		
+		}		
 
 		notifyOTChange(OTChangeEvent.OP_REMOVE, obj, null);		
 	}
