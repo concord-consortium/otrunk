@@ -8,13 +8,14 @@ import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTrunk;
 
 public class OTIncludeRootObject extends DefaultOTObject 
-{
+{	
 	public static interface ResourceSchema extends OTResourceSchema
 	{
 		public URL getHref();
 	}
 	protected ResourceSchema resources;
 
+	OTObject refObject = null;
 	
 	public OTIncludeRootObject(ResourceSchema resources)
     {
@@ -29,12 +30,16 @@ public class OTIncludeRootObject extends DefaultOTObject
 	
 	public OTObject getReference()
 	{
+		if(refObject != null){
+			return refObject;
+		}
+		
 		URL url = getHref();
 		
 		OTrunkImpl otrunkImpl = (OTrunkImpl)getOTObjectService().getOTrunkService(OTrunk.class);
 		
 		try {
-			OTObject refObject = otrunkImpl.getExternalObject(url, getOTObjectService());			
+			refObject = otrunkImpl.getExternalObject(url, getOTObjectService());			
 			return refObject;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
