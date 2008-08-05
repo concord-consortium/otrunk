@@ -37,6 +37,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,6 +58,7 @@ import javax.swing.text.html.HTMLDocument;
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewEntry;
@@ -85,8 +87,17 @@ public class OTDocumentEditView extends OTDocumentView implements
 
 	private OTDocumentEditorKit editorKit;
 
+	public String getXHTMLText(OTObject otObject) {
+		cleanDuplicateDocRefs(otObject);
+
+		return super.getXHTMLText(otObject);
+	}
+	
 	public JComponent getComponent(OTObject otObject) {
 		this.otObject = otObject;
+
+		cleanDuplicateDocRefs(otObject);
+		
 		setup(otObject);
 		initTextAreaModel();
 		
@@ -148,6 +159,33 @@ public class OTDocumentEditView extends OTDocumentView implements
 	//	pageScroller.setViewportView(previewComponent);
 		return previewComponent;
 	}
+
+	private void cleanDuplicateDocRefs(OTObject otObject)
+    {
+	    // clean up duplicate document references
+		if(otObject instanceof OTCompoundDoc){
+			OTCompoundDoc doc = (OTCompoundDoc) otObject;
+			OTObjectList documentRefs = doc.getDocumentRefsAsObjectList();
+			ArrayList uniqueRefs = new ArrayList();
+			for(int i=0; i<documentRefs.size(); i++){
+				OTObject ref = documentRefs.get(i);
+				// remove nulls, there shouldn't be any but just incase
+				if(ref == null){
+					documentRefs.remove(i);
+					i--;
+					continue;
+				}
+				
+				if(uniqueRefs.contains(ref)){
+					documentRefs.remove(i);
+					i--;
+					System.err.println("removing duplicate reference");
+					continue;
+				}				
+				uniqueRefs.add(ref);
+			}
+		}
+    }
 
 	
 

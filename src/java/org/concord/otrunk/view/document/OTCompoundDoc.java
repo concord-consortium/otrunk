@@ -81,6 +81,9 @@ public class OTCompoundDoc extends OTFolderObject
 	{
 		super(resources);
 		this.resources = resources;
+		
+		// It is tempting to try to clean up the document references here, but that will generate a lot of 
+		// learner data that we don't really want to generate.
 	}
 
 	/*
@@ -109,15 +112,35 @@ public class OTCompoundDoc extends OTFolderObject
 		resources.setInput(flag);
 	}
 
-	public void addDocumentReference(OTObject pfObject)
+	/**
+	 * This won't add duplicates
+	 * @param otObject
+	 */
+	public void addDocumentReference(OTObject otObject)
 	{
 		OTObjectList embedded = resources.getDocumentRefs();
-		embedded.add(pfObject);
+		for(int i=0; i<embedded.size(); i++){
+			OTObject ref = embedded.get(i);
+			if(ref != null && ref.equals(otObject)){
+				return;
+			}
+		}
+		embedded.add(otObject);
 	}
 
+	/**
+	 * CHECKME this might not work properly in a multi layered situation
+	 * @param embeddedId
+	 */
 	public void addDocumentReference(OTID embeddedId)
 	{
 		OTObjectList embedded = resources.getDocumentRefs();
+		for(int i=0; i<embedded.size(); i++){
+			OTObject ref = embedded.get(i);
+			if(ref != null && ref.getGlobalId().equals(embeddedId)){
+				return;
+			}
+		}
 		embedded.add(embeddedId);
 	}
 
@@ -161,7 +184,20 @@ public class OTCompoundDoc extends OTFolderObject
 				}
 			}
 		}
-		return resources.getDocumentRefs().getVector();
+		
+		// We had a problem with duplicates getting into this list
+		// From now on no duplicates should be added, but in learner mode
+		// we don't want to remove existing duplicates because it will generate overriding
+		// learner data that isn't good.  
+		Vector references = resources.getDocumentRefs().getVector();
+		Vector uniqueReferences = new Vector();
+		for(int i=0; i<references.size(); i++){
+			if(uniqueReferences.contains(references.get(i))){
+				continue;
+			}
+			uniqueReferences.add(references.get(i));
+		}
+		return uniqueReferences;
 	}
 	
 	public OTObjectList getDocumentRefsAsObjectList(){
