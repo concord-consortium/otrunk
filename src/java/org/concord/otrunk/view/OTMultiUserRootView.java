@@ -49,7 +49,12 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 			firstRun = false;
 		}
 	    OTObject reportTemplate = root.getReportTemplate();
-	    return "<object refid=\"" + reportTemplate.otExternalId() + "\"/>";
+	    String result = "<object refid=\"" + reportTemplate.otExternalId() + "\" ";
+	    if(root.getReportTemplateViewEntry() != null){
+	    	result += "viewid=\"" + root.getReportTemplateViewEntry().otExternalId() + "\" ";
+	    }
+	    result += "/>";
+	    return result;
     }
 	
 	protected void loadUserDatabases(OTMultiUserRoot root) {
