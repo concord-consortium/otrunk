@@ -117,7 +117,8 @@ public class OTViewBundle extends DefaultOTObject
 		} else {
 			viewFactoryServiceAlreadyExisted = true;
 		}
-		if (serviceContext.getService(OTMainFrame.class) == null) {
+    	final OTMainFrame existingMainFrame = (OTMainFrame) serviceContext.getService(OTMainFrame.class);
+		if (existingMainFrame == null) {
 			OTMainFrame mainFrame = new OTMainFrame() {
 
 				public OTFrame getFrame()
@@ -131,9 +132,30 @@ public class OTViewBundle extends DefaultOTObject
 				}
 			};
 			serviceContext.addService(OTMainFrame.class, mainFrame);
+		} else {
+			OTMainFrame mainFrame = new OTMainFrame() {
+				public OTFrame getFrame()
+				{
+					if(resources.isResourceSet("frame")){
+						return resources.getFrame();
+					}
+					return existingMainFrame.getFrame();
+				}
+
+				public boolean getShowLeftPanel()
+				{
+					if(resources.isResourceSet("showLeftPanel")){
+						return resources.getShowLeftPanel();
+					}
+					return existingMainFrame.getShowLeftPanel();
+				}				
+			};
+			serviceContext.addService(OTMainFrame.class, mainFrame);
 		}
     }
 
+    
+    
     /*
 	 * (non-Javadoc)
 	 * 
