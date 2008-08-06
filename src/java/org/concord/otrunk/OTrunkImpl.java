@@ -366,33 +366,49 @@ public class OTrunkImpl implements OTrunk
     	
     	return parentObjectService.getOTObject(root.getGlobalId());
     }
+
+    protected OTObjectServiceImpl getExistingObjectService(XMLDatabase includeDb)
+    {
+		// we've already loaded this database.
+		// It is nice to print an error here because the equals method of the databases
+		// just use the database id.  So if 2 databases have the same id then it will
+		// seem like the database has already been loaded.
+		// FIXME this should check the url of the database, and only print this message
+		// if the urls are different.
+		for(int i=0; i<objectServices.size(); i++){
+			OTObjectServiceImpl objectService = (OTObjectServiceImpl) objectServices.get(i);
+			OTDatabase db = objectService.getMainDb();
+			if(db.equals(includeDb)){
+				return objectService;
+			}
+		}
+		
+		System.err.println("Cannot find objectService for database: " + includeDb.getDatabaseId());
+		return null;			    	
+    }
     
     protected OTObjectServiceImpl loadDatabase(URL url) 
     	throws Exception
-    {
-    	// load the data base
+    {    	
+    	// first see if we have a database with the same context url
+    	for(int i=0; i<databases.size(); i++){
+    		OTDatabase db = (OTDatabase) databases.get(i);
+    		if(!(db instanceof XMLDatabase)) continue;
+    		
+    		XMLDatabase xmlDatabase = (XMLDatabase) db;
+    		if(xmlDatabase.getContextURL().equals(url)){
+    			return getExistingObjectService(xmlDatabase);
+    		}
+    	}
+    	
 		XMLDatabase includeDb = new XMLDatabase(url);
 
+		// load the data base		
 		if(databases.contains(includeDb)){
-			// we've already loaded this database.
-			// It is nice to print an error here because the equals method of the databases
-			// just use the database id.  So if 2 databases have the same id then it will
-			// seem like the database has already been loaded.
-			// FIXME this should check the url of the database, and only print this message
-			// if the urls are different.
 			System.err.println("already loaded database with id: " + includeDb.getDatabaseId() + 
-					" database: " + url.toExternalForm() + " will not be loaded again");
-			
-			for(int i=0; i<objectServices.size(); i++){
-				OTObjectServiceImpl objectService = (OTObjectServiceImpl) objectServices.get(i);
-				OTDatabase db = objectService.getMainDb();
-				if(db.equals(includeDb)){
-					return objectService;
-				}
-			}
-			
-			System.err.println("Cannot find objectService for database: " + includeDb.getDatabaseId());
-			return null;			
+				" database: " + includeDb.getContextURL().toExternalForm() + " will not be loaded again");
+		
+			return getExistingObjectService(includeDb);
 		}
 		
     	// register it with the OTrunkImpl
