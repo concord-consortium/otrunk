@@ -307,7 +307,7 @@ public class OTMLToXHTMLConverter
 			OTViewContext viewContext = viewFactory.getViewContext();
 			OTJComponentServiceFactory serviceFactory =
 			    (OTJComponentServiceFactory) viewContext.getViewService(OTJComponentServiceFactory.class);
-			jComponentService = serviceFactory.createOTJComponentService(viewFactory);
+			jComponentService = serviceFactory.createOTJComponentService(viewFactory, false);
 		}
 		if (viewEntry != null) {
 			return jComponentService.getObjectView(obj, viewContainer, mode, viewEntry);

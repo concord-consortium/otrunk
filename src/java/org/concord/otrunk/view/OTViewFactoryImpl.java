@@ -165,8 +165,6 @@ public class OTViewFactoryImpl implements OTViewFactory
     
     protected void initView(OTView view, OTViewEntry viewEntry)
     {
-    	viewContext.putViewEntry(view, viewEntry);
-    	
     	if(view instanceof OTViewContextAware) {
     		((OTViewContextAware)view).setViewContext(viewContext);
     	}

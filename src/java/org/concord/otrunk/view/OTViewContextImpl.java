@@ -19,8 +19,6 @@ class OTViewContextImpl implements OTViewContext
     private final OTViewFactoryImpl factory;
 	private OTViewContext parent;
 
-	private Map viewEntryMap = new HashMap();
-	
 	/**
      * @param impl
 	 * @param parent 
@@ -63,16 +61,6 @@ class OTViewContextImpl implements OTViewContext
 		return factory.createChildViewFactory();
     }
 
-	public org.concord.framework.otrunk.view.OTViewEntry getViewEntry(OTView view)
-	{
-		return (org.concord.framework.otrunk.view.OTViewEntry) viewEntryMap.get(view);
-	}
-
-	public void putViewEntry(OTView view, org.concord.framework.otrunk.view.OTViewEntry viewEntry)
-	{
-		viewEntryMap.put(view, viewEntry);
-	}
-	
 	/** 
 	 * FIXME
 	 * Although this is not implemented here yet, you can probably get around this by 

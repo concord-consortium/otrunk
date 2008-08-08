@@ -32,13 +32,16 @@ public class OTJComponentServiceImpl implements OTJComponentService
 	OTViewFactory viewFactory;
 	
 	// For now we'll keep these in a regular hashtable we might need to do
-	// some weak referenceing here
+	// some weak referencing here
 	HashMap objToView = new HashMap();
 	HashMap objToComponent = new HashMap();
+
+	private boolean maintainViewMap;
 	
-	public OTJComponentServiceImpl(OTViewFactory viewFactory)
+	public OTJComponentServiceImpl(OTViewFactory viewFactory, boolean maintainViewMap)
 	{
 		this.viewFactory = viewFactory;
+		this.maintainViewMap = maintainViewMap;
 	}
 	
 	public JComponent getComponent(OTObject otObject,
@@ -57,7 +60,10 @@ public class OTJComponentServiceImpl implements OTJComponentService
 	{
 		JComponent component = view.getComponent(otObject);
 		
-		objToComponent.put(otObject, component);
+		if(maintainViewMap){
+			objToComponent.put(otObject, component);
+		}
+		
 		return component;
 	}
 
@@ -170,7 +176,9 @@ public class OTJComponentServiceImpl implements OTJComponentService
         	}
         }
         
-        objToView.put(otObject, view);
+        if(maintainViewMap){
+        	objToView.put(otObject, view);
+        }
         
         return view;
     }
