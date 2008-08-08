@@ -16,9 +16,10 @@ public class OTJComponentServiceFactoryImpl
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.view.OTJComponentServiceFactory#createOTJComponentService()
 	 */
-	public OTJComponentService createOTJComponentService(OTViewFactory viewFactory)
+	public OTJComponentService createOTJComponentService(OTViewFactory viewFactory, 
+		boolean maintainViewMap)
 	{
-		return new OTJComponentServiceImpl(viewFactory);
+		return new OTJComponentServiceImpl(viewFactory, maintainViewMap);
 	}
 
 }

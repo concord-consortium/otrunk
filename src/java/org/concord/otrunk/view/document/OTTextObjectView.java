@@ -183,6 +183,7 @@ public class OTTextObjectView extends AbstractOTJComponentContainerView
      */
     public void viewClosed()
     {
+    	super.viewClosed();
         if(textAreaModel != null) {
             textAreaModel.removeDocumentListener(this);
         }

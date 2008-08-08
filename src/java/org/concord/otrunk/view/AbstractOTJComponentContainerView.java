@@ -23,6 +23,7 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 	 */
 	public void viewClosed()
 	{
+		super.viewClosed();
 		removeAllSubViews();
 	}
 	

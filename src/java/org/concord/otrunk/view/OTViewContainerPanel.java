@@ -180,7 +180,7 @@ public class OTViewContainerPanel extends JPanel
 		OTViewContext viewContext = factory.getViewContext();
 		OTJComponentServiceFactory componentServiceFactory =
 			(OTJComponentServiceFactory) viewContext.getViewService(OTJComponentServiceFactory.class);
-		jComponentService = componentServiceFactory.createOTJComponentService(factory);		
+		jComponentService = componentServiceFactory.createOTJComponentService(factory, false);		
 	}
 		
 	public boolean isTopLevelContainer()
@@ -300,7 +300,7 @@ public class OTViewContainerPanel extends JPanel
 		// For some reason this allows popups to incrementally draw them selves
 		// without it, the popup blocks until the inside content is rendered
 		// before showing anything
-		final Runnable createComponentTask = new CreateComponentTask(currentObject);
+		Runnable createComponentTask = new CreateComponentTask(currentObject);
 
 		/**
 		 * This is disabled for now but we might have to come back to it it
@@ -519,7 +519,6 @@ public class OTViewContainerPanel extends JPanel
 	    		 * @see java.lang.Runnable#run()
 	    		 */
 	    		public void run() {
-	    			// TODO Auto-generated method stub
 	    			enableScrolling();
 	    		}
 	    	});
