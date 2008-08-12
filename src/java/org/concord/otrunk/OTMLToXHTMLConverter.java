@@ -23,7 +23,6 @@
 
 package org.concord.otrunk;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -76,7 +75,6 @@ public class OTMLToXHTMLConverter
 
 	OTJComponentService jComponentService;
 	private OTControllerService controllerService;
-	private Dimension componentPreferredSize;
 
 	public OTMLToXHTMLConverter()
 	{
@@ -337,20 +335,18 @@ public class OTMLToXHTMLConverter
 			return objectText;
 		}
 
-		JComponent comp = getJComponent(obj, viewEntry);
+		view = getOTJComponentView(obj, mode, viewEntry);
+		JComponent comp = ((OTJComponentView)view).getComponent(obj);
 
-		Dimension dim = null;
+		Dimension printDim = null;
 		if (view instanceof OTPrintDimension) {
 			OTPrintDimension dimView = (OTPrintDimension) view;
-			if (componentPreferredSize != null && dimView instanceof JComponent) {
-				((JComponent) dimView).setPreferredSize(componentPreferredSize);
-			}
-			dim = dimView.getPrintDimension(obj, containerDisplayWidth,
+			printDim = dimView.getPrintDimension(obj, containerDisplayWidth,
 			        containerDisplayHeight);
 		}
 
-		if (dim != null) {
-			comp.setSize(dim);
+		if (printDim != null) {
+			comp.setSize(printDim);
 		} else {
 			Dimension dim2 = comp.getPreferredSize();
 			if (dim2.width == 0)
@@ -428,9 +424,5 @@ public class OTMLToXHTMLConverter
 		{
 			return text;
 		}
-	}
-	
-	public void setComponentPreferredSize(Dimension d) {
-		this.componentPreferredSize = d;
-	}
+	}	
 }
