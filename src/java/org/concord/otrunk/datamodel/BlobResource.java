@@ -12,7 +12,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
-import org.concord.loader.util.Transfer;
+import org.concord.otrunk.transfer.Transfer;
 import org.concord.otrunk.xml.Base64;
 
 /**

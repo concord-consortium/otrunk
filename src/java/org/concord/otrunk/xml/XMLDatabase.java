@@ -32,6 +32,8 @@
  */
 package org.concord.otrunk.xml;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -62,6 +64,8 @@ import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
+import org.concord.otrunk.transfer.Transfer;
+import org.concord.otrunk.transfer.URLStreamHandler;
 import org.concord.otrunk.view.OTConfig;
 import org.concord.otrunk.xml.jdom.JDOMDocument;
 
@@ -113,8 +117,9 @@ public class XMLDatabase
 
 	private HashMap reverseReferences = new HashMap();
 
+	private long downloadTime = -1;
 	private long parseTime;
-
+	
 	protected static String getLabel(URL contextURL)
 	{
 		if (contextURL == null) {
@@ -135,12 +140,37 @@ public class XMLDatabase
 
 	public XMLDatabase(URL xmlURL) throws Exception
 	{
-		this(xmlURL.openStream(), xmlURL, System.out);
+		this(xmlURL, System.out);
 	}
 
 	public XMLDatabase(URL xmlURL, PrintStream statusStream) throws Exception
 	{
-		this(xmlURL.openStream(), xmlURL, statusStream);
+		initialize(xmlURL, xmlURL.toExternalForm(), statusStream);
+
+		URLStreamHandler urlStreamHandler = new URLStreamHandler(xmlURL);
+		InputStream urlInStream = urlStreamHandler.getURLStream();		
+		
+		// parse the xml file...
+		long startMillis = -1;
+		JDOMDocument document = null;
+		InputStream inputStream = urlInStream;
+		if(OTConfig.getBooleanProp(OTConfig.TRACE_DB_LOAD_TIME, false)){				
+			long transferStart = System.currentTimeMillis();
+			Transfer transfer = new Transfer();
+			ByteArrayOutputStream byteCache = new ByteArrayOutputStream();
+			transfer.transfer(urlInStream, byteCache);
+			inputStream = new ByteArrayInputStream(byteCache.toByteArray());
+			downloadTime = System.currentTimeMillis() - transferStart;
+		}
+		startMillis = System.currentTimeMillis();
+		try {
+			document = new JDOMDocument(inputStream);
+		} catch (Exception e){
+			urlStreamHandler.printAndThrowURLError("Error reading xml from", false, e);
+		}
+		parseTime = System.currentTimeMillis() - startMillis;
+
+		initializeDoc(document);
 	}
 
 	public XMLDatabase(InputStream xmlStream, URL contextURL, PrintStream statusStream)
@@ -153,19 +183,25 @@ public class XMLDatabase
 	public XMLDatabase(InputStream xmlStream, URL contextURL, String label,
 	        PrintStream statusStream) throws Exception
 	{
-		this.statusStream = statusStream;
-		this.label = label;
-
-		// create the database Id
-		// this might get overriden when the objects are loaded in.
-		databaseId = OTUUID.createOTUUID();
-
+		initialize(contextURL, label, statusStream);
+		
 		// printStatus("Opening otml: " + label);
 
 		// parse the xml file...
-		long startMillis = System.currentTimeMillis();
+		long startMillis = -1;
+		JDOMDocument document = null;
 		try {
-			document = new JDOMDocument(xmlStream);
+			InputStream inputStream = xmlStream;
+			if(OTConfig.getBooleanProp(OTConfig.TRACE_DB_LOAD_TIME, false)){				
+				long transferStart = System.currentTimeMillis();
+				Transfer transfer = new Transfer();
+				ByteArrayOutputStream byteCache = new ByteArrayOutputStream();
+				transfer.transfer(xmlStream, byteCache);
+				inputStream = new ByteArrayInputStream(byteCache.toByteArray());
+				downloadTime = System.currentTimeMillis() - transferStart;
+			}
+			startMillis = System.currentTimeMillis();
+			document = new JDOMDocument(inputStream);
 		} catch (Exception e) {
 
 			if (contextURL != null) {
@@ -184,12 +220,7 @@ public class XMLDatabase
 		}
 		parseTime = System.currentTimeMillis() - startMillis;
 
-		// The order here matters because initialize will look at the codebase attribute of the otrunk
-		// element, and set the contextURL to be that.  That codebase attribute should override 
-		// the passed in contextURL
-		this.contextURL = contextURL;
-		
-		initialize();
+		initializeDoc(document);
 	}
 
 	public XMLDatabase(Reader xmlReader, URL contextURL, PrintStream statusStream)
@@ -201,17 +232,13 @@ public class XMLDatabase
 	public XMLDatabase(Reader xmlReader, URL contextURL, String label,
 	        PrintStream statusStream) throws Exception
 	{
-		this.statusStream = statusStream;
-		this.label = label;
-
+		initialize(contextURL, label, statusStream);
 		// printStatus("Opening otml: " + label);
-		long startMillis = System.currentTimeMillis();
-		document = new JDOMDocument(xmlReader);
+		long startMillis = System.currentTimeMillis();		
+		JDOMDocument document = new JDOMDocument(xmlReader);
 		parseTime = System.currentTimeMillis() - startMillis;
 		
-		this.contextURL = contextURL;
-
-		initialize();
+		initializeDoc(document);
 
 	}
 
@@ -232,16 +259,39 @@ public class XMLDatabase
 
 		return id.equals(((XMLDatabase) object).getDatabaseId());
 	}
-
-	protected void initialize()
+	
+	protected void initialize(URL contextURL, String label, PrintStream statusStream)
 	{
+		this.statusStream = statusStream;
+		this.label = label;
+
+
+		
+		// create the database Id
+		// this might get overriden when the objects are loaded in.
+		databaseId = OTUUID.createOTUUID();
+
+		// The order here matters because initialize will look at the codebase attribute of the otrunk
+		// element, and set the contextURL to be that.  That codebase attribute should override 
+		// the passed in contextURL
+		this.contextURL = contextURL;
+				
+	}
+	
+	protected void initializeDoc(JDOMDocument document)
+	{
+		this.document = document;
+		
 		OTXMLElement rootElement = document.getRootElement();
 
 		String dbCodeBase = rootElement.getAttributeValue("codebase");
+		
+		// the system property overrides what is in the xml document
 		String systemCodeBase = OTConfig.getStringProp(OTConfig.CODEBASE_PROP);
 		if (systemCodeBase != null) {
 			dbCodeBase = systemCodeBase;
 		}
+		
 		if (dbCodeBase != null && dbCodeBase.length() > 0) {
 			// this document has a specific base address
 
@@ -358,9 +408,14 @@ public class XMLDatabase
 
 		long endMillis = System.currentTimeMillis();
 
+		String downloadString = "";
+		if(downloadTime >= 0){
+			downloadString = " downloaded in " + downloadTime + "ms";
+		}
 		statusStream.println("Loaded " + dataObjects.size() + " objects from: " + label
-		        + " parsed in " + parseTime + "ms loaded in " + (endMillis - startMillis)
-		        + "ms");
+		        + downloadString 
+				+ " parsed in " + parseTime + "ms" 
+				+ " loaded in " + (endMillis - startMillis) + "ms" );
 	}
 
 	public static class PackageNotFound

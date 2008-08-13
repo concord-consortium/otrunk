@@ -23,7 +23,7 @@ public class OTConfig
 	public final static String USERDATA_URL_PROP = "otrunk.userdata_url";
 	public final static String REMOTE_SAVE_DATA_PROP = "otrunk.remote_save_data";
 	public final static String SHOW_DESTRUCTIVE_MENU_ITEMS_PROP = "otrunk.view.destructive_menu";	// "New" and "Open"
-	
+	public final static String TRACE_DB_LOAD_TIME = "otrunk.db.trace.load";
 	
 	/**
      * This is yet another hack to support something like layers or mutliple files.

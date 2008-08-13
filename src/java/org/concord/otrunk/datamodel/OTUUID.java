@@ -84,7 +84,6 @@ public class OTUUID extends UUID
 			hwAddress = NativeInterfaces.getPrimaryInterface();
 		} catch (Throwable t) {
 			// can't get the hardware address for some reason
-			System.out.println("OTrunk: Not using native library for uuids");
 			noEthernetInterfaces = true;
 			return null;
 		}
