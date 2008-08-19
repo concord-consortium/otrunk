@@ -79,8 +79,10 @@ public class OTSharingManagerImpl implements OTSharingManager
 	
 	public void remove(OTObject obj)
     {
-	    registry.getSharedObjects().remove(obj);
-	    notifyListeners(new OTSharingEvent(OTSharingEvent.REMOVED, obj));
+		if (isShared(obj)) {
+			registry.getSharedObjects().remove(obj);
+	    	notifyListeners(new OTSharingEvent(OTSharingEvent.REMOVED, obj));
+		}
     }
 	
 	public boolean isShared(OTObject obj)
