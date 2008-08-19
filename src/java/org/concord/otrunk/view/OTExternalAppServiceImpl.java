@@ -48,9 +48,6 @@ public class OTExternalAppServiceImpl
 	public boolean jnlpShowDocument(URL url)
 	{
 		try {
-			// FIXME this should be changed to be a service
-			// so external links can work in both a jnlp
-			// env and a regular application env
 			Class serviceManager = Class
 					.forName("javax.jnlp.ServiceManager");
 			Method lookupMethod = serviceManager.getMethod(
