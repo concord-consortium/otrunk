@@ -302,7 +302,7 @@ public class OTDocumentEditView extends OTDocumentView implements
 			OTObjectService objectService = otObject.getOTObjectService();
 			String strObjID = objectService.getExternalID(objToInsert);
 
-			String strObjText = "<object refid=\"" + strObjID + "\"></object>";
+			String strObjText = "<object refid=\"" + strObjID + "\"></object><br>";
 
 			int pos = editorPane.getSelectionStart();
 			HTMLDocument doc = (HTMLDocument) editorPane.getDocument();
