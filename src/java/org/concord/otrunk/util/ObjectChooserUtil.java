@@ -26,6 +26,29 @@ public class ObjectChooserUtil
 			return null;
 		}
 		
+		return showSelectionDialog(parent, getObjectsFromContext(viewContext, omitObjectsAndClasses));
+		
+	}
+	
+	public static OTObject selectObjectFromSharedObjects(Component parent, OTViewContext viewContext, Class filter){
+		return showSelectionDialog(parent, getObjectFromSharedObjects(viewContext, filter));
+	}
+	
+	public static OTObject selectObjectFromSharedObjects(Component parent, OTSharingManager sharingManager, Class filter){
+		
+		return showSelectionDialog(parent, sharingManager.getAllSharedObjects(filter));
+	}
+	
+	public static OTObject selectObjectFromContextAndShared(Component parent, OTJComponentViewContext jViewContext, OTViewContext viewContext, Object[] omitObjectsAndClasses){
+		Vector allObjects = getObjectsFromContext(jViewContext, omitObjectsAndClasses);
+		Vector objectsFromShared = getObjectFromSharedObjects(viewContext, null);
+		for (int i = 0; i < objectsFromShared.size(); i++) {
+			allObjects.add(objectsFromShared.get(i));
+        }
+		return showSelectionDialog(parent, allObjects);
+	}
+	
+	private static Vector getObjectsFromContext(OTJComponentViewContext viewContext, Object[] omitObjectsAndClasses){
 		Object[] objects = viewContext.getAllObjects();
 		final Vector cleanedObjects = new Vector();
 		for (int i = 0; i < objects.length; i++) {
@@ -36,24 +59,16 @@ public class ObjectChooserUtil
     	        }
 			}
         }
-		
-		return showSelectionDialog(parent, cleanedObjects);
-		
+		return cleanedObjects;
 	}
 	
-	public static OTObject selectObjectFromSharedObjects(Component parent, OTViewContext viewContext, Class filter){
+	private static Vector getObjectFromSharedObjects(OTViewContext viewContext, Class filter){
 		OTSharingManager sharingManager = (OTSharingManager) viewContext.getViewService(OTSharingManager.class);
 		if (sharingManager == null){
 			System.err.println("Cannot create sharing manager from "+viewContext);
 			return null;
 		}
-		
-		return selectObjectFromSharedObjects(parent, sharingManager, filter);
-	}
-	
-	public static OTObject selectObjectFromSharedObjects(Component parent, OTSharingManager sharingManager, Class filter){
-		Vector objects = sharingManager.getAllSharedObjects(filter);
-		return showSelectionDialog(parent, objects);
+		return sharingManager.getAllSharedObjects(filter);
 	}
 	
 	private static OTObject showSelectionDialog(Component parent, Vector objects){
