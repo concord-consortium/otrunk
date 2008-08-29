@@ -64,6 +64,8 @@ import javax.swing.text.html.HTMLDocument;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.concord.framework.otrunk.OTChangeEvent;
+import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
@@ -185,6 +187,8 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		this.otObject = otObject;
 		setup(otObject);
 		initTextAreaModel();
+		
+		((OTChangeNotifying)otObject).addOTChangeListener(this);
 		
 		if (tabbedPane != null) {
 			tabbedPane.removeChangeListener(this);
@@ -747,6 +751,12 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			return null;
 		}
 	}
+	
+	public void stateChanged(OTChangeEvent e)
+    {
+		super.stateChanged(e);
+		updateFormatedView();
+    }
 	
 	public void viewClosed()
 	{
