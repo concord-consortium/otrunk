@@ -188,7 +188,9 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		setup(otObject);
 		initTextAreaModel();
 		
-		((OTChangeNotifying)otObject).addOTChangeListener(this);
+		if (otObject instanceof OTChangeNotifying){
+			((OTChangeNotifying)otObject).addOTChangeListener(this);
+		}
 		
 		if (tabbedPane != null) {
 			tabbedPane.removeChangeListener(this);
