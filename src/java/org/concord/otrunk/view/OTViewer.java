@@ -165,7 +165,9 @@ public class OTViewer extends JFrame
 
 	URL currentURL = null;
 
-	String baseFrameTitle = "OTrunk Viewer";
+	String baseFrameTitle;
+	
+	final static String DEFAULT_BASE_FRAME_TITLE = "OTrunk Viewer";
 
 	OTViewContainerPanel bodyPanel;
 
@@ -279,6 +281,8 @@ public class OTViewer extends JFrame
 		this.showTree = true;
 
 		AppleApplicationUtil.registerWithMacOSX(this);
+		
+		baseFrameTitle = DEFAULT_BASE_FRAME_TITLE;
 
 		try {
 			// this overrides the default base frame title
@@ -610,9 +614,21 @@ public class OTViewer extends JFrame
 				int cornerY = mainFrame.getFrame().getPositionY();
 				int sizeX = mainFrame.getFrame().getWidth();
 				int sizeY = mainFrame.getFrame().getHeight();
+				
+				
+				// See if title is set for main frame (only if name is
+				// still default, so that jnlp prop will still
+				// overrides this)
+				if (baseFrameTitle == DEFAULT_BASE_FRAME_TITLE &&
+						mainFrame.getFrame().isResourceSet("title")){
+					System.out.println("change");
+					baseFrameTitle = mainFrame.getFrame().getTitle();
+					setTitle(baseFrameTitle);
+				}
 
 				setBounds(cornerX, cornerY, cornerX + sizeX, cornerY + sizeY);
 				repaint();
+				
 			}
 			useScrollPane = mainFrame.getFrame().getUseScrollPane();
 		}
