@@ -89,6 +89,8 @@ public class OTLabbookManagerImpl
 			type = "Graphs";
 		} else if (object.toString().indexOf("OTDrawing") > -1){
 			type = "Drawings";
+		}	else if (object.toString().indexOf("OTBlob") > -1){
+				type = "Snapshots";
 		} else if (object.toString().indexOf("OTText") > -1 ||
 				object.toString().indexOf("Question") > -1){
 			type = "Text";
