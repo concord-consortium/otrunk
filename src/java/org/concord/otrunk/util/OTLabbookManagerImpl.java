@@ -7,15 +7,18 @@ import java.util.Vector;
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTLabbookManager;
 import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.util.OTLabbookBundle;
+import org.concord.otrunk.util.OTLabbookBundle.ResourceSchema;
 
 public class OTLabbookManagerImpl
     implements OTLabbookManager, OTChangeListener
 {
-	private final OTLabbookBundle.ResourceSchema resources;
+	private OTLabbookBundle.ResourceSchema resources;
 	private Vector listeners;
+	private OTObjectService objectService;
 
 	public OTLabbookManagerImpl(OTLabbookBundle.ResourceSchema resources)
     {
@@ -27,7 +30,13 @@ public class OTLabbookManagerImpl
 	{
 		OTLabbookEntry entry = createEntry(otObject);
 		resources.getEntries().add(entry);
-		System.out.println("resources.getEntries().get(0) = "+resources.getEntries().get(0));
+	}
+	
+	public void add(OTObject otObject, OTObject container)
+	{
+		OTLabbookEntry entry = createEntry(otObject);
+		entry.setContainer(container);
+		resources.getEntries().add(entry);
 	}
 
 	public void addSnapshot(OTObject snapshot)
@@ -153,5 +162,17 @@ public class OTLabbookManagerImpl
 	       ((OTChangeListener)listeners.get(i)).stateChanged(e); 
         }
 	}
+
+	public void setOTObjectService(OTObjectService objectService)
+    {
+	    this.objectService = objectService;
+	    try {
+	    	OTLabbookBundle bundle = (OTLabbookBundle) objectService.getOTObject(resources.getGlobalId());
+	        this.resources = bundle.resources;
+	        resources.addOTChangeListener(this);
+        } catch (Exception e) {
+	        e.printStackTrace();
+        }
+    }
 
 }
