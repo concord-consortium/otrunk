@@ -163,6 +163,7 @@ public class OTLabbookManagerImpl
         }
 	}
 
+	/*
 	public void setOTObjectService(OTObjectService objectService)
     {
 	    this.objectService = objectService;
@@ -174,5 +175,6 @@ public class OTLabbookManagerImpl
 	        e.printStackTrace();
         }
     }
+    */
 
 }
