@@ -2,11 +2,10 @@ package org.concord.otrunk.util;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTBundle;
-import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTServiceContext;
-import org.concord.framework.otrunk.view.OTLabbookManager;
+import org.concord.framework.otrunk.view.OTLabbookManagerProvider;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
 
@@ -24,7 +23,7 @@ public class OTLabbookBundle extends DefaultOTObject
     }
 	
 	ResourceSchema resources;
-	OTLabbookManager labbookManager;
+	OTLabbookManagerProvider labbookManagerProvider;
 	
 	public OTLabbookBundle(ResourceSchema resources)
     {
@@ -38,13 +37,13 @@ public class OTLabbookBundle extends DefaultOTObject
     		(OTViewFactory) serviceContext.getService(OTViewFactory.class);
     	
     	OTViewContext factoryContext = viewFactory.getViewContext();    	
-    	factoryContext.addViewService(OTLabbookManager.class, labbookManager);
+    	factoryContext.addViewService(OTLabbookManagerProvider.class, labbookManagerProvider);
 	}
 
 	public void registerServices(OTServiceContext serviceContext)
 	{
-		labbookManager = new OTLabbookManagerImpl(resources);
-		serviceContext.addService(OTLabbookManager.class, labbookManager);
+		labbookManagerProvider = new OTLabbookManagerProviderImpl(resources);
+		serviceContext.addService(OTLabbookManagerProvider.class, labbookManagerProvider);
 	}
 	
 	/**
