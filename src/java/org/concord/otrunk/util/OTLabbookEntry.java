@@ -9,6 +9,9 @@ public interface OTLabbookEntry
 	public OTObject getOTObject();
 	public void setOTObject(OTObject object);
 	
+	public OTObject getOriginalObject();
+	public void setOriginalObject(OTObject originalObject);
+	
 	public OTObject getContainer();
 	public void setContainer(OTObject container);
 	
