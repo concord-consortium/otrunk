@@ -838,6 +838,10 @@ public class XMLDatabase
 	private OTID getGlobalId(String idStr)
 	{
 		if (idStr.startsWith("${")) {
+			if(!idStr.endsWith("}")){
+				System.err.println("local id reference must end with }: " + idStr.substring(2,idStr.length()));
+				return null;
+			}
 			String localId = idStr.substring(2, idStr.length() - 1);
 			OTID globalId = (OTID) localIdMap.get(localId);
 			if (globalId == null) {
