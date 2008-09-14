@@ -30,10 +30,8 @@
 package org.concord.otrunk.view.document;
 
 import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -571,11 +569,13 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 				String target = null;
 				String viewEntryId = null;
 				String modeStr = null;
+				String userStr = null;
 				if(tagAttribs != null){
 					target = (String) tagAttribs
 					.getAttribute(HTML.Attribute.TARGET);
 					viewEntryId = (String) tagAttribs.getAttribute("viewid");
 					modeStr = (String) tagAttribs.getAttribute("mode");
+					userStr = (String) tagAttribs.getAttribute("user");
 				}
 				
 				OTViewEntry viewEntry = null;
@@ -606,6 +606,10 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 					modeStr = getViewMode();
 				}
 									
+				if (userStr != null && userStr.length() != 0) {
+					linkObj = getRuntimeObject(linkObj, userStr);
+				}
+				
 				if (target == null) {
 					// FIXME deal with the mode
 					getViewContainer().setCurrentObject(linkObj, viewEntry);
@@ -641,6 +645,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			throw new IllegalArgumentException("otObject can't be null");
 		}
 		pfObject = (OTDocument) otObject;
+		this.otObject = otObject;
 		
 	//	return updateFormatedView().replace(viewEntry.getCss(), "");
 		
