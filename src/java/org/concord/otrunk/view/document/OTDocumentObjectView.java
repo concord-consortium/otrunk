@@ -42,11 +42,7 @@ import javax.swing.text.ComponentView;
 import javax.swing.text.Element;
 import javax.swing.text.Position;
 
-import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.OTUser;
-import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.otrunk.view.OTViewContainerPanel;
 
@@ -97,7 +93,7 @@ public class OTDocumentObjectView extends ComponentView
     	if(refId != null && refId.length() > 0) {
         	OTObject childObject = docView.getReferencedObject(refId);
         	if (userId != null) {
-        		childObject = getRuntimeObject(childObject, userId);
+        		childObject = docView.getRuntimeObject(childObject, userId);
         	}
         	
         	if(childObject == null) {
@@ -127,20 +123,6 @@ public class OTDocumentObjectView extends ComponentView
     	
     	return null;       	
     }
-    
-	protected OTObject getRuntimeObject(OTObject object, String userStr) {
-		try {
-			OTrunk otrunk = docView.getOTrunk();
-			OTObjectService objectService = object.getOTObjectService();
-			OTID userId = objectService.getOTID(userStr);
-			OTUser user = (OTUser) objectService.getOTObject(userId);
-			return otrunk.getUserRuntimeObject(object, user);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
     
     /**
      * This method is to fix a bug in the HTMLEditorKit

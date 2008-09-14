@@ -40,6 +40,8 @@ import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTUser;
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTControllerServiceFactory;
 import org.concord.framework.otrunk.view.OTJComponentService;
 import org.concord.framework.otrunk.view.OTJComponentServiceFactory;
@@ -196,7 +198,7 @@ public class OTMLToXHTMLConverter
 				xhtmlView = (OTXHTMLView) objView;
 				bodyText = xhtmlView.getXHTMLText(topLevelOTObjects[i]);
 
-				Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
+				Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"([^>]*)>");
 				Matcher m = p.matcher(bodyText);
 				StringBuffer parsed = new StringBuffer();
 				OTObjectService objectService = topLevelOTObjects[i].getOTObjectService();
@@ -211,8 +213,31 @@ public class OTMLToXHTMLConverter
 						e1.printStackTrace();
 					} 
 
+					Pattern userPat = Pattern.compile("user=\"([^\"]*)\"");
+					Matcher userMatcher = userPat.matcher(m.group(2));
+					if(userMatcher.find()){
+						String userId = userMatcher.group(1);
+						referencedObject = getRuntimeObject(referencedObject, userId);
+					}
+					
+		        	OTViewEntry viewEntry = null;
+					Pattern viewPat = Pattern.compile("viewid=\"([^\"]*)\"");
+					Matcher viewMatcher = viewPat.matcher(m.group(2));
+					if(viewMatcher.find()){
+						String viewId = userMatcher.group(1);
+			        	if(viewId != null && viewId.length() > 0) {
+							OTID viewOTid = objectService.getOTID(viewId);
+			        		try {
+	                            viewEntry = (OTViewEntry)
+	                            	objectService.getOTObject(viewOTid);
+                            } catch (Exception e) {
+	                            e.printStackTrace();
+                            }
+			        	}
+					}
+
 					// System.out.println(referencedObject.getClass());
-					String url = embedOTObject(referencedObject, null);
+					String url = embedOTObject(referencedObject, viewEntry);
 					// String url = objView.getXHTMLText(folder,
 					// containerDisplayWidth, containerDisplayHeight);
 					if (url != null) {
@@ -425,4 +450,20 @@ public class OTMLToXHTMLConverter
 			return text;
 		}
 	}	
+	
+	public OTObject getRuntimeObject(OTObject object, String userStr) {
+		try {
+			OTObjectService objectService = object.getOTObjectService();
+			OTrunk otrunk = (OTrunk)objectService.getOTrunkService(OTrunk.class);
+			OTID userId = objectService.getOTID(userStr);
+			OTUser user = (OTUser) objectService.getOTObject(userId);
+			return otrunk.getUserRuntimeObject(object, user);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+    
+
 }
