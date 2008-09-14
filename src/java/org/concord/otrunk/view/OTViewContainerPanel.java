@@ -488,7 +488,7 @@ public class OTViewContainerPanel extends JPanel
 	    		});
 	    		scrollPane.setViewportView(myComponent);
 	    		
-	    		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	    		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	    		
 	        	boolean localScrollPanelHasBorder = scrollPanelHasBorder;
 	        	if(currentViewChild != null){
