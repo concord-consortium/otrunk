@@ -72,6 +72,10 @@ public class OTObjectListImpl extends OTCollectionImpl
 
 	protected OTID getId(int index)
 	{
+		if (index < 0){
+			return null;
+		}
+		
 		OTID id = (OTID)list.get(index);
 		if(id == null) {
 			System.err.println("Null item in object list: \n" + 
