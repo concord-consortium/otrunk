@@ -29,16 +29,15 @@ public class OTLabbookManagerImpl
 	
 	public void add(OTObject otObject)
 	{
-		OTLabbookEntry entry = createEntry(otObject);
-		resources.getEntries().add(entry);
+		this.add(otObject, null);
 	}
 	
-	public void add(OTObject otObject, OTObject container)
+	public void add(OTObject otObject, OTObject originalObject)
 	{
-		this.add(otObject, container, null, true);
+		this.add(otObject, originalObject, null);
 	}
 	
-	public void add(OTObject otObject, OTObject container, OTObject originalObject)
+	public void add(OTObject otObject, OTObject originalObject, OTObject container)
 	{
 		this.add(otObject, container, originalObject, true);
 	}
@@ -46,7 +45,9 @@ public class OTLabbookManagerImpl
 	public void add(OTObject otObject, OTObject container, OTObject originalObject, boolean showLabbook)
 	{
 		OTLabbookEntry entry = createEntry(otObject);
-		entry.setContainer(container);
+		if (container != null){
+			entry.setContainer(container);
+		}
 		if (originalObject != null){
 			entry.setOriginalObject(originalObject);
 		}
