@@ -48,6 +48,10 @@ public class ObjectChooserUtil
 		return showSelectionDialog(parent, allObjects);
 	}
 	
+	public static OTObject selectObject(Component parent, Vector objects){
+		return showSelectionDialog(parent, objects);
+	}
+	
 	private static Vector getObjectsFromContext(OTJComponentViewContext viewContext, Object[] omitObjectsAndClasses){
 		Object[] objects = viewContext.getAllObjects();
 		final Vector cleanedObjects = new Vector();
