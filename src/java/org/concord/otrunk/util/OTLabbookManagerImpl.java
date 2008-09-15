@@ -19,6 +19,7 @@ public class OTLabbookManagerImpl
 	private OTLabbookBundle.ResourceSchema resources;
 	private Vector listeners;
 	private OTObjectService objectService;
+	private boolean tempShowLabbook;
 
 	public OTLabbookManagerImpl(OTLabbookBundle.ResourceSchema resources)
     {
@@ -34,11 +35,25 @@ public class OTLabbookManagerImpl
 	
 	public void add(OTObject otObject, OTObject container)
 	{
+		this.add(otObject, container, null, true);
+	}
+	
+	public void add(OTObject otObject, OTObject container, OTObject originalObject)
+	{
+		this.add(otObject, container, originalObject, true);
+	}
+	
+	public void add(OTObject otObject, OTObject container, OTObject originalObject, boolean showLabbook)
+	{
 		OTLabbookEntry entry = createEntry(otObject);
 		entry.setContainer(container);
+		if (originalObject != null){
+			entry.setOriginalObject(originalObject);
+		}
+		tempShowLabbook = showLabbook;
 		resources.getEntries().add(entry);
 	}
-
+	
 	public void addSnapshot(OTObject snapshot)
 	{
 		
@@ -158,8 +173,14 @@ public class OTLabbookManagerImpl
 		if (listeners == null){
 			return;
 		}
+		OTLabbookChangeEvent labbookChangeEvent = new OTLabbookChangeEvent((OTObject) e.getSource());
+		labbookChangeEvent.setOperation(e.getOperation());
+		labbookChangeEvent.setProperty(e.getProperty());
+		labbookChangeEvent.setValue(e.getValue());
+		labbookChangeEvent.setShowLabbook(tempShowLabbook);
+		
 		for (int i = 0; i < listeners.size(); i++) {
-	       ((OTChangeListener)listeners.get(i)).stateChanged(e); 
+	       ((OTChangeListener)listeners.get(i)).stateChanged(labbookChangeEvent); 
         }
 	}
 
@@ -176,5 +197,26 @@ public class OTLabbookManagerImpl
         }
     }
     */
+	
+	public class OTLabbookChangeEvent extends OTChangeEvent
+	{
 
+		private boolean showLabbook = true;
+
+		public OTLabbookChangeEvent(OTObject source)
+        {
+	        super(source);
+        }
+		
+		public void setShowLabbook(boolean showLabbook){
+			this.showLabbook = showLabbook;
+		}
+		
+		/*
+		 * Any listener that will pop up a labbook view should check this first
+		 */
+		public boolean getShowLabbook(){
+			return showLabbook;
+		}
+	}
 }
