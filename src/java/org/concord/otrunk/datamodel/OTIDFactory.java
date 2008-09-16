@@ -45,14 +45,28 @@ import org.concord.framework.otrunk.OTID;
  *
  */
 public class OTIDFactory
-{
+{	
 	public static OTID createOTID(String otidStr)
 	{
+
 	    int bangIndex = otidStr.indexOf("!");
 	    if(bangIndex == 0) {
 	        throw new RuntimeException("Unknown id format");
 	    }
 	    
+	 // First, check to see if it's a transient id
+	    if (otidStr.startsWith(OTTransientMapID.TRANSIENT_ID_PREFIX)) {
+	    	
+	    	String dbIdStr = otidStr.substring(OTTransientMapID.TRANSIENT_ID_PREFIX.length(), bangIndex);
+	    	OTID dbId = OTIDFactory.createOTID(dbIdStr);
+	    	
+	    	String objIdStr = otidStr.substring(bangIndex+1);
+	    	OTID objId = OTIDFactory.createOTID(objIdStr);
+	    	
+	    	return new OTTransientMapID(dbId, objId);
+	    }
+	    
+	    // ok, it's not a transient id...
 	    
 	    String currentIdStr = otidStr;	    	   
 	    if(bangIndex > 0) {

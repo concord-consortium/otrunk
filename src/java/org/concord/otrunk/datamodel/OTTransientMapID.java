@@ -5,11 +5,12 @@ import org.concord.framework.otrunk.OTID;
 public class OTTransientMapID
     implements OTID
 {
+	public static final String TRANSIENT_ID_PREFIX = "transient:";
 	OTID mappedId;
 	Object mapToken;
 	int hashCode;
 	
-	public OTTransientMapID(Object mapToken, OTID mappedId)
+	public OTTransientMapID(OTID mapToken, OTID mappedId)
 	{
 		this.mappedId = mappedId;
 		this.mapToken = mapToken;
@@ -18,7 +19,7 @@ public class OTTransientMapID
 	
 	protected String internalToString()
 	{
-        return mapToken.toString() + "!" + mappedId.toExternalForm();		
+        return TRANSIENT_ID_PREFIX + mapToken.toString().replaceFirst("%", "") + "!" + mappedId.toExternalForm();		
 	}
 	
     /**
@@ -69,4 +70,12 @@ public class OTTransientMapID
     {
 		throw new RuntimeException("Transient IDs do not have a direct external form, OTObjectService.getExternalID should used instead.\n");
     }
+	
+	/*
+	 * Transient IDs should never be persisted! This method is for temporary runtime use only!
+	 */
+	public String toInternalForm()
+	{
+		return internalToString().replaceFirst("%", "");
+	}
 }
