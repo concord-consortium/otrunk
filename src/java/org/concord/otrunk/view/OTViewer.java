@@ -1077,53 +1077,6 @@ public class OTViewer extends JFrame
 		}
 	}
 
-	public void remoteSaveData(String method)
-	    throws Exception
-	{
-		HttpURLConnection urlConn;
-		DataOutputStream urlDataOut;
-		BufferedReader urlDataIn;
-
-		// If method isn't "POST" or "PUT", throw an exception
-		if (!(method.compareTo(OTViewer.HTTP_POST) == 0 || method.compareTo(OTViewer.HTTP_PUT) == 0)) {
-			throw new Exception("Invalid HTTP Request method for data saving");
-		}
-
-		urlConn = (HttpURLConnection) remoteURL.openConnection();
-		urlConn.setDoInput(true);
-		urlConn.setDoOutput(true);
-		urlConn.setUseCaches(false);
-		urlConn.setRequestMethod(method);
-		urlConn.setRequestProperty("Content-Type", "application/xml");
-
-		// Send POST output.
-		urlDataOut = new DataOutputStream(urlConn.getOutputStream());
-		ExporterJDOM.export(urlDataOut, xmlDB.getRoot(), xmlDB);
-		urlDataOut.flush();
-		urlDataOut.close();
-
-		// Get response data.
-		urlDataIn =
-		    new BufferedReader(new InputStreamReader(new DataInputStream(
-		        urlConn.getInputStream())));
-		String str;
-		String response = "";
-		while (null != ((str = urlDataIn.readLine()))) {
-			response += str + "\n";
-		}
-		urlDataIn.close();
-		// Need to trap non-HTTP 200/300 responses and throw an exception (if an
-		// exception isn't thrown already) and capture the exceptions upstream
-		int code = urlConn.getResponseCode();
-		if (code >= 400) {
-			throw new Exception("HTTP Response: " + urlConn.getResponseMessage() + "\n\n"
-			        + response);
-		}
-		urlConn.disconnect();
-		xmlDB.setDirty(false);
-		setTitle(remoteURL.toString());
-	}
-
 	public void createActions()
 	{
 		newUserDataAction = new AbstractAction("New") {
@@ -1290,12 +1243,15 @@ public class OTViewer extends JFrame
 					try {
 						if (OTConfig.isRestEnabled()) {
 							try {
-								remoteSaveData(OTViewer.HTTP_PUT);
+								otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_PUT);
+								setTitle(remoteURL.toString());
 							} catch (Exception e) {
-								remoteSaveData(OTViewer.HTTP_POST);
+								otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_POST);
+								setTitle(remoteURL.toString());
 							}
 						} else {
-							remoteSaveData(OTViewer.HTTP_POST);
+							otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_POST);
+							setTitle(remoteURL.toString());
 						}
 					} catch (Exception e) {
 						JOptionPane.showMessageDialog(
@@ -1439,7 +1395,8 @@ public class OTViewer extends JFrame
 						//  has a security sandbox.
 						System.setProperty(OTConfig.REST_ENABLED_PROP,
 						        Boolean.toString(restCheckbox.isSelected()));
-						remoteSaveData(OTViewer.HTTP_POST);
+						otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_POST);
+						setTitle(remoteURL.toString());
 						updateMenuBar();
 					} catch (Exception e) {
 						System.err.println("Bad URL. Not saving.");

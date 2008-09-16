@@ -29,9 +29,14 @@
  */
 package org.concord.otrunk;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -67,6 +72,8 @@ import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.OTConfig;
 import org.concord.otrunk.view.OTUserSession;
+import org.concord.otrunk.view.OTViewer;
+import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
 
 /**
@@ -789,5 +796,53 @@ public class OTrunkImpl implements OTrunk
 	public OTDataObjectFinder getDataObjectFinder()
     {
     	return dataObjectFinder;
+    }
+	
+	public void remoteSaveData(OTDatabase db, URL remoteURL, String method)
+    throws Exception
+    {
+    	HttpURLConnection urlConn;
+    	DataOutputStream urlDataOut;
+    	BufferedReader urlDataIn;
+    
+    	// If method isn't "POST" or "PUT", throw an exception
+    	if (!(method.compareTo(OTViewer.HTTP_POST) == 0 || method.compareTo(OTViewer.HTTP_PUT) == 0)) {
+    		throw new Exception("Invalid HTTP Request method for data saving");
+    	}
+    
+    	urlConn = (HttpURLConnection) remoteURL.openConnection();
+    	urlConn.setDoInput(true);
+    	urlConn.setDoOutput(true);
+    	urlConn.setUseCaches(false);
+    	urlConn.setRequestMethod(method);
+    	urlConn.setRequestProperty("Content-Type", "application/xml");
+    
+    	// Send POST output.
+    	urlDataOut = new DataOutputStream(urlConn.getOutputStream());
+    	ExporterJDOM.export(urlDataOut, db.getRoot(), db);
+    	urlDataOut.flush();
+    	urlDataOut.close();
+    
+    	// Get response data.
+    	urlDataIn =
+    	    new BufferedReader(new InputStreamReader(new DataInputStream(
+    	        urlConn.getInputStream())));
+    	String str;
+    	String response = "";
+    	while (null != ((str = urlDataIn.readLine()))) {
+    		response += str + "\n";
+    	}
+    	urlDataIn.close();
+    	// Need to trap non-HTTP 200/300 responses and throw an exception (if an
+    	// exception isn't thrown already) and capture the exceptions upstream
+    	int code = urlConn.getResponseCode();
+    	if (code >= 400) {
+    		throw new Exception("HTTP Response: " + urlConn.getResponseMessage() + "\n\n"
+    		        + response);
+    	}
+    	urlConn.disconnect();
+    	if (db instanceof XMLDatabase) {
+    		((XMLDatabase)db).setDirty(false);
+    	}
     }
 }
