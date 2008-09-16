@@ -71,6 +71,7 @@ import org.concord.otrunk.overlay.OverlayImpl;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.OTConfig;
+import org.concord.otrunk.view.OTUserList;
 import org.concord.otrunk.view.OTUserSession;
 import org.concord.otrunk.view.OTViewer;
 import org.concord.otrunk.xml.ExporterJDOM;
@@ -542,7 +543,13 @@ public class OTrunkImpl implements OTrunk
 	        if(otOverlays != null && otOverlays.size() > 0){
 	        	overlays = new ArrayList();
 	        	for(int i=0; i<otOverlays.size(); i++){
-	        		OTOverlay otOverlay = (OTOverlay) otOverlays.get(i);
+	        		OTOverlay otOverlay;
+	        		OTObject otOverlayObj = otOverlays.get(i);
+	        		if (otOverlayObj instanceof OTIncludeRootObject) {
+	        			otOverlay = (OTOverlay) ((OTIncludeRootObject)otOverlayObj).getReference();
+	        		} else {
+	        			otOverlay = (OTOverlay) otOverlays.get(i);
+	        		}
 	        		Overlay overlay = new OverlayImpl(otOverlay);
 	        		if (overlay != null)
 	        			overlays.add(overlay);
