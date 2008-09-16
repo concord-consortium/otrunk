@@ -234,7 +234,7 @@ public class CompositeDatabase
     {
         if(id instanceof OTTransientMapID) {
         	OTTransientMapID mappedID = (OTTransientMapID)id;
-            if(getDatabaseId() == mappedID.getMapToken()) {
+            if(getDatabaseId().equals(mappedID.getMapToken())) {
                 // This is an id that came from our database
                 // so get the relative part of the id which is 
                 // either an id in the

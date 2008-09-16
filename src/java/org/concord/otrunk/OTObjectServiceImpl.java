@@ -295,7 +295,7 @@ public class OTObjectServiceImpl
     {    	
         if(id instanceof OTTransientMapID) {
             Object mapToken = ((OTTransientMapID)id).getMapToken();
-            return mapToken == creationDb.getDatabaseId();            
+            return creationDb.getDatabaseId().equals(mapToken);            
         }
 
         // Check our mainDb to see if it contains the object
