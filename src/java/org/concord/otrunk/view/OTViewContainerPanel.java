@@ -35,6 +35,7 @@ package org.concord.otrunk.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -221,7 +222,16 @@ public class OTViewContainerPanel extends JPanel
 	{
 		if(currentView != null) {
 			try {
-				currentView.viewClosed();
+				// Call on the event thread if we're not already on it
+				if (EventQueue.isDispatchThread()) {
+					currentView.viewClosed();
+				} else {
+					EventQueue.invokeAndWait(new Runnable() {
+						public void run() {
+							currentView.viewClosed();
+                        }
+					});
+				}
 			} catch (Throwable t) {
 				// attempting to close the view caused some form of exception
 				// print the exception and keep going.  This might cause later
