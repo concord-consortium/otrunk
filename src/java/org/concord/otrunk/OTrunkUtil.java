@@ -30,9 +30,6 @@ public class OTrunkUtil
 {
 
 	/**
-	 * This should be redone to only work with OTObjects, and it should
-	 * use the data model under the OTObject, instead of reflection on the 
-	 * object itself.
 	 * 
 	 * @param propertyPath
 	 * @param root
@@ -300,5 +297,103 @@ public class OTrunkUtil
 			Object value = otObject.otGet(property);
 			System.out.println("  " + property.getName() + "=" + value);
 		}		
+	}
+	
+	
+	/**
+	 * Compare the content of the 2 objects.  This isn't complete, it will probably return
+	 * false in some cases when the objects are the same.  So use with caution.
+	 * @param obj1
+	 * @param obj2
+	 * @return
+	 */
+	public static boolean compareObjects(OTObject obj1, OTObject obj2)
+	{		
+		OTClass otClass = obj1.otClass();
+		if(!otClass.equals(obj2.otClass())){
+			return false;
+		}
+		
+		ArrayList allClassProperties = otClass.getOTAllClassProperties();
+		for(int i=0; i<allClassProperties.size(); i++){
+			OTClassProperty property = (OTClassProperty) allClassProperties.get(i);
+		
+			// skip local id properties
+			if("localId".equals(property.getName())){
+				continue;
+			}
+			
+			boolean isSet = obj1.otIsSet(property);
+			if(isSet != obj2.otIsSet(property)){
+				return false;
+			}
+			
+			if(!isSet){
+				continue;
+			}
+			
+			// skip otxml strings because the will have changed and we
+			// need special parsing code to handle them
+			if(property.getType().getInstanceClass() == OTXMLString.class ){
+				continue;
+			}
+			
+			Object value1 = obj1.otGet(property);
+			Object value2 = obj2.otGet(property);
+
+			if(value1 instanceof OTObject && value2 instanceof OTObject){
+				if(!compareObjects((OTObject)value1, (OTObject)value2)){
+					return false;
+				}
+			} else if (value1 instanceof OTObjectList){
+				OTObjectList list1 = (OTObjectList) value1;
+				OTObjectList list2 = (OTObjectList) value2;
+				if(list1.size() != list2.size()){
+					return false;
+				}
+				
+				for(int j=0; j<list1.size(); j++){
+					if(!compareObjects(list1.get(j), list2.get(j))){
+						return false;
+					}
+				}
+				
+			} else if (value1 instanceof OTObjectMap){
+				OTObjectMap map1 = (OTObjectMap) value1;
+				OTObjectMap map2 = (OTObjectMap) value2;
+				if(map1.size() != map2.size()){
+					return false;
+				}
+				
+				Vector objectKeys = map1.getObjectKeys();
+				for(int j=0; j<objectKeys.size(); j++){
+					String key = (String) objectKeys.get(j);
+					if(!compareObjects(map1.getObject(key), map2.getObject(key))){
+						return false;
+					}
+					
+				}				
+			} else if(value1 instanceof BlobResource && value2 instanceof BlobResource){
+				BlobResource blob1 = (BlobResource) value1;
+				BlobResource blob2 = (BlobResource) value2;
+				byte[] bytes1 = blob1.getBytes();
+				byte[] bytes2 = blob2.getBytes();
+				
+				if(bytes1.length != bytes2.length){
+					return false;
+				}
+				
+				for(int j=0;j<bytes1.length;j++){
+					if(bytes1[j] != bytes2[j]){
+						return false;
+					}
+				}
+			} else {
+				if(!value1.equals(value2)){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }
