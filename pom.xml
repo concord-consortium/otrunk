@@ -59,6 +59,12 @@
       <version>1.0</version>
       <scope>compile</scope>
     </dependency>    
+    <dependency>
+      <groupId>org.concord</groupId>
+      <artifactId>otrunk-ui</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <!--  if we have resources we will need to fix the resource directory too -->
@@ -69,12 +75,14 @@
 	      <directory>src/resources</directory>
 	   </resource>
 	</resources>
+	<testResources>
+	</testResources>
 	<plugins>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludes>
-            <exclude>**/EmbedObjectTest.java</exclude>
+            <exclude>org/concord/otrunk/test/**</exclude>
           </excludes>
         </configuration>
       </plugin>
