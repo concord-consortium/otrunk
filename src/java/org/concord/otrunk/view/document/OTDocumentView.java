@@ -461,7 +461,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		}
 
 		inText = inText.replaceAll("<p[ ]*/>", "<p></p>");
-		inText = inText.replaceAll("<div(.*)/>", "<div$1></div>");
+		inText = inText.replaceAll("<div([^>]*)/>", "<div$1></div>");
 		return inText.replaceAll("<([^>]*)/>", "<$1>");
 
 		/*
