@@ -136,11 +136,11 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			tabbedPane = new JTabbedPane();
 
 			textArea = new JTextArea(textAreaModel);
-			textArea.setEnabled(false);
+			textArea.setEditable(false);
 			JScrollPane scrollPane = new JScrollPane(textArea);
 			tabbedPane.add("Source", scrollPane);
 
-			parsedTextArea.setEnabled(false);
+			parsedTextArea.setEditable(false);
 			scrollPane = new JScrollPane(parsedTextArea);
 			tabbedPane.add("Parsed", scrollPane);
 			
@@ -405,6 +405,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			}
 		}
 		
+		// $0 means to just leave the text as is, don't replace anything
 		return "$0";
 	}
 
