@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.view.OTJComponentViewContextAware;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
@@ -15,7 +14,8 @@ import org.concord.framework.otrunk.view.OTViewFactory;
 class OTViewContextImpl implements OTViewContext
 {
     Map services = new HashMap();
-
+    HashMap properties = new HashMap();
+    
     private final OTViewFactoryImpl factory;
 	private OTViewContext parent;
 
@@ -70,5 +70,25 @@ class OTViewContextImpl implements OTViewContext
 	public OTView getViewByObject(OTObject obj)
     {
 		throw new UnsupportedOperationException("not implemented yet");
+    }
+
+	public String getProperty(String propertyName)
+    {
+		String value = (String) properties.get(propertyName);
+		if(parent != null && value == null && !properties.containsKey(propertyName)){
+			return parent.getProperty(propertyName);
+		}
+		
+		return value;
+    }
+
+	public void setProperty(String propertyName, String propertyValue)
+    {
+		properties.put(propertyName, propertyValue);
+    }
+
+	public void unsetProperty(String propertyName)
+    {
+		properties.remove(propertyName);	    
     }		
 }
