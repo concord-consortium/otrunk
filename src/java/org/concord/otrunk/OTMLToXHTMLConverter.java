@@ -67,8 +67,6 @@ public class OTMLToXHTMLConverter
 
 	private OTViewFactory viewFactory;
 
-	private String mode;
-
 	private int containerDisplayWidth;
 
 	private int containerDisplayHeight;
@@ -87,7 +85,7 @@ public class OTMLToXHTMLConverter
 	        OTViewContainer viewContainer)
 	{
 		setViewContainer(viewContainer);
-		setViewFactory(viewFactory);
+		setViewFactory(viewFactory, null);
 	}
 
 	public OTMLToXHTMLConverter(OTViewFactory viewFactory, OTObject otObject)
@@ -104,26 +102,24 @@ public class OTMLToXHTMLConverter
 	public OTMLToXHTMLConverter(OTViewFactory viewFactory, OTObject otObject,
 		OTViewEntry viewEntry, String mode)
 	{
-		setViewFactory(viewFactory);
+		setViewFactory(viewFactory, mode);
 		this.topLevelOTObjects = new OTObject[1];
 		this.topLevelViewEntries = new OTViewEntry[1];
 		this.topLevelOTObjects[0] = otObject;
 		this.topLevelViewEntries[0] = viewEntry;
-		this.mode = mode;
 	}
 	
 	public OTMLToXHTMLConverter(OTViewFactory viewFactory, OTObject[] otObjects)
-{
-	this(viewFactory, otObjects, OTViewFactory.NO_VIEW_MODE);
-}
+	{
+		this(viewFactory, otObjects, OTViewFactory.NO_VIEW_MODE);
+	}
 
 	public OTMLToXHTMLConverter(OTViewFactory viewFactory, OTObject[] otObjects,
 	        String mode)
 	{
-		setViewFactory(viewFactory);
+		setViewFactory(viewFactory, mode);
 		this.topLevelOTObjects = otObjects;
 		this.topLevelViewEntries = new OTViewEntry[otObjects.length];
-		this.mode = mode;
 	}
 
 	public void setViewContainer(OTViewContainer viewContainer)
@@ -137,9 +133,12 @@ public class OTMLToXHTMLConverter
 		}
 	}
 
-	public void setViewFactory(OTViewFactory viewFactory)
+	public void setViewFactory(OTViewFactory viewFactory, String mode)
 	{
-		this.viewFactory = viewFactory;
+		this.viewFactory = viewFactory.getViewContext().createChildViewFactory();
+		this.viewFactory.setDefaultViewMode(mode);
+		this.viewFactory.getViewContext().setProperty(OTXHTMLView.ALWAYS_EMBED_XHTML_VIEW, 
+			"true");
 	}
 
 	// This is not applicable.
@@ -190,7 +189,7 @@ public class OTMLToXHTMLConverter
 			
 			String text = null;
 
-			OTJComponentView objView = getOTJComponentView(topLevelOTObjects[i], mode, topLevelViewEntries[i]);
+			OTJComponentView objView = getOTJComponentView(topLevelOTObjects[i], null, topLevelViewEntries[i]);
 
 			OTXHTMLView xhtmlView = null;
 			String bodyText = "";
@@ -341,7 +340,7 @@ public class OTMLToXHTMLConverter
 
 	protected JComponent getJComponent(OTObject obj, OTViewEntry viewEntry)
 	{
-		OTJComponentView objView = getOTJComponentView(obj, mode, viewEntry);
+		OTJComponentView objView = getOTJComponentView(obj, null, viewEntry);
 
 		JComponent comp = objView.getComponent(obj);
 		return comp;
@@ -351,8 +350,7 @@ public class OTMLToXHTMLConverter
 	{
 		OTView view = viewFactory.getView(obj, OTPrintDimension.class);
 		if (view == null) {
-			view = (OTView) viewFactory.getView(obj, OTJComponentView.class,
-			        mode);
+			view = (OTView) viewFactory.getView(obj, OTJComponentView.class);
 		}
 		
 		if (view instanceof OTXHTMLView) {
@@ -360,7 +358,7 @@ public class OTMLToXHTMLConverter
 			return objectText;
 		}
 
-		view = getOTJComponentView(obj, mode, viewEntry);
+		view = getOTJComponentView(obj, null, viewEntry);
 		JComponent comp = ((OTJComponentView)view).getComponent(obj);
 
 		Dimension printDim = null;

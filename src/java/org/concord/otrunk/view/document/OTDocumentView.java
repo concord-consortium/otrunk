@@ -388,7 +388,10 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			}
 		}
 		
-		if (view instanceof OTXHTMLView && ((OTXHTMLView)view).getEmbedXHTMLView()) {
+		boolean alwaysEmbedXHTMLView = viewContext.getProperty(ALWAYS_EMBED_XHTML_VIEW) != null;
+		
+		if (view instanceof OTXHTMLView && 
+				(alwaysEmbedXHTMLView || ((OTXHTMLView)view).getEmbedXHTMLView())) {
 			OTXHTMLView xhtmlView = (OTXHTMLView) view;
 			try {
 				String replacement = xhtmlView.getXHTMLText(referencedObject);
@@ -414,7 +417,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 			return null;
 		}
 
-		Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"[^>]*>");
+		Pattern p = Pattern.compile("<object[^>]*refid=\"([^\"]*)\"[^>]*>");
 		Pattern pViewId = Pattern.compile("viewid=\"([^\"]*)\"");
 		Pattern pMode = Pattern.compile("mode=\"([^\"]*)\"");
 		Pattern pUser = Pattern.compile("user=\"([^\"]*)\"");
