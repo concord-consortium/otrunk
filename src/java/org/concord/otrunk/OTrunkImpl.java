@@ -404,7 +404,11 @@ public class OTrunkImpl implements OTrunk
     		if(!(db instanceof XMLDatabase)) continue;
     		
     		XMLDatabase xmlDatabase = (XMLDatabase) db;
-    		if(xmlDatabase.getContextURL().equals(url)){
+    		URL contextURL = xmlDatabase.getContextURL();
+    		if (contextURL == null) {
+    			System.err.println("Database without a context url! " + xmlDatabase.getDatabaseId());
+    		}
+    		else if (contextURL.equals(url)){
     			return getExistingObjectService(xmlDatabase);
     		}
     	}
