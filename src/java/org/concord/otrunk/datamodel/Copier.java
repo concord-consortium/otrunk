@@ -280,8 +280,18 @@ public class Copier
 			}
 								
 			// replace the id with the new id
+			String copiedExternalId;
+			if (idProvider != null){
+				copiedExternalId = idProvider.getExternalID(copiedId);
+    		} else {
+    			try {
+    				copiedExternalId = copiedId.toExternalForm();
+    			} catch (Exception e){
+    				copiedExternalId = copiedId.toString();
+    			}
+    		}
 			matcher.appendReplacement(copiedStringBuf, 
-				  attributeName + "=\"" + copiedId.toExternalForm() + "\"");
+				  attributeName + "=\"" + copiedExternalId + "\"");
 			
 			// now the next problem is where to store this copied object
 			// if it was already handled we don't need to figure out 
