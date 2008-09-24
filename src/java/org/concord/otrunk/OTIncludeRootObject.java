@@ -1,6 +1,7 @@
 package org.concord.otrunk;
 
 import java.net.URL;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTObject;
@@ -16,6 +17,7 @@ public class OTIncludeRootObject extends DefaultOTObject
 	protected ResourceSchema resources;
 
 	OTObject refObject = null;
+	private Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	public OTIncludeRootObject(ResourceSchema resources)
     {
@@ -39,7 +41,8 @@ public class OTIncludeRootObject extends DefaultOTObject
 		OTrunkImpl otrunkImpl = (OTrunkImpl)getOTObjectService().getOTrunkService(OTrunk.class);
 		
 		try {
-			refObject = otrunkImpl.getExternalObject(url, getOTObjectService());			
+			refObject = otrunkImpl.getExternalObject(url, getOTObjectService());
+			logger.info("included root object: " + refObject.otExternalId());
 			return refObject;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
