@@ -34,5 +34,7 @@ public interface OTUserDatabaseRef extends OTObjectInterface
 {
 	URL getUrl();
 	
+	URL getOverlayURL();
+	
 	String getWorkgroupUuid();
 }
