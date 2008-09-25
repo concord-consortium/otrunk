@@ -2,14 +2,19 @@ package org.concord.otrunk.overlay;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Vector;
 
+import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.user.OTUserObject;
 
 public class OTUserOverlayManager
 {
 	HashMap overlayToObjectServiceMap;
 	HashMap userToOverlayMap;
+	Vector overlayDatabases;
 	
 	public OTUserOverlayManager() {
 		overlayToObjectServiceMap = new HashMap();
@@ -19,6 +24,10 @@ public class OTUserOverlayManager
 	public void add(OTOverlay otOverlay, OTObjectService objService, OTUserObject userObject) {
 		overlayToObjectServiceMap.put(otOverlay, objService);
 		userToOverlayMap.put(userObject, otOverlay);
+		
+		if (objService instanceof OTObjectServiceImpl) {
+			overlayDatabases.add(((OTObjectServiceImpl) objService).getCreationDb());
+		}
 	}
 	
 	public OTObjectService getObjectService(OTOverlay overlay) {
@@ -60,5 +69,18 @@ public class OTUserOverlayManager
 	public OTUserObject getUserObject(OTObjectService objService) {
 		OTOverlay overlay = getOverlay(objService);
 		return getUserObject(overlay);
+	}
+	
+	public Vector getOverlayDatabases() {
+		return this.overlayDatabases;
+	}
+	
+	public OTObject getOverlayObject(OTUserObject userObject, OTID id) throws Exception {
+		return getOverlayObject(getOverlay(userObject), id);
+	}
+	
+	public OTObject getOverlayObject(OTOverlay overlay, OTID id) throws Exception {
+		OTObjectService objService = getObjectService(overlay);
+		return objService.getOTObject(id);
 	}
 }
