@@ -39,6 +39,7 @@ public class OTAddOverlayAction extends DefaultOTObject
 
 	public void doAction(OTActionContext context)
 	{
+		resources.getOverlayGroup().getOverlays().removeAll();
 		resources.getOverlayGroup().getOverlays().add(resources.getOverlay());
 	}
 
