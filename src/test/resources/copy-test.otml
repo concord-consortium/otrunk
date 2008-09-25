@@ -45,7 +45,7 @@
         <OTFolderObject> 
         <children>  
           <OTTextObject local_id="external_text" name="external text">
-              <bodyText>External Textt</bodyText>
+              <bodyText>External Text</bodyText>
           </OTTextObject>          
         </children>
         </OTFolderObject>
