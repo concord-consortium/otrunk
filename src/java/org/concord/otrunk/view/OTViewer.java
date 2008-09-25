@@ -49,13 +49,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -99,6 +94,7 @@ import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrameManager;
@@ -116,6 +112,7 @@ import org.concord.otrunk.OTSystem;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkServiceEntry;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.overlay.OTOverlayGroup;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -693,10 +690,25 @@ public class OTViewer extends JFrame
 		reloadWindow();
 	}
 
+	public void updateOverlayGroupListeners()
+	{
+		OTObjectList overlays = userSystem.getOverlays();
+		for(int i=0; i<overlays.size(); i++){
+			OTObject item = overlays.get(i);
+			if(item instanceof OTOverlayGroup){
+				((OTOverlayGroup) item).addOTChangeListener(systemChangeListener);
+			}
+		}
+		
+	}
+	
 	public void reloadOverlays()
 	{
 		try {
 			otrunk.reloadOverlays(userSession);
+
+			updateOverlayGroupListeners();
+			
 			reloadWindow();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -876,6 +888,8 @@ public class OTViewer extends JFrame
 							}
 						};
 
+						updateOverlayGroupListeners();
+						
 						userSystem.addOTChangeListener(systemChangeListener);
 					}
 				}
