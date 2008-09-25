@@ -25,6 +25,8 @@
 package org.concord.otrunk.view;
 
 
+import java.net.URL;
+
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectInterface;
 
@@ -36,4 +38,6 @@ public interface OTMultiUserRoot extends OTObjectInterface
 	OTObject getReportTemplate();
 	
 	OTObject getReportTemplateViewEntry();
+	
+	URL getGroupOverlayURL();
 }
