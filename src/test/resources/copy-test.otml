@@ -11,7 +11,7 @@
   </imports>
   <objects>
     <OTSystem>
-      <services>
+      <bundles>
         <OTViewService>
           <viewEntries>
             <OTViewEntry local_id="text_edit"
@@ -19,7 +19,7 @@
               viewClass="org.concord.otrunk.view.document.OTTextObjectView"/>
           </viewEntries>
         </OTViewService>
-      </services>
+      </bundles>
       <root>
         <OTFolderObject> 
         <children>  
