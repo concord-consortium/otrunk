@@ -80,6 +80,9 @@ public class OTUserOverlayManager
 	
 	public OTObject getOTObject(OTOverlay overlay, OTID id) throws Exception {
 		OTObjectService objService = getObjectService(overlay);
+		if (objService == null) {
+			return null;
+		}
 		return objService.getOTObject(id);
 	}
 }
