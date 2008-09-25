@@ -244,7 +244,7 @@ public class Copier
 				
 				// We should first check if the otid is a valid id, if not then it is
 				// an invalid match
-				OTDataObject matchedDataObject = otDb.getOTDataObject(root, otid);
+				OTDataObject matchedDataObject = dataObjectFinder.findDataObject(otid);
 				if(matchedDataObject == null){
 					// this id isn't in our database or it is invalid
 					// print a warning and continue
@@ -284,11 +284,7 @@ public class Copier
 			if (idProvider != null){
 				copiedExternalId = idProvider.getExternalID(copiedId);
     		} else {
-    			try {
-    				copiedExternalId = copiedId.toExternalForm();
-    			} catch (Exception e){
-    				copiedExternalId = copiedId.toString();
-    			}
+    			copiedExternalId = copiedId.toExternalForm();
     		}
 			matcher.appendReplacement(copiedStringBuf, 
 				  attributeName + "=\"" + copiedExternalId + "\"");
