@@ -74,11 +74,11 @@ public class OTUserOverlayManager
 		return this.overlayDatabases;
 	}
 	
-	public OTObject getOverlayObject(OTUserObject userObject, OTID id) throws Exception {
-		return getOverlayObject(getOverlay(userObject), id);
+	public OTObject getOTObject(OTUserObject userObject, OTID id) throws Exception {
+		return getOTObject(getOverlay(userObject), id);
 	}
 	
-	public OTObject getOverlayObject(OTOverlay overlay, OTID id) throws Exception {
+	public OTObject getOTObject(OTOverlay overlay, OTID id) throws Exception {
 		OTObjectService objService = getObjectService(overlay);
 		return objService.getOTObject(id);
 	}
