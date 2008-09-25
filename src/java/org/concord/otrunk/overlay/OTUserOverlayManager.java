@@ -12,13 +12,12 @@ import org.concord.otrunk.user.OTUserObject;
 
 public class OTUserOverlayManager
 {
-	HashMap overlayToObjectServiceMap;
-	HashMap userToOverlayMap;
-	Vector overlayDatabases;
+	HashMap overlayToObjectServiceMap = new HashMap();
+	HashMap userToOverlayMap = new HashMap();
+	Vector overlayDatabases = new Vector();
 	
 	public OTUserOverlayManager() {
-		overlayToObjectServiceMap = new HashMap();
-		userToOverlayMap = new HashMap();
+
 	}
 	
 	public void add(OTOverlay otOverlay, OTObjectService objService, OTUserObject userObject) {
