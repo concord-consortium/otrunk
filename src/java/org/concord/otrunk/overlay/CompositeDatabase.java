@@ -146,6 +146,10 @@ public class CompositeDatabase
     	return activeOverlay.createDeltaObject(baseObject);
     }
     
+    public OTDatabase getActiveOverlayDb() {
+    	return activeOverlayDb;
+    }
+    
     /**
      * FIXME:  This method uses the state database to determine whether
      * an object can be directly changed or it needs to be wrapped by 
