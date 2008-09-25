@@ -66,12 +66,12 @@ import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.overlay.CompositeDataObject;
 import org.concord.otrunk.overlay.CompositeDatabase;
 import org.concord.otrunk.overlay.OTOverlay;
+import org.concord.otrunk.overlay.OTOverlayGroup;
 import org.concord.otrunk.overlay.Overlay;
 import org.concord.otrunk.overlay.OverlayImpl;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.OTConfig;
-import org.concord.otrunk.view.OTUserList;
 import org.concord.otrunk.view.OTUserSession;
 import org.concord.otrunk.view.OTViewer;
 import org.concord.otrunk.xml.ExporterJDOM;
@@ -539,27 +539,41 @@ public class OTrunkImpl implements OTrunk
         compositeDatabases.put(userId, userDb);	
         userObjectServices.put(userId, userObjService);
 
-        // After the user database is complete setup, now we get the overlays.  This way 
-        // the user can change the overlays list.
+        // After the user database is completely setup, now we get the overlays.  
+        // This way the user can change the overlays list and those changes will
+        // affect the overlay list when they are loaded.
+        
+        // The overlay list is added to one overlay at a time.  This allows
+        // overlays to also modify the list or its values.
+        // OTOverlayGroup objects are useful so an overlay or user can insert
+        // an overlay into the list without modifying the whole overlay list.
     	try {
         	ArrayList overlays = null;
 	        OTObjectList otOverlays = getSystemOverlays(user);
 	        if(otOverlays != null && otOverlays.size() > 0){
 	        	overlays = new ArrayList();
+		        userDb.setOverlays(overlays);
 	        	for(int i=0; i<otOverlays.size(); i++){
 	        		OTOverlay otOverlay;
 	        		OTObject otOverlayObj = otOverlays.get(i);
 	        		if (otOverlayObj instanceof OTIncludeRootObject) {
-	        			otOverlay = (OTOverlay) ((OTIncludeRootObject)otOverlayObj).getReference();
-	        		} else {
-	        			otOverlay = (OTOverlay) otOverlays.get(i);
+	        			otOverlayObj = ((OTIncludeRootObject)otOverlayObj).getReference();
 	        		}
-	        		Overlay overlay = new OverlayImpl(otOverlay);
-	        		if (overlay != null)
-	        			overlays.add(overlay);
+
+	        		if(otOverlayObj instanceof OTOverlayGroup){
+	        			OTObjectList members = ((OTOverlayGroup)otOverlayObj).getOverlays();
+	        			for(int j=0; j<members.size(); j++){
+			        		otOverlay = (OTOverlay) members.get(j);
+			        		Overlay overlay = new OverlayImpl(otOverlay);
+			        		overlays.add(overlay);	        				        				
+	        			}
+	        		} else {
+		        		otOverlay = (OTOverlay) otOverlayObj;
+		        		Overlay overlay = new OverlayImpl(otOverlay);
+		        		overlays.add(overlay);	        			
+	        		}
 	        	}
 	        }
-	        userDb.setOverlays(overlays);
         } catch (Exception e) {
 	        // TODO Auto-generated catch block
 	        e.printStackTrace();
