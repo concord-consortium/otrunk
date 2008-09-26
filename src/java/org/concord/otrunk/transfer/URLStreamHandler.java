@@ -36,7 +36,11 @@ public class URLStreamHandler
     	}		
     
     	if (inStream != null) {
-    		System.err.println("  available bytes in input stream: " + inStream.available());
+    		try {
+    			System.err.println("  available bytes in input stream: " + inStream.available());
+    		} catch (IOException e1){
+    			// can't get the available bytes for some reason.
+    		}
     	}
     	
     	Map headerFields = connection.getHeaderFields();
