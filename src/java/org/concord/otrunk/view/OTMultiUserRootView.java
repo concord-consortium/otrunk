@@ -127,6 +127,10 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 	protected void loadGlobalOverlay(OTMultiUserRoot root) {
 		// get the list of overlays
 		try {
+			if(root.getGroupOverlayURL() == null){
+				return;
+			}
+			
 			OTOverlay overlay = (OTOverlay) otrunk.getExternalObject(root.getGroupOverlayURL(), root.getOTObjectService());
 	        if (overlay != null) {
     	        // set up the objectService for it
