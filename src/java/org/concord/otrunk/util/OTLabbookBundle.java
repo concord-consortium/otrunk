@@ -42,10 +42,13 @@ public class OTLabbookBundle extends DefaultOTObject
 
 	public void registerServices(OTServiceContext serviceContext)
 	{
-		labbookManagerProvider = new OTLabbookManagerProviderImpl(resources);
+		labbookManagerProvider = new OTLabbookManagerProviderImpl(this);
 		serviceContext.addService(OTLabbookManagerProvider.class, labbookManagerProvider);
 	}
 	
+	public ResourceSchema getResources(){
+		return resources;
+	}
 	/**
 	 * @return Snapshots taken of models or other objects that don't fit into
 	 * the other categories
