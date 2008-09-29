@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -823,7 +824,11 @@ public class OTrunkImpl implements OTrunk
     	return dataObjectFinder;
     }
 	
-	public void remoteSaveData(OTDatabase db, URL remoteURL, String method)
+	public void remoteSaveData(OTDatabase db, URL remoteURL, String method) throws Exception {
+		remoteSaveData(db, remoteURL, method, null);
+	}
+	
+	public void remoteSaveData(OTDatabase db, URL remoteURL, String method, Authenticator auth)
     throws Exception
     {
     	HttpURLConnection urlConn;
@@ -833,6 +838,10 @@ public class OTrunkImpl implements OTrunk
     	// If method isn't "POST" or "PUT", throw an exception
     	if (!(method.compareTo(OTViewer.HTTP_POST) == 0 || method.compareTo(OTViewer.HTTP_PUT) == 0)) {
     		throw new Exception("Invalid HTTP Request method for data saving");
+    	}
+    	
+    	if (auth != null) {
+    		Authenticator.setDefault(auth);
     	}
     
     	urlConn = (HttpURLConnection) remoteURL.openConnection();
