@@ -2,20 +2,24 @@ package org.concord.otrunk.util;
 
 import java.util.HashMap;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTLabbookManager;
 import org.concord.framework.otrunk.view.OTLabbookManagerProvider;
+import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.util.OTLabbookBundle.ResourceSchema;
 
 public class OTLabbookManagerProviderImpl
     implements OTLabbookManagerProvider
 {
-	private ResourceSchema resources;
+	private OTLabbookBundle bundle;
 	private HashMap managerMap;
 
-	public OTLabbookManagerProviderImpl(OTLabbookBundle.ResourceSchema resources)
+	public OTLabbookManagerProviderImpl(OTLabbookBundle bundle)
     {
-	    this.resources = resources;
+	    this.bundle = bundle;
     }
 
 	public OTLabbookManager getLabbookManager(OTObjectService objectService)
@@ -29,9 +33,14 @@ public class OTLabbookManagerProviderImpl
 		}
 		
         try {
-        	OTLabbookBundle bundle = (OTLabbookBundle) objectService.getOTObject(resources.getGlobalId());
-        	this.resources = bundle.resources;
-        	OTLabbookManager manager = new OTLabbookManagerImpl(resources);
+        	OTID bundleId = bundle.getGlobalId();
+        	OTLabbookManager manager;
+        	if (bundleId instanceof OTTransientMapID){
+        		manager = new OTLabbookManagerImpl(bundle.getResources());
+        	} else {
+        		OTLabbookBundle learnerBundle = (OTLabbookBundle) objectService.getOTObject(bundle.getGlobalId());
+        		manager = new OTLabbookManagerImpl(learnerBundle.getResources());
+        	}
         	managerMap.put(objectService, manager);
     		return manager;
         } catch (Exception e) {
