@@ -45,6 +45,7 @@ import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.datamodel.OTUUID;
+import org.concord.otrunk.xml.XMLDataObject;
 
 /**
  * OTTemplateDatabase
@@ -138,12 +139,20 @@ public class CompositeDatabase
 
     public OTDataObject getActiveDeltaObject(OTDataObject baseObject)
     {
-    	return activeOverlay.getDeltaObject(baseObject);
+    	OTDataObject deltaObject = activeOverlay.getDeltaObject(baseObject);
+    	if(deltaObject instanceof XMLDataObject){
+    		((XMLDataObject) deltaObject).setSaveNulls(true);
+    	}
+		return deltaObject;
     }
     
     public OTDataObject createActiveDeltaObject(OTDataObject baseObject)
     {
-    	return activeOverlay.createDeltaObject(baseObject);
+    	OTDataObject deltaObject = activeOverlay.createDeltaObject(baseObject);
+    	if(deltaObject instanceof XMLDataObject){
+    		((XMLDataObject) deltaObject).setSaveNulls(true);
+    	}    	
+		return deltaObject;
     }
     
     public OTDatabase getActiveOverlayDb() {

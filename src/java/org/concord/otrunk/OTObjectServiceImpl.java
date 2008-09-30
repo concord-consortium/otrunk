@@ -317,7 +317,7 @@ public class OTObjectServiceImpl
      * @return
      * @throws Exception
      */
-    private OTDataObject getOTDataObject(OTID childID)
+    OTDataObject getOTDataObject(OTID childID)
         throws Exception
     {
         // sanity check
@@ -354,10 +354,7 @@ public class OTObjectServiceImpl
 		// make a copy of the original objects data object
 		// it is easier to copy data objects than the actual objects
 		
-		OTObjectServiceImpl originalObjectService = (OTObjectServiceImpl) original.getOTObjectService();
-		
-		OTDataObject originalDataObject = 
-			originalObjectService.getOTDataObject(original.getGlobalId());				
+		OTDataObject originalDataObject = OTInvocationHandler.getOTDataObject(original);
 		
 		// Assume the object list is our object list impl
 		OTDataList orphanDataList = 
@@ -422,7 +419,7 @@ public class OTObjectServiceImpl
     {
 		OTID id = otObject.getGlobalId();
 		try {
-	        OTDataObject dataObject = getOTDataObject(id);
+	        OTDataObject dataObject = OTInvocationHandler.getOTDataObject(otObject);
 	        return dataObject.getCodebase();
         } catch (Exception e) {
 	        e.printStackTrace();

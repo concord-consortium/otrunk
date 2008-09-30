@@ -44,6 +44,7 @@ import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTObjectRevision;
 import org.concord.otrunk.datamodel.OTTransientMapID;
+import org.concord.otrunk.xml.XMLDataObject;
 
 
 /**
@@ -143,6 +144,10 @@ public class CompositeDataObject
 			value = localActiveDelta.getResource(key);
 			if(value != null) {
 				return value;
+			} else if(localActiveDelta.containsKey(key)){
+				// check if the localActiveDelta contains this key in which we should
+				// return null, otherwise we should go on down the line
+				return null;
 			}
 		}
 
@@ -159,6 +164,8 @@ public class CompositeDataObject
 					value = delta.getResource(key);
 					if(value != null) {
 						return value;
+					} else if(delta.containsKey(key)){
+						return null;
 					}
 				}
 				
@@ -218,8 +225,8 @@ public class CompositeDataObject
 	    OTDataObject localActiveDelta = getActiveDeltaObject();
 		
 		if(localActiveDelta == null) {
-			localActiveDelta = database.createActiveDeltaObject(baseObject);
-			System.err.println("created delta object: " + localActiveDelta.getGlobalId().toExternalForm());
+			localActiveDelta = database.createActiveDeltaObject(baseObject);			
+			System.err.println("created delta object: " + localActiveDelta.getGlobalId().toExternalForm());			
 		}
 		
 		return localActiveDelta;
@@ -324,5 +331,62 @@ public class CompositeDataObject
 		// FIXME For now return the codebase of the baseObject.
 		//  this needs to be through through more.
 		return baseObject.getCodebase();
+    }
+
+	public boolean containsKey(String key)
+    {
+		// If we are not a composite then do the basic thing
+		if(!composite){
+			return baseObject.containsKey(key);
+		}
+		
+		// first look in the userObject
+		// then look in the middle deltas
+		// then look in the authoringObject
+
+		OTDataObject localActiveDelta = getActiveDeltaObject();
+		if (localActiveDelta != null && localActiveDelta.containsKey(key)) {
+			return true;
+		}
+
+		if(middleDeltas != null){
+			for(int i=0; i<middleDeltas.length; i++){
+				OTDataObject delta = middleDeltas[i];
+				if (delta != null && delta.containsKey(key)) {
+					return true;
+				}				
+			}
+		}
+		
+		return baseObject.containsKey(key);		
+    }
+	
+	public boolean hasOverrideInTopOverlay(String key)
+	{
+		OTDataObject deltaObject = getActiveDeltaObject();
+		if(deltaObject == null){
+			System.err.println("Doesn't have a delta object");
+			return false;
+		}
+		
+		return deltaObject.containsKey(key);
+	}
+
+	public void removeOverrideInTopOverlay(String name)
+    {
+		OTDataObject deltaObject = getActiveDeltaObject();
+		if(deltaObject == null){
+			System.err.println("Doesn't have a delta object");
+			return;
+		}
+		
+		if(!(deltaObject instanceof XMLDataObject)){
+			System.err.println("Can only remove overrides on xml data objects");
+			return;			
+		}
+		
+		((XMLDataObject)deltaObject).setSaveNulls(false);
+		deltaObject.setResource(name, null);
+		((XMLDataObject)deltaObject).setSaveNulls(true);		
     }
 }

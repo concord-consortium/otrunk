@@ -58,6 +58,7 @@ import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.framework.otrunk.otcore.OTClassProperty;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectFinder;
 import org.concord.otrunk.datamodel.OTDataObjectType;
@@ -594,25 +595,50 @@ public class OTrunkImpl implements OTrunk
     
     public boolean hasUserModified(OTObject authoredObject, OTUser user) throws Exception
     {
-        OTID authoredId = authoredObject.getGlobalId();
-        OTID userId = user.getUserId();
-        CompositeDatabase db = (CompositeDatabase)compositeDatabases.get(userId);
-        
-        if(db == null) {
-            // FIXME this should throw an exception
-            return false;
-        } 
-
-        OTDataObject userDataObject = db.getOTDataObject(null, authoredId);
-
-        if(userDataObject instanceof CompositeDataObject) {
-            OTDataObject userModifications = ((CompositeDataObject)userDataObject).getActiveDeltaObject();
-            return userModifications != null;
-        }
-
-        return false;
+    	OTObject userObject = getUserRuntimeObject(authoredObject, user);
+    	return isModifiedInTopOverlay(userObject);
     }
 
+    public boolean isModifiedInTopOverlay(OTObject otObject)
+    {
+    	OTDataObject dataObject = OTInvocationHandler.getOTDataObject(otObject);
+    	
+        if(dataObject instanceof CompositeDataObject) {
+            OTDataObject overlayModifications = ((CompositeDataObject)dataObject).getActiveDeltaObject();
+            return overlayModifications != null;
+        } else {
+        	System.err.println("Warning: this object isn't from an Overlay");
+        }
+    	
+    	return false;
+    }
+    
+    public boolean hasOverrideInTopOverlay(OTClassProperty property, OTObject otObject)
+    {
+    	OTDataObject dataObject = OTInvocationHandler.getOTDataObject(otObject);
+    	
+        if(dataObject instanceof CompositeDataObject) {
+        	
+            return ((CompositeDataObject)dataObject).hasOverrideInTopOverlay(property.getName());
+        } else {
+        	System.err.println("Warning: this object isn't from an Overlay");
+        }
+    	    	
+    	return false;
+    }
+
+    public void removeOverrideInTopOverlay(OTClassProperty property, OTObject otObject)
+    {
+    	OTDataObject dataObject = OTInvocationHandler.getOTDataObject(otObject);
+    	
+        if(dataObject instanceof CompositeDataObject) {
+        	
+            ((CompositeDataObject)dataObject).removeOverrideInTopOverlay(property.getName());
+        } else {
+        	System.err.println("Warning: this object isn't from an Overlay");
+        }    	
+    }
+    
     public void addDatabase(OTDatabase db)
     {
         if(!databases.contains(db)) {
