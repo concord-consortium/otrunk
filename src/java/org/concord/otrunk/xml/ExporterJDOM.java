@@ -588,7 +588,8 @@ public class ExporterJDOM
 		}
 		
 		String resourceKeys [] = dataObj.getResourceKeys();
-				
+		ArrayList nullResources = new ArrayList();		
+		
 		for(int i=0; i<resourceKeys.length; i++) {
 		    
 		    // FIXME: we are ignoring special keys there should way
@@ -683,7 +684,11 @@ public class ExporterJDOM
 						defaultType);				
 				
 			} else if(resource == null){
-			    System.err.println("Got null resource value");
+				if(xmlDO.getSaveNulls()){
+					nullResources.add(resourceName);
+				} else {
+					System.err.println("Got null resource value");
+				}
 			} else if(resource instanceof Integer ||
 			        resource instanceof Float ||
 			        resource instanceof Byte ||
@@ -751,6 +756,15 @@ public class ExporterJDOM
 				writeResource(dataObj, objectEl, resourceName, primitiveString, 
 						XMLReferenceInfo.ATTRIBUTE);				
 			}
+		}
+		
+		if(nullResources.size() > 0){
+			String unsetList = "";
+			for(int i=0; i<nullResources.size(); i++){
+				unsetList += nullResources.get(i) + " ";
+			}
+			unsetList = unsetList.trim();
+			objectEl.setAttribute("unset", unsetList);
 		}
 		
 		return objectEl;

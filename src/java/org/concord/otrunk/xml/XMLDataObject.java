@@ -65,7 +65,18 @@ public class XMLDataObject
 	private XMLDatabase database = null;
 	private OTXMLElement element;
 	private String localId = null;
-	private boolean preserveUUID = false;		
+	private boolean preserveUUID = false;
+	
+	/**
+	 * If this is true then nulls which are set on this object will
+	 * be saved in a "unset" property on the object.  The value is a 
+	 * space separated list of properties which are null. 
+	 * 
+	 * If this is false then nulls simply not recorded.  This approach
+	 * is used when this object is layered on top of another object
+	 * and needs to override a value set on that lower object.
+	 */
+	private boolean saveNulls = false;
 	
 	HashMap resources = new LinkedHashMap();
 	HashMap referenceInfoMap = new HashMap();
@@ -124,10 +135,8 @@ public class XMLDataObject
 	{
 		Object oldObject;		
 
-		// Hashtables can't know the different between null and empty
-		// so if it is null we'll just remove it
-	    if(resource == null) {
-	        oldObject = resources.remove(key);
+	    if(resource == null && !saveNulls) {
+	    	oldObject = resources.remove(key);
 	    } else {
 	    	oldObject = resources.put(key, resource);			
 		}
@@ -271,4 +280,19 @@ public class XMLDataObject
     {
     	this.preserveUUID = preserveUUID;
     }
+
+	public boolean containsKey(String key)
+    {
+		return resources.containsKey(key);
+    }
+	
+	public void setSaveNulls(boolean flag)
+	{
+		saveNulls = flag;
+	}
+	
+	public boolean getSaveNulls()
+	{
+		return saveNulls;
+	}
 }

@@ -196,4 +196,9 @@ public class FsDataObject
 	    // TODO Auto-generated method stub
 	    return null;
     }
+
+	public boolean containsKey(String key)
+    {
+		return resources.containsKey(key);
+    }
 }

@@ -58,9 +58,26 @@ public interface OTDataObject
 	 */
 	public boolean setResource(String key, Object resource);
 	
+	/**
+	 * Return the value of the resource.  If the resource is not set
+	 * it returns null.  Resources can also be set to null, so 
+	 * the containsKey method should be used to test if this object
+	 * actually has the key or not.
+	 * 
+	 * @param key
+	 * @return
+	 */
 	public Object getResource(String key);
 	public String [] getResourceKeys();
 
+	/**
+	 * Returns true if this object has the key even if the value is null. 
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public boolean containsKey(String key);
+	
 	/**
 	 * This returns a collection of resources.  There are currently only 2
 	 * classes that can be used here: OTResourceList and OTResourceMap

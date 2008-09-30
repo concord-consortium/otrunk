@@ -67,7 +67,7 @@ public class LostOTEventTest extends AbstractOTJComponentView
 		//The first event should be property string
 		if (e.getProperty().equals("string")){
 			if (optionCheck.isSelected()){
-				otObject.setValue(otObject.getValue()+1);
+				otObject.setFloat(otObject.getFloat()+1);
 			}
 			
     		System.out.println("2. " + e + " "+ e.getDescription());

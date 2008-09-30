@@ -34,10 +34,13 @@ package org.concord.otrunk;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 
+import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectInterface;
+import org.concord.otrunk.datamodel.OTDataObject;
 
 
 /**
@@ -162,4 +165,41 @@ public class OTInvocationHandler
 		}
 		return null;
 	}
+		
+	/**
+	 * Using data objects outside of the OTrunk project is discouraged.  They might
+	 * change in the future so they shouldn't be depended upon.
+	 * 
+	 * @param otObject
+	 * @return
+	 */
+	static OTDataObject getOTDataObject(OTObject otObject)
+	{
+		Proxy proxy = null;
+		if(otObject instanceof DefaultOTObject){
+			proxy = (Proxy) ((DefaultOTObject) otObject).otResourceSchema();
+		} else if (otObject instanceof Proxy){
+			proxy = (Proxy) otObject;
+		} else {
+			// this object isn't directly managed by us
+			// A known example of this is OTXHTMLWrapperDoc which implements OTObject
+			// and just wraps an object with a view so the main OTCompoundDoc code 
+			// can display the object.  
+			// In these cases fall back to the less efficient lookup approach
+			OTObjectServiceImpl originalObjectService = (OTObjectServiceImpl) otObject.getOTObjectService();
+			
+			try {
+	            return originalObjectService.getOTDataObject(otObject.getGlobalId());
+            } catch (Exception e) {
+            	e.printStackTrace();
+            	return null;
+            }				
+
+		}
+		
+		OTInvocationHandler invocationHandler = 
+			(OTInvocationHandler) Proxy.getInvocationHandler(proxy);
+		return invocationHandler.otObjectImpl.dataObject;
+	}
+
 }

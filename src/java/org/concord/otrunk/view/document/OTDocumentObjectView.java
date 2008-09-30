@@ -102,8 +102,12 @@ public class OTDocumentObjectView extends ComponentView
 
         	OTViewEntry viewEntry = null;
         	if(viewId != null && viewId.length() > 0) {
-        		viewEntry = (OTViewEntry)
-        			docView.getReferencedObject(viewId);
+        		try{
+        			viewEntry = (OTViewEntry)docView.getReferencedObject(viewId);
+        		} catch (ClassCastException e){
+        			System.err.println("Object " + viewId + " isn't a OTViewEntry");
+        			throw e;
+        		}
         	}
 
         	if(modeStr != null){

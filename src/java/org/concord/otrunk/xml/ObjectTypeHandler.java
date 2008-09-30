@@ -170,6 +170,16 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				continue;
 			}
 			
+			if(attribName.equals("unset")){
+				obj.setSaveNulls(true);
+				String nullResourcesStr = attrib.getValue();
+				String[] nullResources = nullResourcesStr.split(" ");
+				for(int i=0; i<nullResources.length; i++){
+					obj.setResource(nullResources[i], null);
+				}
+				continue;
+			}
+			
 			try {
 			    
 				Object resValue = handleChildResource(element, attribName, 
