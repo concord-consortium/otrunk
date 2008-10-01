@@ -223,7 +223,7 @@ public class OTMLToXHTMLConverter
 					Pattern viewPat = Pattern.compile("viewid=\"([^\"]*)\"");
 					Matcher viewMatcher = viewPat.matcher(m.group(2));
 					if(viewMatcher.find()){
-						String viewId = userMatcher.group(1);
+						String viewId = viewMatcher.group(1);
 			        	if(viewId != null && viewId.length() > 0) {
 							OTID viewOTid = objectService.getOTID(viewId);
 			        		try {
