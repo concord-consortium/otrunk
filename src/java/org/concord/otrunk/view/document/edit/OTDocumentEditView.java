@@ -32,6 +32,7 @@ package org.concord.otrunk.view.document.edit;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -87,6 +88,8 @@ public class OTDocumentEditView extends OTDocumentView implements
 
 	private OTDocumentEditorKit editorKit;
 
+	private JButton viewSrcButton;
+
 	public String getXHTMLText(OTObject otObject) {
 		cleanDuplicateDocRefs(otObject);
 
@@ -140,7 +143,7 @@ public class OTDocumentEditView extends OTDocumentView implements
 			EditBar editBar = new EditBar();
 			leftJustify.add(editBar);
 			
-			JButton viewSrcButton = new JButton("<src>");
+			viewSrcButton = new JButton("<src>");
 			editBar.add(Box.createHorizontalStrut(15));
 			editBar.add(viewSrcButton);
 			viewSrcButton.setActionCommand("viewSrc");
@@ -352,6 +355,11 @@ public class OTDocumentEditView extends OTDocumentView implements
             
 		} else if (e.getActionCommand().equalsIgnoreCase("viewSrc")){
 			final JFrame popupEditor = new JFrame();
+			
+			Point variablesFrameLocation = viewSrcButton.getRootPane().getLocationOnScreen();
+			variablesFrameLocation.translate(40, 15);
+			popupEditor.setLocation(variablesFrameLocation);
+
 			final JTextArea textArea = new JTextArea(10,20);
 			textArea.setText(pfObject.getDocumentText());
 			
