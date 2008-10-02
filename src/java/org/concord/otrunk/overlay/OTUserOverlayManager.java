@@ -8,6 +8,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.otrunk.OTObjectServiceImpl;
+import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
 
 public class OTUserOverlayManager
@@ -25,7 +26,7 @@ public class OTUserOverlayManager
 		userToOverlayMap.put(userObject, otOverlay);
 		
 		if (objService instanceof OTObjectServiceImpl) {
-			overlayDatabases.add(((OTObjectServiceImpl) objService).getCreationDb());
+			overlayDatabases.add(getDatabase(otOverlay));
 		}
 	}
 	
@@ -84,5 +85,14 @@ public class OTUserOverlayManager
 			return null;
 		}
 		return objService.getOTObject(id);
+	}
+	
+	public OTDatabase getDatabase(OTOverlay overlay) {
+		OTObjectServiceImpl objService = (OTObjectServiceImpl) getObjectService(overlay);
+		if (objService != null) {
+			return objService.getCreationDb();
+		} else {
+			return null;
+		}
 	}
 }
