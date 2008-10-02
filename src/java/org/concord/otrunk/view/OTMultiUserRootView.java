@@ -36,10 +36,8 @@ import org.concord.framework.otrunk.view.AbstractOTView;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.otrunk.OTIncludeRootObject;
 import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.overlay.CompositeDatabase;
 import org.concord.otrunk.overlay.OTOverlay;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
-import org.concord.otrunk.overlay.OverlayImpl;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.XMLDatabase;
 
@@ -113,7 +111,7 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
     					overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, ref.getOTObjectService());
     				}
     				
-    			  	OTObjectService objService = createObjectService(overlay);
+    			  	OTObjectService objService = otrunk.createObjectService(overlay);
     			  	
     				// map the object service/overlay to the user
     			  	overlayManager.add(overlay, objService, userObject);
@@ -134,21 +132,13 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 			OTOverlay overlay = (OTOverlay) otrunk.getExternalObject(root.getGroupOverlayURL(), root.getOTObjectService());
 	        if (overlay != null) {
     	        // set up the objectService for it
-    	        OTObjectService objService = createObjectService(overlay);
+    	        OTObjectService objService = otrunk.createObjectService(overlay);
     	        // associate it with the 'null' userobject in otrunk
     	        overlayManager.add(overlay, objService, null);
 	        }
 		} catch (Exception e) {
 	        logger.log(Level.WARNING, "Couldn't set up the group-wide overlay", e);
         }
-	}
-	
-	protected OTObjectService createObjectService(OTOverlay overlay) {
-		// create an object service for the overlay
-		OverlayImpl myOverlay = new OverlayImpl(overlay);
-		CompositeDatabase db = new CompositeDatabase(otrunk.getDataObjectFinder(), myOverlay);
-	  	OTObjectService objService = otrunk.createObjectService(db);
-	  	return objService;
 	}
 
 	public boolean getEmbedXHTMLView()

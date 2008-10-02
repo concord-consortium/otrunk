@@ -32,6 +32,8 @@ package org.concord.otrunk;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.Reference;
@@ -39,6 +41,7 @@ import java.lang.ref.WeakReference;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -338,6 +341,14 @@ public class OTrunkImpl implements OTrunk
         registerObjectService(objService, "" + db);
         
         return objService;
+    }
+    
+    public OTObjectServiceImpl createObjectService(OTOverlay overlay) {
+    	// create an object service for the overlay
+		OverlayImpl myOverlay = new OverlayImpl(overlay);
+		CompositeDatabase db = new CompositeDatabase(this.getDataObjectFinder(), myOverlay);
+	  	OTObjectServiceImpl objService = this.createObjectService(db);
+	  	return objService;
     }
 
     public void registerObjectService(OTObjectServiceImpl objService, String label)
@@ -849,6 +860,19 @@ public class OTrunkImpl implements OTrunk
     {
     	return dataObjectFinder;
     }
+	
+	public void localSaveData(OTDatabase db, File file) throws Exception {
+		DataOutputStream urlDataOut = new DataOutputStream(new FileOutputStream(file));
+    	ExporterJDOM.export(urlDataOut, db.getRoot(), db);
+    	urlDataOut.flush();
+    	urlDataOut.close();
+		
+	}
+	
+	public void localSaveData(OTDatabase db, URL url) throws Exception {
+		File f = new File(url.getFile());
+		localSaveData(db, f);
+	}
 	
 	public void remoteSaveData(OTDatabase db, URL remoteURL, String method) throws Exception {
 		remoteSaveData(db, remoteURL, method, null);
