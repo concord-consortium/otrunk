@@ -41,7 +41,6 @@ import java.lang.ref.WeakReference;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -49,6 +48,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.WeakHashMap;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.concord.framework.otrunk.OTBundle;
 import org.concord.framework.otrunk.OTControllerRegistry;
@@ -76,6 +77,7 @@ import org.concord.otrunk.overlay.Overlay;
 import org.concord.otrunk.overlay.OverlayImpl;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
+import org.concord.otrunk.util.ConcordHostnameVerifier;
 import org.concord.otrunk.view.OTConfig;
 import org.concord.otrunk.view.OTUserSession;
 import org.concord.otrunk.view.OTViewer;
@@ -144,6 +146,13 @@ public class OTrunkImpl implements OTrunk
 	
 	public OTrunkImpl(OTDatabase systemDb, OTDatabase db, ArrayList services) 
 	{	
+		try {
+			ConcordHostnameVerifier verifier = new ConcordHostnameVerifier();
+			HttpsURLConnection.setDefaultHostnameVerifier(verifier);
+		} catch (Exception e) {
+			System.err.println("Couldn't initialize the Concord HostnameVerifier!");
+		}
+		
 		try {
 	        URL dummyURL = new URL("http://www.concord.org");
 	        URLConnection openConnection = dummyURL.openConnection();
@@ -225,7 +234,7 @@ public class OTrunkImpl implements OTrunk
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 *
      * @see org.concord.framework.otrunk.OTrunk#getOTID(java.lang.String)
