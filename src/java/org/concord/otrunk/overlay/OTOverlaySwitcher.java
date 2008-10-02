@@ -7,7 +7,5 @@ import org.concord.framework.otrunk.OTObjectList;
 public interface OTOverlaySwitcher
     extends OTObjectInterface
 {
-	public OTObjectList getOverlays();
-	
 	public OTObject getActivityRoot();
 }
