@@ -214,6 +214,7 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 		
 		logger.info("Save overlay");
 		XMLDatabase db = getDbForOverlay(overlay);
+		if (! db.isDirty()) { return; }
 		
 		try {
     		URL contextURL = db.getContextURL();
@@ -227,6 +228,7 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
     		// dump the db to the context url
 	    
 	    	otrunk.localSaveData(db, contextURL);
+	    	db.setDirty(false);
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }
