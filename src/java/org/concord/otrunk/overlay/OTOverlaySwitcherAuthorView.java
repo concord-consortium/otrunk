@@ -3,11 +3,12 @@ package org.concord.otrunk.overlay;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -19,7 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.OTObjectServiceImpl;
@@ -27,13 +27,14 @@ import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.AbstractOTJComponentContainerView;
-import org.concord.otrunk.view.OTViewer;
 import org.concord.otrunk.xml.XMLDatabase;
 import org.concord.swing.MostRecentFileDialog;
 
 public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerView
 {
-
+	private Logger logger = Logger.getLogger(this.getClass().getName());
+	private static final int SAVE = 0;
+	private static final int OPEN = 1;
 	private OTOverlaySwitcher otSwitcher;
 	private OTObject activityRoot;
 	private HashMap overlayToUserObjectMap = new HashMap();
@@ -42,13 +43,11 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 	private OTObjectServiceImpl rootObjectService;
 	private JPanel mainPanel;
 	private OTUserOverlayManager overlayManager;
-	private OTObjectList overlayList;
 
 	public JComponent getComponent(OTObject otObject)
 	{
 		otSwitcher = (OTOverlaySwitcher) otObject;
 		activityRoot = otSwitcher.getActivityRoot();
-		overlayList = otSwitcher.getOverlays();
 		rootObjectService = (OTObjectServiceImpl) otSwitcher.getOTObjectService();
 		otrunk = (OTrunkImpl) rootObjectService.getOTrunkService(OTrunk.class);
 		
@@ -71,13 +70,28 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("Root", createOverlaySubView(null));
 
-		// set up menu items to add, remove and save overlays
-		JMenuBar menubar = createMenuBar();
-
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
-		mainPanel.add(menubar, BorderLayout.NORTH);
+		// mainPanel.add(menubar, BorderLayout.NORTH);
 		mainPanel.add(tabbedPane, BorderLayout.CENTER);
+		
+		// set up menu items to add, remove and save overlays
+		mainPanel.addComponentListener(new ComponentListener() {
+			boolean hasRun = false;
+
+			public void componentHidden(ComponentEvent e) { }
+			public void componentMoved(ComponentEvent e) { }
+			public void componentShown(ComponentEvent e) { }
+			public void componentResized(ComponentEvent e)
+            {
+				System.err.println("resized");
+	            if (! hasRun) {
+	            	createMenuBar();
+	            	hasRun = true;
+	            }
+            }
+		});
+		
 		return mainPanel;
 	}
 	
@@ -110,66 +124,78 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 		tabbedPane.remove(tabbedPane.getSelectedComponent());
 	}
 	
-	private void addOverlay() {
-        try {
-        	OTOverlay newOverlay = null;
-        	 // open up a file save dialog
-			MostRecentFileDialog mrfd =
-			    new MostRecentFileDialog("org.concord.otviewer.openotml");
-			mrfd.setFilenameFilter("otml");
+	private String askForName() {
+		String name = JOptionPane.showInputDialog(mainPanel, "Please enter a name for this overlay:", "Name your overlay", JOptionPane.QUESTION_MESSAGE);
+		name = verifyNameAvailability(name);
+		return name;
+	}
+	
+	private void addOverlay(OTOverlay newOverlay) throws Exception {
+    	if (newOverlay.getName() == null || newOverlay.getName().length() == 0) {
+    		String name = askForName();
+    		if (name == null || name.length() == 0) {
+    			name = verifyNameAvailability("Untitled");
+    		}
+    		newOverlay.setName(name);
+    	} else {
+    		newOverlay.setName(verifyNameAvailability(newOverlay.getName()));
+    	}
+    	// overlayList.add(newOverlay);
+    	// create object service
+		OTObjectServiceImpl objService = (OTObjectServiceImpl) otrunk.createObjectService(newOverlay);
+		
+		OTUserObject userObj = (OTUserObject) rootObjectService.createObject(OTUserObject.class);
+		userObj.setName(newOverlay.getName());
+		
+		logger.info("Adding overlay");
+		logger.info("overlay: " + newOverlay.getGlobalId());
+		logger.info("objServ: " + objService.getCreationDb().getDatabaseId());
+		logger.info("userObj: " + userObj.getGlobalId());
+		overlayManager.add(newOverlay, objService, userObj);
+		
+		Component comp = createOverlaySubView(newOverlay);
+		tabbedPane.addTab(newOverlay.getName(), comp);
+		tabbedPane.setSelectedComponent(comp);
+		registerOverlay(newOverlay.getName(), userObj);
+	}
+	
+	private String verifyNameAvailability(String name)
+    {
+		String origName = name;
+		int i = 1;
+	    while (overlayToUserObjectMap.containsKey(name)) {
+	    	name = origName + " (" + i++ + ")";
+	    }
+	    return name;
+    }
 
-			int retval = mrfd.showSaveDialog(mainPanel);
-			
-			if (retval == MostRecentFileDialog.APPROVE_OPTION) {
-				try {
-					// set the context url
-	                File f = mrfd.getSelectedFile();
-	                if (f.exists()) {
-	                	newOverlay = (OTOverlay) otrunk.getExternalObject(f.toURL(), rootObjectService);
-	                }
-                	if (newOverlay == null) {
-    					// create a blank one
-    					XMLDatabase xmldb = new XMLDatabase();
-    					OTObjectService newObjectService = otrunk.createObjectService(xmldb);
-    					newOverlay = (OTOverlay) newObjectService.createObject(OTOverlay.class);
-    					xmldb.setRoot(newOverlay.getGlobalId());
-    					otrunk.localSaveData(xmldb, f);
-    					newOverlay = (OTOverlay) otrunk.getExternalObject(f.toURL(), rootObjectService);
-    				}
-                } catch (Exception e) {
-	                e.printStackTrace();
-                }
+	private void newOverlay() {
+		logger.info("New overlay");
+        try {
+			XMLDatabase xmldb = new XMLDatabase();
+			OTObjectService newObjectService = otrunk.createObjectService(xmldb);
+			OTOverlay newOverlay = (OTOverlay) newObjectService.createObject(OTOverlay.class);
+			xmldb.setRoot(newOverlay.getGlobalId());
+			String name = askForName();
+			if (name != null && name.length() > 0) {
+				newOverlay.setName(verifyNameAvailability(name));
+				addOverlay(newOverlay);
 			}
-        	
-        	overlayList.add(newOverlay);
-        	if (newOverlay.getName() == null || newOverlay.getName().length() == 0) {
-        		newOverlay.setName(JOptionPane.showInputDialog(mainPanel, "Please enter a name for this overlay:", "Name your overlay", JOptionPane.QUESTION_MESSAGE));
-        	}
-        	
-        	// create object service
-    		OTObjectServiceImpl objService = (OTObjectServiceImpl) otrunk.createObjectService(newOverlay);
-    		
-    		OTUserObject userObj = (OTUserObject) rootObjectService.createObject(OTUserObject.class);
-    		userObj.setName(newOverlay.getName());
-    		
-    		System.err.println("Adding overlay");
-    		System.err.println("overlay: " + newOverlay.getGlobalId());
-    		System.err.println("objServ: " + objService.getCreationDb().getDatabaseId());
-    		System.err.println("userObj: " + userObj.getGlobalId());
-    		overlayManager.add(newOverlay, objService, userObj);
-    		
-    		Component comp = createOverlaySubView(newOverlay);
-    		tabbedPane.addTab(newOverlay.getName(), comp);
-    		tabbedPane.setSelectedComponent(comp);
-    		registerOverlay(newOverlay.getName(), userObj);
         } catch (Exception e) {
 	        e.printStackTrace();
         }
 	}
 	
 	private void openOverlay() {
-		// FIXME
-		System.err.println("Open overlay");
+		try {
+			File f = askForFile(OPEN);
+			if (f != null) {
+    			OTOverlay newOverlay = (OTOverlay) otrunk.getExternalObject(f.toURL(), rootObjectService);
+    			addOverlay(newOverlay);
+			}
+        } catch (Exception e) {
+	        e.printStackTrace();
+        }
 	}
 	
 	private XMLDatabase getDbForOverlay(OTOverlay overlay) {
@@ -186,48 +212,86 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 		OTOverlay overlay = getCurrentOverlay();
 		if (overlay == null) { return; }
 		
-		System.err.println("Save overlay");
+		logger.info("Save overlay");
 		XMLDatabase db = getDbForOverlay(overlay);
-		// if database doesn't have a context url
-		URL contextURL = db.getContextURL();
-		System.err.println("Context url is: " + contextURL.toExternalForm());
-		// dump the db to the context url
-	    try {
+		
+		try {
+    		URL contextURL = db.getContextURL();
+    		// if database doesn't have a context url
+    		if (contextURL == null) {
+    			File f = askForFile(SAVE);
+    			if (f == null) { return; }
+    			contextURL = f.toURL();
+    		}
+    		logger.info("Context url is: " + contextURL.toExternalForm());
+    		// dump the db to the context url
+	    
 	    	otrunk.localSaveData(db, contextURL);
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }
 	}
 	
-	private JMenuBar createMenuBar() {
-		JMenuBar menuBar = new JMenuBar();
+	private File askForFile(int style) {
+		MostRecentFileDialog mrfd =
+		    new MostRecentFileDialog("org.concord.otviewer.openotml");
+		mrfd.setFilenameFilter("otml");
+
+		int retval = MostRecentFileDialog.CANCEL_OPTION;
+		if (style == OPEN) {
+			retval = mrfd.showOpenDialog(mainPanel);
+		} else if (style == SAVE) {
+			retval = mrfd.showSaveDialog(mainPanel);
+		} else {
+			return null;
+		}
+		
+		if (retval == MostRecentFileDialog.APPROVE_OPTION) {
+			try {
+				// set the context url
+                return mrfd.getSelectedFile();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	private void createMenuBar() {
+		// JMenuBar menuBar = new JMenuBar();
+		JMenuBar menuBar = mainPanel.getRootPane().getJMenuBar();
 		
 		JMenu overlayMenu = new JMenu("Overlays");
 		menuBar.add(overlayMenu);
 		
-		Action addMenuItem = new AbstractAction("Add Overlay") {
-			public void actionPerformed(ActionEvent e)
+		Action newMenuItem = new AbstractAction("New Overlay") {
+            public void actionPerformed(ActionEvent e)
             {
-	            addOverlay();
+	            newOverlay();
             }
 		};
-		Action removeMenuItem = new AbstractAction("Remove Overlay") {
+		Action openMenuItem = new AbstractAction("Open Existing Overlay") {
 			public void actionPerformed(ActionEvent e)
             {
-				removeCurrentOverlay();
+	            openOverlay();
             }
 		};
-		Action saveMenuItem = new AbstractAction("Save Overlay") {
+		Action saveMenuItem = new AbstractAction("Save Current Overlay") {
 			public void actionPerformed(ActionEvent e)
             {
 	            saveCurrentOverlay();
             }
 		};
+		Action deleteMenuItem = new AbstractAction("Delete Current Overlay") {
+			public void actionPerformed(ActionEvent e)
+            {
+				removeCurrentOverlay();
+            }
+		};
 		
-		overlayMenu.add(addMenuItem);
+		overlayMenu.add(newMenuItem);
+		overlayMenu.add(openMenuItem);
 		overlayMenu.add(saveMenuItem);
-		overlayMenu.add(removeMenuItem);
-		
-		return menuBar;
+		overlayMenu.add(deleteMenuItem);
 	}
 }
