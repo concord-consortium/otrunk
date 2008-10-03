@@ -53,6 +53,9 @@ public interface OTPrototypeViewEntry
 	public boolean getCopyPrototype();
 	public final static boolean DEFAULT_copyPrototype = true;
 
+	public int getCopyDepth();
+	public final static int DEFAULT_copyDepth = -1;
+	
 	/**
 	 * Control saving of the prototype copies.  If this is false then the protoype will be 
 	 * recopied each time it is viewed.  And it won't be put into the prototypeCopies list.
