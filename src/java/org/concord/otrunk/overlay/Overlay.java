@@ -54,4 +54,7 @@ public interface Overlay
 	 * @param childObject
 	 */
 	public void registerNonDeltaObject(OTDataObject childObject);
+	
+	public void addOverlayListener(OverlayListener listener);
+	public void removeOverlayListener(OverlayListener listener);
 }

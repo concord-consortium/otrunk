@@ -71,6 +71,26 @@ public class CompositeDatabase
 	Overlay activeOverlay;
 	ArrayList middleOverlays;
 	OTID databaseId;
+
+	private OverlayListener overlayListener = new OverlayListener(){
+
+		public void newDeltaObject(Overlay overlay, OTDataObject baseObject)
+        {
+			// see if we have a this baseObject in a our list, update its
+			// middleObjects if we do
+	    	CompositeDataObject compDataObject = 
+	    		(CompositeDataObject)dataObjectMap.get(baseObject.getGlobalId());
+	        if(compDataObject == null) {
+	        	return;
+	        }
+
+	        // reconstruct the middle deltas
+	        OTDataObject[] middleDeltas = createMiddleDeltas(baseObject);
+	        compDataObject.setMiddleDeltas(middleDeltas);
+	        return;
+        }
+    	
+    };
 	
 	public CompositeDatabase(OTDataObjectFinder objectFinder, Overlay activeOverlay)
 	{
@@ -83,7 +103,10 @@ public class CompositeDatabase
 	
 	public void setOverlays(ArrayList overlays)
 	{
-	    this.middleOverlays = overlays;		
+	    this.middleOverlays = overlays;	
+	    for(int i=0; i<overlays.size(); i++){
+	    	((Overlay)overlays.get(i)).addOverlayListener(overlayListener);
+	    }
 	}
 			
 	
@@ -213,7 +236,22 @@ public class CompositeDatabase
             //throw new RuntimeException("can't find user object: " + childId);
         }
         
-        OTDataObject middleDeltas [] = null;
+        OTDataObject[] middleDeltas = createMiddleDeltas(baseObject);
+        
+        userDataObject = new CompositeDataObject(baseObject, this, middleDeltas, true);
+
+        dataObjectMap.put(childId, userDataObject);
+        
+        // System.err.println("created userDataObject template-id: " + childId + 
+        //         " userDataObject-id: " + userDataObject.getGlobalId());
+        
+    	//System.out.println("v5. " + userDataObject.getGlobalId());
+        return userDataObject;
+    }
+
+	private OTDataObject[] createMiddleDeltas(OTDataObject baseObject)
+    {
+	    OTDataObject middleDeltas [] = null;
         if(middleOverlays != null){
         	ArrayList middleDeltasList = new ArrayList();
         	// if we have middle overlays then we need to see if any of them have a delta for this
@@ -231,16 +269,7 @@ public class CompositeDatabase
         		middleDeltasList.toArray(middleDeltas);
         	}
         }
-        
-        userDataObject = new CompositeDataObject(baseObject, this, middleDeltas, true);
-
-        dataObjectMap.put(childId, userDataObject);
-        
-        // System.err.println("created userDataObject template-id: " + childId + 
-        //         " userDataObject-id: " + userDataObject.getGlobalId());
-        
-    	//System.out.println("v5. " + userDataObject.getGlobalId());
-        return userDataObject;
+	    return middleDeltas;
     }
     
     public OTID resolveID(OTID id)

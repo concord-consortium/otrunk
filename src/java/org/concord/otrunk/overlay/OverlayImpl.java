@@ -1,5 +1,7 @@
 package org.concord.otrunk.overlay;
 
+import java.util.ArrayList;
+
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
@@ -17,6 +19,8 @@ public class OverlayImpl
 	 * presents the combination of multiple overlays.
 	 */
     private OTDatabase overlayDb;
+
+	private ArrayList listeners = new ArrayList();
 
 	public OverlayImpl(OTOverlay otOverlay)
 	{
@@ -64,6 +68,10 @@ public class OverlayImpl
             deltaObjectMap.put(baseObject.getGlobalId().toExternalForm(), 
                     stateObject.getGlobalId());
 			
+            for(int i=0; i<listeners.size(); i++){
+            	((OverlayListener)listeners.get(i)).newDeltaObject(this, baseObject);
+            }
+            
             return stateObject;
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,6 +115,16 @@ public class OverlayImpl
 		}
 
 		nonDeltaObjects.add(id);	    
+    }
+
+	public void addOverlayListener(OverlayListener listener)
+    {
+		listeners.add(listener);	    
+    }
+
+	public void removeOverlayListener(OverlayListener listener)
+    {
+		listeners.remove(listener);	    
     }
 
 }
