@@ -40,6 +40,7 @@ import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.overlay.Overlay;
+import org.concord.otrunk.overlay.OverlayListener;
 
 /**
  * OTTemplateStateMap
@@ -177,6 +178,20 @@ public class OTReferenceMap extends DefaultOTObject
 	 */
 	public void registerNonDeltaObject(OTDataObject childObject)
     {
+    }
+
+	public void addOverlayListener(OverlayListener listener)
+    {
+		// This is only used for user level overlays which are on the top of the 
+		// set of layers, so they don't need to generate overlay change events	
+		throw new UnsupportedOperationException("reference map doesn't generate events");
+    }
+
+	public void removeOverlayListener(OverlayListener listener)
+    {
+		// This is only used for user level overlays which are on the top of the 
+		// set of layers, so they don't need to generate overlay change events	    	    
+		throw new UnsupportedOperationException("reference map doesn't generate events");
     }
 
 

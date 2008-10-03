@@ -365,7 +365,6 @@ public class CompositeDataObject
 	{
 		OTDataObject deltaObject = getActiveDeltaObject();
 		if(deltaObject == null){
-			System.err.println("Doesn't have a delta object");
 			return false;
 		}
 		
@@ -388,5 +387,15 @@ public class CompositeDataObject
 		((XMLDataObject)deltaObject).setSaveNulls(false);
 		deltaObject.setResource(name, null);
 		((XMLDataObject)deltaObject).setSaveNulls(true);		
+    }
+
+	void setMiddleDeltas(OTDataObject [] middleDeltas)
+    {
+	    this.middleDeltas = middleDeltas;
+    }
+
+	OTDataObject [] getMiddleDeltas()
+    {
+	    return middleDeltas;
     }
 }
