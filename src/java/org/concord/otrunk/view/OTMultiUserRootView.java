@@ -25,19 +25,23 @@
 package org.concord.otrunk.view;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.AbstractOTView;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.otrunk.OTIncludeRootObject;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.overlay.CompositeDatabase;
 import org.concord.otrunk.overlay.OTOverlay;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
+import org.concord.otrunk.overlay.Overlay;
+import org.concord.otrunk.overlay.OverlayImpl;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.XMLDatabase;
 
@@ -48,6 +52,7 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 	private boolean firstRun = true;
 	private OTrunkImpl otrunk;
 	OTUserOverlayManager overlayManager;
+	private Overlay globalOverlay;
 	
 	public String getXHTMLText(OTObject otObject) {
 		//System.out.println("ENTER: OTMultiUserRootView#getXHTMLText()");
@@ -57,8 +62,8 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 		if (firstRun) { //why is this method called twice?
 			overlayManager = new OTUserOverlayManager();
 			viewContext.addViewService(OTUserOverlayManager.class, overlayManager);
-			loadUserDatabases(root);
 			loadGlobalOverlay(root);
+			loadUserDatabases(root);
 			firstRun = false;
 		}
 	    OTObject reportTemplate = root.getReportTemplate();
@@ -70,7 +75,7 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 	    return result;
     }
 	
-	protected void loadUserDatabases(OTMultiUserRoot root) {
+	protected void loadUserDatabases(final OTMultiUserRoot root) {
 		OTUserList userList = null;
 		OTObject userListOrig = root.getUserList();
 		if(userListOrig instanceof OTIncludeRootObject){
@@ -79,47 +84,81 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 			userList = (OTUserList) userListOrig;
 		}
 		
-	    OTObjectList userDatabases = userList.getUserDatabases();
+	    final Vector userDatabases = userList.getUserDatabases().getVector();
 	    
-	    for (int i = 0; i < userDatabases.size(); ++i) {
-	    	OTUserDatabaseRef ref = (OTUserDatabaseRef) userDatabases.get(i);
-	    	URL url = ref.getUrl();
-	    	URL overlayURL = ref.getOverlayURL();
-	    	OTUserObject userObject = null;
-	    	try {
-	    		// set up the user session and register it
-	    		OTMLUserSession userSession = new OTMLUserSession(url, null);
-	    		otrunk.registerUserSession(userSession);
-	    		userObject = userSession.getUserObject();
-	    	}
-	    	catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Couldn't initialize user session", e);
+	    Runnable userDBTask = new Runnable(){
+
+	    	public synchronized OTUserDatabaseRef nextDb()
+	    	{
+	    		if(userDatabases.size() == 0){
+	    			return null;
+	    		}
+	    		
+	    		return (OTUserDatabaseRef) userDatabases.remove(0);
 	    	}
 	    	
-    		// set up the overlay, if it exists
-    		if (overlayURL != null && userObject != null) {
-    			try {
-    				// get the OTOverlay
-    				OTOverlay overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, ref.getOTObjectService());
-    				
-    				if (overlay == null) {
-    					// create a blank one
-    					XMLDatabase xmldb = new XMLDatabase();
-    					overlay = (OTOverlay) root.getOTObjectService().createObject(OTOverlay.class);
-    					xmldb.setRoot(overlay.getGlobalId());
-    					otrunk.remoteSaveData(xmldb, overlayURL, OTViewer.HTTP_PUT);
-    					overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, ref.getOTObjectService());
-    				}
-    				
-    			  	OTObjectService objService = otrunk.createObjectService(overlay);
-    			  	
-    				// map the object service/overlay to the user
-    			  	overlayManager.add(overlay, objService, userObject);
-    			} catch (Exception e) {
-    				logger.log(Level.SEVERE, "Couldn't initialize user overlay", e);
-    			}
-    		}
-	    }
+			public void run()
+            {	
+				while(true){
+					OTUserDatabaseRef ref = nextDb();
+					if(ref == null){
+						break;
+					}
+					URL url = ref.getUrl();
+					URL overlayURL = ref.getOverlayURL();	    	
+					OTUserObject userObject = null;
+					try {
+						// set up the user session and register it
+						OTMLUserSession userSession = new OTMLUserSession(url, null);
+						otrunk.registerUserSession(userSession);
+						userObject = userSession.getUserObject();
+					}
+					catch (Exception e) {
+						logger.log(Level.SEVERE, "Couldn't initialize user session", e);
+					}
+
+					// set up the overlay, if it exists
+					if (overlayURL != null && userObject != null) {
+						try {
+							// get the OTOverlay
+							OTOverlay overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, ref.getOTObjectService());
+
+							if (overlay == null) {
+								// create a blank one
+								XMLDatabase xmldb = new XMLDatabase();
+								overlay = (OTOverlay) root.getOTObjectService().createObject(OTOverlay.class);
+								xmldb.setRoot(overlay.getGlobalId());
+								otrunk.remoteSaveData(xmldb, overlayURL, OTViewer.HTTP_PUT);
+								overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, ref.getOTObjectService());
+							}
+
+							OTObjectService objService = createObjectService(overlay, false);
+
+		    			  	synchronized (this){
+		        				// map the object service/overlay to the user
+		    			  		overlayManager.add(overlay, objService, userObject);
+		    			  	}
+						} catch (Exception e) {
+							logger.log(Level.SEVERE, "Couldn't initialize user overlay", e);
+						}
+					}
+				}	            
+            }
+	    
+			
+	    };
+
+		Thread t1 = new Thread(userDBTask);
+		Thread t2 = new Thread(userDBTask);
+		t1.start();
+		t2.start();
+		try {
+	        t1.join();
+	        t2.join();
+        } catch (InterruptedException e1) {
+	        // TODO Auto-generated catch block
+	        e1.printStackTrace();
+        }	    
 	}
 	
 	protected void loadGlobalOverlay(OTMultiUserRoot root) {
@@ -129,16 +168,32 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 				return;
 			}
 			
-			OTOverlay overlay = (OTOverlay) otrunk.getExternalObject(root.getGroupOverlayURL(), root.getOTObjectService());
-	        if (overlay != null) {
+			OTOverlay otOverlay = (OTOverlay) otrunk.getExternalObject(root.getGroupOverlayURL(), root.getOTObjectService());
+	        if (otOverlay != null) {
     	        // set up the objectService for it
-    	        OTObjectService objService = otrunk.createObjectService(overlay);
+    	        OTObjectService objService = createObjectService(otOverlay, true);
     	        // associate it with the 'null' userobject in otrunk
-    	        overlayManager.add(overlay, objService, null);
+    	        overlayManager.add(otOverlay, objService, null);
 	        }
 		} catch (Exception e) {
 	        logger.log(Level.WARNING, "Couldn't set up the group-wide overlay", e);
         }
+	}
+	
+	protected OTObjectService createObjectService(OTOverlay overlay, boolean isGlobal) {
+		// create an object service for the overlay
+		OverlayImpl myOverlay = new OverlayImpl(overlay);
+		if(isGlobal){
+			globalOverlay = myOverlay;
+		}
+		CompositeDatabase db = new CompositeDatabase(otrunk.getDataObjectFinder(), myOverlay);
+		if(!isGlobal){
+			ArrayList overlays = new ArrayList();
+			overlays.add(globalOverlay);
+			db.setOverlays(overlays);
+		}
+	  	OTObjectService objService = otrunk.createObjectService(db);
+	  	return objService;
 	}
 
 	public boolean getEmbedXHTMLView()
