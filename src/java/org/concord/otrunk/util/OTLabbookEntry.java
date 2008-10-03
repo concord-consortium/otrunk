@@ -23,4 +23,8 @@ public interface OTLabbookEntry
 	
 	public String getType();
 	public void setType(String type);
+	
+	// used for drawing on top of a screenshot
+	public OTObject getDrawingTool();
+	public void setDrawingTool(OTObject drawingTool);
 }
