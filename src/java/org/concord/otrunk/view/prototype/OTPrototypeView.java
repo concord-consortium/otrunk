@@ -4,6 +4,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.AbstractOTJComponentView;
 import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTViewEntry;
@@ -63,16 +64,31 @@ public class OTPrototypeView extends AbstractOTJComponentView
 
 	protected OTObject getPrototypeCopy(OTObject model)
 	{
-		String prototypeCopyKey = model.otExternalId();
 		
 		if(viewEntry.getCopyPrototype()){
+			String prototypeCopyKey = model.otExternalId();
 			OTObject prototypeCopy = viewEntry.getPrototypeCopies().getObject(prototypeCopyKey);
 
 			// make one if there isn't
 			if(prototypeCopy == null) {			
 				try {
+					OTObjectService copyObjectService;
+					// if we are saving the prototype copies they should be saved in the 
+					// objectService of the model which will could be a learner data base or
+					// an overlay.
+					// if we aren't saving the copies then it is more efficient to do the  
+					// copying in viewEntry objectService that way there won't be extra objects
+					// created that aren't needed.  And this way the definition of the controller
+					// can reference parts of the prototype and they will be the same object after
+					// the copy.
+					if(viewEntry.getSavePrototypeCopies()){
+						copyObjectService = model.getOTObjectService();
+					} else {
+						copyObjectService = viewEntry.getOTObjectService();
+					}
 					prototypeCopy =
-						model.getOTObjectService().copyObject(viewEntry.getPrototype(), -1);
+						copyObjectService.copyObject(viewEntry.getPrototype(), 
+							viewEntry.getCopyDepth());
 					
 					if(viewEntry.getSavePrototypeCopies()){
 						viewEntry.getPrototypeCopies().putObject(prototypeCopyKey, prototypeCopy);
