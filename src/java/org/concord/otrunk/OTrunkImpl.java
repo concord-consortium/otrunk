@@ -870,17 +870,43 @@ public class OTrunkImpl implements OTrunk
     	return dataObjectFinder;
     }
 	
+	public void localSaveData(XMLDatabase xmldb) throws Exception {
+		if (xmldb.getSourceURL() == null) {
+			throw new MalformedURLException("Invalid source URL on XMLDatabase: " + xmldb.getDatabaseId().toString());
+		}
+		localSaveData(xmldb, xmldb.getSourceURL());
+	}
+	
 	public void localSaveData(OTDatabase db, File file) throws Exception {
+		if (db instanceof XMLDatabase) {
+			XMLDatabase xmldb = (XMLDatabase) db;
+			if (! xmldb.getSourceURL().equals(file.toURL())) {
+				xmldb.setSourceURL(file.toURL());
+			}
+		}
 		DataOutputStream urlDataOut = new DataOutputStream(new FileOutputStream(file));
     	ExporterJDOM.export(urlDataOut, db.getRoot(), db);
     	urlDataOut.flush();
     	urlDataOut.close();
-		
+    	if (db instanceof XMLDatabase) {
+    		((XMLDatabase)db).setSourceVerified(true);
+    	}
 	}
 	
 	public void localSaveData(OTDatabase db, URL url) throws Exception {
 		File f = new File(url.getFile());
 		localSaveData(db, f);
+	}
+	
+	public void remoteSaveData(XMLDatabase xmldb, String method) throws Exception {
+		remoteSaveData(xmldb, method, null);
+	}
+	
+	public void remoteSaveData(XMLDatabase xmldb, String method, Authenticator auth) throws Exception {
+		if (xmldb.getSourceURL() == null) {
+			throw new MalformedURLException("Invalid source URL on XMLDatabase: " + xmldb.getDatabaseId().toString());
+		}
+		remoteSaveData(xmldb, xmldb.getSourceURL(), method, auth);
 	}
 	
 	public void remoteSaveData(OTDatabase db, URL remoteURL, String method) throws Exception {
@@ -897,6 +923,12 @@ public class OTrunkImpl implements OTrunk
     	// If method isn't "POST" or "PUT", throw an exception
     	if (!(method.compareTo(OTViewer.HTTP_POST) == 0 || method.compareTo(OTViewer.HTTP_PUT) == 0)) {
     		throw new Exception("Invalid HTTP Request method for data saving");
+    	}
+    	
+    	if (db instanceof XMLDatabase) {
+    		if (! ((XMLDatabase)db).getSourceURL().equals(remoteURL)) {
+    			((XMLDatabase)db).setSourceURL(remoteURL);
+    		}
     	}
     	
     	if (auth != null) {
@@ -936,6 +968,7 @@ public class OTrunkImpl implements OTrunk
     	urlConn.disconnect();
     	if (db instanceof XMLDatabase) {
     		((XMLDatabase)db).setDirty(false);
+    		((XMLDatabase)db).setSourceVerified(true);
     	}
     }
 }

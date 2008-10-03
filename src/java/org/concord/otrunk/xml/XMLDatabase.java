@@ -110,6 +110,8 @@ public class XMLDatabase
 	private JDOMDocument document;
 
 	private URL contextURL;
+	
+	private URL sourceURL = null;
 
 	private ArrayList listeners;
 
@@ -119,6 +121,8 @@ public class XMLDatabase
 
 	private long downloadTime = -1;
 	private long parseTime;
+
+	private boolean sourceVerified = false;
 	
 	protected static String getLabel(URL contextURL)
 	{
@@ -275,7 +279,7 @@ public class XMLDatabase
 		// element, and set the contextURL to be that.  That codebase attribute should override 
 		// the passed in contextURL
 		this.contextURL = contextURL;
-				
+		setSourceURL(contextURL);
 	}
 	
 	protected void initializeDoc(JDOMDocument document)
@@ -316,6 +320,9 @@ public class XMLDatabase
 		if (dbId != null && dbId.length() > 0) {
 			databaseId = OTIDFactory.createOTID(dbId);
 		}
+		
+		// Everything is loaded, so we know the sourceURL was valid
+		setSourceVerified(true);
 	}
 
 	public void loadObjects()
@@ -937,5 +944,45 @@ public class XMLDatabase
 			// to want a custom object to record which property is making this reference
 			refs = new ArrayList();
 		}
+	}
+	
+	/**
+	 * This returns the URL which points to the location that this db came from or should be saved to.
+	 * It is similar to the contextURL, except that this won't be changed if the source resets the codebase.
+	 * 
+	 * @return URL The URL from which this db was loaded, or to which this db has/will be persisted
+	 */
+	public URL getSourceURL() {
+		return this.sourceURL;
+	}
+	
+	/**
+	 * Set a new location for this db to be persisted. Setting this will cause the source to
+	 * be unverified since it does no checking to make sure the URL points to a valid, accessible location.
+	 * 
+	 * @param source URL The location to which this db should be persisted.
+	 */
+	public void setSourceURL(URL source) {
+		this.sourceURL = source;
+		this.sourceVerified  = false;
+	}
+	
+	/**
+	 * Denotes if the sourceURL is known to be a valid, accessible location.
+	 * 
+	 * @return boolean true if the sourceURL is valid and accessible, false if it's not valid/accessible or it's unknown
+	 */
+	public boolean isSourceVerified() {
+		return this.sourceVerified;
+	}
+	
+	/**
+	 * Sets whether the sourceURL is valid and accessible. This should only be set once the db has been successfully persisted
+	 * to the sourceURL!
+	 * 
+	 * @param verified boolean true if the sourceURL is valid and accessible, false if it's not valid/accessible or it's unknown
+	 */
+	public void setSourceVerified(boolean verified) {
+		this.sourceVerified = verified;
 	}
 }
