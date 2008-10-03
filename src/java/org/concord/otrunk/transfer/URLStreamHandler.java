@@ -31,8 +31,12 @@ public class URLStreamHandler
     	}		
     	
     	System.err.println(message + ": " + connection.getURL());
-    	if (httpConnection != null) {			
-    		System.err.println("  Response code: " + httpConnection.getResponseCode()); 
+    	if (httpConnection != null) {
+    		try {
+    			System.err.println("  Response code: " + httpConnection.getResponseCode());
+    		} catch (IOException ioe){
+    			// can't get the response code for some reason
+    		}
     	}		
     
     	if (inStream != null) {
