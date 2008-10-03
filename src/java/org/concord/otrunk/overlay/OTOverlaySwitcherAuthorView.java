@@ -209,6 +209,10 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 	}
 	
 	private void saveCurrentOverlay() {
+		saveCurrentOverlay(false);
+	}
+	
+	private void saveCurrentOverlay(boolean askForFilename) {
 		OTOverlay overlay = getCurrentOverlay();
 		if (overlay == null) { return; }
 		
@@ -217,17 +221,18 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 		if (! db.isDirty()) { return; }
 		
 		try {
-    		URL contextURL = db.getContextURL();
+    		URL sourceURL = db.getSourceURL();
     		// if database doesn't have a context url
-    		if (contextURL == null) {
+    		if (askForFilename || sourceURL == null) {
     			File f = askForFile(SAVE);
     			if (f == null) { return; }
-    			contextURL = f.toURL();
+    			sourceURL = f.toURL();
+    			db.setSourceURL(sourceURL);
     		}
-    		logger.info("Context url is: " + contextURL.toExternalForm());
+    		logger.info("Source url is: " + sourceURL.toExternalForm());
     		// dump the db to the context url
 	    
-	    	otrunk.localSaveData(db, contextURL);
+	    	otrunk.localSaveData(db);
 	    	db.setDirty(false);
 	    } catch (Exception e) {
 	    	e.printStackTrace();
@@ -251,7 +256,11 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 		if (retval == MostRecentFileDialog.APPROVE_OPTION) {
 			try {
 				// set the context url
-                return mrfd.getSelectedFile();
+				File f = mrfd.getSelectedFile();
+				if (! f.getName().endsWith(".otml")) {
+					f = new File(f.getCanonicalPath() + ".otml");
+				}
+                return f;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -284,6 +293,12 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 	            saveCurrentOverlay();
             }
 		};
+		Action saveAsMenuItem = new AbstractAction("Save Current Overlay As...") {
+			public void actionPerformed(ActionEvent e)
+            {
+	            saveCurrentOverlay(true);
+            }
+		};
 		Action deleteMenuItem = new AbstractAction("Delete Current Overlay") {
 			public void actionPerformed(ActionEvent e)
             {
@@ -294,6 +309,7 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 		overlayMenu.add(newMenuItem);
 		overlayMenu.add(openMenuItem);
 		overlayMenu.add(saveMenuItem);
+		overlayMenu.add(saveAsMenuItem);
 		overlayMenu.add(deleteMenuItem);
 	}
 }
