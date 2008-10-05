@@ -119,6 +119,8 @@ public class XMLDatabase
 
 	private HashMap reverseReferences = new HashMap();
 
+
+	private long urlOpenTime;
 	private long downloadTime = -1;
 	private long parseTime;
 
@@ -151,8 +153,11 @@ public class XMLDatabase
 	{
 		initialize(xmlURL, xmlURL.toExternalForm(), statusStream);
 
+		long openingStart = System.currentTimeMillis();
 		URLStreamHandler urlStreamHandler = new URLStreamHandler(xmlURL);
 		InputStream urlInStream = urlStreamHandler.getURLStream();		
+		urlOpenTime = System.currentTimeMillis() - openingStart;
+		
 		
 		// parse the xml file...
 		long startMillis = -1;
@@ -415,14 +420,17 @@ public class XMLDatabase
 
 		long endMillis = System.currentTimeMillis();
 
+		String parsedLabel = "downloaded and parsed xml";
 		String downloadString = "";
 		if(downloadTime >= 0){
 			downloadString = " downloaded in " + downloadTime + "ms";
-		}
+			parsedLabel = "parsed xml";
+		} 
 		statusStream.println("Loaded " + dataObjects.size() + " objects from: " + label
+	            + " opened url in " + urlOpenTime + "ms"
 		        + downloadString 
-				+ " parsed in " + parseTime + "ms" 
-				+ " loaded in " + (endMillis - startMillis) + "ms" );
+				+ " " + parsedLabel + " in " + parseTime + "ms" 
+				+ " loaded ot db in " + (endMillis - startMillis) + "ms" );
 	}
 
 	public static class PackageNotFound
