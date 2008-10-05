@@ -76,6 +76,8 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
     }
 	
 	protected void loadUserDatabases(final OTMultiUserRoot root) {
+		long start = System.currentTimeMillis();
+
 		OTUserList userList = null;
 		OTObject userListOrig = root.getUserList();
 		if(userListOrig instanceof OTIncludeRootObject){
@@ -83,7 +85,10 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 		} else {
 			userList = (OTUserList) userListOrig;
 		}
-		
+
+        System.out.println("user list load time: " + 
+        	(System.currentTimeMillis() - start) + "ms");        
+
 	    final Vector userDatabases = userList.getUserDatabases().getVector();
 	    
 	    Runnable userDBTask = new Runnable(){
@@ -148,26 +153,31 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 			
 	    };
 
-		Thread t1 = new Thread(userDBTask);
-		Thread t2 = new Thread(userDBTask);
-		t1.start();
-		t2.start();
+	    Thread [] threads = new Thread[3];
+	    for(int i=0; i<threads.length; i++){
+	    	threads[i] = new Thread(userDBTask);
+	    	threads[i].start();
+	    }
 		try {
-	        t1.join();
-	        t2.join();
+		    for(int i=0; i<threads.length; i++){
+		    	threads[i].join();
+		    }
         } catch (InterruptedException e1) {
 	        // TODO Auto-generated catch block
 	        e1.printStackTrace();
         }	    
+        
+        System.out.println("total user db and overlay load time: " + 
+        	(System.currentTimeMillis() - start) + "ms");        
 	}
 	
 	protected void loadGlobalOverlay(OTMultiUserRoot root) {
-		// get the list of overlays
 		try {
 			if(root.getGroupOverlayURL() == null){
 				return;
 			}
-			
+
+			long start = System.currentTimeMillis();
 			OTOverlay otOverlay = (OTOverlay) otrunk.getExternalObject(root.getGroupOverlayURL(), root.getOTObjectService());
 	        if (otOverlay != null) {
     	        // set up the objectService for it
@@ -175,6 +185,8 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
     	        // associate it with the 'null' userobject in otrunk
     	        overlayManager.add(otOverlay, objService, null);
 	        }
+	        System.out.println("group overlay load time: " + 
+	        	(System.currentTimeMillis() - start) + "ms");
 		} catch (Exception e) {
 	        logger.log(Level.WARNING, "Couldn't set up the group-wide overlay", e);
         }
