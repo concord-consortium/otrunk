@@ -36,6 +36,7 @@ import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.ComponentView;
@@ -68,6 +69,12 @@ public class OTDocumentObjectView extends ComponentView
     	super(elem);
     	this.docView = docView;
         viewContainerPanel = docView.createViewContainerPanel();
+        
+        // The view container panel starts with a Border Layout which doesn't
+        // return a accurate maximum size, which is used by the EditorKit when deciding
+        // how much horizontal space this component should fill.  BoxLayout does compute
+        // this correctly.
+        viewContainerPanel.setLayout(new BoxLayout(viewContainerPanel, BoxLayout.X_AXIS));
     }
     
     protected Component createComponent() 
