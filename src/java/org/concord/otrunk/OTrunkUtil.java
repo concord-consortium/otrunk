@@ -396,4 +396,25 @@ public class OTrunkUtil
 		}
 		return true;
 	}
+	
+	public static boolean listEquals(OTObjectList list1, OTObjectList list2)
+	{
+		if(list1.size() != list2.size()){
+			return false;
+		}
+		for(int j=0; j<list1.size(); j++){
+			if(list1.get(j) == null){
+				if(list2.get(j) == null){
+					continue;
+				} else {
+					return false;
+				}
+			}
+			
+			if(!list1.get(j).equals(list2.get(j))){
+				return false;
+			}
+		}
+		return true;
+	}
 }

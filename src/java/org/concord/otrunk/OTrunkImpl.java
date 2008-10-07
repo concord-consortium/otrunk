@@ -62,7 +62,6 @@ import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.otcore.OTClass;
-import org.concord.framework.otrunk.otcore.OTClassProperty;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectFinder;
 import org.concord.otrunk.datamodel.OTDataObjectType;
@@ -632,33 +631,7 @@ public class OTrunkImpl implements OTrunk
     	
     	return false;
     }
-    
-    public boolean hasOverrideInTopOverlay(OTClassProperty property, OTObject otObject)
-    {
-    	OTDataObject dataObject = OTInvocationHandler.getOTDataObject(otObject);
-    	
-        if(dataObject instanceof CompositeDataObject) {
-        	
-            return ((CompositeDataObject)dataObject).hasOverrideInTopOverlay(property.getName());
-        } else {
-        	System.err.println("Warning: this object isn't from an Overlay");
-        }
-    	    	
-    	return false;
-    }
-
-    public void removeOverrideInTopOverlay(OTClassProperty property, OTObject otObject)
-    {
-    	OTDataObject dataObject = OTInvocationHandler.getOTDataObject(otObject);
-    	
-        if(dataObject instanceof CompositeDataObject) {
-        	
-            ((CompositeDataObject)dataObject).removeOverrideInTopOverlay(property.getName());
-        } else {
-        	System.err.println("Warning: this object isn't from an Overlay");
-        }    	
-    }
-    
+        
     public void addDatabase(OTDatabase db)
     {
         if(!databases.contains(db)) {

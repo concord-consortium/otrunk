@@ -25,6 +25,7 @@ import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.overlay.CompositeDataObject;
 import org.concord.otrunk.view.OTConfig;
 
 public class OTObjectInternal implements OTObjectInterface
@@ -327,8 +328,9 @@ public class OTObjectInternal implements OTObjectInterface
 	{
 		Object value = getResourceInternal(property, returnType);
 		
-		// If the resource value is an OTObject save a reference to it		
-		if(value instanceof OTObject || value instanceof OTObjectCollection){
+		// If the resource value is an OTObject save a reference to it
+		// if this is is an overridden property then don't save it 
+		if(!property.isOverriddenProperty() && (value instanceof OTObject || value instanceof OTObjectCollection)){
 			String propertyName = property.getName();
 			saveReference(propertyName, value);
 		}
@@ -347,7 +349,22 @@ public class OTObjectInternal implements OTObjectInterface
 		
         // If this class is the one handling the overlays then this call
         // would be substituted by one that goes through all of the overlayed data objects.
-	    Object resourceValue = getResourceValue(resourceName);
+	    Object resourceValue = null;
+	    Object overriddenValue = null;
+	    if(property.isOverriddenProperty()){
+	        if(dataObject instanceof CompositeDataObject) {        	
+	            Object nonActiveDeltaResource = 
+	            	((CompositeDataObject)dataObject).getNonActiveDeltaResource(resourceName);
+
+	            resourceValue = nonActiveDeltaResource;
+	            overriddenValue = resourceValue;
+	        } else {
+	        	System.err.println("Warning: this object isn't from an Overlay");
+		    	resourceValue = getResourceValue(resourceName);
+	        }    	    
+	    } else {
+	    	resourceValue = getResourceValue(resourceName);
+	    }
 	    
 	    // we can't rely on the returnType here because it could be an
 	    // interface that isn't in the ot package
@@ -382,7 +399,9 @@ public class OTObjectInternal implements OTObjectInterface
 	        
 	    } else if(OTResourceMap.class.isAssignableFrom(returnType)) {
 	        try {
-	        	return getResourceMap(resourceName);
+	        	OTDataMap list = 
+	        		(OTDataMap) getResourceCollection(resourceName, OTDataMap.class, overriddenValue);
+	            return new OTResourceMapImpl(resourceName, list, this);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -390,7 +409,9 @@ public class OTObjectInternal implements OTObjectInterface
 	        return null;
 	    } else if(OTObjectMap.class.isAssignableFrom(returnType)) {
 	        try {
-	        	return getObjectMap(resourceName);
+	        	OTDataMap list = 
+	        		(OTDataMap) getResourceCollection(resourceName, OTDataMap.class, overriddenValue);
+	            return new OTObjectMapImpl(resourceName, list, this);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -398,7 +419,9 @@ public class OTObjectInternal implements OTObjectInterface
 	        return null;				
 	    } else if(OTResourceList.class.isAssignableFrom(returnType)) {
 	        try {
-	        	return getResourceList(resourceName);
+	        	OTDataList list = 
+	        		(OTDataList) getResourceCollection(resourceName, OTDataList.class, overriddenValue);
+	            return new OTResourceListImpl(resourceName, list, this);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -406,7 +429,9 @@ public class OTObjectInternal implements OTObjectInterface
 	        return null;				
 	    } else if(OTObjectList.class.isAssignableFrom(returnType)) {
 	        try {					
-	        	return getObjectList(resourceName);
+	        	OTDataList list = 
+	        		(OTDataList) getResourceCollection(resourceName, OTDataList.class, overriddenValue);
+	            return new OTObjectListImpl(resourceName, list, this);
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -455,6 +480,16 @@ public class OTObjectInternal implements OTObjectInterface
     	return dataObject.getResource(resourceName);
     }
 
+	public Object getResourceCollection(String resourceName, Class collectionClass,
+		Object overriddenValue)
+	{
+    	if(overriddenValue != null){
+    		return overriddenValue;
+    	} else {
+    		return dataObject.getResourceCollection(resourceName, collectionClass);
+    	}		
+	}
+	
 	public OTResourceMap getResourceMap(String resourceName)
     {
         OTDataMap map = (OTDataMap)dataObject.getResourceCollection(
@@ -476,10 +511,10 @@ public class OTObjectInternal implements OTObjectInterface
         return new OTResourceListImpl(resourceName, list, this);
     }
 
-	public OTObjectList getObjectList(String resourceName)
-    {
-    	OTDataList list = (OTDataList)dataObject.getResourceCollection(
-                resourceName, OTDataList.class);
+	public OTObjectList getObjectList(String resourceName, Object overriddenValue)
+    {		
+    	OTDataList list = 
+    		(OTDataList) getResourceCollection(resourceName, OTDataList.class, overriddenValue);
         return new OTObjectListImpl(resourceName, list, this);
     }
 
@@ -600,7 +635,15 @@ public class OTObjectInternal implements OTObjectInterface
     }
 
 	public boolean otIsSet(OTClassProperty property)
-    {
+    {    	
+		if(property.isOnlyInOverlayProperty()){
+			if(dataObject instanceof CompositeDataObject) {     	
+				return ((CompositeDataObject)dataObject).hasOverrideInTopOverlay(property.getName());
+			} else {
+				System.err.println("Warning: this object isn't from an Overlay");
+			}
+		}
+		
         Object resourceValue = dataObject.getResource(property.getName());
         return resourceValue != null;
     }
@@ -613,6 +656,25 @@ public class OTObjectInternal implements OTObjectInterface
 
 	public void otUnSet(OTClassProperty property)
     {
+		/*
+		boolean isOnlyInOverlayProperty();
+		
+		public boolean isOverridenProperty();
+		
+		public OTClassProperty getOnlyInOverlayProperty();
+		
+		public OTClassProperty getOverridenProperty();
+		*/
+
+		if(property.isOnlyInOverlayProperty()){	    	
+	        if(dataObject instanceof CompositeDataObject) {	        	
+	            ((CompositeDataObject)dataObject).removeOverrideInTopOverlay(property.getName());
+	            return;
+	        } else {
+	        	System.err.println("Warning: this object isn't from an Overlay");
+	        }    		
+		}
+		
 		setResource(property.getName(), null);
     }
 

@@ -12,6 +12,8 @@ public class OTClassPropertyImpl
 	Object defaultValue;
 	OTType type;
 	String name;
+	private boolean onlyInOverlayProperty;
+	private boolean overridenProperty;
 	
 	public OTClassPropertyImpl(String name, OTType type, Object defaultValue)
 	{
@@ -54,4 +56,34 @@ public class OTClassPropertyImpl
     {
 		return type instanceof OTPrimitiveType;
     }
+	
+	public boolean isOnlyInOverlayProperty()
+	{
+		return onlyInOverlayProperty;
+	}
+	
+	public boolean isOverriddenProperty()
+	{
+		return overridenProperty;
+	}
+	
+	public OTClassProperty getOnlyInOverlayProperty()
+	{
+		OTClassPropertyImpl copy = copy();
+		copy.onlyInOverlayProperty = true;
+		return copy;
+	}
+	
+	public OTClassProperty getOverriddenProperty()
+	{
+		OTClassPropertyImpl copy = copy();
+		copy.overridenProperty = true;
+		return copy;		
+	}
+
+	private OTClassPropertyImpl copy()
+    {
+		return new OTClassPropertyImpl(name, type, defaultValue);
+    }
+
 }
