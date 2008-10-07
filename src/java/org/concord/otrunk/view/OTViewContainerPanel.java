@@ -138,6 +138,11 @@ public class OTViewContainerPanel extends JPanel
 	public OTViewContainerPanel(OTFrameManager frameManager)
 	{
 		super(new BorderLayout());
+		
+		// using Box layout helps several things
+		// but it affects lots of code, so we should try to turn it on when we have some
+		// breathing room
+		//setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
 		viewContainer = new MyViewContainer();
 		
