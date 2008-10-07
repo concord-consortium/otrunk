@@ -132,7 +132,7 @@ public class OTJComponentServiceImpl implements OTJComponentService
     			// so a wrapper view is used which does this on the getComponent method    			
     			OTXHTMLView xhtmlView = (OTXHTMLView) genericView;
 
-    			OTXHTMLWrapperDoc wrapperDoc = new OTXHTMLWrapperDoc(xhtmlView, otObject);
+    			OTXHTMLWrapperDoc wrapperDoc = new OTXHTMLWrapperDoc(xhtmlView, otObject, viewEntry);
     			
     			// we look up a view for the wrapper doc in the default view entries 
     			view = (OTJComponentView) viewFactory.getView(wrapperDoc, OTJComponentView.class, OTViewFactory.NO_VIEW_MODE);

@@ -8,6 +8,7 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.framework.otrunk.otcore.OTClassProperty;
+import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.otrunk.view.document.OTDocument;
 
@@ -19,8 +20,9 @@ public class OTXHTMLWrapperDoc implements OTDocument
 {
 	private OTXHTMLView xhtmlView;
 	private OTObject xhtmlObject;
+	private OTViewEntry viewEntry;
 	
-	public OTXHTMLWrapperDoc(OTXHTMLView view, OTObject object)
+	public OTXHTMLWrapperDoc(OTXHTMLView view, OTObject object, OTViewEntry viewEntry)
 	{
 		if(view == null) {
 			throw new IllegalArgumentException("view can't be null");
@@ -31,6 +33,8 @@ public class OTXHTMLWrapperDoc implements OTDocument
 			throw new IllegalArgumentException("object can't be null");
 		}
 		this.xhtmlObject =object;
+		
+		this.viewEntry = viewEntry;
 	}
 	
 	public String getDocumentText() {
@@ -50,7 +54,11 @@ public class OTXHTMLWrapperDoc implements OTDocument
 	}
 
 	public OTID getGlobalId() {
-		return xhtmlObject.getGlobalId();
+		if(viewEntry != null){
+			return viewEntry.getGlobalId();
+		} else {
+			return xhtmlObject.getGlobalId();
+		}
 	}
 
 	public String getName() {
@@ -58,7 +66,11 @@ public class OTXHTMLWrapperDoc implements OTDocument
 	}
 
 	public OTObjectService getOTObjectService() {
-		return xhtmlObject.getOTObjectService();
+		if(viewEntry != null){
+			return viewEntry.getOTObjectService();
+		} else {
+			return xhtmlObject.getOTObjectService();
+		}
 	}
 
 	public String otExternalId()
