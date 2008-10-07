@@ -31,6 +31,9 @@ public class OTStretchingView extends AbstractOTJComponentView
 
 		borderLayoutPanel.add(textArea, BorderLayout.CENTER);
 		borderLayoutPanel.add(button, BorderLayout.EAST);
+
+		// Uncommenting this will limit the size that it stretches to
+		//borderLayoutPanel.setMaximumSize(new Dimension(1024, 1024));
 		
 		return borderLayoutPanel;
 	}
