@@ -154,7 +154,7 @@ public class CompositeDataObject
 		return getNonActiveDeltaResource(key);
 	}
 
-	protected Object getNonActiveDeltaResource(String key)
+	public Object getNonActiveDeltaResource(String key)
 	{
 		Object value = null;
 		if(middleDeltas != null){
@@ -392,6 +392,9 @@ public class CompositeDataObject
 	void setMiddleDeltas(OTDataObject [] middleDeltas)
     {
 	    this.middleDeltas = middleDeltas;
+	    
+	    // throw away our cached collections
+	    resourceCollections.clear();
     }
 
 	OTDataObject [] getMiddleDeltas()

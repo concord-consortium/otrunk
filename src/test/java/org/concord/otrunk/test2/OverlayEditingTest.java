@@ -46,7 +46,7 @@ public class OverlayEditingTest extends TestCase
 				assertFalse("after unset the root object thinks the int prop is still set.", 
 					root.otIsSet(intProp));
 				assertTrue("root doesn't have the int prop overriden", 
-					otrunk.hasOverrideInTopOverlay(intProp, root));				
+					root.otIsSet(intTopOverlayProp));				
             }
 
 		};
@@ -79,11 +79,11 @@ public class OverlayEditingTest extends TestCase
 				assertFalse("after unset the root object thinks the int prop is still set.", 
 					root.otIsSet(intProp));
 				assertTrue("root doesn't have the int prop overriden", 
-					otrunk.hasOverrideInTopOverlay(intProp, root));
+					root.otIsSet(intTopOverlayProp));
 				
 				assertFalse("root has the float prop set", root.otIsSet(floatProp));
 				assertFalse("root has the float prop overriden", 
-					otrunk.hasOverrideInTopOverlay(floatProp, root));					            
+					root.otIsSet(floatTopOverlayProp));					            
             }
 
 			
@@ -118,11 +118,11 @@ public class OverlayEditingTest extends TestCase
 				assertTrue("after set the root object thinks the int prop is not set.", 
 					root.otIsSet(intProp));
 				assertTrue("root doesn't have the int prop overriden", 
-					otrunk.hasOverrideInTopOverlay(intProp, root));
+					root.otIsSet(intTopOverlayProp));
 			
 				assertTrue("Value of int is not 2", root.getInt() == 2);
 				
-				otrunk.removeOverrideInTopOverlay(intProp, root);
+				root.otUnSet(intTopOverlayProp);
 
 				assertTrue("Value of int is not the original", root.getInt() == originalInt);
 
@@ -152,11 +152,11 @@ public class OverlayEditingTest extends TestCase
 				assertFalse("after setting to null the root object thinks the ref prop is set.", 
 					root.otIsSet(referenceProp));
 				assertTrue("root doesn't have the int prop overriden", 
-					otrunk.hasOverrideInTopOverlay(referenceProp, root));
+					root.otIsSet(referenceTopOverlayProp));
 			
 				assertTrue("Value of refernece is not null", root.getReference() == null);
-				
-				otrunk.removeOverrideInTopOverlay(referenceProp, root);
+
+				root.otUnSet(referenceTopOverlayProp);
 
 				assertTrue("Value of reference is not the original", 
 					root.getReference().equals(origObj));
@@ -180,7 +180,10 @@ public class OverlayEditingTest extends TestCase
 		protected OTrunkImpl otrunk;
 		protected OTClassProperty intProp;
 		protected OTClassProperty floatProp;
-		protected OTClassProperty referenceProp;			
+		protected OTClassProperty referenceProp;
+		protected OTClassProperty intTopOverlayProp;
+		protected OTClassProperty floatTopOverlayProp;			
+		protected OTClassProperty referenceTopOverlayProp;
 		
 		public void init(URL input) throws Exception
 		{
@@ -208,8 +211,11 @@ public class OverlayEditingTest extends TestCase
 			// We want to try setting some properties to null
 			// Assume the root object is a OTBasicTestObject
 			intProp = root.otClass().getProperty("int");
+			intTopOverlayProp = intProp.getOnlyInOverlayProperty();
 			floatProp = root.otClass().getProperty("float");
+			floatTopOverlayProp = floatProp.getOnlyInOverlayProperty();
 			referenceProp = root.otClass().getProperty("reference");
+			referenceTopOverlayProp = referenceProp.getOnlyInOverlayProperty();
 		}
 		
 		public String getUserDataString() throws Exception
@@ -244,11 +250,11 @@ public class OverlayEditingTest extends TestCase
 			// The passed in authored content should have the int property set
 			assertTrue("root doesn't have the int prop set", root.otIsSet(intProp));
 			assertFalse("root already has the int prop overriden", 
-				otrunk.hasOverrideInTopOverlay(intProp, root));
+				root.otIsSet(intTopOverlayProp));
 			
 			assertFalse("root has the float prop set", root.otIsSet(floatProp));
 			assertFalse("root has the float prop overriden", 
-				otrunk.hasOverrideInTopOverlay(floatProp, root));	            
+				root.otIsSet(floatTopOverlayProp));	            
 		}
 	}
 	

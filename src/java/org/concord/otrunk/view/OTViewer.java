@@ -357,7 +357,6 @@ public class OTViewer extends JFrame
 				MouseEvent mEvent = (MouseEvent) event;
 				
 				if (mEvent.getID() == MouseEvent.MOUSE_CLICKED
-				        && (mEvent.getButton() == MouseEvent.BUTTON3)
 				        && (mEvent.getModifiersEx() & MouseEvent.ALT_DOWN_MASK) != 0) {
 					System.out.println(event.getSource().toString());					
 				}
