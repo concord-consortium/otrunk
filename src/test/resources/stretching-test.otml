@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="33754150-b594-11d9-9669-0800200c9a66" >
+  <imports>
+    <import class="org.concord.otrunk.OTSystem"/>
+    <import class="org.concord.otrunk.view.OTFolderObject"/>
+    <import class="org.concord.otrunk.view.OTViewEntry"/>
+    <import class="org.concord.otrunk.view.OTViewService"/>
+    <import class="org.concord.otrunk.test.OTBasicTestObject"/>
+    <import class="org.concord.otrunk.view.document.OTCompoundDoc"/>
+  </imports>
+  <objects>
+    <OTSystem>
+      <services>
+        <OTViewService>
+          <viewEntries>
+            <OTViewEntry
+              objectClass="org.concord.otrunk.view.document.OTDocument" 
+              viewClass="org.concord.otrunk.view.document.OTDocumentView"/>
+            <OTViewEntry local_id="text_edit"
+              objectClass="org.concord.otrunk.test.OTBasicTestObject" 
+              viewClass="org.concord.otrunk.test.OTStretchingView"/>
+          </viewEntries>
+        </OTViewService>
+      </services>
+      <root>
+        <OTCompoundDoc>
+          <bodyText>
+            Text before stretch<br/>
+            <object refid="${stretchy}"/><br/>
+            Text after.
+          </bodyText>
+          <documentRefs>
+            <OTBasicTestObject local_id="stretchy" name="should stretch and stretch"/>
+          </documentRefs>
+          </OTCompoundDoc>
+      </root>
+    </OTSystem>
+  </objects>
+</otrunk>
