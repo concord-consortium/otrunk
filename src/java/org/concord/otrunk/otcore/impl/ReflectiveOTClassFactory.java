@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
@@ -142,6 +143,11 @@ public class ReflectiveOTClassFactory
 
 		Class schemaInterface =  ((OTClassImpl)otClass).getSchemaInterface();
 		
+		if(DefaultOTObject.class.isAssignableFrom(schemaInterface)){
+			throw new IllegalStateException("the schemaInterface can't be a DefaultOTObject: "
+				+ schemaInterface);
+		}
+		
 		Method [] methods = schemaInterface.getDeclaredMethods();
 			
 		for(int j=0; j<methods.length; j++) {
@@ -227,7 +233,13 @@ public class ReflectiveOTClassFactory
 		return processAllNewlyRegisteredClasses();
 	}
 	
-	public ArrayList loadClasses(List classList)
+	/**
+	 * This has to be synchronized because if a new class
+	 * is added in the middle it will be in an invalid state.
+	 * @param classList
+	 * @return
+	 */
+	synchronized public ArrayList loadClasses(List classList)
 	{		
 		for(Iterator i=classList.iterator(); i.hasNext();){
 			Class nextClass = (Class) i.next();
