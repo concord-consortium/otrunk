@@ -447,7 +447,10 @@ public class ExporterJDOM
 			type = TypeService.getDataPrimitiveType(item.getClass());
 
 			if(type == null){
-				System.err.println("unknown list item type: " + item.getClass());				
+				String msg = "ExporterJDOM#exportCollectionItem: ";
+				msg += "Unknown list item type: " + item.getClass();
+				msg += " parentResourceName=" + parentResourceName;
+				System.err.println(msg);				
 				return null;
 			}
 			
