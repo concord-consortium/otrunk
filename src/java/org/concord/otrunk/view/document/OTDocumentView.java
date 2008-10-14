@@ -111,6 +111,8 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	protected OTViewEntry viewEntry;
 
 	private KeyEventDispatcher sourceViewDispatcher;
+	
+	private boolean updateViewOnStateChange = true;
 
 	public final static String XHTML_PREFIX_START =
 	// "<?xml version='1.0' encoding='UTF-8'?>\n" +
@@ -766,8 +768,14 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	public void stateChanged(OTChangeEvent e)
     {
 		super.stateChanged(e);
-		updateFormatedView();
+		if (updateViewOnStateChange()){
+			updateFormatedView();
+		}
     }
+	
+	public boolean updateViewOnStateChange(){
+		return updateViewOnStateChange;
+	}
 	
 	public void viewClosed()
 	{
