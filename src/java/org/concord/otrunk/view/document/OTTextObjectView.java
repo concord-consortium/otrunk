@@ -145,10 +145,18 @@ public class OTTextObjectView extends AbstractOTJComponentContainerView
             return;
         }
         
-        try {
-            textAreaModel.replace(0, textAreaModel.getLength(), pfObject.getDocumentText(), null);
-        } catch (Exception exc) {
-            exc.printStackTrace();
+        /*
+         * This was being called every time any change was made to a document, which made
+         * it impossible for a learner to change any properties on a document without saving the 
+         * contents of the document to their learner data. This has noe been changed so that this
+         * is only called if the change event is in the bodyText of the document. -SF
+         */  
+        if (e.getProperty().equalsIgnoreCase("bodyText")){
+            try {
+                textAreaModel.replace(0, textAreaModel.getLength(), pfObject.getDocumentText(), null);
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
         }
     }
     
