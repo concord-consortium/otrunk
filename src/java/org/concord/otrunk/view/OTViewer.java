@@ -39,6 +39,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
@@ -1916,27 +1919,27 @@ public class OTViewer extends JFrame
 
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.WHITE);
-		panel.setLayout(null);
-
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 0.5;
+		c.insets = new Insets(5,10,5,10);
+		
 		JLabel lNew = new JLabel("Click the \"New\" button to create a new portfolio:");
 		JLabel lOpen = new JLabel("Click the \"Open\" button to open a saved portfolio:");
 		JButton bNew = new JButton("New");
 		JButton bOpen = new JButton("Open");
-
-		panel.add(lNew);
-		panel.add(lOpen);
-		panel.add(bNew);
-		panel.add(bOpen);
-
-		lNew.setLocation(50, 100);
-		lOpen.setLocation(50, 150);
-		bNew.setLocation(400, 100);
-		bOpen.setLocation(400, 150);
-
-		lNew.setSize(340, 30);
-		lOpen.setSize(340, 30);
-		bNew.setSize(70, 25);
-		bOpen.setSize(70, 25);
+		
+		c.gridx = 0;
+		c.gridy = 0;
+		panel.add(lNew, c);
+		c.gridx = 1;
+		panel.add(bNew, c);
+		c.gridx = 0;
+		c.gridy = 1;
+		panel.add(lOpen, c);
+		c.gridx = 1;
+		panel.add(bOpen, c);
 
 		bNew.setOpaque(false);
 		bOpen.setOpaque(false);
@@ -1961,7 +1964,7 @@ public class OTViewer extends JFrame
 		});
 
 		commDialog.getContentPane().add(panel);
-		commDialog.setBounds(200, 200, 500, 300);
+		commDialog.setBounds(200, 200, 450, 200);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run()
 			{
