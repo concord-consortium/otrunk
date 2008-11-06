@@ -249,13 +249,15 @@ public class OTViewFactoryImpl implements OTViewFactory
     
     public void addViewEntry(OTViewEntry entry)
     {
-    	addViewEntry(entry, false);
+    	InternalViewEntry internalEntry = createInternalViewEntry(entry);
+    	if(internalEntry == null){
+    		return;
+    	}
+
+        viewMap.add(internalEntry);
     }
     
-    /* (non-Javadoc)
-	 * @see org.concord.otrunk.view.OTViewFactory#addViewEntry(java.lang.Class, java.lang.Class)
-	 */
-    public void addViewEntry(OTViewEntry entry, boolean addToTop)
+    protected InternalViewEntry createInternalViewEntry(OTViewEntry entry)
     {
         String objClassStr = entry.getObjectClass();
         String viewClassStr = entry.getViewClass();
@@ -271,19 +273,34 @@ public class OTViewFactoryImpl implements OTViewFactory
             }
 
             internalEntry.otEntryID = entry.getGlobalId();
-            if (addToTop){
-            	viewMap.add(0, internalEntry);
-            } else {
-            	viewMap.add(internalEntry);
-            }
-            
+            return internalEntry;
         } catch (ClassNotFoundException e) {
             System.err.println("Can't find view: " + viewClassStr + 
-                    " for object: " + objClassStr);
+                " for object: " + objClassStr);
             System.err.println("  error: " + e.toString());
         }
-
+        
+        return null;
     }
+    
+    
+    /* (non-Javadoc)
+	 * @see org.concord.otrunk.view.OTViewFactory#addViewEntry(java.lang.Class, java.lang.Class)
+	 */
+    public void addViewEntry(OTViewEntry entry, boolean addToTop)
+    {
+    	InternalViewEntry internalEntry = createInternalViewEntry(entry);
+    	if(internalEntry == null){
+    		return;
+    	}
+
+        if (addToTop){
+        	viewMap.add(0, internalEntry);
+        } else {
+        	viewMap.add(internalEntry);
+        }
+    }    	
+    	
 
     /**
      * This will return the viewEntry setup by this mode.  If no viewEntry is 
@@ -466,9 +483,12 @@ public class OTViewFactoryImpl implements OTViewFactory
 		// Add view entries
 		Vector viewEntries = viewBundle.getViewEntries().getVector();
 		Iterator it = viewEntries.iterator();
+		Vector tempViewMap = new Vector();
 		while (it.hasNext()){
-			addViewEntry((OTViewEntry)it.next(), true);
+			tempViewMap.add(createInternalViewEntry((OTViewEntry)it.next()));
 		}
+
+		viewMap.addAll(0, tempViewMap);
 		
 		// Override currentMode
 		if (viewBundle.getCurrentMode() != null){
