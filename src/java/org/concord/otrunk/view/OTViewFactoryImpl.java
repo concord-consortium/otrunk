@@ -485,7 +485,11 @@ public class OTViewFactoryImpl implements OTViewFactory
 		Iterator it = viewEntries.iterator();
 		Vector tempViewMap = new Vector();
 		while (it.hasNext()){
-			tempViewMap.add(createInternalViewEntry((OTViewEntry)it.next()));
+			InternalViewEntry internalViewEntry = createInternalViewEntry((OTViewEntry)it.next());
+			if(internalViewEntry == null){
+				continue;
+			}
+			tempViewMap.add(internalViewEntry);
 		}
 
 		viewMap.addAll(0, tempViewMap);
