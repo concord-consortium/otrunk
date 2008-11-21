@@ -79,10 +79,11 @@ public class XMLDataList
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#add(java.lang.Object)
 	 */
-	public void add(Object object)
+	public boolean add(Object object)
 	{
-		list.add(object);
+		boolean added = list.add(object);
 		updateModifiedTime();
+		return added;
 	}
 
 	/* (non-Javadoc)
@@ -130,11 +131,13 @@ public class XMLDataList
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceList#remove(java.lang.Object)
 	 */
-	public void remove(Object obj)
+	public boolean remove(Object obj)
 	{
-		if(list.remove(obj)){
+		boolean removed = list.remove(obj);
+		if(removed){
 			updateModifiedTime();
 		}
+		return removed;
 	}
 
 	public void setResourceInfo(int index, XMLReferenceInfo info)
@@ -146,6 +149,11 @@ public class XMLDataList
 	{
 		return (XMLReferenceInfo) referenceInfoMap.get(new Integer(index));
 	}
+
+	public boolean contains(Object obj)
+    {
+		return list.contains(obj);
+    }
 	
 
 }

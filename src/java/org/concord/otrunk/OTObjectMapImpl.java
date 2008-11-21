@@ -136,13 +136,13 @@ public class OTObjectMapImpl extends OTCollectionImpl
 		}
 	}
 
-	public void removeAll()
-    {
+	public void clear()
+	{
 		map.removeAll();
 		referenceMap = null;
-		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);
-    }
-
+		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);		
+	}
+	
 	public int size()
     {
 		return map.size();		

@@ -32,7 +32,10 @@
 */
 package org.concord.otrunk;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTChangeEvent;
@@ -50,7 +53,7 @@ import org.concord.otrunk.datamodel.OTDataList;
  * @author scott<p>
  *
  */
-public class OTObjectListImpl extends OTCollectionImpl 
+public class OTObjectListImpl extends OTCollectionImpl
 	implements OTObjectList
 {
 	protected OTDataList list;
@@ -107,7 +110,11 @@ public class OTObjectListImpl extends OTCollectionImpl
 		}
 		return null;
 	}
-	
+
+	/**
+	 * 
+	 * @see org.concord.framework.otrunk.OTObjectList#getVector()
+	 */
 	public Vector getVector()
 	{
 		Vector childVector = new Vector();
@@ -214,15 +221,15 @@ public class OTObjectListImpl extends OTCollectionImpl
 		return list.size();
 	}
 	
-	public void removeAll()
+	public void clear()
 	{
 		list.removeAll();
 		
 		referenceMap = null;
 		
-		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);
+		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);		
 	}
-
+	
 	/**
 	 * @see org.concord.framework.otrunk.OTObjectList#remove(org.concord.framework.otrunk.OTObject)
 	 */
@@ -276,5 +283,138 @@ public class OTObjectListImpl extends OTCollectionImpl
 	OTDataList getDataList()
 	{
 		return list;
-	}	
+	}
+
+	public Iterator iterator()
+    {
+		return new Iterator(){
+			/**
+			 * This points to the current object index;
+			 */
+			int index = -1;
+			
+			public boolean hasNext()            
+			{
+				return index < size();
+            }
+
+			public Object next()
+            {
+				index++;
+				return get(index);
+            }
+
+			public void remove()
+            {
+				OTObjectListImpl.this.remove(index);	            
+            }			
+		};
+    }
+
+	public boolean contains(Object obj)
+	{
+		if(!(obj instanceof OTObject)){
+			throw new IllegalArgumentException("not an OTObject");
+		}
+		
+		OTID id = ((OTObject)obj).getGlobalId();
+		if(id == null) {
+			throw new IllegalArgumentException("null object id");
+		}
+
+		return list.contains(obj);
+	}
+	
+	public Object[] toArray()
+    {
+		return toArray(new OTObject[list.size()]);
+    }
+
+	public Object[] toArray(Object[] array)
+    {
+		if(!(array instanceof OTObject[])){
+			throw new IllegalArgumentException("need to pass an OTObject array");
+		}
+		int size = list.size();
+		if(array.length < size){
+            array = (Object[])Array.newInstance(array.getClass().getComponentType(), size);		
+		}
+
+		for(int i=0; i<size; i++) {
+			try {	
+				OTID childID = getId(i);
+				if(childID == null){
+					array[i] = null;
+				} else {
+					array[i] = objectInternal.getOTObject(childID);					
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}		
+		
+        if (array.length > size) {
+            array[size] = null;
+        }
+        
+        return array;
+    }	
+
+	public boolean containsAll(Collection c)
+    {
+		Iterator iterator = c.iterator();
+		while(iterator.hasNext()){
+			if(!contains(iterator.next())){
+				return false;
+			}
+		}
+		
+		return true;
+    }
+
+	/**
+	 * Unsupported use add(OTObject) instead
+	 * @see java.util.Collection#add(java.lang.Object)
+	 */
+	public boolean add(Object obj)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * Unsupported
+	 * @see java.util.Collection#addAll(java.util.Collection)
+	 */
+	public boolean addAll(Collection c)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * Unsupported use remove(OTObject) instead
+	 * @see java.util.Collection#remove(java.lang.Object)
+	 */
+	public boolean remove(Object o)
+    {
+		throw new UnsupportedOperationException();
+    }
+	
+	/** 
+	 * Unsupported 
+	 * @see java.util.Collection#removeAll(java.util.Collection)
+	 */
+	public boolean removeAll(Collection c)
+    {
+		throw new UnsupportedOperationException();
+    }
+
+	/**
+	 * Unsupported
+	 * @see java.util.Collection#retainAll(java.util.Collection)
+	 */
+	public boolean retainAll(Collection c)
+    {
+		throw new UnsupportedOperationException();
+    }
+
 }

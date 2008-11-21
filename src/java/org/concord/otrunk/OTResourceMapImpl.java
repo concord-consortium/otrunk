@@ -46,11 +46,11 @@ public class OTResourceMapImpl extends OTResourceCollectionImpl
 		notifyOTChange(OTChangeEvent.OP_PUT, key, previousValue);
 	}
 
-	public void removeAll() 
-	{
+	public void clear()
+    {
 		map.removeAll();
-		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);
-	}
+		notifyOTChange(OTChangeEvent.OP_REMOVE_ALL, null, null);	    
+    }		
 
 	public int size() 
 	{

@@ -9,7 +9,7 @@ import org.concord.otrunk.datamodel.BlobResource;
  * @author scott
  *
  */
-public class OTResourceCollectionImpl extends OTCollectionImpl
+public abstract class OTResourceCollectionImpl extends OTCollectionImpl
 {
 	public OTResourceCollectionImpl(String property, OTObjectInternal handler)
 	{
