@@ -85,10 +85,10 @@ final class CompositeDataList extends CompositeDataCollection
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#add(java.lang.Object)
 	 */
-	public void add(Object object)
+	public boolean add(Object object)
 	{
         object = resolveIDResource(object);
-	    getUserList().add(object);
+	    return getUserList().add(object);
 	}
 
 	
@@ -123,9 +123,16 @@ final class CompositeDataList extends CompositeDataCollection
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceList#remove(java.lang.Object)
 	 */
-	public void remove(Object obj)
+	public boolean remove(Object obj)
 	{
         obj = resolveIDResource(obj);
-	    getUserList().remove(obj);
-	}				
+	    return getUserList().remove(obj);
+	}
+
+	public boolean contains(Object obj)
+    {
+        obj = resolveIDResource(obj);
+		OTDataList listForRead = getListForRead();
+		return listForRead.contains(obj);
+    }				
 }

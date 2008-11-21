@@ -93,15 +93,14 @@ public class FsDataList
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTResourceList#add(java.lang.Object)
 	 */
-	public void add(Object object) 
+	public boolean add(Object object) 
 	{
 		if(readOnly) {
-			// TODO should throw an exception
-			return;
+			return false;
 		}
 
 		updateModifiedTime();
-		list.add(object);
+		return list.add(object);
 	}
 
 	/* (non-Javadoc)
@@ -153,9 +152,14 @@ public class FsDataList
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.OTResourceList#remove(java.lang.Object)
 	 */
-	public void remove(Object obj)
+	public boolean remove(Object obj)
 	{
 		updateModifiedTime();
-		list.remove(obj);
+		return list.remove(obj);
 	}
+
+	public boolean contains(Object obj)
+    {
+		return list.contains(obj);
+    }
 }

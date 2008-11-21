@@ -45,15 +45,17 @@ package org.concord.otrunk.datamodel;
 public interface OTDataList extends OTDataCollection
 {
 
-	public abstract Object get(int index);
+	public Object get(int index);
 
-	public abstract void add(Object object);
+	public boolean add(Object object);
 
-	public abstract void add(int index, Object object);
+	public void add(int index, Object object);
 	
 	public Object set(int index, Object object);
 	
 	public void remove(int index);
 	
-	public void remove(Object obj);
+	public boolean remove(Object obj);
+	
+	public boolean contains(Object obj);
 }
