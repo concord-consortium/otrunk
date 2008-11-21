@@ -202,6 +202,14 @@ public class OTViewerHelper
 		
 	}
 	
+	/**
+	 * 
+	 * @param otDB
+	 * @param parentComponent can be null if the parent component is not known.  This component
+	 *  is used to setup a message service which shows dialogs.  In order for those dialogs to
+	 *  centered on a component that component must be passed in.
+	 * @throws Exception
+	 */
 	public void loadOTrunk(OTDatabase otDB, Component parentComponent)
 	throws Exception
 	{		
