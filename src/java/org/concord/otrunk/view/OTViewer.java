@@ -1245,7 +1245,7 @@ public class OTViewer extends JFrame
 		saveAction = new AbstractAction("Save Authored Content...") {
 
 			/**
-			 * nothing to serizile here
+			 * nothing to serialize here
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -1302,7 +1302,7 @@ public class OTViewer extends JFrame
 		saveAsAction = new AbstractAction("Save Authored Content As...") {
 
 			/**
-			 * nothing to serizile here
+			 * nothing to serialize here
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -1449,7 +1449,7 @@ public class OTViewer extends JFrame
 
 		exportHiResImageAction = new AbstractAction("Export Hi Res Image...") {
 			/**
-			 * nothing to serizile here
+			 * nothing to serialize here
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -1463,7 +1463,7 @@ public class OTViewer extends JFrame
 		debugAction = new AbstractAction("Debug Mode") {
 
 			/**
-			 * nothing to serizile here
+			 * nothing to serialize here
 			 */
 			private static final long serialVersionUID = 1L;
 
@@ -1784,7 +1784,7 @@ public class OTViewer extends JFrame
 			// some view creates
 			// data in the viewClosed method then that data will not get saved
 			// here.
-			// I think the key to solving this is to seperate the
+			// I think the key to solving this is to separate the
 			// automatic/logging data from the
 			// user visible data. And then make a rule that saving data in the
 			// viewClosed method
