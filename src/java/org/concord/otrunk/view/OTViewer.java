@@ -347,9 +347,10 @@ public class OTViewer extends JFrame
 
 		focusManager.addKeyEventDispatcher(deleteDispatcher);
 		
-		// If the mouse click is a real right click event and alt is pressed
-		// then this code will print
-		// out the toString method of the object which the mouse is over.
+		// If the mouse click is a right click event and alt is pressed
+		// or on a Mac the ctrl and option keys are down
+		// then this code will print out the toString method of the 
+		// object which the mouse is over to the console.
 		AWTEventListener awtEventListener = new AWTEventListener(){
 			public void eventDispatched(AWTEvent event)
 			{
