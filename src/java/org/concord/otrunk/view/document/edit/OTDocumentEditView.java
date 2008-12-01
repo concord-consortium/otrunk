@@ -205,6 +205,8 @@ public class OTDocumentEditView extends OTDocumentView implements
 		}
 
 		String bodyText = pfObject.getDocumentText();
+		if (bodyText == null)
+			bodyText = "";
 		bodyText = substituteIncludables(bodyText);
 		
 		int origCaretPos = 0;
