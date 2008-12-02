@@ -468,7 +468,13 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 		inText = inText.replaceAll("<p[ ]*/>", "<p></p>");
 		inText = inText.replaceAll("<div([^>]*)/>", "<div$1></div>");
-		return inText.replaceAll("<([^>]*)/>", "<$1>");
+		inText = inText.replaceAll("<([^>]*)/>", "<$1>");
+		
+		if (otObject instanceof OTCompoundDoc && ((OTCompoundDoc)otObject).getDivClasses() != null){
+			inText = addDivWrappers(inText, ((OTCompoundDoc)otObject).getDivClasses());
+		}
+		
+		return inText;
 
 		/*
 		 * Pattern p = Pattern.compile("<([^>]*)/>"); Matcher m =
@@ -486,6 +492,18 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		 * tag: " + tagBody); e.printStackTrace(); } } m.appendTail(parsed);
 		 * return parsed.toString();
 		 */
+	}
+	
+	/*
+	 * If there are multiple div classes, they are wrapped backwards, so that
+	 * the last class is the inner-most wrapper. 
+	 */
+	private String addDivWrappers(String inText, String divClasses){
+		String[] classes = divClasses.split(" ");
+		for (int i = classes.length-1; i >= 0; i--) {
+			inText = "<div class=\""+classes[i]+"\">"+inText+"</div>";
+        }
+		return inText;
 	}
 	
 	// FIXME: Does this do anything anymore? Nothing seems to call it. -SF

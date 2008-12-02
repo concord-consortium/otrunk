@@ -70,6 +70,9 @@ public class OTCompoundDoc extends OTFolderObject
 
 		public void setMarkupLanguage(String lang);
 		
+		public void setDivClasses(String divClasses);
+		public String getDivClasses();
+		
 		public void setShowEditBar(boolean showEditBar);
 		public boolean getShowEditBar();
 		public static boolean DEFAULT_showEditBar = true;
@@ -261,6 +264,29 @@ public class OTCompoundDoc extends OTFolderObject
 	public OTObjectService getOTObjectService()
 	{
 		return resources.getOTObjectService();
+	}
+
+	/**
+	 * DivClasses can be used to automatically wrap text with one or
+	 * more named div wrappers. Wrappers are added so that the last class named
+	 * is the inner-most wrapper. Class names are separated by spaces.
+	 * E.g.
+	 * 		<OTCompoundDoc divClasses="fancyBorder bigText">
+	 * 			<bodyText>Some text</bodyText>
+	 * 		</OTCompoundDoc>
+	 * results in
+	 * 		<div class="fancyBorder">
+	 * 			<div class="bigText">
+	 * 				Some text
+	 * 			</div>
+	 * 		</div>
+	 */
+	public String getDivClasses(){
+		return resources.getDivClasses();
+	}
+	
+	public void setDivClasses(String divClasses){
+		resources.setDivClasses(divClasses);
 	}
 	
 	public void setShowEditBar(boolean showEditBar)
