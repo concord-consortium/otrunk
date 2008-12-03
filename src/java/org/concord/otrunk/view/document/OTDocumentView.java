@@ -278,6 +278,7 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 				editorPane.addHyperlinkListener(this);
 			}
 			bodyText = htmlizeText(bodyText);
+			bodyText = addHiddenTextChanges(bodyText);
 
 			if (documentConfig != null) {
 				
@@ -492,6 +493,22 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		 * tag: " + tagBody); e.printStackTrace(); } } m.appendTail(parsed);
 		 * return parsed.toString();
 		 */
+	}
+	
+	/**
+	 * This method is like htmlizeText, but it applies the changes after the
+	 * editorPane has been created, so that any changes will not appear in
+	 * the author's src view
+	 * 
+	 * @param inText
+	 * @return
+	 */
+	private String addHiddenTextChanges(String inText){
+		if (otObject instanceof OTCompoundDoc && ((OTCompoundDoc)otObject).getDivClasses() != null){
+			inText = addDivWrappers(inText, ((OTCompoundDoc)otObject).getDivClasses());
+		}
+		
+		return inText;
 	}
 	
 	/*
