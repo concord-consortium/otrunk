@@ -159,7 +159,7 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 			
 			public boolean hasNext()            
 			{
-				return index < size();
+				return index < (size() - 1);
             }
 
 			public Object next()
