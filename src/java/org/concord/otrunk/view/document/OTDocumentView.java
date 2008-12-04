@@ -471,10 +471,6 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		inText = inText.replaceAll("<div([^>]*)/>", "<div$1></div>");
 		inText = inText.replaceAll("<([^>]*)/>", "<$1>");
 		
-		if (otObject instanceof OTCompoundDoc && ((OTCompoundDoc)otObject).getDivClasses() != null){
-			inText = addDivWrappers(inText, ((OTCompoundDoc)otObject).getDivClasses());
-		}
-		
 		return inText;
 
 		/*
