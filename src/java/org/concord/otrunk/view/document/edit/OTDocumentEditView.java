@@ -135,7 +135,8 @@ public class OTDocumentEditView extends OTDocumentView implements
 		if (otObject instanceof OTCompoundDoc && ((OTCompoundDoc)otObject).getShowEditBar()){
 			JPanel wrapper = new JPanel(new BorderLayout());
 			JScrollPane pageScroller = new JScrollPane(previewComponent);
-			pageScroller.setPreferredSize(new Dimension(350,100));
+			int height = ((OTCompoundDoc)otObject).getAuthorPageHeight();
+			pageScroller.setPreferredSize(new Dimension(350,height));
 			((JEditorPane)previewComponent).setCaretPosition(0);
 			wrapper.add(pageScroller, BorderLayout.CENTER);
 			JPanel leftJustify = new JPanel(new FlowLayout(FlowLayout.LEADING));
