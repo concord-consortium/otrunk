@@ -76,6 +76,14 @@ public class OTCompoundDoc extends OTFolderObject
 		public void setShowEditBar(boolean showEditBar);
 		public boolean getShowEditBar();
 		public static boolean DEFAULT_showEditBar = true;
+		
+		public void setAllowEmbeddedXHTMLViews(boolean allowEmbeddedXHTMLViews);
+		public boolean getAllowEmbeddedXHTMLViews();
+		public static boolean DEFAULT_allowEmbeddedXHTMLViews = true;
+		
+		public void setAuthorPageHeight(int authorPageHeight);
+		public int getAuthorPageHeight();
+		public static int DEFAULT_authorPageHeight = 300;
 	}
 
 	private ResourceSchema resources;
@@ -297,5 +305,21 @@ public class OTCompoundDoc extends OTFolderObject
 	public boolean getShowEditBar()
 	{
 		return resources.getShowEditBar();
+	}
+	
+	public void setAllowEmbeddedXHTMLViews(boolean allowEmbeddedXHTMLViews){
+		resources.setAllowEmbeddedXHTMLViews(allowEmbeddedXHTMLViews);
+	}
+	
+	public boolean getAllowEmbeddedXHTMLViews(){
+		return resources.getAllowEmbeddedXHTMLViews();
+	}
+	
+	public void setAuthorPageHeight(int authorPageHeight){
+		resources.setAuthorPageHeight(authorPageHeight);
+	}
+	
+	public int getAuthorPageHeight(){
+		return resources.getAuthorPageHeight();
 	}
 }

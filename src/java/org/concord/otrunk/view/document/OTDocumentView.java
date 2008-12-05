@@ -393,22 +393,25 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 		
 		boolean alwaysEmbedXHTMLView = viewContext.getProperty(ALWAYS_EMBED_XHTML_VIEW) != null;
 		
-		if (view instanceof OTXHTMLView && 
-				(alwaysEmbedXHTMLView || ((OTXHTMLView)view).getEmbedXHTMLView())) {
-			OTXHTMLView xhtmlView = (OTXHTMLView) view;
-			try {
-				String replacement = xhtmlView.getXHTMLText(referencedObject);
-				if (replacement == null) {
-					// this is an empty embedded object
-					System.err.println("empty embedd obj: " + idStr);
-					return "";
-				}
-				return OTrunkUtil.escapeReplacement(replacement);
-			} catch (Exception e) {
-				System.err
-						.println("Failed to generate xhtml version of embedded object");
-				e.printStackTrace();
-			}
+		// If the compoundDoc doesn't permit them, don't embed any xhtml versions
+		if (!(otObject instanceof OTCompoundDoc && !((OTCompoundDoc)otObject).getAllowEmbeddedXHTMLViews())){
+    		if (view instanceof OTXHTMLView && 
+    				(alwaysEmbedXHTMLView || ((OTXHTMLView)view).getEmbedXHTMLView())) {
+    			OTXHTMLView xhtmlView = (OTXHTMLView) view;
+    			try {
+    				String replacement = xhtmlView.getXHTMLText(referencedObject);
+    				if (replacement == null) {
+    					// this is an empty embedded object
+    					System.err.println("empty embedd obj: " + idStr);
+    					return "";
+    				}
+    				return OTrunkUtil.escapeReplacement(replacement);
+    			} catch (Exception e) {
+    				System.err
+    						.println("Failed to generate xhtml version of embedded object");
+    				e.printStackTrace();
+    			}
+    		}
 		}
 		
 		// $0 means to just leave the text as is, don't replace anything
