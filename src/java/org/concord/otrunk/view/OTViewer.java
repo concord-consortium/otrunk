@@ -152,6 +152,8 @@ public class OTViewer extends JFrame
 	public final static String HIDE_TREE_PROP = "otrunk.view.hide_tree";
 	
 	public final static String SHOW_CONSOLE_PROP = "otrunk.view.show_console";
+	
+	public final static String DEMO_ONLY_PROP = "otrunk.view.demo";
 
 	public final static String HTTP_PUT = "PUT";
 
@@ -296,14 +298,19 @@ public class OTViewer extends JFrame
 
 		setTitle(baseFrameTitle);
 
-		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e)
-			{
-				exitAction.actionPerformed(null);
-			}
-		});
+		// If "otrunk.view.demo" is true, closing frame will just dispose
+		// the frame, not exit.
+		if (!Boolean.getBoolean(DEMO_ONLY_PROP)){
+    		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    	
+    		addWindowListener(new WindowAdapter() {
+    			public void windowClosing(WindowEvent e)
+    			{
+    				exitAction.actionPerformed(null);
+    			}
+    		});
+		}
+		
 
 		consoleFrame = new JFrame("Console");
 		StreamRecord record = new StreamRecord(50000);
