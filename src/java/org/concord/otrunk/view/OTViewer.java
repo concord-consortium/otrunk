@@ -154,6 +154,8 @@ public class OTViewer extends JFrame
 	public final static String SHOW_CONSOLE_PROP = "otrunk.view.show_console";
 	
 	public final static String DEMO_ONLY_PROP = "otrunk.view.demo";
+	
+	public final static String OTML_URL_PROP = "otrunk.otmlurl";
 
 	public final static String HTTP_PUT = "PUT";
 
@@ -453,6 +455,14 @@ public class OTViewer extends JFrame
 	public void initArgs(String[] args)
 	{
 		URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
+		
+		if (authorOTMLURL == null && System.getProperty(OTML_URL_PROP, null) != null) {
+			try {
+	            authorOTMLURL = new URL(System.getProperty(OTML_URL_PROP, null));
+            } catch (MalformedURLException e) {
+	            e.printStackTrace();
+            }
+		}
 
 		if (authorOTMLURL == null) {
 			authorOTMLURL = OTViewer.class.getResource("no-arguments-page.otml");
