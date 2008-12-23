@@ -378,7 +378,14 @@ public class OTObjectListImpl extends OTCollectionImpl
 	 */
 	public boolean add(Object obj)
 	{
-		throw new UnsupportedOperationException();
+		if (obj instanceof OTObject) {
+			add((OTObject) obj);
+			return true;
+		}
+		else
+		{
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	/**
