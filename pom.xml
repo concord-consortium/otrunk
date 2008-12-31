@@ -58,12 +58,6 @@
       <artifactId>ekit</artifactId>
       <version>1.0</version>
       <scope>compile</scope>
-    </dependency>    
-    <dependency>
-      <groupId>org.concord</groupId>
-      <artifactId>otrunk-ui</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
