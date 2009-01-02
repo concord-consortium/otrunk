@@ -114,7 +114,12 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 					OTUserObject userObject = null;
 					try {
 						// set up the user session and register it
-						OTMLUserSession userSession = new OTMLUserSession(url, null);
+						OTMLUserSession userSession;
+						if (url != null) {
+							userSession = new OTMLUserSession(url, null);
+						} else {
+							userSession = new OTMLUserSession();
+						}
 						otrunk.registerUserSession(userSession);
 						userObject = userSession.getUserObject();
 					}
