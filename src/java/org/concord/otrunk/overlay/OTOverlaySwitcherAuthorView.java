@@ -53,7 +53,7 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 		
 		overlayManager = (OTUserOverlayManager) viewContext.getViewService(OTUserOverlayManager.class);
 		if (overlayManager == null) {
-			overlayManager = new OTUserOverlayManager();
+			overlayManager = new OTUserOverlayManager(otrunk);
 			viewContext.addViewService(OTUserOverlayManager.class, overlayManager);
 		}
 
