@@ -33,6 +33,7 @@ import javax.swing.JComponent;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTrunk;
+import org.concord.framework.otrunk.view.AbstractOTView;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.otrunk.OTIncludeRootObject;
 import org.concord.otrunk.OTrunkImpl;
@@ -41,7 +42,7 @@ import org.concord.otrunk.user.OTUserObject;
 import org.concord.framework.otrunk.view.OTViewEntry;
 
 
-public class OTMultiUserRootView extends AbstractOTJComponentContainerView implements OTXHTMLView 
+public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView 
 {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 	private boolean firstRun = true;
@@ -64,22 +65,22 @@ public class OTMultiUserRootView extends AbstractOTJComponentContainerView imple
 	    reportTemplate = root.getReportTemplate();
 	}
 	
-	public JComponent getComponent(OTObject otObject) {
+/*	public JComponent getComponent(OTObject otObject) {
 		logger.info("Running in JComponent mode");
 		init(otObject);
 		JComponent c = null;
 		c = createSubViewComponent(root.getReportTemplate(), false, (OTViewEntry) root.getReportTemplateViewEntry());
 		return c;
 	}
-	
+*/
 	public String getXHTMLText(OTObject otObject) {
 		logger.info("Running in XHTML mode");
 		init(otObject);
-	    String result = "<div style='width: 100%; height: 100%;'><object refid=\"" + reportTemplate.otExternalId() + "\" ";
+	    String result = "<object refid=\"" + reportTemplate.otExternalId() + "\" ";
 	    if(root.getReportTemplateViewEntry() != null){
 	    	result += "viewid=\"" + root.getReportTemplateViewEntry().otExternalId() + "\" ";
 	    }
-	    result += "/></div>";
+	    result += "/>";
 	    return result;
     }
 	
@@ -187,6 +188,6 @@ public class OTMultiUserRootView extends AbstractOTJComponentContainerView imple
 
 	public boolean getEmbedXHTMLView()
     {
-	    return false;
+	    return true;
     }
 }
