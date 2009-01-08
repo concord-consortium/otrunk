@@ -899,7 +899,8 @@ public class OTrunkImpl implements OTrunk
     	}
     	
     	if (db instanceof XMLDatabase) {
-    		if (! ((XMLDatabase)db).getSourceURL().equals(remoteURL)) {
+    		XMLDatabase xmldb = (XMLDatabase) db;
+    		if (xmldb.getSourceURL() != null && ! xmldb.getSourceURL().equals(remoteURL)) {
     			((XMLDatabase)db).setSourceURL(remoteURL);
     		}
     	}

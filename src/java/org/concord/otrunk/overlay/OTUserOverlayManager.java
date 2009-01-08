@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
@@ -15,11 +16,13 @@ import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
+import org.concord.otrunk.util.StandardPasswordAuthenticator;
 import org.concord.otrunk.view.OTViewer;
 import org.concord.otrunk.xml.XMLDatabase;
 
 public class OTUserOverlayManager
 {
+	Logger logger = Logger.getLogger(this.getClass().getName());
 	HashMap overlayToObjectServiceMap = new HashMap();
 	HashMap userToOverlayMap = new HashMap();
 	Vector overlayDatabases = new Vector();
@@ -40,26 +43,39 @@ public class OTUserOverlayManager
 	 * @throws Exception
 	 */
 	public void add(URL overlayURL, OTObject contextObject, OTUserObject userObject, boolean isGlobal) throws Exception {
-			// get the OTOverlay OTObject from the otml at the URL specified
-			OTOverlay overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, contextObject.getOTObjectService());
+		// get the OTOverlay OTObject from the otml at the URL specified
+		OTOverlay overlay = null;
+		try {
+			overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, contextObject.getOTObjectService());
+		} catch (Exception e) {
+			// some error occurred...
+			logger.warning("Couldn't get overlay for user\n" + overlayURL + "\n" + e.getMessage());
+		}
 
-			// if there isn't an overlay object, and it's not supposed to be a global one, go ahead and try to make a default one
-			if (overlay == null && isGlobal == false) {
-				// create a blank one
-				XMLDatabase xmldb = new XMLDatabase();
-				overlay = (OTOverlay) contextObject.getOTObjectService().createObject(OTOverlay.class);
-				xmldb.setRoot(overlay.getGlobalId());
-				otrunk.remoteSaveData(xmldb, overlayURL, OTViewer.HTTP_PUT);
-				overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, contextObject.getOTObjectService());
+		// if there isn't an overlay object, and it's not supposed to be a global one, go ahead and try to make a default one
+		if (overlay == null && isGlobal == false) {
+			// create a blank one
+			try {
+    			XMLDatabase xmldb = new XMLDatabase();
+    			overlay = (OTOverlay) contextObject.getOTObjectService().createObject(OTOverlay.class);
+    			xmldb.getDataObjects().put(overlay.getGlobalId(), otrunk.getDataObjectFinder().findDataObject(overlay.getGlobalId()));
+    			xmldb.setRoot(overlay.getGlobalId());
+    			otrunk.remoteSaveData(xmldb, overlayURL, OTViewer.HTTP_PUT, new StandardPasswordAuthenticator());
+    			
+    			overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, contextObject.getOTObjectService());
+			} catch (Exception e) {
+				// still an error. skip the overlay for this user/url
+				logger.warning("Couldn't create a default overlay for user\n" + overlayURL + "\n" + e.getMessage());
 			}
+		}
 
-			// if the overlay exists, the create an objectservice for it and register it
-			if (overlay != null) {
-    			OTObjectService objService = createObjectService(overlay, isGlobal);
-    
-    			// map the object service/overlay to the user
-    		  	add(overlay, objService, userObject);
-			}
+		// if the overlay exists, the create an objectservice for it and register it
+		if (overlay != null) {
+			OTObjectService objService = createObjectService(overlay, isGlobal);
+
+			// map the object service/overlay to the user
+			add(overlay, objService, userObject);
+		}
 	}
 	
 	/**
