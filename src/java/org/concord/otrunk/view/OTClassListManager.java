@@ -2,6 +2,7 @@ package org.concord.otrunk.view;
 
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTBundle;
@@ -17,6 +18,8 @@ import org.concord.otrunk.user.OTUserObject;
 public class OTClassListManager extends DefaultOTObject
     implements OTBundle
 {
+	private Logger logger = Logger.getLogger(this.getClass().getName());
+	
 	public static interface ResourceSchema extends OTResourceSchema 
 	{
 		// list of users that are in this class. specify the URL or the list
@@ -36,7 +39,6 @@ public class OTClassListManager extends DefaultOTObject
 	private OTUserObject currentClassMember;
 
 	private OTUserOverlayManager overlayManager;
-	private boolean overlayManagerNeedsRegistered = false;
 	
 	public OTClassListManager(ResourceSchema resources)
     {
@@ -54,20 +56,17 @@ public class OTClassListManager extends DefaultOTObject
 			initializeUserListFromURL();
 		}
 		
-		overlayManager = (OTUserOverlayManager) serviceContext.getService(OTUserOverlayManager.class);
-		if (overlayManager == null) {
-			overlayManager = new OTUserOverlayManager(otrunk);
-			overlayManagerNeedsRegistered = true;
-		}
-		
 		processUserList();
 	}
 
 	public void registerServices(OTServiceContext serviceContext)
 	{
 		serviceContext.addService(OTClassListManager.class, this);
-		if (overlayManagerNeedsRegistered) {
+		overlayManager = (OTUserOverlayManager) serviceContext.getService(OTUserOverlayManager.class);
+		if (overlayManager == null) {
+			overlayManager = new OTUserOverlayManager(otrunk);
 			serviceContext.addService(OTUserOverlayManager.class, overlayManager);
+			// logger.info("Overlay manager registered as service");
 		}
 	}
 	
@@ -114,6 +113,10 @@ public class OTClassListManager extends DefaultOTObject
             }
     	}
     	}
+    }
+    
+    public OTUserObject getCurrentClassMember() {
+    	return this.currentClassMember;
     }
 
 }

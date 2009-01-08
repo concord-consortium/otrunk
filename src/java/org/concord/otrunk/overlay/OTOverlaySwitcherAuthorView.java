@@ -24,7 +24,6 @@ import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.AbstractOTJComponentContainerView;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -198,16 +197,6 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
         }
 	}
 	
-	private XMLDatabase getDbForOverlay(OTOverlay overlay) {
-		OTDatabase db = overlayManager.getDatabase(overlay);
-		if (db instanceof XMLDatabase) {
-			return (XMLDatabase) db;
-		} else if (db instanceof CompositeDatabase) {
-			return (XMLDatabase) ((CompositeDatabase) db).getActiveOverlayDb();
-		}
-		return null;
-	}
-	
 	private void saveCurrentOverlay() {
 		saveCurrentOverlay(false);
 	}
@@ -217,7 +206,7 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 		if (overlay == null) { return; }
 		
 		logger.info("Save overlay");
-		XMLDatabase db = getDbForOverlay(overlay);
+		XMLDatabase db = overlayManager.getXMLDatabase(overlay);
 		if (! db.isDirty()) { return; }
 		
 		try {
