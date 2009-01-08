@@ -56,6 +56,7 @@ public class OTUserOverlayManager
 		if (overlay == null && isGlobal == false) {
 			// create a blank one
 			try {
+				logger.info("Creating empty overlay database on the fly...");
     			XMLDatabase xmldb = new XMLDatabase();
     			overlay = (OTOverlay) contextObject.getOTObjectService().createObject(OTOverlay.class);
     			xmldb.getDataObjects().put(overlay.getGlobalId(), otrunk.getDataObjectFinder().findDataObject(overlay.getGlobalId()));
@@ -180,4 +181,14 @@ public class OTUserOverlayManager
 			return null;
 		}
 	}
+
+	public XMLDatabase getXMLDatabase(OTOverlay overlay) {
+    	OTDatabase db = getDatabase(overlay);
+    	if (db instanceof XMLDatabase) {
+    		return (XMLDatabase) db;
+    	} else if (db instanceof CompositeDatabase) {
+    		return (XMLDatabase) ((CompositeDatabase) db).getActiveOverlayDb();
+    	}
+    	return null;
+    }
 }

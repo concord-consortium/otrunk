@@ -295,6 +295,10 @@ public class OTObjectServiceImpl
     {    	
         if(id instanceof OTTransientMapID) {
             Object mapToken = ((OTTransientMapID)id).getMapToken();
+            if (creationDb.getDatabaseId() == null) {
+            	System.err.println("Database with a null id!");
+            	return false;
+            }
             return creationDb.getDatabaseId().equals(mapToken);            
         }
 
