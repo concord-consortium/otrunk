@@ -267,6 +267,8 @@ public class OTViewer extends JFrame
 	 */
 	private boolean launchedBySailOTViewer = false;
 	
+	private boolean sailSaveEnabled = true;
+	
 	public static void setOTViewFactory(OTViewFactory factory)
 	{
 		otViewFactory = factory;
@@ -527,42 +529,51 @@ public class OTViewer extends JFrame
 			getContentPane().add(bodyPanel);
 		}
 
-		if (OTConfig.isShowStatus()) {
+		if (OTConfig.isShowStatus() || (getUserMode() == OTConfig.SINGLE_USER_MODE && ! isSailSaveEnabled())) {
 			statusPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 1));
 
-			final JLabel saveStateLabel = new JLabel("File saved");
-			statusPanel.add(saveStateLabel);
-			statusPanel.add(Box.createHorizontalStrut(20));
-			statusPanel.add(new MemoryMonitorPanel());
-			statusPanel.add(Box.createHorizontalStrut(5));
+			if (OTConfig.isShowStatus()) {
+    			final JLabel saveStateLabel = new JLabel("File saved");
+    			statusPanel.add(saveStateLabel);
+    			statusPanel.add(Box.createHorizontalStrut(20));
+    			statusPanel.add(new MemoryMonitorPanel());
+    			statusPanel.add(Box.createHorizontalStrut(5));
+    			
+    			// It takes a while for xmlDM to be initialized...
+    			Thread waitForDB = new Thread() {
+    				public void run()
+    				{
+    					while (xmlDB == null) {
+    						try {
+    							sleep(1000);
+    						} catch (Exception e) {
+    						}
+    					}
+    					xmlDB.addXMLDatabaseChangeListener(new XMLDatabaseChangeListener() {
+
+    						public void stateChanged(XMLDatabaseChangeEvent e)
+    						{
+    							if (xmlDB.isDirty()) {
+    								saveStateLabel.setText("Unsaved changes");
+    							} else {
+    								saveStateLabel.setText("File saved");
+    							}
+    							statusPanel.repaint();
+    						}
+    					});
+    				}
+    			};
+    			waitForDB.start();
+			}
+			
+			if (getUserMode() == OTConfig.SINGLE_USER_MODE && ! isSailSaveEnabled()) {
+				JLabel readOnlyLabel = new JLabel("User Data Will Not Be Saved!");
+				statusPanel.setBackground(Color.RED);
+				statusPanel.add(readOnlyLabel);
+				statusPanel.add(Box.createHorizontalStrut(5));
+			}
+			
 			getContentPane().add(statusPanel, BorderLayout.SOUTH);
-
-			// It takes a while for xmlDM to be initialized...
-			Thread waitForDB = new Thread() {
-				public void run()
-				{
-					while (xmlDB == null) {
-						try {
-							sleep(1000);
-						} catch (Exception e) {
-						}
-					}
-					xmlDB.addXMLDatabaseChangeListener(new XMLDatabaseChangeListener() {
-
-						public void stateChanged(XMLDatabaseChangeEvent e)
-						{
-							if (xmlDB.isDirty()) {
-								saveStateLabel.setText("Unsaved changes");
-							} else {
-								saveStateLabel.setText("File saved");
-							}
-							statusPanel.repaint();
-						}
-					});
-				}
-			};
-			waitForDB.start();
-
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -2047,6 +2058,23 @@ public class OTViewer extends JFrame
 	{
 		return otrunk;
 	}
+
+	/**
+     * @param sailSaveEnabled the sailSaveEnabled to set
+     */
+    public void setSailSaveEnabled(boolean sailSaveEnabled)
+    {
+	    this.sailSaveEnabled = sailSaveEnabled;
+    }
+
+	/**
+	 * True is sail saving is enabled
+     * @return the sailSaveEnabled
+     */
+    public boolean isSailSaveEnabled()
+    {
+	    return sailSaveEnabled;
+    }
 	
 } // @jve:decl-index=0:visual-constraint="10,10"
 
