@@ -36,7 +36,7 @@ public class OTClassListManager extends DefaultOTObject
 	private OTObjectList userList;
 	private OTrunkImpl otrunk;
 	
-	private OTUserObject currentClassMember;
+	private OTClassMember currentClassMember;
 
 	private OTUserOverlayManager overlayManager;
 	
@@ -101,7 +101,7 @@ public class OTClassListManager extends DefaultOTObject
     		
     	// if current user is set, make it the current user
     	if (classMember.getIsCurrentUser()) {
-    		this.currentClassMember = classMember.getUserObject();
+    		this.currentClassMember = classMember;
     	}
     	// if overlay url is set, load and register overlay
     	if (classMember.getOverlayURL() != null) {
@@ -115,8 +115,12 @@ public class OTClassListManager extends DefaultOTObject
     	}
     }
     
-    public OTUserObject getCurrentClassMember() {
+    public OTClassMember getCurrentClassMember() {
     	return this.currentClassMember;
+    }
+    
+    public OTUserObject getCurrentClassMemberUserObject() {
+    	return this.currentClassMember.getUserObject();
     }
 
 }

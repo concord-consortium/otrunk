@@ -45,7 +45,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		logger.info(msg);
 		*/
 		if (overlay == null && classListManager != null && overlayManager != null) {
-			OTUserObject currentClassMember = classListManager.getCurrentClassMember();
+			OTUserObject currentClassMember = classListManager.getCurrentClassMemberUserObject();
 			overlay = overlayManager.getOverlay(currentClassMember);
 		}
 
