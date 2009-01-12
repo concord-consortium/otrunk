@@ -133,6 +133,9 @@ final class CompositeDataList extends CompositeDataCollection
     {
         obj = resolveIDResource(obj);
 		OTDataList listForRead = getListForRead();
+		if (listForRead == null) {
+			return false;
+		}
 		return listForRead.contains(obj);
     }				
 }
