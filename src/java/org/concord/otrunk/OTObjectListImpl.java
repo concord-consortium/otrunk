@@ -373,7 +373,10 @@ public class OTObjectListImpl extends OTCollectionImpl
     }
 
 	/**
-	 * Unsupported use add(OTObject) instead
+	 * Theoretically the following method should not be be called.  If the obj is 
+	 * a instance of OTObject then the more specific method should be called, however
+	 * it seems in at least some versions of JRuby this more general add method is
+	 * called instead.   
 	 * @see java.util.Collection#add(java.lang.Object)
 	 */
 	public boolean add(Object obj)
@@ -384,7 +387,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 		}
 		else
 		{
-			throw new UnsupportedOperationException();
+			throw new IllegalArgumentException();
 		}
 	}
 	
