@@ -176,7 +176,11 @@ public class OTObjectServiceImpl
     	return new OTControllerServiceImpl(this, registry);
     }
     
-    GeneratedClassLoader gClassLoader = new GeneratedClassLoader();
+    // This will work as long as all of the object classes are loaded by the same classloader
+    // if the OTClass classes are loaded by different classloaders there will probably have
+    // to be multiple GeneratedClassLoader
+    GeneratedClassLoader gClassLoader = 
+    	new GeneratedClassLoader(OTObjectServiceImpl.class.getClassLoader());
     
     public OTObject loadOTObject(OTObjectInternal otObjectImpl, Class otObjectClass)
     throws  Exception

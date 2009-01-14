@@ -10,6 +10,11 @@ import org.objectweb.asm.ClassWriter;
 
 public class GeneratedClassLoader extends ClassLoader
 {	
+	public GeneratedClassLoader(ClassLoader parent)
+	{
+		super(parent);
+	}
+	
 	public Class generateClass(Class abstractClass) throws IOException {
 		String name = abstractClass.getName() + "_Generated";
 		Class<?> existingClass = findLoadedClass(name);
