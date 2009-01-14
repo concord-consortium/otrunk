@@ -59,6 +59,12 @@
       <version>1.0</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>3.1</version>
+      <scope>provided</scope>
+    </dependency> 
   </dependencies>
 
   <!--  if we have resources we will need to fix the resource directory too -->
@@ -73,12 +79,48 @@
 	</testResources>
 	<plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludes>
             <exclude>org/concord/otrunk/test/**</exclude>
           </excludes>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <property name="maven-jar" value="${project.build.directory}/${project.build.finalName}.jar"/>
+                <!--  this is a hack because I couldn't find another way to get the path to a dependcy jar
+                    the dependency plugin can be used to copy a jar but why copy it when we just 
+                    need to reference it -->
+                <property name="asm-jar" value="${settings.localRepository}/asm/asm/3.1/asm-3.1.jar"/>
+                <ant target="jar" inheritRefs="true"/>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+           <dependency>
+             <groupId>com.tonicsystems</groupId>
+             <artifactId>jarjar</artifactId>
+             <version>0.6</version>
+           </dependency>
+        </dependencies>
       </plugin>
   	</plugins>
   </build>

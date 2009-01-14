@@ -1,16 +1,12 @@
-<project name="OTrunk" default="jar" basedir =".">
-	<import file="../ProjectSets/standard-ant-targets.xml"/>
-
-	<property name="jar-name" value="otrunk"/>
-	
-	<path id="run-classpath">
-    	<pathelement location="../thirdparty/ozoneServer-1.2.x-dev.jar"/>
-    	<pathelement location="jug.jar"/>
-    	<pathelement location="sc-api-j2se.jar"/>
-		
-	</path>
-
-	<path id="build-classpath">
-		<path refid="run-classpath"/>
-	</path>	
+<project name="OTrunk" basedir =".">
+	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
+	        classpath="maven.plugin.classpath"/>
+	<target name="jar">
+		<jarjar jarfile="${maven-jar}.jarjar">
+			<zipfileset src="${maven-jar}"/>
+			<zipfileset src="${asm-jar}"/>
+			<rule pattern="org.objectweb.asm.**" result="org.concord.otrunk.asm.@1"/>
+		</jarjar>
+		<move file="${maven-jar}.jarjar" overwrite="true" tofile="${maven-jar}"/>
+	</target>
 </project>

@@ -45,6 +45,7 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.otrunk.asm.GeneratedClassLoader;
 import org.concord.otrunk.datamodel.DataObjectUtil;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataObject;
@@ -55,6 +56,7 @@ import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.datamodel.OTUUID;
 import org.concord.otrunk.otcore.impl.ReflectiveOTClassFactory;
 import org.concord.otrunk.overlay.CompositeDatabase;
+import org.concord.otrunk.view.OTConfig;
 import org.concord.otrunk.xml.XMLDataObject;
 
 public class OTObjectServiceImpl
@@ -174,23 +176,33 @@ public class OTObjectServiceImpl
     	return new OTControllerServiceImpl(this, registry);
     }
     
+    GeneratedClassLoader gClassLoader = new GeneratedClassLoader();
+    
     public OTObject loadOTObject(OTObjectInternal otObjectImpl, Class otObjectClass)
     throws  Exception
     {
         OTObject otObject = null;
         
         if(otObjectClass.isInterface()) {
-            OTBasicObjectHandler handler = new OTBasicObjectHandler(otObjectImpl, otrunk, otObjectClass);
+        	if(OTConfig.getBooleanProp(OTConfig.USE_ASM, false)){
+        		Class generatedClass = gClassLoader.generateClass(otObjectClass);
+        		OTObjectInternal internalObj = (OTObjectInternal) generatedClass.newInstance();
+        		otObject = internalObj;
+        		internalObj.setup(otObjectImpl);
+        		internalObj.setEventSource(internalObj);
+        	} else {        	
 
-            try {
-            	otObject = (OTObject)Proxy.newProxyInstance(otObjectClass.getClassLoader(),
-            			new Class[] { otObjectClass }, handler);
-            	handler.setOTObject(otObject);
-            } catch (ClassCastException e){
-            	throw new RuntimeException("The OTClass: " + otObjectClass + 
-            			" does not extend OTObject or OTObjectInterface", e);
-            }
+        		OTBasicObjectHandler handler = new OTBasicObjectHandler(otObjectImpl, otrunk, otObjectClass);
 
+        		try {
+        			otObject = (OTObject)Proxy.newProxyInstance(otObjectClass.getClassLoader(),
+        				new Class[] { otObjectClass }, handler);
+        			handler.setOTObject(otObject);
+        		} catch (ClassCastException e){
+        			throw new RuntimeException("The OTClass: " + otObjectClass + 
+        				" does not extend OTObject or OTObjectInterface", e);
+        		}
+        	}
         } else {                    
             otObject = setResourcesFromSchema(otObjectImpl, otObjectClass);
         }

@@ -69,8 +69,22 @@ public class OTObjectInternal implements OTObjectInterface
 
 	private HashMap referencedObjects;
 	
+	public OTObjectInternal()
+	{		
+	}
+	
 	public OTObjectInternal(OTDataObject dataObject, OTObjectServiceImpl objectService, OTClass otClass)
     {
+		setup(dataObject, objectService, otClass);
+    }	
+
+	public void setup(OTObjectInternal objInternal)
+	{
+		setup(objInternal.dataObject, objInternal.objectService, objInternal.otClass);
+	}
+	
+	public void setup(OTDataObject dataObject, OTObjectServiceImpl objectService, OTClass otClass)
+	{
 		this.objectService = objectService;
     	this.dataObject = dataObject;
     	
@@ -80,9 +94,9 @@ public class OTObjectInternal implements OTObjectInterface
 		if(otClass == null){
 			throw new IllegalStateException("otClass cannot be null");
 		}
-		this.otClass = otClass;
-    }	
-
+		this.otClass = otClass;		
+	}
+	
 	/* (non-Javadoc)
      * @see org.concord.otrunk.OTObjectInternal#getOTObjectService()
      */
@@ -310,6 +324,15 @@ public class OTObjectInternal implements OTObjectInterface
 		return otIsSet(property);
     }
 
+	public Object getResourceChecked(String resourceName, Class returnType)
+	{
+		try {
+	        return getResource(resourceName, returnType);
+        } catch (Exception e) {
+        	throw new RuntimeException(e);
+        }
+	}
+	
 	public Object getResource(String resourceName, Class returnType)
 		throws Exception
 	{

@@ -50,7 +50,7 @@ public interface OTStateRoot
     public OTObjectMap getUserMap();
     
     public String getFormatVersionString();
-    public String setFormatVersionString(String version);
+    public void setFormatVersionString(String version);
     
     
 }
