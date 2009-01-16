@@ -295,13 +295,12 @@ public class OTViewer extends JFrame
     }
     
     public void init(String urlStr) {
+        updateRemoteURL(urlStr); //set remoteURL
         initGUI();
         if (urlStr == null) {
             return;
         }
         try {
-        	URL url = new URL(urlStr);
-            updateRemoteURL(url); //set remoteURL
             initURL(new URL(urlStr)); //load data and update GUI
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -474,13 +473,13 @@ public class OTViewer extends JFrame
         setupBodyPanel();
     }
 
-    private void updateRemoteURL(URL defaultURL) {
+    private void updateRemoteURL(String defaultURL) {
         String remote = System.getProperty(OTConfig.REMOTE_URL_PROP, null);
 
         try {
             if (remote == null) {
-                if (defaultURL != null && defaultURL.toString().startsWith("http:")) {
-                    remoteURL = defaultURL;
+                if (defaultURL != null && defaultURL.startsWith("http:")) {
+                    remoteURL = new URL(defaultURL);
                 }
             } else {
                 remoteURL = new URL(remote);
