@@ -2,6 +2,7 @@ package org.concord.otrunk.view;
 
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.DefaultOTObject;
@@ -80,8 +81,7 @@ public class OTClassListManager extends DefaultOTObject
 	        	userList.add(objects.nextElement());
 	        }
         } catch (Exception e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
+	        logger.log(Level.SEVERE, "Couldn't initialize class list from URL: " + userListURL, e);
         }
 	}
 
@@ -108,8 +108,7 @@ public class OTClassListManager extends DefaultOTObject
     		try {
 	            overlayManager.add(classMember.getOverlayURL(), classMember, classMember.getUserObject(), false);
             } catch (Exception e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
+	            logger.log(Level.WARNING, "Couldn't load overlay for user: " + classMember.getName(), e);
             }
     	}
     	}
@@ -121,6 +120,10 @@ public class OTClassListManager extends DefaultOTObject
     
     public OTUserObject getCurrentClassMemberUserObject() {
     	return this.currentClassMember.getUserObject();
+    }
+    
+    public void reloadAll() {
+    	processUserList();
     }
 
 }
