@@ -291,18 +291,18 @@ public class OTViewer extends JFrame
             currentAuthoredFile = new File(url.getPath());
         }
         
-        init(url);
+        init(url.toExternalForm());
     }
     
-    public void init(URL url) {
-        updateRemoteURL(url); //set remoteURL
-        
+    public void init(String urlStr) {
         initGUI();
-        if (url == null) {
+        if (urlStr == null) {
             return;
         }
         try {
-            initURL(url); //load data and update GUI
+        	URL url = new URL(urlStr);
+            updateRemoteURL(url); //set remoteURL
+            initURL(new URL(urlStr)); //load data and update GUI
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (Exception e) {
