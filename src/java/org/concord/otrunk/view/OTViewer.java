@@ -280,7 +280,7 @@ public class OTViewer extends JFrame
         registerDebugEventListeners(); //for debugging
     }
 
-    public void init(String[] args) {
+    public void initWithArgs(String[] args) {
         justStarted = true; //means PRE-instructionPanel?
         showTree = true;
 
@@ -290,6 +290,11 @@ public class OTViewer extends JFrame
         if ("file".equalsIgnoreCase(url.getProtocol())) {
             currentAuthoredFile = new File(url.getPath());
         }
+        
+        init(url);
+    }
+    
+    public void init(URL url) {
         updateRemoteURL(url); //set remoteURL
         
         initGUI();
@@ -1979,7 +1984,7 @@ public class OTViewer extends JFrame
 
         OTViewer viewer = new OTViewer();
 
-        viewer.init(args);
+        viewer.initWithArgs(args);
         System.out.println("User mode: " + viewer.getUserMode());
     }
 } // @jve:decl-index=0:visual-constraint="10,10"
