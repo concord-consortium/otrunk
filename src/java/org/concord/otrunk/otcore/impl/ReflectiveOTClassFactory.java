@@ -3,6 +3,7 @@ package org.concord.otrunk.otcore.impl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectInterface;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTResourceList;
@@ -18,6 +20,7 @@ import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTXMLString;
 import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.framework.otrunk.otcore.OTType;
+import org.concord.otrunk.AbstractOTObject;
 import org.concord.otrunk.OTInvocationHandler;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.xml.TypeService;
@@ -79,21 +82,34 @@ public class ReflectiveOTClassFactory
 			Constructor [] memberConstructors = javaClass.getConstructors();
 			Constructor resourceConstructor = memberConstructors[0]; 
 			Class [] params = resourceConstructor.getParameterTypes();
-					
-			// Check all the conditions for incorrect imports.
-			if(memberConstructors.length > 1 || params == null || 
-					params.length == 0 ||
-					!OTResourceSchema.class.isAssignableFrom(params[0])) {
-				System.err.println("Invalid constructor for OTrunk Object: " + otClassName +
+
+			if(AbstractOTObject.class.isAssignableFrom(javaClass)){
+				if(memberConstructors.length > 1 || (params != null && params.length != 0)){
+					System.err.println(
+						"Invalid constructor for OTrunk Object extending AbstactOTObject: " + otClassName +
 						"\n   If you are using an otml file check the import statements and " + 
 						"try removing this class.  If you are creating a new OTClass then you need to fix " +
-						"the constructor.");
-				throw new RuntimeException("OTObjects should only have 1 constructor" + "\n" +
-						" whose first argument is the resource schema");
+					"the constructor.");
+					throw new RuntimeException(
+						"OTObjects extending AbstractOTObject should only have 1 no arg constructor");					
+				}
+			} else {
+
+				// Check all the conditions for incorrect imports.
+				if(memberConstructors.length > 1 || params == null || 
+						params.length == 0 ||
+						!OTResourceSchema.class.isAssignableFrom(params[0])) {
+					System.err.println("Invalid constructor for OTrunk Object: " + otClassName +
+						"\n   If you are using an otml file check the import statements and " + 
+						"try removing this class.  If you are creating a new OTClass then you need to fix " +
+					"the constructor.");
+					throw new RuntimeException("OTObjects should only have 1 constructor" + "\n" +
+					" whose first argument is the resource schema");
+				}
+
+				constructorSchemaClass = params[0];
+				((OTClassImpl)otClass).setConstructorSchemaClass(constructorSchemaClass);
 			}
-			
-			constructorSchemaClass = params[0];
-			((OTClassImpl)otClass).setConstructorSchemaClass(constructorSchemaClass);
 		}
 
 		// now we need to register the parent classes.
@@ -119,6 +135,11 @@ public class ReflectiveOTClassFactory
 		if(!OTObject.class.isAssignableFrom(javaSuperType)){
 			// this interface isn't an OTClass
 			return;
+		}
+		
+		if(AbstractOTObject.class == javaSuperType){
+			// skip over this and just process the OTObjectInterface
+			javaSuperType = OTObjectInterface.class;
 		}
 		
 		OTClass parentOTClass = OTrunkImpl.getOTClass(javaSuperType.getName());
@@ -158,6 +179,11 @@ public class ReflectiveOTClassFactory
 				continue;
 			}
 
+			if(!Modifier.isAbstract(methods[j].getModifiers())){
+				// non abstract method skip it
+				continue;
+			}
+			
 			if(methods[j].getParameterTypes().length != 0){
 				// this method doesn't have the correct signature
 				continue;
@@ -168,8 +194,17 @@ public class ReflectiveOTClassFactory
 			
 			if(methodName.startsWith("get")){
 				resourceName = OTInvocationHandler.getResourceName(3,methodName);
-			} else if(methodName.startsWith("is") && resourceClass == Boolean.TYPE) {
-				resourceName = OTInvocationHandler.getResourceName(2,methodName);
+			} else if(methodName.startsWith("_get")){
+				resourceName = OTInvocationHandler.getResourceName(4,methodName);				
+			} else if(resourceClass == Boolean.TYPE) {
+				if(methodName.startsWith("is")){
+					resourceName = OTInvocationHandler.getResourceName(2,methodName);
+				} else if(methodName.startsWith("_is")){
+					resourceName = OTInvocationHandler.getResourceName(3,methodName);					
+				} else {
+					// this method isn't a property definition method
+					continue;
+				}
 			} else {
 				// this method isn't a property definition method
 				continue;

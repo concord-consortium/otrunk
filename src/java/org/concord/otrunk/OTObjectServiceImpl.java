@@ -189,7 +189,7 @@ public class OTObjectServiceImpl
         
         if(otObjectClass.isInterface()) {
         	if(OTConfig.getBooleanProp(OTConfig.USE_ASM, false)){
-        		Class generatedClass = gClassLoader.generateClass(otObjectClass);
+        		Class generatedClass = gClassLoader.generateClass(otObjectClass, otObjectImpl.otClass());
         		OTObjectInternal internalObj = (OTObjectInternal) generatedClass.newInstance();
         		otObject = internalObj;
         		internalObj.setup(otObjectImpl);
@@ -207,7 +207,13 @@ public class OTObjectServiceImpl
         				" does not extend OTObject or OTObjectInterface", e);
         		}
         	}
-        } else {                    
+        } else if(AbstractOTObject.class.isAssignableFrom(otObjectClass)){
+    		Class generatedClass = gClassLoader.generateClass(otObjectClass, otObjectImpl.otClass());
+    		OTObjectInternal internalObj = (OTObjectInternal) generatedClass.newInstance();
+    		otObject = internalObj;
+    		internalObj.setup(otObjectImpl);
+    		internalObj.setEventSource(internalObj);        	
+        } else {
             otObject = setResourcesFromSchema(otObjectImpl, otObjectClass);
         }
 
