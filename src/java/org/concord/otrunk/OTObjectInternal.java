@@ -346,6 +346,15 @@ public class OTObjectInternal implements OTObjectInterface
 			return getResource(resourceName, null);
 	}
 	
+	public Object getResourceChecked(OTClassProperty property, Class returnType)	
+	{
+		try {
+	        return getResource(property, returnType);
+        } catch (Exception e) {
+        	throw new RuntimeException(e);
+        }
+	}
+	
 	public Object getResource(OTClassProperty property, Class returnType)
 		throws Exception
 	{
