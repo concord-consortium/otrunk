@@ -49,7 +49,7 @@ public class OTBasicObjectHandler extends OTInvocationHandler
 {
     OTObject otObject;
     
-	public OTBasicObjectHandler(OTObjectInternal otObjectImpl, OTrunkImpl db, Class objectInterface)
+	public OTBasicObjectHandler(OTObjectInternal otObjectImpl, OTrunkImpl db, Class<?> objectInterface)
 	{
 		super(otObjectImpl, db, objectInterface);
 	}
