@@ -86,13 +86,16 @@ public class BlobResource
     		bytes = outStream.toByteArray();
     		return bytes;
     	} catch (SocketException sockExcp){
-    		System.err.println(sockExcp.toString());
+    		System.err.println("error loading xml resource: " + blobURL);
+    		System.err.println("   " + sockExcp.toString());
     	} catch (FileNotFoundException e){
-    		System.err.println("error loading xml resource: ");
+    		System.err.println("error loading xml resource: " + blobURL);
     		System.err.println("   " + e.toString());
     	} catch(UnknownHostException e) {
-    		System.err.println(e.toString());
+    		System.err.println("error loading xml resource: " + blobURL);
+    		System.err.println("   " + e.toString());
     	} catch(Exception e) {
+    		System.err.println("error loading xml resource: " + blobURL);
     		e.printStackTrace();
     	} finally {
 

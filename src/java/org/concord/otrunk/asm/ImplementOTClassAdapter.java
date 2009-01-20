@@ -282,16 +282,24 @@ public class ImplementOTClassAdapter extends ClassAdapter
 			Method[] declaredMethods = currentClass.getDeclaredMethods();
 			for (Method method : declaredMethods) {
 		        if(Modifier.isAbstract(method.getModifiers())){
-		        	boolean isDefined = false;
+		        	boolean skip = false;
 		        	for (Method definedMethod : definedMethods) {
 		        		if(method.getName().equals(definedMethod.getName()) &&
 		        				Arrays.equals(method.getParameterTypes(),definedMethod.getParameterTypes())){
 		        			// this abstract method is defined within this class tree so skip it
-		        			isDefined = true;
+		        			skip = true;
 		        			break;
 		        		}
 		        	}
-		        	if(isDefined){
+		        	for (Method abstractMethod : abstractMethods) {
+		        		if(method.getName().equals(abstractMethod.getName()) &&
+		        				Arrays.equals(method.getParameterTypes(),abstractMethod.getParameterTypes())){
+		        			// this abstract method is already defined elsewhere so don't add it twice
+		        			skip = true;
+		        			break;
+		        		}
+		        	}
+		        	if(skip){
 		        		continue;
 		        	}
 		        	abstractMethods.add(method);
