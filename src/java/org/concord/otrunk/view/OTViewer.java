@@ -240,10 +240,6 @@ public class OTViewer extends JFrame
     private AbstractAction exportHiResImageAction;
     private AbstractAction exportToHtmlAction;
 
-    public static void setOTViewFactory(OTViewFactory factory) {
-        otViewFactory = factory;
-    }
-
     public OTViewer() {
         super();
 
@@ -284,6 +280,12 @@ public class OTViewer extends JFrame
             });
         }
 
+        createConsoleFrame();
+        commDialog = new JDialog(this, true);
+        registerDebugEventListeners();
+    }
+
+    private void createConsoleFrame() {
         consoleFrame = new JFrame("Console");
         StreamRecord record = new StreamRecord(50000);
         StreamRecordView view = new StreamRecordView(record);
@@ -297,8 +299,9 @@ public class OTViewer extends JFrame
         if (OTConfig.getBooleanProp(SHOW_CONSOLE_PROP, false)) {
             consoleFrame.setVisible(true);
         }
-        commDialog = new JDialog(this, true);
-        
+    }
+
+    private void registerDebugEventListeners() {
         // for debugging
         // add a breakpoint below, run in debugging mode, and then hit Meta-B
         // the object you're currently focused on will be passed in here and you
@@ -422,8 +425,7 @@ public class OTViewer extends JFrame
 
     }
 
-    public void initArgs(String[] args)
-    {
+    public void initArgs(String[] args) {
         URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
         
         if (authorOTMLURL == null && System.getProperty(OTML_URL_PROP, null) != null) {
@@ -469,14 +471,10 @@ public class OTViewer extends JFrame
         return authorOTMLURL.toString();
     }
 
-    public void init(String url)
-    {
+    public void init(String url) {
         updateRemoteURL(url);
-
         createActions();
-
         updateMenuBar();
-
         setJMenuBar(menuBar);
 
         frameManager = new OTFrameManagerImpl();
@@ -634,16 +632,14 @@ public class OTViewer extends JFrame
         setupBodyPanel();
     }
     
-    public void initWithWizard(String url)
-    {
+    public void initWithWizard(String url) {
         justStarted = true;
 
         init(url);
 
         if (userMode == OTConfig.SINGLE_USER_MODE) {
             SwingUtilities.invokeLater(new Runnable() {
-                public void run()
-                {
+                public void run() {
                     instructionPanel();
                 }
             });
@@ -963,41 +959,6 @@ public class OTViewer extends JFrame
         return userSession.getUserObject();
     }
 
-    public static void main(String[] args)
-    {
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-
-        OTViewer viewer = new OTViewer();
-
-        if (OTConfig.getBooleanProp(OTConfig.SINGLE_USER_PROP, false)) {
-            viewer.setUserMode(OTConfig.SINGLE_USER_MODE);
-        } else if (OTConfig.getBooleanProp(OTConfig.NO_USER_PROP, false)) {
-            viewer.setUserMode(OTConfig.NO_USER_MODE);
-        }
-
-        viewer.initArgs(args);
-    }
-
-    class ExitAction extends AbstractAction
-    {
-        /**
-         * nothing to serialize here.
-         */
-        private static final long serialVersionUID = 1L;
-
-        public ExitAction()
-        {
-            super("Exit");
-        }
-
-        public void actionPerformed(ActionEvent e)
-        {
-            // If this suceeds then the VM will exit so
-            // the window will get disposed
-            exit();
-        }
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -1090,8 +1051,7 @@ public class OTViewer extends JFrame
         }
     }
 
-    public void createActions()
-    {
+    public void createActions() {
         newUserDataAction = new AbstractAction("New") {
 
             /**
@@ -2043,7 +2003,44 @@ public class OTViewer extends JFrame
     {
         return sailSaveEnabled;
     }
-    
+
+    public static void setOTViewFactory(OTViewFactory factory) {
+        otViewFactory = factory;
+    }
+
+    public static void main(String[] args) {
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+        OTViewer viewer = new OTViewer();
+
+        if (OTConfig.getBooleanProp(OTConfig.SINGLE_USER_PROP, false)) {
+            viewer.setUserMode(OTConfig.SINGLE_USER_MODE);
+        } else if (OTConfig.getBooleanProp(OTConfig.NO_USER_PROP, false)) {
+            viewer.setUserMode(OTConfig.NO_USER_MODE);
+        }
+
+        viewer.initArgs(args);
+    }
+
+    class ExitAction extends AbstractAction
+    {
+        /**
+         * nothing to serialize here.
+         */
+        private static final long serialVersionUID = 1L;
+
+        public ExitAction()
+        {
+            super("Exit");
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            // If this suceeds then the VM will exit so
+            // the window will get disposed
+            exit();
+        }
+    }
 } // @jve:decl-index=0:visual-constraint="10,10"
 
 class HtmlFileFilter extends javax.swing.filechooser.FileFilter
