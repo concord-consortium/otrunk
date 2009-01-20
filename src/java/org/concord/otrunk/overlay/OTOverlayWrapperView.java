@@ -1,5 +1,6 @@
 package org.concord.otrunk.overlay;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
@@ -28,6 +29,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	
 	public JComponent getComponent(OTObject otObject)
 	{
+		// logger.info("Initializing overlay wrapper");
 		// FIXME Changes to the object will ONLY be save in the overlay! We should probably mirror
 		// the changes to the current user's session overlay, too!
 		// logger.info("Initializing");
@@ -45,6 +47,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		logger.info(msg);
 		*/
 		if (overlay == null && classListManager != null && overlayManager != null) {
+			// logger.info("Using class list manager/overlay manager");
 			OTUserObject currentClassMember = classListManager.getCurrentClassMemberUserObject();
 			overlay = overlayManager.getOverlay(currentClassMember);
 		}
@@ -52,6 +55,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		// logger.info("overlay object is: " + overlay);
 		
 		if (overlay != null) {
+			// logger.info("had an overlay");
     		try {
     			OTID id = wrappedObject.getGlobalId();
     			if (id instanceof OTTransientMapID) {
@@ -60,8 +64,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
     	        wrappedObject = overlayManager.getOTObject(overlay, id);
     	        
             } catch (Exception e) {
-    	        // TODO Auto-generated catch block
-    	        e.printStackTrace();
+    	        logger.log(Level.SEVERE, "Couldn't get the object from the overlay!", e);
             }
 		}
 		
@@ -72,13 +75,13 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	}
 	
 	public void viewClosed() {
+		// logger.info("Closing the wrapped object's views");
 		removeAllSubViews();
 		// save everything
 		try {
 	        otrunk.remoteSaveData(overlayManager.getXMLDatabase(overlay), OTViewer.HTTP_PUT, new StandardPasswordAuthenticator());
         } catch (Exception e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
+        	logger.log(Level.SEVERE, "Couldn't save the user's overlay!", e);
         }
 		super.viewClosed();
 	}
