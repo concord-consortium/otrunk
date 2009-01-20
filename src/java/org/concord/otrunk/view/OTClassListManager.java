@@ -94,6 +94,7 @@ public class OTClassListManager extends DefaultOTObject
     }
     
     private void processUserList() {
+    	// logger.info("processing users...");
     	// for each user
     	Enumeration classMemberList = userList.getVector().elements();
     	while (classMemberList.hasMoreElements()) {
@@ -123,6 +124,8 @@ public class OTClassListManager extends DefaultOTObject
     }
     
     public void reloadAll() {
+    	// FIXME there might be a memory leak where overlays get registered in OTrunk, and then orphaned because the OTUserOverlayManager no longer has a reference to them
+    	// we might want to make sure the overlay manager deletes previous references first...
     	processUserList();
     }
 
