@@ -479,69 +479,99 @@ public class OTViewer extends JFrame
 
         frameManager = new OTFrameManagerImpl();
         bodyPanel = new OTViewContainerPanel(frameManager);
-
         bodyPanel.addViewContainerListener(this);
 
         if (showTree) {
-
             dataTreeModel = new SimpleTreeModel();
-
             folderTreeModel = new SimpleTreeModel();
-
             updateTreePane();
-
             getContentPane().add(splitPane);
         } else {
             getContentPane().add(bodyPanel);
         }
-
-        if (OTConfig.isShowStatus() || (getUserMode() == OTConfig.SINGLE_USER_MODE && ! isSailSaveEnabled())) {
-            statusPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 1));
-
-            if (OTConfig.isShowStatus()) {
-                final JLabel saveStateLabel = new JLabel("File saved");
-                statusPanel.add(saveStateLabel);
-                statusPanel.add(Box.createHorizontalStrut(20));
-                statusPanel.add(new MemoryMonitorPanel());
-                statusPanel.add(Box.createHorizontalStrut(5));
-                
-                // It takes a while for xmlDM to be initialized...
-                Thread waitForDB = new Thread() {
-                    public void run()
-                    {
-                        while (xmlDB == null) {
-                            try {
-                                sleep(1000);
-                            } catch (Exception e) {
-                            }
-                        }
-                        xmlDB.addXMLDatabaseChangeListener(new XMLDatabaseChangeListener() {
-
-                            public void stateChanged(XMLDatabaseChangeEvent e)
-                            {
-                                if (xmlDB.isDirty()) {
-                                    saveStateLabel.setText("Unsaved changes");
-                                } else {
-                                    saveStateLabel.setText("File saved");
-                                }
-                                statusPanel.repaint();
-                            }
-                        });
-                    }
-                };
-                waitForDB.start();
-            }
-            
-            if (getUserMode() == OTConfig.SINGLE_USER_MODE && ! isSailSaveEnabled()) {
-                JLabel readOnlyLabel = new JLabel("User Data Will Not Be Saved!");
-                statusPanel.setBackground(Color.RED);
-                statusPanel.add(readOnlyLabel);
-                statusPanel.add(Box.createHorizontalStrut(5));
-            }
-            
-            getContentPane().add(statusPanel, BorderLayout.SOUTH);
+        
+        if (OTConfig.isShowStatus() || noClassAssignedForStudent()) {
+            initStatusBar();
         }
 
+        initFrameDimensions();
+
+        if (url == null) {
+            return;
+        }
+
+        try {
+            initializeURL(new URL(url));
+        } catch (MalformedURLException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (Exception e) {
+            // FIXME: this should popup a dialog
+            System.err.println("Can't load url");
+            e.printStackTrace();
+            return;
+        }
+    }
+
+    /*
+     * Test to determine whether to display warning that the student may not 
+     * be running the activity with correct portal settings.
+     * 
+     * Shoud return true when the activity is not run in student mode and
+     * is not assigned a class and a teacher through the portal. 
+     */
+    private boolean noClassAssignedForStudent() {
+        return getUserMode() == OTConfig.SINGLE_USER_MODE && ! isSailSaveEnabled();
+    }
+
+    private void initStatusBar() {
+        statusPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 1));
+
+        if (OTConfig.isShowStatus()) {
+            final JLabel saveStateLabel = new JLabel("File saved");
+            statusPanel.add(saveStateLabel);
+            statusPanel.add(Box.createHorizontalStrut(20));
+            statusPanel.add(new MemoryMonitorPanel());
+            statusPanel.add(Box.createHorizontalStrut(5));
+            
+            // It takes a while for xmlDM to be initialized...
+            Thread waitForDB = new Thread() {
+                public void run()
+                {
+                    while (xmlDB == null) {
+                        try {
+                            sleep(1000);
+                        } catch (Exception e) {
+                        }
+                    }
+                    xmlDB.addXMLDatabaseChangeListener(new XMLDatabaseChangeListener() {
+
+                        public void stateChanged(XMLDatabaseChangeEvent e)
+                        {
+                            if (xmlDB.isDirty()) {
+                                saveStateLabel.setText("Unsaved changes");
+                            } else {
+                                saveStateLabel.setText("File saved");
+                            }
+                            statusPanel.repaint();
+                        }
+                    });
+                }
+            };
+            waitForDB.start();
+        }
+        
+        if (noClassAssignedForStudent()) {
+            JLabel readOnlyLabel = new JLabel("User Data Will Not Be Saved!");
+            statusPanel.setBackground(Color.RED);
+            statusPanel.add(readOnlyLabel);
+            statusPanel.add(Box.createHorizontalStrut(5));
+        }
+        
+        getContentPane().add(statusPanel, BorderLayout.SOUTH);
+    }
+    
+    private void initFrameDimensions() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run()
             {
@@ -570,22 +600,6 @@ public class OTViewer extends JFrame
 
             }
         });
-
-        if (url == null) {
-            return;
-        }
-
-        try {
-            initializeURL(new URL(url));
-        } catch (MalformedURLException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (Exception e) {
-            // FIXME: this should popup a dialog
-            System.err.println("Can't load url");
-            e.printStackTrace();
-            return;
-        }
     }
 
     public void initializeURL(URL url)
@@ -1049,442 +1063,6 @@ public class OTViewer extends JFrame
             System.err.println("Remote URL is invalid.");
             e.printStackTrace();
         }
-    }
-
-    public void createActions() {
-        newUserDataAction = new AbstractAction("New") {
-
-            /**
-             * nothing to serialize here
-             */
-            private static final long serialVersionUID = 1L;
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-             */
-            public void actionPerformed(ActionEvent arg0)
-            {
-                createNewUser();
-            }
-
-        };
-
-        loadUserDataAction = new AbstractAction("Open...") {
-            /**
-             * nothing to serialize here. Just the parent class.
-             */
-            private static final long serialVersionUID = 1L;
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-             */
-            public void actionPerformed(ActionEvent arg0)
-            {
-                openUserData(true);
-            }
-
-        };
-
-        exportToHtmlAction = new AbstractAction("Export to html...") {
-            /**
-             * nothing to serialize here
-             */
-            private static final long serialVersionUID = 1L;
-
-            public void actionPerformed(ActionEvent arg0)
-            {
-                File fileToSave = getReportFile();
-                OTMLToXHTMLConverter otxc =
-                    new OTMLToXHTMLConverter(otViewFactory, bodyPanel.getViewContainer());
-                otxc.setXHTMLParams(fileToSave, 800, 600);
-
-                (new Thread(otxc)).start();
-            }
-        };
-        // Isn't it enabled by default?
-        exportToHtmlAction.setEnabled(true);
-
-        saveUserDataAction = new AbstractAction("Save") {
-
-            /**
-             * Nothing to serialize here
-             */
-            private static final long serialVersionUID = 1L;
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-             */
-            public void actionPerformed(ActionEvent arg0)
-            {
-                userSession.save();
-                
-                // the save operation might change the label used by the session
-                setTitle(baseFrameTitle + ": " + userSession.getLabel());
-            }
-        };
-
-        saveUserDataAsAction = new AbstractAction("Save As...") {
-
-            /**
-             * nothing to serizile here
-             */
-            private static final long serialVersionUID = 1L;
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-             */
-            public void actionPerformed(ActionEvent arg0)
-            {
-                if(userSession instanceof OTMLUserSession){
-                    ((OTMLUserSession)userSession).setDialogParent(SwingUtilities.getRoot(OTViewer.this));
-                }
-                
-                userSession.saveAs();
-            }
-        };
-
-        loadAction = new AbstractAction("Open Authored Content...") {
-
-            /**
-             * nothing to serizile here
-             */
-            private static final long serialVersionUID = 1L;
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-             */
-            public void actionPerformed(ActionEvent arg0)
-            {
-                Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
-
-                MostRecentFileDialog mrfd =
-                    new MostRecentFileDialog("org.concord.otviewer.openotml");
-                mrfd.setFilenameFilter("otml");
-
-                int retval = mrfd.showOpenDialog(frame);
-
-                File file = null;
-                if (retval == MostRecentFileDialog.APPROVE_OPTION) {
-                    file = mrfd.getSelectedFile();
-                }
-
-                if (file != null && file.exists()) {
-                    System.out.println("load file name: " + file);
-                    // if they open an authored file then they are overriding
-                    // the remoteURL,
-                    // at least for now. This makes the title bar update
-                    // correctly, and
-                    // fixes a lockup that happens when they have opened a local
-                    // file and then
-                    // try to save it again.
-                    remoteURL = null;
-                    loadFile(file);
-                    
-                    exportToHtmlAction.setEnabled(true);                                        
-                }
-            }
-
-        };
-        loadAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O,
-            java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        
-        saveAction = new AbstractAction("Save Authored Content...") {
-
-            /**
-             * nothing to serialize here
-             */
-            private static final long serialVersionUID = 1L;
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-             */
-            public void actionPerformed(ActionEvent arg0)
-            {
-                if (OTConfig.isRemoteSaveData() && remoteURL != null) {
-                    try {
-                        if (OTConfig.isRestEnabled()) {
-                            try {
-                                otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_PUT);
-                                setTitle(remoteURL.toString());
-                            } catch (Exception e) {
-                                otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_POST);
-                                setTitle(remoteURL.toString());
-                            }
-                        } else {
-                            otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_POST);
-                            setTitle(remoteURL.toString());
-                        }
-                    } catch (Exception e) {
-                        JOptionPane.showMessageDialog(
-                            (Frame) SwingUtilities.getRoot(OTViewer.this),
-                                        "There was an error saving. Check your URL and try again.",
-                            "Error Saving", JOptionPane.ERROR_MESSAGE);
-                        e.printStackTrace();
-                    }
-                } else {
-                    if (currentAuthoredFile == null) {
-                        saveAsAction.actionPerformed(arg0);
-                        return;
-                    }
-
-                    if (checkForReplace(currentAuthoredFile)) {
-                        try {
-                            ExporterJDOM.export(currentAuthoredFile, xmlDB.getRoot(),
-                                xmlDB);
-                            xmlDB.setDirty(false);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } // end if (remoteUrl == null)
-            }
-        };
-        
-        saveAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S,
-            java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-        saveAsAction = new AbstractAction("Save Authored Content As...") {
-
-            /**
-             * nothing to serialize here
-             */
-            private static final long serialVersionUID = 1L;
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-             */
-            public void actionPerformed(ActionEvent arg0)
-            {
-                Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
-
-                MostRecentFileDialog mrfd =
-                    new MostRecentFileDialog("org.concord.otviewer.saveotml");
-                mrfd.setFilenameFilter("otml");
-
-                if (currentAuthoredFile != null) {
-                    mrfd.setCurrentDirectory(currentAuthoredFile.getParentFile());
-                    mrfd.setSelectedFile(currentAuthoredFile);
-                }
-
-                int retval = mrfd.showSaveDialog(frame);
-
-                File file = null;
-                if (retval == MostRecentFileDialog.APPROVE_OPTION) {
-                    file = mrfd.getSelectedFile();
-
-                    String fileName = file.getPath();
-
-                    if (!fileName.toLowerCase().endsWith(".otml")) {
-                        file = new File(file.getAbsolutePath() + ".otml");
-                    }
-
-                    if (checkForReplace(file)) {
-                        try {
-                            ExporterJDOM.export(file, xmlDB.getRoot(), xmlDB);
-                            currentAuthoredFile = file;
-                            currentURL = file.toURL();
-                            xmlDB.setDirty(false);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    frame.setTitle(fileName);
-                    remoteURL = null;
-                    updateMenuBar();
-
-                }
-            }
-        };
-
-        saveRemoteAsAction = new AbstractAction("Save Remotely As...") {
-
-            /**
-             * nothing to serizile here
-             */
-            private static final long serialVersionUID = 1L;
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-             */
-            public void actionPerformed(ActionEvent arg0)
-            {
-                // Pop up a dialog asking for a URL
-                // Post the otml to the url
-                JPanel panel = new JPanel();
-                panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-                panel.setLayout(new BorderLayout());
-
-                JLabel prompt =
-                    new JLabel("Please enter the URL to which you would like to save:");
-                prompt.setBorder(new EmptyBorder(0, 0, 10, 0));
-                JTextField textField = new JTextField();
-                if (remoteURL == null) {
-                    textField.setText("http://");
-                } else {
-                    textField.setText(remoteURL.toString());
-                }
-
-                JPanel checkboxPanel = new JPanel();
-                JCheckBox restCheckbox = new JCheckBox("REST Enabled?");
-                restCheckbox.setSelected(OTConfig.isRestEnabled());
-                checkboxPanel.setBorder(new EmptyBorder(5, 5, 0, 0));
-                checkboxPanel.add(restCheckbox);
-
-                panel.add(prompt, BorderLayout.NORTH);
-                panel.add(textField, BorderLayout.CENTER);
-                panel.add(checkboxPanel, BorderLayout.SOUTH);
-
-                int returnVal =
-                    CustomDialog.showOKCancelDialog(
-                        (Frame) SwingUtilities.getRoot(OTViewer.this), // parent
-                        panel, // custom content
-                        "Save URL", // title
-                        false, // resizeable
-                        true // modal
-                        );
-
-                if (returnVal == 0) {
-                    try {
-                        remoteURL = new URL(textField.getText());
-                        // WARNING this will cause a security exception if we
-                        // are running in a applet or jnlp which
-                        //  has a security sandbox.
-                        System.setProperty(OTConfig.REST_ENABLED_PROP,
-                                Boolean.toString(restCheckbox.isSelected()));
-                        otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_POST);
-                        setTitle(remoteURL.toString());
-                        updateMenuBar();
-                    } catch (Exception e) {
-                        System.err.println("Bad URL. Not saving.");
-                        JOptionPane.showMessageDialog(
-                            (Frame) SwingUtilities.getRoot(OTViewer.this),
-                                        "There was an error saving. Check your URL and try again.",
-                            "Error Saving", JOptionPane.ERROR_MESSAGE);
-                        e.printStackTrace();
-                    }
-                } else {
-                    // CANCELLED
-                }
-            }
-        };
-
-        exportImageAction = new AbstractAction("Export Image...") {
-
-            /**
-             * nothing to serialize here
-             */
-            private static final long serialVersionUID = 1L;
-
-            public void actionPerformed(ActionEvent e)
-            {
-                // this introduces a dependency on concord Swing project
-                // instead there needs to be a way to added these actions
-                // through
-                // the xml
-                Component currentComp = bodyPanel.getCurrentComponent();
-                Util.makeScreenShot(currentComp);
-            }
-        };
-
-        exportHiResImageAction = new AbstractAction("Export Hi Res Image...") {
-            /**
-             * nothing to serialize here
-             */
-            private static final long serialVersionUID = 1L;
-
-            public void actionPerformed(ActionEvent e)
-            {
-                Component currentComp = bodyPanel.getCurrentComponent();
-                Util.makeScreenShot(currentComp, 2, 2);
-            }
-        };
-
-        debugAction = new AbstractAction("Debug Mode") {
-
-            /**
-             * nothing to serialize here
-             */
-            private static final long serialVersionUID = 1L;
-
-            public void actionPerformed(ActionEvent e)
-            {
-                Object source = e.getSource();
-                if (((JCheckBoxMenuItem) source).isSelected()) {
-                    System.setProperty(OTConfig.DEBUG_PROP, "true");
-                } else {
-                    System.setProperty(OTConfig.DEBUG_PROP, "false");
-                }
-
-                try {
-                    reloadWindow();
-                } catch (Exception exp) {
-                    exp.printStackTrace();
-                }
-
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run()
-                    {
-                        updateMenuBar();
-                    }
-                });
-                exportToHtmlAction.setEnabled(true);
-            }
-        };
-
-        showConsoleAction = new AbstractAction("Show Console") {
-
-            /**
-             * nothing to serialize here
-             */
-            private static final long serialVersionUID = 1L;
-
-            public void actionPerformed(ActionEvent e)
-            {
-                if (consoleFrame != null) {
-                    consoleFrame.setVisible(true);
-                }
-            }
-        };
-
-        reloadWindowAction = new AbstractAction("Reload window") {
-
-            /**
-             * nothing to serialize here
-             */
-            private static final long serialVersionUID = 1L;
-
-            public void actionPerformed(ActionEvent e)
-            {
-                try {
-                    reload();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-        };
-        
-        reloadWindowAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R,
-            java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
-        exitAction = new ExitAction();
-
     }
 
     /**
@@ -2006,6 +1584,442 @@ public class OTViewer extends JFrame
 
     public static void setOTViewFactory(OTViewFactory factory) {
         otViewFactory = factory;
+    }
+
+    public void createActions() {
+        newUserDataAction = new AbstractAction("New") {
+
+            /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            /*
+             * (non-Javadoc)
+             * 
+             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+             */
+            public void actionPerformed(ActionEvent arg0)
+            {
+                createNewUser();
+            }
+
+        };
+
+        loadUserDataAction = new AbstractAction("Open...") {
+            /**
+             * nothing to serialize here. Just the parent class.
+             */
+            private static final long serialVersionUID = 1L;
+
+            /*
+             * (non-Javadoc)
+             * 
+             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+             */
+            public void actionPerformed(ActionEvent arg0)
+            {
+                openUserData(true);
+            }
+
+        };
+
+        exportToHtmlAction = new AbstractAction("Export to html...") {
+            /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(ActionEvent arg0)
+            {
+                File fileToSave = getReportFile();
+                OTMLToXHTMLConverter otxc =
+                    new OTMLToXHTMLConverter(otViewFactory, bodyPanel.getViewContainer());
+                otxc.setXHTMLParams(fileToSave, 800, 600);
+
+                (new Thread(otxc)).start();
+            }
+        };
+        // Isn't it enabled by default?
+        exportToHtmlAction.setEnabled(true);
+
+        saveUserDataAction = new AbstractAction("Save") {
+
+            /**
+             * Nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            /*
+             * (non-Javadoc)
+             * 
+             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+             */
+            public void actionPerformed(ActionEvent arg0)
+            {
+                userSession.save();
+                
+                // the save operation might change the label used by the session
+                setTitle(baseFrameTitle + ": " + userSession.getLabel());
+            }
+        };
+
+        saveUserDataAsAction = new AbstractAction("Save As...") {
+
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+            /*
+             * (non-Javadoc)
+             * 
+             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+             */
+            public void actionPerformed(ActionEvent arg0)
+            {
+                if(userSession instanceof OTMLUserSession){
+                    ((OTMLUserSession)userSession).setDialogParent(SwingUtilities.getRoot(OTViewer.this));
+                }
+                
+                userSession.saveAs();
+            }
+        };
+
+        loadAction = new AbstractAction("Open Authored Content...") {
+
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+            /*
+             * (non-Javadoc)
+             * 
+             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+             */
+            public void actionPerformed(ActionEvent arg0)
+            {
+                Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
+
+                MostRecentFileDialog mrfd =
+                    new MostRecentFileDialog("org.concord.otviewer.openotml");
+                mrfd.setFilenameFilter("otml");
+
+                int retval = mrfd.showOpenDialog(frame);
+
+                File file = null;
+                if (retval == MostRecentFileDialog.APPROVE_OPTION) {
+                    file = mrfd.getSelectedFile();
+                }
+
+                if (file != null && file.exists()) {
+                    System.out.println("load file name: " + file);
+                    // if they open an authored file then they are overriding
+                    // the remoteURL,
+                    // at least for now. This makes the title bar update
+                    // correctly, and
+                    // fixes a lockup that happens when they have opened a local
+                    // file and then
+                    // try to save it again.
+                    remoteURL = null;
+                    loadFile(file);
+                    
+                    exportToHtmlAction.setEnabled(true);                                        
+                }
+            }
+
+        };
+        loadAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O,
+            java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        
+        saveAction = new AbstractAction("Save Authored Content...") {
+
+            /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            /*
+             * (non-Javadoc)
+             * 
+             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+             */
+            public void actionPerformed(ActionEvent arg0)
+            {
+                if (OTConfig.isRemoteSaveData() && remoteURL != null) {
+                    try {
+                        if (OTConfig.isRestEnabled()) {
+                            try {
+                                otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_PUT);
+                                setTitle(remoteURL.toString());
+                            } catch (Exception e) {
+                                otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_POST);
+                                setTitle(remoteURL.toString());
+                            }
+                        } else {
+                            otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_POST);
+                            setTitle(remoteURL.toString());
+                        }
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(
+                            (Frame) SwingUtilities.getRoot(OTViewer.this),
+                                        "There was an error saving. Check your URL and try again.",
+                            "Error Saving", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace();
+                    }
+                } else {
+                    if (currentAuthoredFile == null) {
+                        saveAsAction.actionPerformed(arg0);
+                        return;
+                    }
+
+                    if (checkForReplace(currentAuthoredFile)) {
+                        try {
+                            ExporterJDOM.export(currentAuthoredFile, xmlDB.getRoot(),
+                                xmlDB);
+                            xmlDB.setDirty(false);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } // end if (remoteUrl == null)
+            }
+        };
+        
+        saveAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S,
+            java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+        saveAsAction = new AbstractAction("Save Authored Content As...") {
+
+            /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            /*
+             * (non-Javadoc)
+             * 
+             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+             */
+            public void actionPerformed(ActionEvent arg0)
+            {
+                Frame frame = (Frame) SwingUtilities.getRoot(OTViewer.this);
+
+                MostRecentFileDialog mrfd =
+                    new MostRecentFileDialog("org.concord.otviewer.saveotml");
+                mrfd.setFilenameFilter("otml");
+
+                if (currentAuthoredFile != null) {
+                    mrfd.setCurrentDirectory(currentAuthoredFile.getParentFile());
+                    mrfd.setSelectedFile(currentAuthoredFile);
+                }
+
+                int retval = mrfd.showSaveDialog(frame);
+
+                File file = null;
+                if (retval == MostRecentFileDialog.APPROVE_OPTION) {
+                    file = mrfd.getSelectedFile();
+
+                    String fileName = file.getPath();
+
+                    if (!fileName.toLowerCase().endsWith(".otml")) {
+                        file = new File(file.getAbsolutePath() + ".otml");
+                    }
+
+                    if (checkForReplace(file)) {
+                        try {
+                            ExporterJDOM.export(file, xmlDB.getRoot(), xmlDB);
+                            currentAuthoredFile = file;
+                            currentURL = file.toURL();
+                            xmlDB.setDirty(false);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    frame.setTitle(fileName);
+                    remoteURL = null;
+                    updateMenuBar();
+
+                }
+            }
+        };
+
+        saveRemoteAsAction = new AbstractAction("Save Remotely As...") {
+
+            /**
+             * nothing to serizile here
+             */
+            private static final long serialVersionUID = 1L;
+
+            /*
+             * (non-Javadoc)
+             * 
+             * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+             */
+            public void actionPerformed(ActionEvent arg0)
+            {
+                // Pop up a dialog asking for a URL
+                // Post the otml to the url
+                JPanel panel = new JPanel();
+                panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+                panel.setLayout(new BorderLayout());
+
+                JLabel prompt =
+                    new JLabel("Please enter the URL to which you would like to save:");
+                prompt.setBorder(new EmptyBorder(0, 0, 10, 0));
+                JTextField textField = new JTextField();
+                if (remoteURL == null) {
+                    textField.setText("http://");
+                } else {
+                    textField.setText(remoteURL.toString());
+                }
+
+                JPanel checkboxPanel = new JPanel();
+                JCheckBox restCheckbox = new JCheckBox("REST Enabled?");
+                restCheckbox.setSelected(OTConfig.isRestEnabled());
+                checkboxPanel.setBorder(new EmptyBorder(5, 5, 0, 0));
+                checkboxPanel.add(restCheckbox);
+
+                panel.add(prompt, BorderLayout.NORTH);
+                panel.add(textField, BorderLayout.CENTER);
+                panel.add(checkboxPanel, BorderLayout.SOUTH);
+
+                int returnVal =
+                    CustomDialog.showOKCancelDialog(
+                        (Frame) SwingUtilities.getRoot(OTViewer.this), // parent
+                        panel, // custom content
+                        "Save URL", // title
+                        false, // resizeable
+                        true // modal
+                        );
+
+                if (returnVal == 0) {
+                    try {
+                        remoteURL = new URL(textField.getText());
+                        // WARNING this will cause a security exception if we
+                        // are running in a applet or jnlp which
+                        //  has a security sandbox.
+                        System.setProperty(OTConfig.REST_ENABLED_PROP,
+                                Boolean.toString(restCheckbox.isSelected()));
+                        otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_POST);
+                        setTitle(remoteURL.toString());
+                        updateMenuBar();
+                    } catch (Exception e) {
+                        System.err.println("Bad URL. Not saving.");
+                        JOptionPane.showMessageDialog(
+                            (Frame) SwingUtilities.getRoot(OTViewer.this),
+                                        "There was an error saving. Check your URL and try again.",
+                            "Error Saving", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace();
+                    }
+                } else {
+                    // CANCELLED
+                }
+            }
+        };
+
+        exportImageAction = new AbstractAction("Export Image...") {
+
+            /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(ActionEvent e)
+            {
+                // this introduces a dependency on concord Swing project
+                // instead there needs to be a way to added these actions
+                // through
+                // the xml
+                Component currentComp = bodyPanel.getCurrentComponent();
+                Util.makeScreenShot(currentComp);
+            }
+        };
+
+        exportHiResImageAction = new AbstractAction("Export Hi Res Image...") {
+            /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(ActionEvent e)
+            {
+                Component currentComp = bodyPanel.getCurrentComponent();
+                Util.makeScreenShot(currentComp, 2, 2);
+            }
+        };
+
+        debugAction = new AbstractAction("Debug Mode") {
+
+            /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(ActionEvent e)
+            {
+                Object source = e.getSource();
+                if (((JCheckBoxMenuItem) source).isSelected()) {
+                    System.setProperty(OTConfig.DEBUG_PROP, "true");
+                } else {
+                    System.setProperty(OTConfig.DEBUG_PROP, "false");
+                }
+
+                try {
+                    reloadWindow();
+                } catch (Exception exp) {
+                    exp.printStackTrace();
+                }
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run()
+                    {
+                        updateMenuBar();
+                    }
+                });
+                exportToHtmlAction.setEnabled(true);
+            }
+        };
+
+        showConsoleAction = new AbstractAction("Show Console") {
+
+            /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(ActionEvent e)
+            {
+                if (consoleFrame != null) {
+                    consoleFrame.setVisible(true);
+                }
+            }
+        };
+
+        reloadWindowAction = new AbstractAction("Reload window") {
+
+            /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(ActionEvent e)
+            {
+                try {
+                    reload();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+        };
+        
+        reloadWindowAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R,
+            java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
+        exitAction = new ExitAction();
+
     }
 
     public static void main(String[] args) {
