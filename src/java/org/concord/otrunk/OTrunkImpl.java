@@ -384,11 +384,27 @@ public class OTrunkImpl implements OTrunk
      * @return
      * @throws Exception
      */
-    public OTObject getExternalObject(URL url, OTObjectService parentObjectService) 
+    public OTObject getExternalObject(URL url, OTObjectService parentObjectService) throws Exception
+	{
+    	return getExternalObject(url, parentObjectService, false);
+	}
+    
+    /**
+     * the parentObjectService needs to be passed in so the returned object
+     * uses the correct layers based on the context in which this method is
+     * called.
+     * 
+     * @param url
+     * @param parentObjectService
+     * @param reload
+     * @return
+     * @throws Exception
+     */
+    public OTObject getExternalObject(URL url, OTObjectService parentObjectService, boolean reload) 
     	throws Exception
     {
     	OTObjectServiceImpl externalObjectService = 
-    		loadDatabase(url);
+    		loadDatabase(url, reload);
 		
     	// get the root object either the real root or the system root
     	OTObject root = getRoot(externalObjectService);
@@ -416,7 +432,11 @@ public class OTrunkImpl implements OTrunk
 		return null;			    	
     }
     
-    protected OTObjectServiceImpl loadDatabase(URL url) 
+    protected OTObjectServiceImpl loadDatabase(URL url) throws Exception {
+    	return loadDatabase(url, false);
+    }
+    
+    protected OTObjectServiceImpl loadDatabase(URL url, boolean reload) 
     	throws Exception
     {    	
     	// first see if we have a database with the same context url
@@ -430,7 +450,13 @@ public class OTrunkImpl implements OTrunk
     			System.err.println("Database without a context url! " + xmlDatabase.getDatabaseId());
     		}
     		else if (contextURL.equals(url)){
-    			return getExistingObjectService(xmlDatabase);
+    			if (reload) {
+    				// remove the current database, so we can reload it below
+    				System.err.println("Removing database so we can reload it.");
+    				databases.remove(xmlDatabase);
+    			} else {
+    				return getExistingObjectService(xmlDatabase);
+    			}
     		}
     	}
     	

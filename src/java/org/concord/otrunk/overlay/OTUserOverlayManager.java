@@ -46,7 +46,7 @@ public class OTUserOverlayManager
 		// get the OTOverlay OTObject from the otml at the URL specified
 		OTOverlay overlay = null;
 		try {
-			overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, contextObject.getOTObjectService());
+			overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, contextObject.getOTObjectService(), true);
 		} catch (Exception e) {
 			// some error occurred...
 			logger.warning("Couldn't get overlay for user\n" + overlayURL + "\n" + e.getMessage());
