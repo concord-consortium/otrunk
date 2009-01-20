@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
@@ -42,7 +41,7 @@ public class OTObjectInternal implements OTObjectInterface
 	 * This is null unless there are actually listeners added this saves some 
 	 * memory.
 	 */
-    ArrayList changeListeners = null;
+    ArrayList<WeakReference<OTChangeListener>> changeListeners = null;
 
     /**
      * This is for debugging purposes it contains a mapping from
@@ -50,7 +49,7 @@ public class OTObjectInternal implements OTObjectInterface
      * referenced.  This way when the listener is gc'd we can printout
      * its "label" (toString value).
      */
-    Map changeListenerLabels;
+    Map<WeakReference<OTChangeListener>, String> changeListenerLabels;
     
     /**
      * This can be used by a user of an object to turn off the listening
@@ -132,7 +131,7 @@ public class OTObjectInternal implements OTObjectInterface
     		return;
     	}
 
-    	Vector toBeRemoved = null;
+    	ArrayList<WeakReference<OTChangeListener>> toBeRemoved = null;
 
     	OTChangeEvent changeEvent = new OTChangeEvent(changeEventSource);
 
@@ -144,18 +143,18 @@ public class OTObjectInternal implements OTObjectInterface
     	try {
 
     		for(int i=0;i<changeListeners.size(); i++){
-    			WeakReference ref = (WeakReference)changeListeners.get(i);
-    			Object listener = ref.get();
+    			WeakReference<OTChangeListener> ref = changeListeners.get(i);
+    			OTChangeListener listener = ref.get();
     			if(traceListeners && !(listener instanceof InternalListener)){
     				System.out.println("sending stateChanged " + changeEvent.getDescription() +
     						" to " + listener);
     			}
     			if(listener != null) {
-    				((OTChangeListener)listener).stateChanged(changeEvent);
+    				listener.stateChanged(changeEvent);
     			} else {
     				// the listener was gc'd so lets mark it to be removed
     				if(toBeRemoved == null) {
-    					toBeRemoved = new Vector();
+    					toBeRemoved = new ArrayList<WeakReference<OTChangeListener>>();
     				}
     				if(traceListeners){
     					System.out.println("otChangeListener garbage collected:" +
@@ -198,19 +197,19 @@ public class OTObjectInternal implements OTObjectInterface
 		}
 
 		if(changeListeners == null){
-			changeListeners = new ArrayList();
+			changeListeners = new ArrayList<WeakReference<OTChangeListener>>();
 		}
 		
 		// Check if the changeListener has already been added 
 	    for(int i=0; i<changeListeners.size(); i++) {
-	        WeakReference ref = (WeakReference)changeListeners.get(i);
+	        WeakReference<OTChangeListener> ref = changeListeners.get(i);
 	        if(changeListener == ref.get()) {
 	        	// this changeListener has already been added 
 	        	return;
 	        }
 	    }		
 		
-	    WeakReference listenerRef = new WeakReference(changeListener);
+	    WeakReference<OTChangeListener> listenerRef = new WeakReference<OTChangeListener>(changeListener);
 	    changeListeners.add(listenerRef);
 	    
 	    // debugging instrumentation
@@ -221,7 +220,8 @@ public class OTObjectInternal implements OTObjectInterface
 	    	System.out.println("   listener:" + changeListener+")");
 
 	    	if(changeListenerLabels == null){
-	    		changeListenerLabels = new HashMap();
+	    		changeListenerLabels = new HashMap<WeakReference<OTChangeListener>, String>();
+	    		// the ("" + obj) is used in case the changeListener is null 
 	    		changeListenerLabels.put(listenerRef, "" + changeListener);
 	    	}
 	    }
@@ -243,9 +243,9 @@ public class OTObjectInternal implements OTObjectInterface
 	    	return;
 	    }
 	    
-	    // param OTChangeListener listener		    
+	    // param OTChangeListener listener
 	    for(int i=0; i<changeListeners.size(); i++) {
-	        WeakReference ref = (WeakReference)changeListeners.get(i);
+	        WeakReference<OTChangeListener> ref = changeListeners.get(i);
 	        if(changeListener == ref.get()) {
 	            changeListeners.remove(i);
 	            // if we don't break right away then the "i" variable will skip over the 
@@ -324,7 +324,7 @@ public class OTObjectInternal implements OTObjectInterface
 		return otIsSet(property);
     }
 
-	public Object getResourceChecked(String resourceName, Class returnType)
+	public Object getResourceChecked(String resourceName, Class<?> returnType)
 	{
 		try {
 	        return getResource(resourceName, returnType);
@@ -333,7 +333,7 @@ public class OTObjectInternal implements OTObjectInterface
         }
 	}
 	
-	public Object getResource(String resourceName, Class returnType)
+	public Object getResource(String resourceName, Class<?> returnType)
 		throws Exception
 	{
 		OTClassProperty classProperty = otClass().getProperty(resourceName);
@@ -346,7 +346,7 @@ public class OTObjectInternal implements OTObjectInterface
 			return getResource(resourceName, null);
 	}
 	
-	public Object getResourceChecked(OTClassProperty property, Class returnType)	
+	public Object getResourceChecked(OTClassProperty property, Class<?> returnType)	
 	{
 		try {
 	        return getResource(property, returnType);
@@ -355,7 +355,7 @@ public class OTObjectInternal implements OTObjectInterface
         }
 	}
 	
-	public Object getResource(OTClassProperty property, Class returnType)
+	public Object getResource(OTClassProperty property, Class<?> returnType)
 		throws Exception
 	{
 		Object value = getResourceInternal(property, returnType);
@@ -369,7 +369,7 @@ public class OTObjectInternal implements OTObjectInterface
 		return value;
 	}
 	
-	public Object getResourceInternal(OTClassProperty property, Class returnType)
+	public Object getResourceInternal(OTClassProperty property, Class<?> returnType)
 		throws Exception
 	{
 		String resourceName = property.getName();

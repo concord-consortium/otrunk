@@ -75,11 +75,7 @@ public class OTClassListManager extends DefaultOTObject
 		try {
 	        OTObjectSet set = (OTObjectSet) otrunk.getExternalObject(userListURL, resources.getOTObjectService());
 	        
-	        // because OTObjectList.addAll() is unsupported, iterate and add them individually
-	        Enumeration objects = set.getObjects().getVector().elements();
-	        while (objects.hasMoreElements()) {
-	        	userList.add(objects.nextElement());
-	        }
+	        userList.addAll(set.getObjects());
         } catch (Exception e) {
 	        logger.log(Level.SEVERE, "Couldn't initialize class list from URL: " + userListURL, e);
         }

@@ -46,10 +46,9 @@ public class OTBreadthFirstSearch
         }
         */
 		OTClass otClass = root.otClass();
-		ArrayList otClassProperties = otClass.getOTAllClassProperties();
+		ArrayList<OTClassProperty> otClassProperties = otClass.getOTAllClassProperties();
 		
-		for(int i=0; i<otClassProperties.size(); i++){
-			OTClassProperty prop = (OTClassProperty) otClassProperties.get(i);
+		for (OTClassProperty prop : otClassProperties) {
 			if(prop.isPrimitive()){
 				continue;
 			}
@@ -64,14 +63,15 @@ public class OTBreadthFirstSearch
 				
 				if(collection instanceof OTObjectList){
 					OTObjectList list = (OTObjectList) collection;
-					for(int j=0; j<list.size(); j++){
-						OTObject child = list.get(j);
-						
-					}
+					for (OTObject object : list) {
+						// FIXME need to look for the object in the list
+						// do something with the object to remove the warning
+						object.getClass();
+                    }
 				}
-			}
-		}
-
+			}	        
+        }
+		
 		throw new UnsupportedOperationException("This method isn't finished yet");
 	}
 

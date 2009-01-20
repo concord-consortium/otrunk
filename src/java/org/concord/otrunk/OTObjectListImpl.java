@@ -65,7 +65,7 @@ public class OTObjectListImpl extends OTCollectionImpl
      * Using an ArrayList seemed like the natural thing to do, but it is hard to keep
      * that synchronized with the data list.  So instead a map is used.
      */
-	protected HashMap referenceMap;
+	protected HashMap<OTID, OTObject> referenceMap;
 	
 	public OTObjectListImpl(String property, OTDataList resList, OTObjectInternal objectInternal)
 	{
@@ -101,7 +101,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 			OTObject otObject = objectInternal.getOTObject(id);
 			
 			if(referenceMap == null){
-				referenceMap = new HashMap();
+				referenceMap = new HashMap<OTID, OTObject>();
 			}
 			referenceMap.put(id, otObject);
 			return otObject;
@@ -115,9 +115,9 @@ public class OTObjectListImpl extends OTCollectionImpl
 	 * 
 	 * @see org.concord.framework.otrunk.OTObjectList#getVector()
 	 */
-	public Vector getVector()
+	public Vector<OTObject> getVector()
 	{
-		Vector childVector = new Vector();
+		Vector<OTObject> childVector = new Vector<OTObject>();
 
 		for(int i=0; i<list.size(); i++) {
 			try {	
@@ -135,7 +135,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 		return childVector;
 	}
 			
-	public void add(OTObject obj)
+	public boolean add(OTObject obj)
 	{
 		OTID id = obj.getGlobalId();
 		if(id == null) {
@@ -145,11 +145,13 @@ public class OTObjectListImpl extends OTCollectionImpl
 		list.add(id);
 		
 		if(referenceMap == null){
-			referenceMap = new HashMap();
+			referenceMap = new HashMap<OTID, OTObject>();
 		}
 		referenceMap.put(id, obj);
 		
 		notifyOTChange(OTChangeEvent.OP_ADD, obj, null);
+		
+		return true;
 	}
 	
 	public void add(int index, OTObject obj)
@@ -162,7 +164,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 		list.add(index, id);
 		
 		if(referenceMap == null){
-			referenceMap = new HashMap();
+			referenceMap = new HashMap<OTID, OTObject>();
 		}
 		referenceMap.put(id, obj);
 		
@@ -203,7 +205,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 		}
 
 		if(referenceMap == null){
-			referenceMap = new HashMap();
+			referenceMap = new HashMap<OTID, OTObject>();
 		}
 		referenceMap.put(id, obj);
 		
@@ -233,8 +235,13 @@ public class OTObjectListImpl extends OTCollectionImpl
 	/**
 	 * @see org.concord.framework.otrunk.OTObjectList#remove(org.concord.framework.otrunk.OTObject)
 	 */
-	public void remove(OTObject obj)
+	public boolean remove(Object genericObj)
 	{
+		if(!(genericObj instanceof OTObject)){
+			throw new RuntimeException("can't remove object that isn't a OTObject");			
+		}
+		
+		OTObject obj = (OTObject) genericObj;
 		OTID id = obj.getGlobalId();
 		if(id == null) {
 			throw new RuntimeException("adding null id object list");
@@ -246,6 +253,8 @@ public class OTObjectListImpl extends OTCollectionImpl
 		}
 		
 		notifyOTChange(OTChangeEvent.OP_REMOVE, obj, null);
+		
+		return true;
 	}
 
 	/**
@@ -285,9 +294,9 @@ public class OTObjectListImpl extends OTCollectionImpl
 		return list;
 	}
 
-	public Iterator iterator()
+	public Iterator<OTObject> iterator()
     {
-		return new Iterator(){
+		return new Iterator<OTObject>(){
 			/**
 			 * This points to the current object index;
 			 */
@@ -298,7 +307,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 				return index < (size() - 1);
             }
 
-			public Object next()
+			public OTObject next()
             {
 				index++;
 				return get(index);
@@ -330,14 +339,15 @@ public class OTObjectListImpl extends OTCollectionImpl
 		return toArray(new OTObject[list.size()]);
     }
 
-	public Object[] toArray(Object[] array)
+	@SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] array)
     {
 		if(!(array instanceof OTObject[])){
 			throw new IllegalArgumentException("need to pass an OTObject array");
 		}
 		int size = list.size();
 		if(array.length < size){
-            array = (Object[])Array.newInstance(array.getClass().getComponentType(), size);		
+            array = (T[])Array.newInstance(array.getClass().getComponentType(), size);		
 		}
 
 		for(int i=0; i<size; i++) {
@@ -346,7 +356,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 				if(childID == null){
 					array[i] = null;
 				} else {
-					array[i] = objectInternal.getOTObject(childID);					
+					array[i] = (T) objectInternal.getOTObject(childID);										
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -360,9 +370,9 @@ public class OTObjectListImpl extends OTCollectionImpl
         return array;
     }	
 
-	public boolean containsAll(Collection c)
+	public boolean containsAll(Collection<?> c)
     {
-		Iterator iterator = c.iterator();
+		Iterator<?> iterator = c.iterator();
 		while(iterator.hasNext()){
 			if(!contains(iterator.next())){
 				return false;
@@ -373,47 +383,22 @@ public class OTObjectListImpl extends OTCollectionImpl
     }
 
 	/**
-	 * Theoretically the following method should not be be called.  If the obj is 
-	 * a instance of OTObject then the more specific method should be called, however
-	 * it seems in at least some versions of JRuby this more general add method is
-	 * called instead.   
-	 * @see java.util.Collection#add(java.lang.Object)
-	 */
-	public boolean add(Object obj)
-	{
-		if (obj instanceof OTObject) {
-			add((OTObject) obj);
-			return true;
-		}
-		else
-		{
-			throw new IllegalArgumentException();
-		}
-	}
-	
-	/**
-	 * Unsupported
 	 * @see java.util.Collection#addAll(java.util.Collection)
 	 */
-	public boolean addAll(Collection c)
+	public boolean addAll(Collection<? extends OTObject> c)
 	{
-		throw new UnsupportedOperationException();
+		for (OTObject object : c) {
+	        add(object);
+        }
+		
+		return true;
 	}
-	
-	/**
-	 * Unsupported use remove(OTObject) instead
-	 * @see java.util.Collection#remove(java.lang.Object)
-	 */
-	public boolean remove(Object o)
-    {
-		throw new UnsupportedOperationException();
-    }
 	
 	/** 
 	 * Unsupported 
 	 * @see java.util.Collection#removeAll(java.util.Collection)
 	 */
-	public boolean removeAll(Collection c)
+	public boolean removeAll(Collection<?> c)
     {
 		throw new UnsupportedOperationException();
     }
@@ -422,7 +407,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 	 * Unsupported
 	 * @see java.util.Collection#retainAll(java.util.Collection)
 	 */
-	public boolean retainAll(Collection c)
+	public boolean retainAll(Collection<?> c)
     {
 		throw new UnsupportedOperationException();
     }

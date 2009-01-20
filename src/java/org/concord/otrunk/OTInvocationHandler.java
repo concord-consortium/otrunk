@@ -55,7 +55,7 @@ import org.concord.otrunk.datamodel.OTDataObject;
 public class OTInvocationHandler
 	implements InvocationHandler
 {
-	protected static HashMap internalMethodMap;
+	protected static HashMap<String, Method> internalMethodMap;
 	 
 	OTObjectInternal otObjectImpl;
 	
@@ -63,7 +63,7 @@ public class OTInvocationHandler
      * @param dataObject
      * @param db
      */
-    public OTInvocationHandler(OTObjectInternal otObjectImpl, OTrunkImpl db, Class schemaInterface)
+    public OTInvocationHandler(OTObjectInternal otObjectImpl, OTrunkImpl db, Class<?> schemaInterface)
     {
     	this.otObjectImpl = otObjectImpl;
         
@@ -74,7 +74,7 @@ public class OTInvocationHandler
 
 	protected static void initializeInternalMethodMap()
     {
-		internalMethodMap = new HashMap();
+		internalMethodMap = new HashMap<String, Method>();
 		
 		Method [] interfaceMethods = OTObjectInterface.class.getMethods();
 		
@@ -90,10 +90,10 @@ public class OTInvocationHandler
 	            internalMethod = OTObjectInternal.class.getMethod("internalEquals", new Class []{Object.class});
 	            internalMethodMap.put("equals", internalMethod);
 	            
-	            internalMethod = OTObjectInternal.class.getMethod("internalHashCode", null);
+	            internalMethod = OTObjectInternal.class.getMethod("internalHashCode");
 	            internalMethodMap.put("hashCode", internalMethod);
 
-	            internalMethod = OTObjectInternal.class.getMethod("internalToString", null);
+	            internalMethod = OTObjectInternal.class.getMethod("internalToString");
 	            internalMethodMap.put("toString", internalMethod);
             } catch (SecurityException e) {
 	            // TODO Auto-generated catch block
@@ -140,7 +140,7 @@ public class OTInvocationHandler
 		// The return type is needed as a hint to the getResource method
 		// This hint is needed to handle Blob resources which can be returned
 		// as either urls or byte[].
-		Class returnType = method.getReturnType();
+		Class<?> returnType = method.getReturnType();
 		
 		if(methodName.startsWith("is")) {
             String resourceName = getResourceName(2, methodName);

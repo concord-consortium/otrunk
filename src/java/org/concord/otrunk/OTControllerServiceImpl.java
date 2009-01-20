@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.WeakHashMap;
 import java.util.Map.Entry;
 
@@ -48,24 +47,25 @@ public class OTControllerServiceImpl implements OTControllerService
 	 * key is a OTObject
 	 * value is a realObject
 	 */
-	Map realObjectFromOTMap = new HashMap();
+	Map<OTObject, WeakReference<Object>> realObjectFromOTMap = 
+		new HashMap<OTObject, WeakReference<Object>>();
 
 	/**
 	 * key is the real object
 	 * value is the OTController
 	 */ 
-	Map controllerFromRealMap = new WeakHashMap();
+	Map<Object, OTController> controllerFromRealMap = new WeakHashMap<Object, OTController>();
 	
 	/**
 	 * key is the OTObject
 	 * value is the OTController
 	 */
-	Map controllerFromOTMap = new WeakHashMap();
+	Map<OTObject, OTController> controllerFromOTMap = new WeakHashMap<OTObject, OTController>();
 	
 	/**
 	 * A map of services that can be used by controller.
 	 */
-	Map serviceMap = new HashMap();
+	Map<Class<?>, Object> serviceMap = new HashMap<Class<?>, Object>();
 	
 	OTObjectService objectService;
 	OTControllerRegistry registry;
@@ -147,11 +147,11 @@ public class OTControllerServiceImpl implements OTControllerService
 	private final OTController getControllerInternal(OTObject otObject, Object realObject)
 	{
 		// need to find the OTController that can handle this OTObject
-		Class otObjectClass = null;
+		Class<? extends OTObject> otObjectClass = null;
 		if(otObject != null) {
 			otObjectClass = otObject.getClass();
 		}
-		Class realObjectClass = null;
+		Class<?> realObjectClass = null;
 		if(realObject != null) {
 			realObjectClass = realObject.getClass();
 		}
@@ -204,25 +204,31 @@ public class OTControllerServiceImpl implements OTControllerService
 		return controller;
 	}
 	
-	private final OTController createControllerInternal(Class otObjectClass, Class realObjectClass)
+	@SuppressWarnings("unchecked")
+    private final OTController createControllerInternal(Class<? extends OTObject> otObjectClass, 
+		Class<?> realObjectClass)
 	{
 		// need to find the OTController that can handle this OTObject
 		// need to go through all the parents of the otObjectClass
-		Class controllerClass = 
+		Class<? extends OTController> controllerClass = 
 			registry.getControllerClassByOTObjectClass(otObjectClass);
 
 		// try the first level of interfaces if the class can't be found
 		// this should really go up the inheritance tree, both interfaces and
 		// superclasses		
 		// just doing the first level will handle the proxy classes
-		Class [] interfaces = null;
+		Class<?> [] interfaces = null;
 		
 		if(controllerClass == null) {
 			// I believe this will return only the first level of interfaces
 			interfaces = otObjectClass.getInterfaces();
-			for(int i=0; i<interfaces.length; i++){				
+			for (Class<?> class1 : interfaces) {
+				// skip non OTObject classes
+				if(!OTObject.class.isAssignableFrom(class1)){
+					continue;
+				}
 				controllerClass = 
-					registry.getControllerClassByOTObjectClass(interfaces[i]);
+					registry.getControllerClassByOTObjectClass((Class<? extends OTObject>) class1);
 				if(controllerClass != null){
 					break;
 				}
@@ -256,7 +262,7 @@ public class OTControllerServiceImpl implements OTControllerService
 		
 	private Object getExistingRealObjectFromOTObject(OTObject otObject) 
 	{
-		Reference ref = (Reference)realObjectFromOTMap.get(otObject);
+		Reference<?> ref = (Reference<?>)realObjectFromOTMap.get(otObject);
 		if(ref != null){
 			return ref.get();	
 		}
@@ -334,7 +340,7 @@ public class OTControllerServiceImpl implements OTControllerService
 		return realObject;
 	}
 
-	public Class [] getRealObjectClasses(Class controllerClass) {
+	public Class<?> [] getRealObjectClasses(Class<? extends OTController> controllerClass) {
 		try {
 			Field field = controllerClass.getField("realObjectClasses");
 			return (Class [])field.get(null);
@@ -351,12 +357,9 @@ public class OTControllerServiceImpl implements OTControllerService
 		return null;
 	}
 
-	public Class getOTObjectClass(Class controllerClass) {
+	@SuppressWarnings("unchecked")
+    public Class<? extends OTObject> getOTObjectClass(Class<? extends OTController> controllerClass) {
 		try {
-			if(!OTController.class.isAssignableFrom(controllerClass)){
-				throw new IllegalArgumentException("controllerClass doesn't implement "+ OTController.class);
-			}
-			
 			Field field = controllerClass.getField("otObjectClass");
 			return (Class)field.get(null);
 		} catch (SecurityException e) {
@@ -394,7 +397,7 @@ public class OTControllerServiceImpl implements OTControllerService
 		// Figure out which otObjectClass we should be using
 		// this comes from the controller class we found
 			// TODO this should look for matches up the inheritance tree.
-		Class controllerClass = 
+		Class<? extends OTController> controllerClass = 
 			registry.getControllerClassByRealObjectClass(realObject.getClass());
 		
 		if(controllerClass == null) {
@@ -403,7 +406,7 @@ public class OTControllerServiceImpl implements OTControllerService
 			return null;
 		}
 
-		Class otObjectClass = getOTObjectClass(controllerClass);
+		Class<? extends OTObject> otObjectClass = getOTObjectClass(controllerClass);
 
 		// if we don't have a view then we don't have the otObject
 		// so we need to make a new one.
@@ -422,7 +425,7 @@ public class OTControllerServiceImpl implements OTControllerService
 					otObjectClass);
 		}
 		
-		// instanciate the controller
+		// Instantiate the controller
 		try {
 			controller = (OTController)controllerClass.newInstance();
 		} catch (InstantiationException e) {
@@ -473,7 +476,7 @@ public class OTControllerServiceImpl implements OTControllerService
 		// store the relationship in the proper places
 		// this should be done before methods on the controller are called
 		// this should prevent infinite loops if there is a circular reference
-		realObjectFromOTMap.put(otObject, new WeakReference(realObject));
+		realObjectFromOTMap.put(otObject, new WeakReference<Object>(realObject));
 		synchronized(controllerFromRealMap){
 			controllerFromRealMap.put(realObject, controller);
 		}
@@ -512,7 +515,7 @@ public class OTControllerServiceImpl implements OTControllerService
 	 * 
 	 * @see org.concord.framework.otrunk.OTControllerService#registerControllerClass(java.lang.Class)
 	 */
-	public void registerControllerClass(Class viewClass) 
+	public void registerControllerClass(Class<? extends OTController> viewClass) 
 	{		
 		registry.registerControllerClass(viewClass);
 	}
@@ -536,27 +539,27 @@ public class OTControllerServiceImpl implements OTControllerService
     public void dispose()
     {
     	disposing  = true;
-    	Vector disposedControllers = new Vector();
+    	ArrayList<OTController> disposedControllers = new ArrayList<OTController>();
 
     	// There are 2 maps that contain references to controllers.
     	// They should be in sync so we only have to search one
     	// we won't dispose controllers in our shared service that is its job not ours
     	synchronized(controllerFromRealMap){
-    		Set entries = controllerFromRealMap.entrySet();    		
-    		Iterator iterator = entries.iterator();
+    		Set<Entry<Object, OTController>> entries = controllerFromRealMap.entrySet();    		
+    		Iterator<Entry<Object, OTController>> iterator = entries.iterator();
     		
     		// Copy the entries so if any of the controller.dispose
     		// calls cause changes to the list a concurrency exception
     		// wouldn't be thrown.
-    		ArrayList entriesCopy = new ArrayList();
+    		ArrayList<Entry<Object, OTController>> entriesCopy = new ArrayList<Entry<Object, OTController>>();
     		while(iterator.hasNext()){
-    			Entry entry = (Entry) iterator.next();
+    			Entry<Object, OTController> entry = (Entry<Object, OTController>) iterator.next();
     			entriesCopy.add(entry);
     		}
 
     		iterator = entriesCopy.iterator();
     		while(iterator.hasNext()){
-    			Entry entry = (Entry) iterator.next();
+    			Entry<Object, OTController> entry = iterator.next();
     			OTController controller = (OTController) entry.getValue();
     			if(disposedControllers.contains(controller)){
     				continue;
@@ -567,10 +570,6 @@ public class OTControllerServiceImpl implements OTControllerService
     	}
     }
     
-    protected void disposeValues(Map map, Vector disposedControllers)
-    {
-    }
-
 	public OTControllerServiceImpl getSharedService()
     {
     	return sharedService;
@@ -589,14 +588,15 @@ public class OTControllerServiceImpl implements OTControllerService
 		return subService;
 	}
 
-	public void addService(Class serviceClass, Object service)
+	public void addService(Class<?> serviceClass, Object service)
     {
 		serviceMap.put(serviceClass, service);
 	    
     }
 
-	public Object getService(Class serviceClass)
+	@SuppressWarnings("unchecked")
+    public <T> T getService(Class<T> serviceClass)
     {
-		return serviceMap.get(serviceClass);
+		return (T) serviceMap.get(serviceClass);
     }
 }
