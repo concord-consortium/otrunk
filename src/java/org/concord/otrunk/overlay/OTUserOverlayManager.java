@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
@@ -27,6 +28,7 @@ public class OTUserOverlayManager
 	ArrayList<OTDatabase> overlayDatabases = new ArrayList<OTDatabase>();
 	OTrunkImpl otrunk;
 	ArrayList<OverlayImpl> globalOverlays = new ArrayList<OverlayImpl>();
+	private StandardPasswordAuthenticator authenticator = new StandardPasswordAuthenticator();
 	
 	public OTUserOverlayManager(OTrunkImpl otrunk) {
 		this.otrunk = otrunk;
@@ -160,6 +162,10 @@ public class OTUserOverlayManager
 		return this.overlayDatabases;
 	}
 	
+	public Set<OTOverlay> getOverlays() {
+		return this.overlayToObjectServiceMap.keySet();
+	}
+	
 	public OTObject getOTObject(OTUserObject userObject, OTID id) throws Exception {
 		return getOTObject(getOverlay(userObject), id);
 	}
@@ -213,5 +219,10 @@ public class OTUserOverlayManager
 		if (objService instanceof OTObjectServiceImpl) {
 			overlayDatabases.add(getDatabase(otOverlay));
 		}
+	}
+	
+	public void remoteSave(OTOverlay overlay) throws Exception {
+		// FIXME need to check if we're in read-only mode or not
+		otrunk.remoteSaveData(getXMLDatabase(overlay), OTViewer.HTTP_PUT, authenticator);
 	}
 }
