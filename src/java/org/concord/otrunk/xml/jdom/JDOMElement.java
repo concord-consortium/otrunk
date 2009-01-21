@@ -31,10 +31,11 @@ package org.concord.otrunk.xml.jdom;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
+import org.concord.otrunk.xml.OTXMLAttribute;
+import org.concord.otrunk.xml.OTXMLContent;
 import org.concord.otrunk.xml.OTXMLElement;
 import org.jdom.Attribute;
 import org.jdom.Comment;
@@ -70,13 +71,13 @@ public class JDOMElement extends JDOMContent
     /* (non-Javadoc)
      * @see org.concord.otrunk.xml.OTXMLElement#getChildren()
      */
-    public List getChildren()
+    public List<OTXMLElement> getChildren()
     {
-        Vector wrappedChildren = new Vector();
-        List children = element.getChildren();
+        ArrayList<OTXMLElement> wrappedChildren = new ArrayList<OTXMLElement>();
+        List<?> children = element.getChildren();
 //        element.getCo
-		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			
-			Element child = (Element)childIter.next();
+        for(Object obj: children){
+			Element child = (Element)obj;
 			JDOMElement wrappedChild = new JDOMElement(child);
 			wrappedChildren.add(wrappedChild);
 		}
@@ -84,13 +85,13 @@ public class JDOMElement extends JDOMContent
         return wrappedChildren; 
     }
 
-    public List getContent()
+    public List<OTXMLContent> getContent()
     {
-        Vector wrappedContent = new Vector();
-        List content = element.getContent();
-//        element.getCo
-		for(Iterator childIter = content.iterator(); childIter.hasNext(); ) {			
-			Content child = (Content)childIter.next();
+        ArrayList<OTXMLContent> wrappedContent = new ArrayList<OTXMLContent>();
+        List<?> content = element.getContent();
+        
+        for(Object obj: content){
+			Content child = (Content)obj;
 			JDOMContent wrappedChild = null;
 			if(child instanceof Element){
 				wrappedChild = new JDOMElement((Element)child);
@@ -132,12 +133,13 @@ public class JDOMElement extends JDOMContent
     /* (non-Javadoc)
      * @see org.concord.otrunk.xml.OTXMLElement#getAttributes()
      */
-    public List getAttributes()
+    public List<OTXMLAttribute> getAttributes()
     {
-        Vector wrappedAttributes = new Vector();
-        List attributes = element.getAttributes();
-		for(Iterator attribIter = attributes.iterator(); attribIter.hasNext(); ) {			
-			Attribute attrib = (Attribute)attribIter.next();
+        ArrayList<OTXMLAttribute> wrappedAttributes = new ArrayList<OTXMLAttribute>();
+        List<?> attributes = element.getAttributes();
+        
+		for(Object obj: attributes ) {			
+			Attribute attrib = (Attribute)obj;
 			JDOMAttribute wrappedAttrib = new JDOMAttribute(this, attrib);
 			wrappedAttributes.add(wrappedAttrib);
 		}

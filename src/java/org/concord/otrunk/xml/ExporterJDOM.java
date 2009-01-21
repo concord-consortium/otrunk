@@ -61,6 +61,7 @@ import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
 import org.jdom.Comment;
+import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.IllegalDataException;
@@ -91,13 +92,12 @@ public class ExporterJDOM
 	private static Pattern hrefPattern = Pattern.compile("(href=\")([^:\"]*)(\")");
 
 	OTDatabase otDb;
-	ArrayList writtenIds;
-	ArrayList processedClasses;
-	HashMap containers;
+	ArrayList<OTID> writtenIds;
+	ArrayList<String> processedClasses;
 	
-	private ArrayList processedIds;
-	private ArrayList duplicateClasses;
-	private HashMap incomingReferenceMap;
+	private ArrayList<OTID> processedIds;
+	private ArrayList<String> duplicateClasses;
+	private HashMap<OTID, ArrayList<OTDataObject>> incomingReferenceMap;
 	
 	private URL contextURL;
 	
@@ -179,12 +179,11 @@ public class ExporterJDOM
 
 	public ExporterJDOM()
 	{
-		writtenIds = new ArrayList();
-		processedClasses = new ArrayList();
-		duplicateClasses = new ArrayList();
-		containers = new HashMap();
-		processedIds = new ArrayList();
-		incomingReferenceMap = new HashMap();		
+		writtenIds = new ArrayList<OTID>();
+		processedClasses = new ArrayList<String>();
+		duplicateClasses = new ArrayList<String>();
+		processedIds = new ArrayList<OTID>();
+		incomingReferenceMap = new HashMap<OTID,ArrayList<OTDataObject>>();		
 	}
 
 	/**
@@ -202,7 +201,7 @@ public class ExporterJDOM
 		// This preserves any imported classes that might not have been actually used in the otml file
 		// these imported classes are currently the only way to load in packages, so they need to be preserved.
 		if(db instanceof XMLDatabase){
-			ArrayList importedClasses = ((XMLDatabase)db).getImportedOTObjectClasses();
+			ArrayList<String> importedClasses = ((XMLDatabase)db).getImportedOTObjectClasses();
 			processedClasses.addAll(importedClasses);
 		}
 	
@@ -277,13 +276,12 @@ public class ExporterJDOM
 			// If not using full class names check for duplicates
 			if(!useFullClassNames){
 				String objectClassName = getClassName(objectFullClassName);
-				for(int i=0; i<processedClasses.size(); i++){
-					String processedFullClassName = (String) processedClasses.get(i);
+				for(String processedFullClassName: processedClasses){
 					String processedClassName = getClassName(processedFullClassName);
 					if(processedClassName.equals(objectClassName)){
 						// This is very bad
 						System.err.println("Duplicate Class names found: " +
-								processedClasses.get(i) + " and " +
+							processedFullClassName + " and " +
 								objectFullClassName);
 						System.err.println("This database needs to be saved with useFullClassNames turned on");
 						if(!duplicateClasses.contains(processedFullClassName)){
@@ -416,9 +414,9 @@ public class ExporterJDOM
         	return;
         } else {
         	// record that this parent object is referencing this object.
-    		ArrayList refList = (ArrayList) incomingReferenceMap.get(id);
+    		ArrayList<OTDataObject> refList = incomingReferenceMap.get(id);
     		if(refList == null){
-    			refList = new ArrayList();
+    			refList = new ArrayList<OTDataObject>();
     			incomingReferenceMap.put(id, refList);
     		}
     		
@@ -583,7 +581,7 @@ public class ExporterJDOM
 			// We should also check to see if the objects id has been explicitly set
 			// in that case it should be written out anyhow.  I'm not sure how to 
 			// do that yet.
-			ArrayList incomingReferences = (ArrayList) incomingReferenceMap.get(id);
+			ArrayList<OTDataObject> incomingReferences = incomingReferenceMap.get(id);
 			if((xmlDO != null && xmlDO.isPreserveUUID() && id instanceof OTUUID) ||
 					(incomingReferences != null && incomingReferences.size() > 1)){
 				objectEl.setAttribute("id", id.toExternalForm());
@@ -591,7 +589,7 @@ public class ExporterJDOM
 		}
 		
 		String resourceKeys [] = dataObj.getResourceKeys();
-		ArrayList nullResources = new ArrayList();		
+		ArrayList<String> nullResources = new ArrayList<String>();		
 		
 		for(int i=0; i<resourceKeys.length; i++) {
 		    
@@ -618,7 +616,7 @@ public class ExporterJDOM
 			    	continue;
 			    }
 			    
-			    ArrayList content = new ArrayList();
+			    ArrayList<Content> content = new ArrayList<Content>();
 				for(int j=0;j<list.size(); j++) {
 					Object listElement = list.get(j);
 					if(list instanceof XMLDataList){
@@ -636,7 +634,7 @@ public class ExporterJDOM
 			} else if(resource instanceof OTDataMap) {
 			    OTDataMap map = (OTDataMap)resource;
 			    String [] mapKeys = map.getKeys();
-			    ArrayList content = new ArrayList();
+			    ArrayList<Content> content = new ArrayList<Content>();
 			    for(int j=0; j<mapKeys.length; j++) {
 			    	Element entryEl = new Element("entry");
 			    	content.add(entryEl);
@@ -893,7 +891,7 @@ public class ExporterJDOM
 		if(content instanceof Element){
 			resourceEl.setContent((Element) content);		
 		} else if(content instanceof Collection){
-			resourceEl.setContent((Collection) content);					
+			resourceEl.setContent((Collection<?>) content);					
 		}
 	}
 	

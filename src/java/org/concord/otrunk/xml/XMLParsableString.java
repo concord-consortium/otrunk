@@ -32,7 +32,7 @@
 */
 package org.concord.otrunk.xml;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,14 +71,14 @@ public class XMLParsableString
 		this.content = content;
 	}
 	
-	public OTXMLString parse(Hashtable localIdMap)
+	public OTXMLString parse(HashMap<String, OTID> localIdMap)
 	{
 		Pattern p = Pattern.compile("\\$\\{([^}]*)\\}");
 		Matcher m = p.matcher(content);
 		StringBuffer parsed = new StringBuffer();
 		while(m.find()) {
 			String localId = m.group(1);
-			OTID globalId = (OTID)localIdMap.get(localId);
+			OTID globalId = localIdMap.get(localId);
 			if(globalId != null) {
 				String globalIdStr = globalId.toExternalForm();
 				m.appendReplacement(parsed, globalIdStr);

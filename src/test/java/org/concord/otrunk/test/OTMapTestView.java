@@ -1,9 +1,8 @@
 package org.concord.otrunk.test;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -14,11 +13,11 @@ import org.concord.framework.otrunk.view.OTJComponentView;
 
 public class OTMapTestView implements OTJComponentView {
 
-	HashMap map;
+	HashMap<String, Object> map;
 	
 	public OTMapTestView()
 	{
-		map = new HashMap();
+		map = new HashMap<String, Object>();
 		map.put("myString", "hello world");
 		map.put("myInteger", new Integer("10"));
 		map.put("myFloat", new Float("33.1"));
@@ -33,10 +32,8 @@ public class OTMapTestView implements OTJComponentView {
 	public JComponent getComponent(OTObject otObject) {
 		OTResourceMap otMap = ((OTMapTestObject)otObject).getResourceMap();
 		if(otMap.size() == 0){
-			Set entries = map.entrySet();
-			Iterator iter = entries.iterator();
-			while(iter.hasNext()){
-				Map.Entry entry = (Map.Entry)iter.next();
+			Set<Entry<String, Object>> entries = map.entrySet();
+			for (Entry<String, Object> entry : entries) {
 				otMap.put((String)entry.getKey(), entry.getValue());
 			}
 			
@@ -47,10 +44,8 @@ public class OTMapTestView implements OTJComponentView {
 			return new JLabel("Map Size doesn't match");						
 		}
 		
-		Set entries = map.entrySet();
-		Iterator iter = entries.iterator();
-		while(iter.hasNext()){
-			Map.Entry entry = (Map.Entry)iter.next();
+		Set<Entry<String, Object>> entries = map.entrySet();
+		for (Entry<String, Object> entry : entries) {
 			Object value = otMap.get((String)entry.getKey());
 			if(value instanceof byte[]) {
 				if(!checkBytes(value, entry.getValue())){

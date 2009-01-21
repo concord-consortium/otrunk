@@ -32,8 +32,8 @@
 */
 package org.concord.otrunk.xml;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
 
 import org.concord.otrunk.datamodel.OTDataList;
 
@@ -50,10 +50,10 @@ import org.concord.otrunk.datamodel.OTDataList;
 public class XMLDataList
 	implements OTDataList
 {
-	Vector list = new Vector();
+	ArrayList<Object> list = new ArrayList<Object>();
 	XMLDataObject dataObject;
 	
-	HashMap referenceInfoMap = new HashMap();
+	HashMap<Integer, XMLReferenceInfo> referenceInfoMap = new HashMap<Integer, XMLReferenceInfo>();
 	
 	public XMLDataList(XMLDataObject parent)
 	{
@@ -115,7 +115,7 @@ public class XMLDataList
 	 */
 	public void removeAll()
 	{
-		list.removeAllElements();
+		list.clear();
 		updateModifiedTime();
 	}
 
@@ -147,7 +147,7 @@ public class XMLDataList
 	
 	public XMLReferenceInfo getReferenceInfo(int index)
 	{
-		return (XMLReferenceInfo) referenceInfoMap.get(new Integer(index));
+		return referenceInfoMap.get(new Integer(index));
 	}
 
 	public boolean contains(Object obj)

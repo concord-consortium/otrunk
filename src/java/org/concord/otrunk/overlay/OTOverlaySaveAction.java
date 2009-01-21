@@ -7,11 +7,8 @@ import java.util.Set;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTResourceSchema;
-import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTAction;
 import org.concord.framework.otrunk.view.OTActionContext;
-import org.concord.otrunk.OTObjectServiceImpl;
-import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.util.StandardPasswordAuthenticator;
 
 public class OTOverlaySaveAction extends DefaultOTObject

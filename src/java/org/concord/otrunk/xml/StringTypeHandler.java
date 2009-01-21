@@ -68,7 +68,7 @@ public class StringTypeHandler extends PrimitiveResourceTypeHandler
 	    // as xml text.
 	    // if there is a string that shouldn't have xml tags in it
 	    // then a invalid resource value message will be printed.
-	    List children = element.getChildren();
+	    List<?> children = element.getChildren();
 	    if(children != null && children.size() > 0) {
 		    String contentStr = element.getContentAsXMLText();
 		    return new XMLParsableString(contentStr);			    

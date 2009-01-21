@@ -50,10 +50,8 @@ import org.concord.otrunk.datamodel.OTDataMap;
 public class XMLDataMap 
 	implements OTDataMap
 {
-	HashMap hTable = new LinkedHashMap();
+	HashMap<String, Object> hTable = new LinkedHashMap<String, Object>();
 	XMLDataObject dataObject;
-	
-	HashMap referenceInfoMap = new HashMap();
 	
 	public XMLDataMap(XMLDataObject parent)
 	{

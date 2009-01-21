@@ -48,13 +48,13 @@ public interface OTXMLElement extends OTXMLContent
      * Should return an empty list if there are no children
      * @return
      */
-    public List getChildren();
+    public List<?> getChildren();
    
     /**
      * Returns a list of the content of the element including the comments.
      * @return
      */
-    public List getContent();
+    public List<?> getContent();
     
     public OTXMLElement getChild(String name);
     
@@ -64,7 +64,7 @@ public interface OTXMLElement extends OTXMLContent
      * Should return an empty list if there are no attributes
      * @return
      */
-    public List getAttributes();
+    public List<?> getAttributes();
     
     public String getTextTrim();
     

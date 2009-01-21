@@ -196,6 +196,6 @@ public class EmbedObjectTest extends JFrame
 		"</otrunk>";
 		EmbedObjectTest test = new EmbedObjectTest(xmlString);
 		test.pack();
-		test.show();
+		test.setVisible(true);
 	}
 }

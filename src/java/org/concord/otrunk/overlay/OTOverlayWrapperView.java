@@ -12,14 +12,10 @@ import javax.swing.JPanel;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTrunk;
-import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.user.OTUserObject;
-import org.concord.otrunk.util.StandardPasswordAuthenticator;
 import org.concord.otrunk.view.AbstractOTJComponentContainerView;
 import org.concord.otrunk.view.OTClassListManager;
-import org.concord.otrunk.view.OTViewer;
 
 public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 {
@@ -30,7 +26,6 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	private OTOverlayWrapper wrapper;
 	private OTClassListManager classListManager;
 	private OTUserOverlayManager overlayManager;
-	private OTrunkImpl otrunk;
 	private JButton submitButton;
 	
 	public JComponent getComponent(OTObject otObject)
@@ -40,7 +35,6 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		// the changes to the current user's session overlay, too!
 		// logger.info("Initializing");
 		wrapper = (OTOverlayWrapper) otObject;
-		otrunk = (OTrunkImpl) wrapper.getOTObjectService().getOTrunkService(OTrunk.class);
 		overlay = wrapper.getOverlay();
 		classListManager = (OTClassListManager) wrapper.getOTObjectService().getOTrunkService(OTClassListManager.class);
 		overlayManager = (OTUserOverlayManager) wrapper.getOTObjectService().getOTrunkService(OTUserOverlayManager.class);

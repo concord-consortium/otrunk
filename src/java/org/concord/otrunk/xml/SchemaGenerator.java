@@ -35,7 +35,6 @@ package org.concord.otrunk.xml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.concord.framework.otrunk.otcore.OTClass;
@@ -70,18 +69,19 @@ public class SchemaGenerator
 		
 		Element rootElement = document.getRootElement();
 		
-		ArrayList importedOTObjectClasses = new ArrayList();
+		ArrayList<Class<?>> importedOTObjectClasses = new ArrayList<Class<?>>();
 				
 		Element importsElement = rootElement;
-		List imports = importsElement.getChildren();		
-		for(Iterator iterator=imports.iterator();iterator.hasNext();) {
-			Element currentImport=(Element)iterator.next();
+		List<?> imports = importsElement.getChildren();
+		for (Object object : imports) {	        
+			Element currentImport=(Element)object;
 			String className = currentImport.getAttributeValue("class");
-			Class importClass = Class.forName(className);
+			Class<?> importClass = Class.forName(className);
 			importedOTObjectClasses.add(importClass);
 		}		
 		
-		ArrayList referrencedOTClasses = ReflectiveOTClassFactory.singleton.loadClasses(importedOTObjectClasses);
+		ArrayList<OTClass> referrencedOTClasses = 
+			ReflectiveOTClassFactory.singleton.loadClasses(importedOTObjectClasses);
 						
 		for(int i=0; i<referrencedOTClasses.size(); i++){
 			OTClass otClass = (OTClass) referrencedOTClasses.get(i);
@@ -89,19 +89,17 @@ public class SchemaGenerator
 			System.out.println("" + otClass.getName());
 
 			System.out.print("     extends ");
-			ArrayList superTypes = otClass.getOTSuperTypes();
-			for(int j=0; j<superTypes.size(); j++){
-				OTClass superType = (OTClass) superTypes.get(j);
+			ArrayList<OTClass> superTypes = otClass.getOTSuperTypes();
+			for (OTClass superType : superTypes) {
 				System.out.print(superType.getName() + " ");
 			}
 			System.out.println();
 			
-			ArrayList properties = otClass.getOTClassProperties();
+			ArrayList<OTClassProperty> properties = otClass.getOTClassProperties();
 			if(properties == null || properties.size() == 0){
 				System.out.println("   no class properties");
 			}
-			for(int j=0; j<properties.size(); j++) {
-				OTClassProperty otProperty = (OTClassProperty) properties.get(j);
+			for (OTClassProperty otProperty : properties) {
 				String resName = otProperty.getName();
 				int numSpaces = 20 - resName.length();
 				String spaces = "";
@@ -109,7 +107,7 @@ public class SchemaGenerator
 				OTType otType = otProperty.getType();
 				String typeName = "null type";
 				if(otType != null){
-					Class typeClass = otType.getInstanceClass();
+					Class<?> typeClass = otType.getInstanceClass();
 					typeName = typeClass.getName();
 				}
 				System.out.println("  " + resName + spaces + " : " +

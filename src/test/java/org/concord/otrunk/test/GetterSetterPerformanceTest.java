@@ -37,10 +37,11 @@ public class GetterSetterPerformanceTest
 
 		long startTime = System.currentTimeMillis();
 		int count = 1000000;
-		float float1;
+		@SuppressWarnings("unused")
+        float float1;
 		for(int i=0; i<count; i++){
 			float1 = obj.getFloat();			
-		}
+		}		
 		
 		long endTime = System.currentTimeMillis();
 		System.err.println("time for millon gets: " + (endTime - startTime) + "ms");
