@@ -24,10 +24,9 @@ public class AppletTester extends JApplet
 	    listApplets.addActionListener(new ActionListener(){
 	    	public void actionPerformed(ActionEvent e)
 	    	{
-	    		Enumeration applets = getAppletContext().getApplets();
-	    		System.out.println("Applet Lister found: ");
+	    		Enumeration<Applet> applets = getAppletContext().getApplets();
 	    		while(applets.hasMoreElements()){
-	    			Applet a = (Applet)applets.nextElement();
+	    			Applet a = applets.nextElement();
 	    			System.out.println("  " +  a.getParameter("name"));
 	    		}
 	    	}

@@ -33,7 +33,8 @@
 package org.concord.otrunk.overlay;
 
 import java.net.URL;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Set;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataCollection;
@@ -71,7 +72,8 @@ public class CompositeDataObject
     // or it is a wrapper around a user created object
 	private boolean composite;
 	
-	private Hashtable resourceCollections = new Hashtable();
+	private HashMap<String, OTDataCollection> resourceCollections = 
+		new HashMap<String, OTDataCollection>();
 	
 	public CompositeDataObject(OTDataObject baseObject, 
 	        CompositeDatabase db, OTDataObject[] middleDeltas, boolean composite)
@@ -183,40 +185,36 @@ public class CompositeDataObject
 	public String[] getResourceKeys()
 	{
 
-        Hashtable keyTable = new Hashtable();
+        HashMap<String, OTDataObject> keyTable = new HashMap<String, OTDataObject>();
         OTDataObject localActiveDelta = getActiveDeltaObject();
         if (localActiveDelta != null) {
             String [] userKeys = localActiveDelta.getResourceKeys();
-            for(int i=0; i<userKeys.length; i++){
+            for (String userKey : userKeys) {
                 // we can put any object, but lets use the userObject
                 // so we might take advantage of that later
-                keyTable.put(userKeys[i], localActiveDelta);
+                keyTable.put(userKey, localActiveDelta);
             }
         }
         
 		if(middleDeltas != null){
-			for(int i=0; i<middleDeltas.length; i++){
-				OTDataObject delta = middleDeltas[i];
+			for (OTDataObject delta : middleDeltas) {
 	            String [] userKeys = delta.getResourceKeys();
-	            for(int j=0; j<userKeys.length; j++){
-	                keyTable.put(userKeys[j], delta);
+	            for (String userKey : userKeys) {
+	                keyTable.put(userKey, delta);
 	            }				
 			}
 		}
         
         if(baseObject != null) {
             String [] authorKeys = baseObject.getResourceKeys();
-            for(int i=0; i<authorKeys.length; i++){
-                Object oldValue = keyTable.get(authorKeys[i]);
-                if(oldValue == null){
-                    keyTable.put(authorKeys[i], baseObject);
-                }
+            for (String key : authorKeys) {
+            	keyTable.put(key, baseObject);
             }
         }
 
-        Object [] keys = keyTable.keySet().toArray();
-        String [] strKeys = new String [keys.length];
-        System.arraycopy(keys, 0, strKeys, 0, keys.length);
+        Set<String> keySet = keyTable.keySet();
+        String [] strKeys = new String [keySet.size()];
+        strKeys = keySet.toArray(strKeys);
         return strKeys;
 	}
 
@@ -291,12 +289,13 @@ public class CompositeDataObject
         return resource;
     }
     
-	public OTDataCollection getResourceCollection(String key, 
-			Class collectionClass)
+	@SuppressWarnings("unchecked")
+    public <T extends OTDataCollection> T getResourceCollection(String key, 
+		Class<T> collectionClass)
 	{
-		OTDataCollection collection = (OTDataCollection)resourceCollections.get(key);
+		OTDataCollection collection = resourceCollections.get(key);
 	    if(collection != null) {
-	        return collection;
+	        return (T)collection;
 	    }
 
 	    // Get the base list that a delta will be built against
@@ -314,7 +313,7 @@ public class CompositeDataObject
 
 		resourceCollections.put(key, collection);
 
-	    return collection;
+	    return (T)collection;
 	}
 
 	/**

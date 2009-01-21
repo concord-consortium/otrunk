@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -25,7 +23,7 @@ public class OTUserOverlayManager
 	Logger logger = Logger.getLogger(this.getClass().getName());
 	HashMap overlayToObjectServiceMap = new HashMap();
 	HashMap userToOverlayMap = new HashMap();
-	Vector overlayDatabases = new Vector();
+	ArrayList<OTDatabase> overlayDatabases = new ArrayList<OTDatabase>();
 	OTrunkImpl otrunk;
 	Vector globalOverlays = new Vector();
 	
@@ -157,7 +155,7 @@ public class OTUserOverlayManager
 		return getUserObject(overlay);
 	}
 	
-	public Vector getOverlayDatabases() {
+	public ArrayList<OTDatabase> getOverlayDatabases() {
 		return this.overlayDatabases;
 	}
 	

@@ -35,7 +35,7 @@ package org.concord.otrunk.datamodel.fs;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.Date;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataCollection;
@@ -63,7 +63,7 @@ public class FsDataObject
 	private static final long serialVersionUID = 1L;
 	
 	private OTID globalId;
-	Hashtable resources = new Hashtable();
+	HashMap<String, Object> resources = new HashMap<String, Object>();
 	Date creationTime = null;
 	Date modifiedTime = null;
 	FsDatabase database = null;
@@ -158,11 +158,12 @@ public class FsDataObject
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDataObject#getResourceList(java.lang.String)
 	 */
-	public OTDataCollection getResourceCollection(String key, Class collectionClass)
+	@SuppressWarnings("unchecked")
+    public <T extends OTDataCollection> T getResourceCollection(String key, Class<T> collectionClass)
 	{
 		Object listObj = resources.get(key);
 		if(collectionClass.isInstance(listObj)) {
-			return (OTDataCollection)listObj;
+			return (T)listObj;
 		}
 		
 		if(listObj != null) {
@@ -176,11 +177,11 @@ public class FsDataObject
 		if(collectionClass == OTDataList.class) {
 		    FsDataList list = new FsDataList(this);
 		    resources.put(key, list);
-		    return list;
+		    return (T)list;
 		} else if(collectionClass == OTDataMap.class) {
 		    FsDataMap map = new FsDataMap(this);
 		    resources.put(key, map);
-		    return map;
+		    return (T)map;
 		}
 		
 		return null;

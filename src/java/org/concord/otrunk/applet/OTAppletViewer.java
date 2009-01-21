@@ -122,9 +122,9 @@ public class OTAppletViewer extends JApplet
 					// Go through all the applets on the page that are OTAppletViewerS and
 					// check if we are set to be their master.  If so then notify them
 					// that we have finished loading.
-					Enumeration applets = appletContext.getApplets();
+					Enumeration<Applet> applets = appletContext.getApplets();
 					while(applets.hasMoreElements()){
-						Applet a = (Applet)applets.nextElement();
+						Applet a = applets.nextElement();
 						System.out.println("" + getAppletName() + " found: " + a.getParameter("name"));
 						if(a instanceof OTAppletViewer &&
 								!((OTAppletViewer)a).isMaster() &&
@@ -325,9 +325,9 @@ public class OTAppletViewer extends JApplet
 
 		// We did not find our master using that simple look up approach
 		// try manually going through all the applets
-		Enumeration applets = getAppletContext().getApplets();
+		Enumeration<Applet> applets = getAppletContext().getApplets();
 		while(applets.hasMoreElements()){
-			Applet a = (Applet)applets.nextElement();
+			Applet a = applets.nextElement();
 			System.out.println("" + getAppletName() + " found: " + a.getParameter("name"));
 			if(a instanceof OTAppletViewer){
 				OTAppletViewer sibbling = (OTAppletViewer)a;

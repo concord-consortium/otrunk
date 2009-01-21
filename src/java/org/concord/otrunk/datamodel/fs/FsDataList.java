@@ -33,7 +33,7 @@
 package org.concord.otrunk.datamodel.fs;
 
 import java.io.Serializable;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.concord.otrunk.datamodel.OTDataList;
 
@@ -52,7 +52,7 @@ public class FsDataList
 {
 	private static final long serialVersionUID = 1L;
 	
-	Vector list = new Vector();
+	ArrayList<Object> list = new ArrayList<Object>();
 	boolean readOnly;
 	private FsDataObject dataObject = null;
 		
@@ -137,7 +137,7 @@ public class FsDataList
 	public void removeAll()
 	{
 		updateModifiedTime();
-		list.removeAllElements();
+		list.clear();
 	}
 
 	/* (non-Javadoc)

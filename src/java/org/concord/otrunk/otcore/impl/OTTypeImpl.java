@@ -4,14 +4,14 @@ import org.concord.framework.otrunk.otcore.OTType;
 
 public abstract class OTTypeImpl implements OTType
 {
-	protected Class instanceClass;
+	protected Class<?> instanceClass;
 	
-	public OTTypeImpl(Class instanceClass)
+	public OTTypeImpl(Class<?> instanceClass)
 	{
 		this.instanceClass = instanceClass;
 	}
 	
-	public Class getInstanceClass()
+	public Class<?> getInstanceClass()
 	{
 		return instanceClass;
 	}

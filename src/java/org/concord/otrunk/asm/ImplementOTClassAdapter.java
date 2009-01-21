@@ -25,12 +25,12 @@ public class ImplementOTClassAdapter extends ClassAdapter
 	private static final int SETTER = 2;
 
 	private String className;
-	private Class abstractClass;
+	private Class<?> abstractClass;
 	private HashMap<String, String> internalMethodMap;
 	private String parentName;
 	private OTClass otClass;
 	
-	public ImplementOTClassAdapter(ClassVisitor cv, Class abstractClass, OTClass otClass)
+	public ImplementOTClassAdapter(ClassVisitor cv, Class<?> abstractClass, OTClass otClass)
     {
 	    super(cv);
 	    this.abstractClass = abstractClass;

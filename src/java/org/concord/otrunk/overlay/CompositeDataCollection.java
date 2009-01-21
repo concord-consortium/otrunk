@@ -13,14 +13,14 @@ import org.concord.otrunk.datamodel.OTDataObject;
 public abstract class CompositeDataCollection 
 	implements OTDataCollection
 {
-	private Class collectionType;
+	private Class<? extends OTDataCollection> collectionType;
 	private CompositeDataObject parent;
 	private OTDataCollection baseCollection;
 	private String resourceName;
 	private boolean composite;
 	
 	
-	public CompositeDataCollection(Class collectionType, 
+	public CompositeDataCollection(Class<? extends OTDataCollection> collectionType, 
 			CompositeDataObject parent,
 			OTDataCollection baseCollection,
 			String resourceName, boolean composite)

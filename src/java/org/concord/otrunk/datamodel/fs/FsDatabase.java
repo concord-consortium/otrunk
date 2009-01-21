@@ -41,8 +41,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.concord.framework.otrunk.OTID;
@@ -69,7 +69,7 @@ public class FsDatabase implements OTDatabase
 {
 	// This needs to be initialized from files in the db folder
 	// and on closing it should be written out again
-	Hashtable dbIndex = new Hashtable();
+	HashMap<OTID, FsDataObject> dbIndex = new HashMap<OTID, FsDataObject>();
 
 	// This needs to be initialized and saved in the db folder
 	// index file.
@@ -119,12 +119,12 @@ public class FsDatabase implements OTDatabase
 				continue;
 			}
 			
-			OTDataObject obj;			
+			FsDataObject obj;			
 			OTID childId = OTIDFactory.createOTID(childName);
 			try {
 				FileInputStream inStream = new FileInputStream(children[i]);
 				ObjectInputStream objInStream = new ObjectInputStream(inStream);
-				obj = (OTDataObject)objInStream.readObject();
+				obj = (FsDataObject)objInStream.readObject();
 				inStream.close();
 			} catch (Exception e) {
 				System.err.println("Error loading obj: " + childId);
@@ -164,18 +164,17 @@ public class FsDatabase implements OTDatabase
 		// temporary place incase there is an error writting
 		// an object.  Currently when there is an error writting an element
 		// the whole database is corrupted.
-		
-		Enumeration elements = dbIndex.elements();
-		while (elements.hasMoreElements()) {
-			FsDataObject dataObject = (FsDataObject)(elements.nextElement());
+			
+		Collection<FsDataObject> values = dbIndex.values();
+		for (FsDataObject dataObject : values) {
 			OTID id = dataObject.getGlobalId();
 			String fileName = id.toExternalForm();
 			File dataFile = new File(dbFolder, fileName);
 			FileOutputStream outStream = new FileOutputStream(dataFile);
 			ObjectOutputStream objOutStream = new ObjectOutputStream(outStream);
 			objOutStream.writeObject(dataObject);
-			objOutStream.close();
-		}
+			objOutStream.close();	        
+        }
 	}
 	
 	
@@ -199,10 +198,10 @@ public class FsDatabase implements OTDatabase
 	public OTDataObject createDataObject(OTDataObjectType type, OTID id)
 		throws Exception
 	{
-    	OTDataObject dataObject = new FsDataObject(type, (OTUUID)id, this);
-    	((FsDataObject)dataObject).creationInit();
+    	FsDataObject dataObject = new FsDataObject(type, (OTUUID)id, this);
+    	dataObject.creationInit();
     	
-    	Object oldValue = dbIndex.put(dataObject.getGlobalId(), dataObject);
+    	FsDataObject oldValue = dbIndex.put(dataObject.getGlobalId(), dataObject);
     	if(oldValue != null) {
     		dbIndex.put(dataObject.getGlobalId(), oldValue);
     		throw new Exception("repeated unique id");
@@ -223,14 +222,14 @@ public class FsDatabase implements OTDatabase
 
 	public void importDataObject(OTDataObject obj)
 	{
-		dbIndex.put(obj.getGlobalId(), obj);
+		dbIndex.put(obj.getGlobalId(), (FsDataObject)obj);
 	}
 	
 	
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.OTDatabase#createCollection(java.lang.Class)
 	 */
-	public OTDataCollection createCollection(OTDataObject parent, Class collectionClass)
+	public OTDataCollection createCollection(OTDataObject parent, Class<?> collectionClass)
 		throws Exception
 	{
 		if(collectionClass.equals(OTDataList.class)) {
