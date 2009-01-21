@@ -1,9 +1,14 @@
 package org.concord.otrunk.overlay;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
@@ -26,6 +31,8 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	private OTClassListManager classListManager;
 	private OTUserOverlayManager overlayManager;
 	private OTrunkImpl otrunk;
+	private StandardPasswordAuthenticator authenticator = new StandardPasswordAuthenticator();
+	private JButton submitButton;
 	
 	public JComponent getComponent(OTObject otObject)
 	{
@@ -71,19 +78,40 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		// logger.info("wrapped object is: " + wrappedObject);
 		subview = createSubViewComponent(wrappedObject);
 		
-		return subview;
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		
+		mainPanel.add(subview);
+		
+		if (wrapper.getShowButton()) {
+			submitButton = new JButton(wrapper.getButtonText());
+			mainPanel.add(submitButton);
+			
+			submitButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e)
+                {
+	                saveData();
+                }
+			});
+		}
+		
+		return mainPanel;
 	}
 	
 	public void viewClosed() {
 		// logger.info("Closing the wrapped object's views");
 		removeAllSubViews();
+		saveData();
+		super.viewClosed();
+	}
+	
+	private void saveData() {
 		// save everything
 		try {
-	        otrunk.remoteSaveData(overlayManager.getXMLDatabase(overlay), OTViewer.HTTP_PUT, new StandardPasswordAuthenticator());
+	        otrunk.remoteSaveData(overlayManager.getXMLDatabase(overlay), OTViewer.HTTP_PUT, authenticator);
         } catch (Exception e) {
         	logger.log(Level.SEVERE, "Couldn't save the user's overlay!", e);
         }
-		super.viewClosed();
 	}
 
 }

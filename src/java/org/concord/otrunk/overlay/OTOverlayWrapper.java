@@ -15,4 +15,18 @@ public interface OTOverlayWrapper
 	 */
 	public OTOverlay getOverlay();
 	public OTObject getWrappedObject();
+	
+	public static boolean DEFAULT_showButton = true;
+	/**
+	 * Whether or not to show the submit button
+	 * @return
+	 */
+	public boolean getShowButton();
+	
+	public static String DEFAULT_buttonText = "Submit";
+	/**
+	 * The text used for the "submit" button.
+	 * @return
+	 */
+	public String getButtonText();
 }
