@@ -89,7 +89,7 @@ public class XMLDatabase
 
 	ArrayList importedOTObjectClasses = new ArrayList();
 
-	Hashtable dataObjects = new Hashtable();
+	HashMap<OTID, XMLDataObject> dataObjects = new HashMap<OTID, XMLDataObject>();
 
 	// a map of xml file ids to UUIDs
 	Hashtable localIdMap = new Hashtable();
@@ -567,7 +567,7 @@ public class XMLDatabase
 		return databaseId;
 	}
 
-	public Hashtable getDataObjects()
+	public HashMap<OTID, XMLDataObject> getDataObjects()
 	{
 		return dataObjects;
 	}
@@ -637,7 +637,7 @@ public class XMLDatabase
 
 		XMLDataObject dataObject = new XMLDataObject(element, id, this);
 
-		Object oldValue = dataObjects.put(dataObject.getGlobalId(), dataObject);
+		XMLDataObject oldValue = dataObjects.put(dataObject.getGlobalId(), dataObject);
 		if (oldValue != null) {
 			dataObjects.put(dataObject.getGlobalId(), oldValue);
 			throw new Exception("repeated unique id: "

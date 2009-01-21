@@ -32,8 +32,6 @@
 */
 package org.concord.otrunk.user;
 
-import java.util.Hashtable;
-
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTResourceMap;
@@ -56,18 +54,7 @@ public class OTUserObject extends DefaultOTObject
 		public OTResourceMap getUserDataMap();
 	}
 	
-	private ResourceSchema resources;
-
-	/**
-	 * Cache of user data objects.  These are virtual data objects
-	 * that have an authoring object and create a user state object
-	 * if the user makes any change to the authoring object.
-	 * 
-	 * We keep this cache so we don't generate one of these objects more 
-	 * than once
-	 */
-	Hashtable userDataObjects = new Hashtable();
-	
+	private ResourceSchema resources;	
 
 	public OTUserObject(ResourceSchema resources) 
 	{

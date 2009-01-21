@@ -39,13 +39,14 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class Transfer
 {
     public static final int CHAR_BUFFER_SIZE = 1024;
     public static final int BYTE_BUFFER_SIZE = CHAR_BUFFER_SIZE * 64;
-    protected Vector listeners = new Vector();
+    protected ArrayList<TransferListener> listeners = new ArrayList<TransferListener>();
     protected TransferEvent currentEvent;
     protected int charBufferSize = CHAR_BUFFER_SIZE;
     protected int byteBufferSize = BYTE_BUFFER_SIZE;
@@ -243,7 +244,7 @@ public class Transfer
 		}
 	}
 	
-	public Vector getFileNames(String dirName, Vector fileList, boolean includeDirs)
+	public Vector<String> getFileNames(String dirName, Vector<String> fileList, boolean includeDirs)
 	{
 		File directory = new File(dirName);
 		String [] fileNames = directory.list();
@@ -267,7 +268,7 @@ public class Transfer
 	
 	public String [] getFileNames(String dirName, boolean includeDirs)
 	{
-		Vector fileList = getFileNames(dirName, new Vector(), includeDirs);
+		Vector<String> fileList = getFileNames(dirName, new Vector<String>(), includeDirs);
 		String [] fileNames = new String[fileList.size()];
 		for (int i = 0; i < fileNames.length; i++)
 		{
@@ -283,7 +284,7 @@ public class Transfer
 	
 	public File [] getFiles(String dirName, boolean includeDirs)
 	{
-		Vector fileList = getFileNames(dirName, new Vector(), includeDirs);
+		Vector<String> fileList = getFileNames(dirName, new Vector<String>(), includeDirs);
 		File [] files = new File[fileList.size()];
 		for (int i = 0; i < files.length; i++)
 		{
@@ -305,20 +306,18 @@ public class Transfer
     
     public void addTransferListener(TransferListener listener)
     {
-        listeners.addElement(listener);
+        listeners.add(listener);
     }
     
     public void removeTransferListener(TransferListener listener)
     {
-        listeners.removeElement(listener);
+        listeners.remove(listener);
     }
     
     public void checkEvent(String sourceContent, String contentName)
     {
         currentEvent = new TransferEvent(this, sourceContent, contentName, 0);
-        for (int i = 0; i < listeners.size(); i++)
-        {
-            TransferListener listener = (TransferListener) listeners.elementAt(i);
+        for (TransferListener listener : listeners) {
             listener.transferCheck(currentEvent);
         }
     }
@@ -336,9 +335,7 @@ public class Transfer
             currentEvent.setContentName(contentName);
             currentEvent.setContentLength(length);
         }
-        for (int i = 0; i < listeners.size(); i++)
-        {
-            TransferListener listener = (TransferListener) listeners.elementAt(i);
+        for (TransferListener listener : listeners) {
             listener.transferStarted(currentEvent);
         }
     }
@@ -348,9 +345,7 @@ public class Transfer
         if (currentEvent instanceof TransferEvent)
         {
             currentEvent.setProgress(currentTotal);
-            for (int i = 0; i < listeners.size(); i++)
-            {
-                TransferListener listener = (TransferListener) listeners.elementAt(i);
+            for (TransferListener listener : listeners) {
                 listener.transferProgress(currentEvent);
             }
         }
@@ -358,9 +353,7 @@ public class Transfer
     
     public void finishEvent()
     {
-        for (int i = 0; i < listeners.size(); i++)
-        {
-            TransferListener listener = (TransferListener) listeners.elementAt(i);
+        for (TransferListener listener : listeners) {
             listener.transferFinished(currentEvent);
         }
     }
@@ -368,9 +361,7 @@ public class Transfer
     public void abortEvent(Exception e)
     {
         currentEvent.setException(e);
-        for (int i = 0; i < listeners.size(); i++)
-        {
-            TransferListener listener = (TransferListener) listeners.elementAt(i);
+        for (TransferListener listener : listeners) {
             listener.transferAborted(currentEvent);
         }
     }
@@ -392,11 +383,11 @@ public class Transfer
 			Transfer transfer = new Transfer();
             if (args[0].toLowerCase().equals("client"))
             {
-                Transfer.Client client = transfer.createTransferClient(args[1], Integer.parseInt(args[2]), args[3]);
+                transfer.createTransferClient(args[1], Integer.parseInt(args[2]), args[3]);
             }
             else if (args[0].toLowerCase().equals("server"))
             {
-                Transfer.Server server = transfer.createTransferServer(Integer.parseInt(args[1]));
+                transfer.createTransferServer(Integer.parseInt(args[1]));
             }
         }
     }
@@ -406,7 +397,6 @@ public class Transfer
 	{
 		protected Socket clientSocket;
 		protected Thread serverThread;
-		protected Vector listeners = new Vector();
 		protected Transfer transfer;
 		
 		public Server(Transfer transfer, int port)

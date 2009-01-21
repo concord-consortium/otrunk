@@ -1,6 +1,6 @@
 package org.concord.otrunk.util;
 
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTObject;
@@ -14,7 +14,7 @@ import org.concord.framework.otrunk.OTObjectFilter;
 public class OTSharingManagerImpl implements OTSharingManager
 {
 	private OTSharingBundle.ResourceSchema registry;
-	private Vector listeners;
+	private ArrayList<OTSharingListener> listeners;
 	
 	public OTSharingManagerImpl(OTSharingBundle.ResourceSchema registry)
 	{
@@ -25,7 +25,7 @@ public class OTSharingManagerImpl implements OTSharingManager
 	 * 
 	 * @return all objects being shared
 	 */
-	public Vector getAllSharedObjects(){
+	public Vector<OTObject> getAllSharedObjects(){
 		return registry.getSharedObjects().getVector();
 	}
 	
@@ -34,8 +34,8 @@ public class OTSharingManagerImpl implements OTSharingManager
 	 * @param clazz specific class of object
 	 * @return all shared objects of type clazz. If null, all shared objects are returned
 	 */
-	public Vector getAllSharedObjects(Class clazz){
-		final Class myClazz = clazz;
+	public Vector<OTObject> getAllSharedObjects(Class<?> clazz){
+		final Class<?> myClazz = clazz;
 		
 		if (myClazz == null) {
 			return getAllSharedObjects();
@@ -56,7 +56,7 @@ public class OTSharingManagerImpl implements OTSharingManager
 	 * @param filter an OTObjectFilter implementation
 	 * @return all shared objects matching OTObjectFilter filter
 	 */
-	public Vector getAllSharedObjects(OTObjectFilter filter) {
+	public Vector<OTObject> getAllSharedObjects(OTObjectFilter filter) {
 		return filter.filterList(getAllSharedObjects());
 	}
 	
@@ -93,7 +93,7 @@ public class OTSharingManagerImpl implements OTSharingManager
 	public void addOTSharingListener(OTSharingListener listener)
     {
 		if (listeners == null) {
-			listeners = new Vector();
+			listeners = new ArrayList<OTSharingListener>();
 		}
 		
 	    listeners.add(listener);
@@ -102,7 +102,7 @@ public class OTSharingManagerImpl implements OTSharingManager
 	public void removeOTSharingListener(OTSharingListener listener)
     {
 		if (listeners == null) {
-			listeners = new Vector();
+			listeners = new ArrayList<OTSharingListener>();
 		}
 		
 	    listeners.remove(listener);
@@ -110,12 +110,10 @@ public class OTSharingManagerImpl implements OTSharingManager
 	
 	private void notifyListeners(OTSharingEvent event) {
 		if (listeners == null) {
-			listeners = new Vector();
+			listeners = new ArrayList<OTSharingListener>();
 		}
-		
-		Enumeration ls = listeners.elements();
-		while (ls.hasMoreElements()) {
-			OTSharingListener lis = (OTSharingListener) ls.nextElement();
+
+		for (OTSharingListener lis : listeners) {
     		if (event.getType() == OTSharingEvent.SHARED) {
     			lis.objectShared(event);
     		} else if (event.getType() == OTSharingEvent.REMOVED) {

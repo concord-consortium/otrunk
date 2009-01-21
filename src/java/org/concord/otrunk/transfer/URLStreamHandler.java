@@ -5,9 +5,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 
@@ -47,12 +46,9 @@ public class URLStreamHandler
     		}
     	}
     	
-    	Map headerFields = connection.getHeaderFields();
+    	Map<String, List<String>> headerFields = connection.getHeaderFields();
     	if(headerFields != null){
-    		Set entrySet = headerFields.entrySet();
-    		Iterator iterator = entrySet.iterator();
-    		while(iterator.hasNext()){
-    			Entry entry = (Entry) iterator.next();
+    		for (Entry<String, List<String>> entry : headerFields.entrySet()) {
     			System.err.println("  " + entry.getKey() + ": " + entry.getValue());
     		}
     	}

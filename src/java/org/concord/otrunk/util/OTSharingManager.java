@@ -11,21 +11,21 @@ public interface OTSharingManager
 	 * 
 	 * @return all objects being shared
 	 */
-	public Vector getAllSharedObjects();
+	public Vector<OTObject> getAllSharedObjects();
 	
 	/**
 	 * 
 	 * @param clazz specific class of object
 	 * @return all shared objects of type clazz
 	 */
-	public Vector getAllSharedObjects(Class clazz);
+	public Vector<OTObject> getAllSharedObjects(Class<?> clazz);
 	
 	/**
 	 * 
 	 * @param filter OTObjectFilter
 	 * @return all shared objects matching the OTObjectFilter
 	 */
-	public Vector getAllSharedObjects(OTObjectFilter filter);
+	public Vector<OTObject> getAllSharedObjects(OTObjectFilter filter);
 	
 	/**
 	 * 

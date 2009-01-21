@@ -20,7 +20,7 @@ public class OverlayImpl
 	 */
     private OTDatabase overlayDb;
 
-	private ArrayList listeners = new ArrayList();
+	private ArrayList<OverlayListener> listeners = new ArrayList<OverlayListener>();
 
 	public OverlayImpl(OTOverlay otOverlay)
 	{
