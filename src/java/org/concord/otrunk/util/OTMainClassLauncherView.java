@@ -59,7 +59,7 @@ public class OTMainClassLauncherView extends AbstractOTJComponentView
 		String mainClassStr = launcher.getMainClass();
 		
 		try {
-			Class mainClass = Class.forName(mainClassStr);
+			Class<?> mainClass = Class.forName(mainClassStr);
 			java.lang.reflect.Method mainMethod = mainClass.getMethod("main", new Class [] {String[].class});
 			mainMethod.invoke(null, new Object []{null});
         } catch (SecurityException e) {

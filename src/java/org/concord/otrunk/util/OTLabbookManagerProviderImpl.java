@@ -4,18 +4,15 @@ import java.util.HashMap;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTLabbookManager;
 import org.concord.framework.otrunk.view.OTLabbookManagerProvider;
-import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTTransientMapID;
-import org.concord.otrunk.util.OTLabbookBundle.ResourceSchema;
 
 public class OTLabbookManagerProviderImpl
     implements OTLabbookManagerProvider
 {
 	private OTLabbookBundle bundle;
-	private HashMap managerMap;
+	private HashMap<OTObjectService, OTLabbookManager> managerMap;
 
 	public OTLabbookManagerProviderImpl(OTLabbookBundle bundle)
     {
@@ -25,11 +22,11 @@ public class OTLabbookManagerProviderImpl
 	public OTLabbookManager getLabbookManager(OTObjectService objectService)
 	{
 		if (managerMap == null){
-			managerMap = new HashMap();
+			managerMap = new HashMap<OTObjectService, OTLabbookManager>();
 		}
 		
 		if (managerMap.get(objectService) != null){
-			return (OTLabbookManager) managerMap.get(objectService);
+			return managerMap.get(objectService);
 		}
 		
         try {

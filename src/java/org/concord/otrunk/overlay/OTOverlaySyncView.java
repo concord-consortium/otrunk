@@ -21,16 +21,16 @@ public class OTOverlaySyncView extends AbstractOTJComponentView
 {
 
 	private OTJComponentViewContext jViewContext;
-	private HashMap externalIdToObject = new HashMap();
+	private HashMap<String, ArrayList<OTObject>> externalIdToObject = 
+		new HashMap<String, ArrayList<OTObject>>();
 	
 	private OTChangeListener changeListener = new OTChangeListener(){
 		public void stateChanged(OTChangeEvent e)
         {
 	        OTObject source = (OTObject) e.getSource();
 	        String otExternalId = source.otExternalId();
-	        ArrayList relatedList = (ArrayList) externalIdToObject.get(otExternalId);
-	        for(int i=0; i<relatedList.size(); i++){
-	        	OTObject related = (OTObject) relatedList.get(i);
+	        ArrayList<OTObject> relatedList = externalIdToObject.get(otExternalId);
+	        for (OTObject related : relatedList) {
 	        	if(related.equals(source)){
 	        		continue;
 	        	}
@@ -42,7 +42,9 @@ public class OTOverlaySyncView extends AbstractOTJComponentView
 	        		((OTObjectInterface) related).addOTChangeListener(this);
 	        	} else {
 	        		// FIXME This is currently unsupported there should be some otMethod for doing this 
-	        		// or possibly a dummy property that be pased to otSet can cause an update. 
+	        		// or possibly a dummy property that be passed to otSet can cause an update.
+	        		// Or this whole need of sending events like this should be removed because the
+	        		// underlying dataobjects should send these events automatically
 	        	}
 	        }
         }
@@ -60,9 +62,9 @@ public class OTOverlaySyncView extends AbstractOTJComponentView
 				for(int i=0; i<allObjects.length; i++){
 					OTObject sibling = (OTObject) allObjects[i];
 					String idStr = sibling.otExternalId();
-					ArrayList relatedObjects = (ArrayList) externalIdToObject.get(idStr);
+					ArrayList<OTObject> relatedObjects = externalIdToObject.get(idStr);
 					if(relatedObjects == null){
-						relatedObjects = new ArrayList();
+						relatedObjects = new ArrayList<OTObject>();
 						externalIdToObject.put(idStr, relatedObjects);
 					}
 

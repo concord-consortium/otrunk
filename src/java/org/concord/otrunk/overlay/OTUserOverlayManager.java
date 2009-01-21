@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
@@ -15,13 +16,15 @@ import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.util.StandardPasswordAuthenticator;
 import org.concord.otrunk.view.OTViewer;
+import org.concord.otrunk.xml.XMLDataObject;
 import org.concord.otrunk.xml.XMLDatabase;
 
 public class OTUserOverlayManager
 {
 	Logger logger = Logger.getLogger(this.getClass().getName());
-	HashMap overlayToObjectServiceMap = new HashMap();
-	HashMap userToOverlayMap = new HashMap();
+	HashMap<OTOverlay, OTObjectService> overlayToObjectServiceMap = 
+		new HashMap<OTOverlay, OTObjectService>();
+	HashMap<OTUserObject, OTOverlay> userToOverlayMap = new HashMap<OTUserObject, OTOverlay>();
 	ArrayList<OTDatabase> overlayDatabases = new ArrayList<OTDatabase>();
 	OTrunkImpl otrunk;
 	ArrayList<OverlayImpl> globalOverlays = new ArrayList<OverlayImpl>();
@@ -56,7 +59,13 @@ public class OTUserOverlayManager
 				logger.info("Creating empty overlay database on the fly...");
     			XMLDatabase xmldb = new XMLDatabase();
     			overlay = (OTOverlay) contextObject.getOTObjectService().createObject(OTOverlay.class);
-    			xmldb.getDataObjects().put(overlay.getGlobalId(), otrunk.getDataObjectFinder().findDataObject(overlay.getGlobalId()));
+    			
+    			// FIXME this approach bypasses the normal way of adding a data object to the 
+    			// database.  It seems like it should be changed to create an object service for
+    			// the newly created database and then make the overlay in that object service.
+    			// that should get around the code below
+    			xmldb.getDataObjects().put(overlay.getGlobalId(), 
+    				(XMLDataObject) otrunk.getDataObjectFinder().findDataObject(overlay.getGlobalId()));
     			xmldb.setRoot(overlay.getGlobalId());
     			otrunk.remoteSaveData(xmldb, overlayURL, OTViewer.HTTP_PUT, new StandardPasswordAuthenticator());
     			
@@ -93,7 +102,7 @@ public class OTUserOverlayManager
 		
 		// if it's not a global overlay, add all the global overlays to its stack of overlays
 		if(!isGlobal){
-			ArrayList overlays = new ArrayList();
+			ArrayList<Overlay> overlays = new ArrayList<Overlay>();
 			if (globalOverlays.size() > 0) {
 				overlays.addAll(globalOverlays);
 			}
@@ -114,38 +123,32 @@ public class OTUserOverlayManager
 	}
 	
 	public OTObjectService getObjectService(OTOverlay overlay) {
-		return (OTObjectService) overlayToObjectServiceMap.get(overlay);
+		return overlayToObjectServiceMap.get(overlay);
 	}
 	
 	public OTObjectService getObjectService(OTUserObject userObj) {
-		return (OTObjectService) overlayToObjectServiceMap.get(userToOverlayMap.get(userObj));
+		return overlayToObjectServiceMap.get(userToOverlayMap.get(userObj));
 	}
 	
 	public OTOverlay getOverlay(OTUserObject userObj) {
 		return (OTOverlay) userToOverlayMap.get(userObj);
 	}
 	
-	public OTOverlay getOverlay(OTObjectService objService) {
-		if (overlayToObjectServiceMap.containsValue(objService)) {
-    		for (Iterator overlayList = userToOverlayMap.keySet().iterator(); overlayList.hasNext();) {
-    	        OTOverlay overlay = (OTOverlay) overlayList.next();
-    	        if (userToOverlayMap.get(overlay) == objService) {
-    	        	return overlay;
-    	        }
-            }
-		}
+	public OTOverlay getOverlay(OTObjectService objService) {		
+		for (Entry<OTOverlay,OTObjectService> entry : overlayToObjectServiceMap.entrySet()) {
+			if(entry.getValue() == objService){
+				return entry.getKey();
+			}
+        }
 		return null;
 	}
 	
 	public OTUserObject getUserObject(OTOverlay overlay) {
-		if (userToOverlayMap.containsValue(overlay)) {
-    		for (Iterator userList = userToOverlayMap.keySet().iterator(); userList.hasNext();) {
-    	        OTUserObject userObject = (OTUserObject) userList.next();
-    	        if (userToOverlayMap.get(userObject) == overlay) {
-    	        	return userObject;
-    	        }
-            }
-		}
+		for (Entry<OTUserObject, OTOverlay> entry : userToOverlayMap.entrySet()) {
+			if(entry.getValue() == overlay){
+				return entry.getKey();
+			}
+        }
 		return null;
 	}
 	

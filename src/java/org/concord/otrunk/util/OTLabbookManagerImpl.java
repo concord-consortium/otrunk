@@ -1,24 +1,20 @@
 package org.concord.otrunk.util;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTLabbookManager;
-import org.concord.otrunk.datamodel.OTDataCollection;
-import org.concord.otrunk.util.OTLabbookBundle;
-import org.concord.otrunk.util.OTLabbookBundle.ResourceSchema;
 
 public class OTLabbookManagerImpl
     implements OTLabbookManager, OTChangeListener
 {
 	private OTLabbookBundle.ResourceSchema resources;
-	private Vector listeners;
-	private OTObjectService objectService;
+	private ArrayList<OTChangeListener> listeners;
 	private boolean tempShowLabbook;
 
 	public OTLabbookManagerImpl(OTLabbookBundle.ResourceSchema resources)
@@ -80,27 +76,27 @@ public class OTLabbookManagerImpl
 		resources.getEntries().add(entry);
 	}
 
-	public Vector getGraphs()
+	public Vector<OTObject> getGraphs()
 	{
 		return resources.getEntries().getVector();
 	}
 
-	public Vector getDrawings()
+	public Vector<OTObject> getDrawings()
 	{
 		return resources.getEntries().getVector();
 	}
 
-	public Vector getText()
+	public Vector<OTObject> getText()
 	{
 		return resources.getEntries().getVector();
 	}
 
-	public Vector getSnapshots()
+	public Vector<OTObject> getSnapshots()
 	{
 		return resources.getEntries().getVector();
 	}
 	
-	public Vector getAllEntries(){
+	public Vector<OTObject> getAllEntries(){
 		return resources.getEntries().getVector();
 	}
 	
@@ -157,7 +153,7 @@ public class OTLabbookManagerImpl
 	
 	public void addLabbookListener(OTChangeListener listener){
 		if (listeners == null){
-			listeners = new Vector();
+			listeners = new ArrayList<OTChangeListener>();
 		}
 		if (!listeners.contains(listener)){
 			listeners.add(listener);
