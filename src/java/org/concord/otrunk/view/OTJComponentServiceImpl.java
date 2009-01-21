@@ -33,8 +33,8 @@ public class OTJComponentServiceImpl implements OTJComponentService
 	
 	// For now we'll keep these in a regular hashtable we might need to do
 	// some weak referencing here
-	HashMap objToView = new HashMap();
-	HashMap objToComponent = new HashMap();
+	HashMap<OTObject, OTJComponentView> objToView = new HashMap<OTObject, OTJComponentView>();
+	HashMap<OTObject, JComponent> objToComponent = new HashMap<OTObject, JComponent>();
 
 	private boolean maintainViewMap;
 	
@@ -188,12 +188,12 @@ public class OTJComponentServiceImpl implements OTJComponentService
 
 		public JComponent getComponentByObject(OTObject obj)
         {
-			return (JComponent)objToComponent.get(obj);
+			return objToComponent.get(obj);
         }
 
 		public OTView getViewByObject(OTObject obj)
         {
-			return (OTView)objToView.get(obj);
+			return objToView.get(obj);
         }
 
 		public Object[] getAllObjects()

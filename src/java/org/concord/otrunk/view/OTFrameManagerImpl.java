@@ -5,10 +5,11 @@ package org.concord.otrunk.view;
 
 import java.awt.BorderLayout;
 import java.lang.reflect.Method;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTFrame;
 import org.concord.framework.otrunk.view.OTFrameManager;
@@ -18,7 +19,7 @@ import org.concord.framework.otrunk.view.OTViewFactory;
 
 public class OTFrameManagerImpl implements OTFrameManager 
 {
-	Hashtable frameContainers = new Hashtable();
+	HashMap<OTID, FrameContainer> frameContainers = new HashMap<OTID, FrameContainer>();
 	OTViewFactory viewFactory;
 	private JFrame jFrame;
 	private int oldX = 0;

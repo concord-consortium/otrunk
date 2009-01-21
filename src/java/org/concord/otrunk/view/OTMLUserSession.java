@@ -332,7 +332,7 @@ public class OTMLUserSession
 
 		// find the user from this database.
 		// this currently is the first user in the userMap
-		Vector keys = userMap.getObjectKeys();
+		Vector<String> keys = userMap.getObjectKeys();
 		refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));
 	}
 

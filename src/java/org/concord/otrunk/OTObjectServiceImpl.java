@@ -128,12 +128,12 @@ public class OTObjectServiceImpl
     	return otObjectImpl;
     }
     
-    @SuppressWarnings("unchecked")
     public OTObject getOTObject(OTID childID) throws Exception
     {
     	return getOTObject(childID, false);
     }
     
+    @SuppressWarnings("unchecked")
     public OTObject getOTObject(OTID childID, boolean reload) throws Exception
     {
         // sanity check

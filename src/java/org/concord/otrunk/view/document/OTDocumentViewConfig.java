@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Vector;
 
 import org.concord.framework.otrunk.DefaultOTObject;
+import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.view.OTViewEntry;
@@ -135,10 +135,8 @@ public class OTDocumentViewConfig extends DefaultOTObject implements DocumentCon
 		}
 		
 		if (getCssBlocks() != null && getCssBlocks().getVector().size() > 0){
-			Vector cssBlocks =  getCssBlocks().getVector();
-			
-			for (int i = 0; i < cssBlocks.size(); i++) {
-                OTCssText otCssText = (OTCssText) cssBlocks.get(i);
+			for(OTObject obj: getCssBlocks()){
+                OTCssText otCssText = (OTCssText) obj;
                 
                 // retrieve CSS definitions (originally) from the otml file
                 String text = otCssText.getCssText();

@@ -29,7 +29,6 @@
  */
 package org.concord.otrunk.view.document;
 
-import java.awt.KeyEventDispatcher;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -110,8 +109,6 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 	
 	protected OTViewEntry viewEntry;
 
-	private KeyEventDispatcher sourceViewDispatcher;
-	
 	private boolean updateViewOnStateChange = true;
 
 	public final static String XHTML_PREFIX_START =

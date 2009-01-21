@@ -53,9 +53,9 @@ public interface OTFolder
 	
 	public int getChildCount();
 	
-	public Vector getChildVector();
+	public Vector<OTObject> getChildVector();
 	
-	public void setChildVector(Vector children);
+	public void setChildVector(Vector<OTObject> children);
 	
 	public String getName();
 }

@@ -3,7 +3,7 @@
  */
 package org.concord.otrunk.view;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentService;
@@ -15,7 +15,8 @@ import org.concord.framework.otrunk.view.OTViewContainer;
  */
 public class OTJComponentContainerHelper
 {
-	private Vector viewContainerPanels = new Vector();
+	private ArrayList<OTViewContainerPanel> viewContainerPanels = 
+		new ArrayList<OTViewContainerPanel>();
 	private OTFrameManager frameManager;
 	private String viewMode;
 	private boolean useScrollPane = false;
@@ -35,12 +36,10 @@ public class OTJComponentContainerHelper
 	
 	public void removeAllSubViews()
 	{
-		for(int i=0; i<viewContainerPanels.size(); i++){
-			OTViewContainerPanel panel = 
-				(OTViewContainerPanel) viewContainerPanels.get(i);
+		for(OTViewContainerPanel panel: viewContainerPanels){
 			panel.setCurrentObject(null);
 		}
-		viewContainerPanels.removeAllElements();
+		viewContainerPanels.clear();
 	}
 	
 	public OTViewContainerPanel createViewContainerPanel()

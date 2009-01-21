@@ -22,14 +22,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 package org.concord.otrunk.view.document.edit;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.JTextPane;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.text.html.HTML;
 
 import com.hexidec.ekit.EkitCore;
-import com.hexidec.ekit.component.*;
-
+import com.hexidec.ekit.component.SimpleInfoDialog;
 import com.hexidec.util.Translatrix;
 
 /** Class for implementing HTML format actions
@@ -58,7 +58,8 @@ public class FormatAction extends StyledEditorKit.StyledTextAction
 		}
 		if(selText == null || textLength < 1)
 		{
-			SimpleInfoDialog sidWarn = new SimpleInfoDialog(parentEkit.getFrame(), "", true, Translatrix.getTranslationString("ErrorNoTextSelected"), SimpleInfoDialog.ERROR);
+			new SimpleInfoDialog(parentEkit.getFrame(), "", true, 
+				Translatrix.getTranslationString("ErrorNoTextSelected"), SimpleInfoDialog.ERROR);
 		}
 		else
 		{

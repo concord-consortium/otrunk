@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.net.URL;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -52,22 +52,7 @@ public class EditBar extends JToolBar implements ActionListener
 // Translatrix.getTranslationString("InsertAnchor") + menuDialog, HTML.Tag.A);
 	
 	private JMenuBar jMenuBar;
-	private JMenu jMenuFile;
-	private JMenu jMenuEdit;
-	private JMenu jMenuView;
 	private JMenu jMenuFont;
-	private JMenu jMenuFormat;
-	private JMenu jMenuInsert;
-	private JMenu jMenuTable;
-	private JMenu jMenuForms;
-	private JMenu jMenuSearch;
-	private JMenu jMenuTools;
-	private JMenu jMenuHelp;
-	private JMenu jMenuDebug;
-	
-	private JToolBar jToolBarMain;
-	private JToolBar jToolBarFormat;
-	private JToolBar jToolBarStyles;
 	
 	/* Constants */
 	// Menu Keys
@@ -130,35 +115,17 @@ public class EditBar extends JToolBar implements ActionListener
 	public static final int TOOLBAR_FORMAT = 2;
 	public static final int TOOLBAR_STYLES = 3;
 	
-	private static Hashtable htMenus = new Hashtable();
-	private static Hashtable htTools = new Hashtable();
+	private static HashMap<String, JMenu> htMenus = new HashMap<String, JMenu>();
+	private static HashMap<String, JComponent> htTools = new HashMap<String, JComponent>();
 	
 	
-	private JButtonNoFocus jbtnNewHTML;
-	private JButtonNoFocus jbtnOpenHTML;
-	private JButtonNoFocus jbtnSaveHTML;
-	private JButtonNoFocus jbtnPrint;
-	private JButtonNoFocus jbtnCut;
-	private JButtonNoFocus jbtnCopy;
-	private JButtonNoFocus jbtnPaste;
-	private JButtonNoFocus jbtnUndo;
-	private JButtonNoFocus jbtnRedo;
 	private JButtonNoFocus jbtnBold;
 	private JButtonNoFocus jbtnItalic;
 	private JButtonNoFocus jbtnUnderline;
-	private JButtonNoFocus jbtnStrike;
-	private JButtonNoFocus jbtnSuperscript;
-	private JButtonNoFocus jbtnSubscript;
-	private JButtonNoFocus jbtnUList;
-	private JButtonNoFocus jbtnOList;
 	private JButtonNoFocus jbtnAlignLeft;
 	private JButtonNoFocus jbtnAlignCenter;
 	private JButtonNoFocus jbtnAlignRight;
 	private JButtonNoFocus jbtnAlignJustified;
-	private JButtonNoFocus jbtnFind;
-	private JButtonNoFocus jbtnUnicode;
-	private JButtonNoFocus jbtnUnicodeMath;
-	private JButtonNoFocus jbtnAnchor;
 	private JButtonNoFocus jbtnInsertTable;
 	private JButtonNoFocus jbtnEditTable;
 	private JButtonNoFocus jbtnEditCell;
@@ -166,9 +133,6 @@ public class EditBar extends JToolBar implements ActionListener
 	private JButtonNoFocus jbtnInsertColumn;
 	private JButtonNoFocus jbtnDeleteRow;
 	private JButtonNoFocus jbtnDeleteColumn;
-	private JToggleButtonNoFocus jtbtnViewSource;
-	private JComboBoxNoFocus jcmbStyleSelector;
-	private JComboBoxNoFocus jcmbFontSelector;
 	
 	/**
 	 * Creates the default, single line toolbar
@@ -240,7 +204,6 @@ public class EditBar extends JToolBar implements ActionListener
 		jMenuFont.add(jMenuFontSub);
 		jMenuFont.addSeparator();
 		JMenu jMenuFontColor = new JMenu(Translatrix.getTranslationString("Color"));
-			Hashtable customAttr = new Hashtable(); customAttr.put("color","black");
 // jMenuFontColor.add(new JMenuItem(new CustomAction(this,
 // Translatrix.getTranslationString("CustomColor") + menuDialog, HTML.Tag.FONT,
 // customAttr)));
@@ -535,7 +498,7 @@ public class EditBar extends JToolBar implements ActionListener
 	 */
 	public void initializeSingleToolbar(String toolbarSeq)
 	{
-		Vector vcToolPicks = new Vector();
+		Vector<String> vcToolPicks = new Vector<String>();
 		StringTokenizer stToolbars = new StringTokenizer(toolbarSeq.toUpperCase(), "|");
 		while(stToolbars.hasMoreTokens())
 		{
@@ -553,11 +516,11 @@ public class EditBar extends JToolBar implements ActionListener
 		customizeToolBar(TOOLBAR_SINGLE, vcToolPicks, true);
 	}
 	
-	public void customizeToolBar(int whichToolBar, Vector vcTools, boolean isShowing)
+	public void customizeToolBar(int whichToolBar, Vector<String> vcTools, boolean isShowing)
 	{
 		for(int i = 0; i < vcTools.size(); i++)
 		{
-			String toolToAdd = ((String)(vcTools.elementAt(i))).toUpperCase();
+			String toolToAdd = vcTools.elementAt(i).toUpperCase();
 			if(toolToAdd.equals(KEY_TOOL_SEP))
 			{
 				add(new JToolBar.Separator());

@@ -170,7 +170,7 @@ public class OTDocumentEditView extends OTDocumentView implements
 		if(otObject instanceof OTCompoundDoc){
 			OTCompoundDoc doc = (OTCompoundDoc) otObject;
 			OTObjectList documentRefs = doc.getDocumentRefsAsObjectList();
-			ArrayList uniqueRefs = new ArrayList();
+			ArrayList<OTObject> uniqueRefs = new ArrayList<OTObject>();
 			for(int i=0; i<documentRefs.size(); i++){
 				OTObject ref = documentRefs.get(i);
 				// remove nulls, there shouldn't be any but just incase
@@ -419,7 +419,7 @@ public class OTDocumentEditView extends OTDocumentView implements
 
 	public void keyPressed(KeyEvent e)
     {
-		if (e.getKeyCode() == e.VK_ENTER){
+		if (e.getKeyCode() == KeyEvent.VK_ENTER){
 			int pos = editorPane.getSelectionStart();
 			HTMLDocument doc = (HTMLDocument) editorPane.getDocument();
 			try {

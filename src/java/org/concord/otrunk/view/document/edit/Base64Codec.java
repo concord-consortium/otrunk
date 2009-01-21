@@ -25,7 +25,7 @@ import java.util.Vector;
 
 public class Base64Codec
 {
-	public static Vector Base64Tokens = new Vector(64);
+	public static Vector<String> Base64Tokens = new Vector<String>(64);
 	static
 	{
 		Base64Tokens.add("A");

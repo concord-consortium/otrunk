@@ -1,10 +1,8 @@
 package org.concord.otrunk.view.document.edit;
 
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +27,6 @@ import javax.swing.event.ListSelectionListener;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.AbstractOTJComponentView;
-import org.concord.otrunk.view.document.OTCompoundDoc;
 import org.concord.otrunk.view.document.OTDocument;
 
 /**

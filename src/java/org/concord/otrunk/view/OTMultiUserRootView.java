@@ -25,11 +25,9 @@
 package org.concord.otrunk.view;
 
 import java.net.URL;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.JComponent;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTrunk;
@@ -39,7 +37,6 @@ import org.concord.otrunk.OTIncludeRootObject;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
 import org.concord.otrunk.user.OTUserObject;
-import org.concord.framework.otrunk.view.OTViewEntry;
 
 
 public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView 
@@ -98,7 +95,8 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
         System.out.println("user list load time: " + 
         	(System.currentTimeMillis() - start) + "ms");        
 
-	    final Vector userDatabases = userList.getUserDatabases().getVector();
+	    final ArrayList<OTObject> userDatabases = 
+	    	new ArrayList<OTObject>(userList.getUserDatabases());
 	    
 	    Runnable userDBTask = new Runnable(){
 

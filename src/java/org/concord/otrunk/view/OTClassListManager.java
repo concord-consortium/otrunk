@@ -1,12 +1,12 @@
 package org.concord.otrunk.view;
 
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTBundle;
+import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTServiceContext;
@@ -92,26 +92,26 @@ public class OTClassListManager extends DefaultOTObject
     private void processUserList(boolean reload) {
     	// logger.info("processing users...");
     	// for each user
-    	Enumeration classMemberList = userList.getVector().elements();
-    	while (classMemberList.hasMoreElements()) {
-    		OTClassMember classMember = (OTClassMember) classMemberList.nextElement();
-    		
-    	// if current user is set, make it the current user
-    	if (classMember.getIsCurrentUser()) {
-    		this.currentClassMember = classMember;
-    	}
-    	// if overlay url is set, load and register overlay
-    	if (classMember.getOverlayURL() != null) {
-    		try {
-    			if (reload) {
-    				// to avoid problems where the overlayManager still references different versions of the overlay, we'll remove the old ones first
-    				overlayManager.remove(classMember.getUserObject());
+    	
+    	for(OTObject obj: userList){
+    		OTClassMember classMember = (OTClassMember) obj;
+
+    		// if current user is set, make it the current user
+    		if (classMember.getIsCurrentUser()) {
+    			this.currentClassMember = classMember;
+    		}
+    		// if overlay url is set, load and register overlay
+    		if (classMember.getOverlayURL() != null) {
+    			try {
+    				if (reload) {
+    					// to avoid problems where the overlayManager still references different versions of the overlay, we'll remove the old ones first
+    					overlayManager.remove(classMember.getUserObject());
+    				}
+    				overlayManager.add(classMember.getOverlayURL(), classMember, classMember.getUserObject(), false);
+    			} catch (Exception e) {
+    				logger.log(Level.WARNING, "Couldn't load overlay for user: " + classMember.getName(), e);
     			}
-	            overlayManager.add(classMember.getOverlayURL(), classMember, classMember.getUserObject(), false);
-            } catch (Exception e) {
-	            logger.log(Level.WARNING, "Couldn't load overlay for user: " + classMember.getName(), e);
-            }
-    	}
+    		}
     	}
     }
     

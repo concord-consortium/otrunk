@@ -13,8 +13,8 @@ import org.concord.framework.otrunk.view.OTViewFactory;
 
 class OTViewContextImpl implements OTViewContext
 {
-    Map services = new HashMap();
-    HashMap properties = new HashMap();
+    Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
+    HashMap<String, String> properties = new HashMap<String, String>();
     
     private final OTViewFactoryImpl factory;
 	private OTViewContext parent;
@@ -32,11 +32,11 @@ class OTViewContextImpl implements OTViewContext
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.view.OTViewServiceProvider#getViewService(java.lang.Class)
 	 */
-	public Object getViewService(Class serviceClass) 
-	{
+	@SuppressWarnings("unchecked")
+    public <T> T getViewService(Class<T> serviceClass)	{
 		Object service = services.get(serviceClass);
 		if(service != null){
-			return service;
+			return (T)service;
 		}
 		
 		// We now look in the parent factory
@@ -51,7 +51,7 @@ class OTViewContextImpl implements OTViewContext
 	/* (non-Javadoc)
 	 * @see org.concord.framework.otrunk.view.OTViewFactory#addService(java.lang.Object)
 	 */
-	public void addViewService(Class serviceClass, Object service) 
+	public <T> void addViewService(Class<T> serviceClass, T service) 
 	{
 		services.put(serviceClass, service);
 	}
@@ -74,7 +74,7 @@ class OTViewContextImpl implements OTViewContext
 
 	public String getProperty(String propertyName)
     {
-		String value = (String) properties.get(propertyName);
+		String value = properties.get(propertyName);
 		if(parent != null && value == null && !properties.containsKey(propertyName)){
 			return parent.getProperty(propertyName);
 		}
