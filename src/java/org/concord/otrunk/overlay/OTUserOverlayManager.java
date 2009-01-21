@@ -189,4 +189,28 @@ public class OTUserOverlayManager
     	}
     	return null;
     }
+	
+	public void remove(OTOverlay overlay) {
+		OTUserObject userObject = getUserObject(overlay);
+		OTObjectService objService = getObjectService(overlay);
+		
+		remove(userObject, overlay, objService);
+    }
+
+	public void remove(OTUserObject userObject) {
+		OTOverlay otOverlay = getOverlay(userObject);
+		OTObjectService objService = getObjectService(otOverlay);
+		
+		remove(userObject, otOverlay, objService);
+    }
+	
+	private void remove(OTUserObject userObject, OTOverlay otOverlay, OTObjectService objService) {
+		otrunk.removeObjectService((OTObjectServiceImpl) objService);
+		overlayToObjectServiceMap.remove(otOverlay);
+		userToOverlayMap.remove(userObject);
+		
+		if (objService instanceof OTObjectServiceImpl) {
+			overlayDatabases.add(getDatabase(otOverlay));
+		}
+	}
 }
