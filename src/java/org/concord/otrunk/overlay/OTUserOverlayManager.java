@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
@@ -25,7 +24,7 @@ public class OTUserOverlayManager
 	HashMap userToOverlayMap = new HashMap();
 	ArrayList<OTDatabase> overlayDatabases = new ArrayList<OTDatabase>();
 	OTrunkImpl otrunk;
-	Vector globalOverlays = new Vector();
+	ArrayList<OverlayImpl> globalOverlays = new ArrayList<OverlayImpl>();
 	
 	public OTUserOverlayManager(OTrunkImpl otrunk) {
 		this.otrunk = otrunk;
