@@ -372,6 +372,10 @@ public class OTrunkImpl implements OTrunk
         }    	
     }
     
+    public void removeObjectService(OTObjectServiceImpl objService) {
+    	objectServices.remove(objService);
+    }
+    
     public void registerUserSession(OTUserSession userSession) throws Exception
     {
     	userSession.setOTrunk(this);
@@ -413,7 +417,7 @@ public class OTrunkImpl implements OTrunk
     	// get the root object either the real root or the system root
     	OTObject root = getRoot(externalObjectService);
     	
-    	return parentObjectService.getOTObject(root.getGlobalId());
+    	return parentObjectService.getOTObject(root.getGlobalId(), reload);
     }
 
     protected OTObjectServiceImpl getExistingObjectService(XMLDatabase includeDb)
@@ -456,6 +460,8 @@ public class OTrunkImpl implements OTrunk
     				// remove the current database, so we can reload it below
     				System.err.println("Removing database so we can reload it.");
     				databases.remove(xmlDatabase);
+    				removeObjectService(getExistingObjectService(xmlDatabase));
+    				break;
     			} else {
     				return getExistingObjectService(xmlDatabase);
     			}
@@ -810,8 +816,13 @@ public class OTrunkImpl implements OTrunk
     	loadedObjects.put(otId, objRef);    		
     }
     
-    OTObject getLoadedObject(OTID otId)
+    OTObject getLoadedObject(OTID otId, boolean reload)
     {
+    	if (reload) {
+    		loadedObjects.remove(otId);
+    		return null;
+    	}
+    	
     	OTObject otObject = null;
     	Reference<OTObject> otObjectRef = loadedObjects.get(otId);
     	if(otObjectRef != null) {
@@ -838,13 +849,19 @@ public class OTrunkImpl implements OTrunk
      * @throws Exception
      */
     OTObject getOrphanOTObject(OTID childID, OTObjectServiceImpl oldService)
+    throws Exception
+    {
+    	return getOrphanOTObject(childID, oldService, false);
+    }
+    
+    OTObject getOrphanOTObject(OTID childID, OTObjectServiceImpl oldService, boolean reload)
         throws Exception
     {
         for(int i=0; i<objectServices.size(); i++) {
             OTObjectServiceImpl objService = objectServices.get(i);
             // To avoid infinite loop, the objService must not equal to oldService
             if(objService.managesObject(childID) && objService != oldService) {
-            	return objService.getOTObject(childID);
+            	return objService.getOTObject(childID, reload);
             }
         }
         

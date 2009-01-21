@@ -131,6 +131,11 @@ public class OTObjectServiceImpl
     @SuppressWarnings("unchecked")
     public OTObject getOTObject(OTID childID) throws Exception
     {
+    	return getOTObject(childID, false);
+    }
+    
+    public OTObject getOTObject(OTID childID, boolean reload) throws Exception
+    {
         // sanity check
         if(childID == null) {
             throw new Exception("Null child id");
@@ -147,12 +152,12 @@ public class OTObjectServiceImpl
         	// So if we can't find this object then we go out to OTrunk to see if it can find
         	// the object.  The way that this happens needs to be more clear so the ramifcations
         	// are clear.
-        	return otrunk.getOrphanOTObject(childID, this);
+        	return otrunk.getOrphanOTObject(childID, this, reload);
         }
 
         // Look for our object to see it is already setup in the otrunk list of loaded objects
         // it might be better to have each object service maintain its own list of loaded objects
-        OTObject otObject = otrunk.getLoadedObject(childDataObject.getGlobalId());
+        OTObject otObject = otrunk.getLoadedObject(childDataObject.getGlobalId(), reload);
         if(otObject != null) {
             return otObject;
         }

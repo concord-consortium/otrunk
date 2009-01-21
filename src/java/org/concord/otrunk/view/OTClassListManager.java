@@ -57,7 +57,7 @@ public class OTClassListManager extends DefaultOTObject
 			initializeUserListFromURL();
 		}
 		
-		processUserList();
+		processUserList(false);
 	}
 
 	public void registerServices(OTServiceContext serviceContext)
@@ -89,7 +89,7 @@ public class OTClassListManager extends DefaultOTObject
 	    return userList;
     }
     
-    private void processUserList() {
+    private void processUserList(boolean reload) {
     	// logger.info("processing users...");
     	// for each user
     	Enumeration classMemberList = userList.getVector().elements();
@@ -103,6 +103,10 @@ public class OTClassListManager extends DefaultOTObject
     	// if overlay url is set, load and register overlay
     	if (classMember.getOverlayURL() != null) {
     		try {
+    			if (reload) {
+    				// to avoid problems where the overlayManager still references different versions of the overlay, we'll remove the old ones first
+    				overlayManager.remove(classMember.getUserObject());
+    			}
 	            overlayManager.add(classMember.getOverlayURL(), classMember, classMember.getUserObject(), false);
             } catch (Exception e) {
 	            logger.log(Level.WARNING, "Couldn't load overlay for user: " + classMember.getName(), e);
@@ -120,9 +124,7 @@ public class OTClassListManager extends DefaultOTObject
     }
     
     public void reloadAll() {
-    	// FIXME there might be a memory leak where overlays get registered in OTrunk, and then orphaned because the OTUserOverlayManager no longer has a reference to them
-    	// we might want to make sure the overlay manager deletes previous references first...
-    	processUserList();
+    	processUserList(true);
     }
 
 }
