@@ -1,3 +1,29 @@
+/*
+ * This class was modified from the com.hexidec.ekit.EditBar class,
+ * created by Howard Kistler and (c) 2000 under the LGPL.
+ * 
+ * The EKit project can be found at http://www.hexidec.com/ekit.php
+ * 
+ * The original license is below:
+ * 
+ * ************************************************
+ * 
+ * GNU Lesser General Public License
+ * 
+ * Ekit - Java Swing HTML Editor & Viewer
+ * Copyright (C) 2000 Howard Kistler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ */
+
 package org.concord.otrunk.view.document.edit;
 
 import java.awt.Color;
@@ -108,7 +134,7 @@ public class EditBar extends JToolBar implements ActionListener
 	public static final String KEY_TOOL_DELETECOL = "CD";
 
 	public static final String TOOLBAR_DEFAULT_MULTI  = "NW|OP|SV|PR|SP|CT|CP|PS|SP|UN|RE|SP|FN|SP|UC|UM|SP|SR|*|BL|IT|UD|SP|SK|SU|SB|SP|AL|AC|AR|AJ|SP|UL|OL|SP|LK|*|ST|SP|FO";
-	public static final String TOOLBAR_DEFAULT_SINGLE = "BL|IT|UD|SP|SP|CT|CP|PS|SP|UN|RE|SP|SP|FN|SP|UC|SP|LK|SP|SR|SP|PR|";
+	public static final String TOOLBAR_DEFAULT_SINGLE = "BL|IT|UD";
 
 	public static final int TOOLBAR_SINGLE = 0;
 	public static final int TOOLBAR_MAIN   = 1;
@@ -168,7 +194,7 @@ public class EditBar extends JToolBar implements ActionListener
 	// JMenuItem jmiSubscript = new JMenuItem(actionFontSubscript);
 	// if(showMenuIcons) { jmiSubscript.setIcon(getEkitIcon("Sub")); }
 	// jMenuFont.add(jmiSubscript);
-		jMenuFont.addSeparator();
+	//	jMenuFont.addSeparator();
 	// jMenuFont.add(new JMenuItem(new FormatAction(this,
 	// Translatrix.getTranslationString("FormatBig"), HTML.Tag.BIG)));
 	// jMenuFont.add(new JMenuItem(new FormatAction(this,
@@ -181,8 +207,8 @@ public class EditBar extends JToolBar implements ActionListener
 			jMenuFontSize.add(new JMenuItem(new StyledEditorKit.FontSizeAction(Translatrix.getTranslationString("FontSize5"), 18)));
 			jMenuFontSize.add(new JMenuItem(new StyledEditorKit.FontSizeAction(Translatrix.getTranslationString("FontSize6"), 24)));
 			jMenuFontSize.add(new JMenuItem(new StyledEditorKit.FontSizeAction(Translatrix.getTranslationString("FontSize7"), 32)));
-		jMenuFont.add(jMenuFontSize);
-		jMenuFont.addSeparator();
+	//	jMenuFont.add(jMenuFontSize);
+	//	jMenuFont.addSeparator();
 		JMenu jMenuFontSub      = new JMenu(Translatrix.getTranslationString("Font"));
 	// JMenuItem jmiSelectFont = new JMenuItem(actionSelectFont);
 	// jmiSelectFont.setText(Translatrix.getTranslationString("FontSelect") +
@@ -201,8 +227,8 @@ public class EditBar extends JToolBar implements ActionListener
 	// JMenuItem((Action)actions.get("font-family-Monospaced"));
 	// jmiMonospaced.setText(Translatrix.getTranslationString("FontMonospaced"));
 	// jMenuFontSub.add(jmiMonospaced);
-		jMenuFont.add(jMenuFontSub);
-		jMenuFont.addSeparator();
+	//	jMenuFont.add(jMenuFontSub);
+	//	jMenuFont.addSeparator();
 		JMenu jMenuFontColor = new JMenu(Translatrix.getTranslationString("Color"));
 // jMenuFontColor.add(new JMenuItem(new CustomAction(this,
 // Translatrix.getTranslationString("CustomColor") + menuDialog, HTML.Tag.FONT,
@@ -223,7 +249,7 @@ public class EditBar extends JToolBar implements ActionListener
 			jMenuFontColor.add(new JMenuItem(new StyledEditorKit.ForegroundAction(Translatrix.getTranslationString("ColorTeal"),    new Color(  0,128,128))));
 			jMenuFontColor.add(new JMenuItem(new StyledEditorKit.ForegroundAction(Translatrix.getTranslationString("ColorWhite"),   new Color(255,255,255))));
 			jMenuFontColor.add(new JMenuItem(new StyledEditorKit.ForegroundAction(Translatrix.getTranslationString("ColorYellow"),  new Color(255,255,  0))));
-		jMenuFont.add(jMenuFontColor);
+	//	jMenuFont.add(jMenuFontColor);
 
 		/* FORMAT Menu */
 /*

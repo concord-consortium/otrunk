@@ -1,23 +1,28 @@
 /*
-GNU Lesser General Public License
-
-CustomAction
-Copyright (C) 2000 Howard Kistler
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ * This class was modified from the com.hexidec.ekit.action.CustomAction class,
+ * created by Howard Kistler and (c) 2000 under the LGPL.
+ * 
+ * The EKit project can be found at http://www.hexidec.com/ekit.php
+ * 
+ * The original license is below:
+ * 
+ * ************************************************
+ * 
+ * GNU Lesser General Public License
+ * 
+ * Ekit - Java Swing HTML Editor & Viewer
+ * Copyright (C) 2000 Howard Kistler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ */
 
 package org.concord.otrunk.view.document.edit;
 
