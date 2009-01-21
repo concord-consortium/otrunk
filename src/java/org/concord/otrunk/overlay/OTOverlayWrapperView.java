@@ -31,7 +31,6 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	private OTClassListManager classListManager;
 	private OTUserOverlayManager overlayManager;
 	private OTrunkImpl otrunk;
-	private StandardPasswordAuthenticator authenticator = new StandardPasswordAuthenticator();
 	private JButton submitButton;
 	
 	public JComponent getComponent(OTObject otObject)
@@ -108,7 +107,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	private void saveData() {
 		// save everything
 		try {
-	        otrunk.remoteSaveData(overlayManager.getXMLDatabase(overlay), OTViewer.HTTP_PUT, authenticator);
+	        overlayManager.remoteSave(overlay);
         } catch (Exception e) {
         	logger.log(Level.SEVERE, "Couldn't save the user's overlay!", e);
         }

@@ -2,8 +2,8 @@ package org.concord.otrunk.overlay;
 
 import java.awt.event.ActionListener;
 import java.net.Authenticator;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTResourceSchema;
@@ -12,10 +12,7 @@ import org.concord.framework.otrunk.view.OTAction;
 import org.concord.framework.otrunk.view.OTActionContext;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.util.StandardPasswordAuthenticator;
-import org.concord.otrunk.view.OTViewer;
-import org.concord.otrunk.xml.XMLDatabase;
 
 public class OTOverlaySaveAction extends DefaultOTObject
 	implements OTAction {
@@ -36,21 +33,20 @@ public class OTOverlaySaveAction extends DefaultOTObject
 
 	public void doAction(OTActionContext context) {
 		
-		OTObjectServiceImpl objService = (OTObjectServiceImpl) getOTObjectService();
-		OTrunkImpl otrunk = (OTrunkImpl) objService.getOTrunkService(OTrunk.class);
-		
 		OTUserOverlayManager userOverlayManager = 
 			context.getViewContext().getViewService(OTUserOverlayManager.class);
-		try {
-			ArrayList<OTDatabase> allDatabases = userOverlayManager.getOverlayDatabases();
+		
+			// ArrayList<OTDatabase> allDatabases = userOverlayManager.getOverlayDatabases();
+			Set<OTOverlay> overlaySet = userOverlayManager.getOverlays();
 
-			for (Iterator<OTDatabase> databases = allDatabases.iterator(); databases.hasNext();) {
-				XMLDatabase db = (XMLDatabase) ((CompositeDatabase) databases.next()).getActiveOverlayDb();
-				otrunk.remoteSaveData(db, OTViewer.HTTP_PUT, authenticator);
+			for (Iterator<OTOverlay> overlays = overlaySet.iterator(); overlays.hasNext();) {
+				try {
+					userOverlayManager.remoteSave(overlays.next());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
 			}
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
+		
 	}
 
 	public String getActionText() {
