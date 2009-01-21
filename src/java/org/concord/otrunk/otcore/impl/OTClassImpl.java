@@ -9,30 +9,30 @@ import org.concord.framework.otrunk.otcore.OTClassProperty;
 public class OTClassImpl extends OTTypeImpl
 	implements OTClass
 {
-	private ArrayList superTypes = new ArrayList();
+	private ArrayList<OTClass> superTypes = new ArrayList<OTClass>();
 	
-	private ArrayList properties = new ArrayList();
+	private ArrayList<OTClassProperty> properties = new ArrayList<OTClassProperty>();
 
-	Class constructorSchemaClass;
+	Class<?> constructorSchemaClass;
 		
-	public OTClassImpl(Class javaClass)
+	public OTClassImpl(Class<?> javaClass)
 	{
 		super(javaClass);
 	}
 	
-	public void setConstructorSchemaClass(Class schemaClass)
+	public void setConstructorSchemaClass(Class<?> schemaClass)
 	{
 		this.constructorSchemaClass = schemaClass;
 	}
 		
-	public Class getConstructorSchemaClass()
+	public Class<?> getConstructorSchemaClass()
     {
     	return constructorSchemaClass;
     }
 
-	public Class getSchemaInterface()
+	public Class<?> getSchemaInterface()
 	{
-		Class schemaClass = getConstructorSchemaClass();
+		Class<?> schemaClass = getConstructorSchemaClass();
 		if(schemaClass != null){
 			return schemaClass;
 		}
@@ -40,19 +40,17 @@ public class OTClassImpl extends OTTypeImpl
 		return getInstanceClass();
 	}
 	
-	public ArrayList getOTAllClassProperties()
+	public ArrayList<OTClassProperty> getOTAllClassProperties()
 	{		
-		ArrayList allProperties = new ArrayList(properties);		
+		ArrayList<OTClassProperty> allProperties = new ArrayList<OTClassProperty>(properties);		
 		
-		ArrayList allSuperTypes = getAllSuperTypes();
-		for(int i=0; i < allSuperTypes.size(); i++){
-			ArrayList superProperties = ((OTClassImpl)allSuperTypes.get(i)).getOTClassProperties();
-			for(int j=0; j < superProperties.size(); j++){
-				OTClassProperty superProperty = (OTClassProperty) superProperties.get(j);
+		ArrayList<OTClass> allSuperTypes = getAllSuperTypes();
+		for (OTClass superType : allSuperTypes) {
+			ArrayList<OTClassProperty> superProperties = superType.getOTClassProperties();
+			for (OTClassProperty superProperty : superProperties) {
 				String superPropName = superProperty.getName();
 				boolean foundExistingProperty = false;
-				for(int k=0; k < allProperties.size(); k++){
-					OTClassProperty existingProperty = (OTClassProperty) allProperties.get(k);
+				for (OTClassProperty existingProperty : allProperties) {
 					if(existingProperty.getName().equals(superPropName)){
 						foundExistingProperty = true;
 						break;
@@ -68,7 +66,7 @@ public class OTClassImpl extends OTTypeImpl
 		return allProperties;
 	}
 		
-	public ArrayList getOTClassProperties()
+	public ArrayList<OTClassProperty> getOTClassProperties()
 	{
 		return properties;
 	}	
@@ -83,7 +81,7 @@ public class OTClassImpl extends OTTypeImpl
 			return property;
 		}
 
-		ArrayList allSuperTypes = getAllSuperTypes();
+		ArrayList<OTClass> allSuperTypes = getAllSuperTypes();
 		for(int i=0; i < allSuperTypes.size(); i++){
 			property = ((OTClassImpl)allSuperTypes.get(i)).getPropertyInternal(resourceName);
 			if(property != null){
@@ -106,14 +104,14 @@ public class OTClassImpl extends OTTypeImpl
 		return null;
 	}
 	
-	public ArrayList getAllSuperTypes()
+	public ArrayList<OTClass> getAllSuperTypes()
 	{
-		ArrayList allSuperTypes = new ArrayList(superTypes);
+		ArrayList<OTClass> allSuperTypes = new ArrayList<OTClass>(superTypes);
 		
 		for(int i=0; i < allSuperTypes.size(); i++){			
-			ArrayList superSuperTypes = ((OTClass)allSuperTypes.get(i)).getOTSuperTypes();
+			ArrayList<OTClass> superSuperTypes = allSuperTypes.get(i).getOTSuperTypes();
 			for(int j=0; j < superSuperTypes.size(); j++){
-				OTClass superType = (OTClass) superSuperTypes.get(j);
+				OTClass superType = superSuperTypes.get(j);
 				if(allSuperTypes.contains(superType)){
 					continue;
 				}
@@ -124,7 +122,7 @@ public class OTClassImpl extends OTTypeImpl
 		return allSuperTypes;
 	}
 	
-	public ArrayList getOTSuperTypes()
+	public ArrayList<OTClass> getOTSuperTypes()
 	{
 		return superTypes;
 	}

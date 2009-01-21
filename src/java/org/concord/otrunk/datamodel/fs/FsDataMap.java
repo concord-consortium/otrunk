@@ -33,7 +33,7 @@
 package org.concord.otrunk.datamodel.fs;
 
 import java.io.Serializable;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import org.concord.otrunk.datamodel.OTDataMap;
 
@@ -52,7 +52,7 @@ public class FsDataMap
 {
 	private static final long serialVersionUID = 1L;
 	
-	Hashtable map = new Hashtable();
+	HashMap<String, Object> map = new HashMap<String, Object>();
 	boolean readOnly;
 	private FsDataObject dataObject = null;
 	

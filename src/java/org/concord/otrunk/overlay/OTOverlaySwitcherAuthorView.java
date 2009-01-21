@@ -36,7 +36,8 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 	private static final int OPEN = 1;
 	private OTOverlaySwitcher otSwitcher;
 	private OTObject activityRoot;
-	private HashMap overlayToUserObjectMap = new HashMap();
+	private HashMap<String, OTUserObject> overlayToUserObjectMap = 
+		new HashMap<String, OTUserObject>();
 	private JTabbedPane tabbedPane;
 	private OTrunkImpl otrunk;
 	private OTObjectServiceImpl rootObjectService;
@@ -115,7 +116,7 @@ public class OTOverlaySwitcherAuthorView extends AbstractOTJComponentContainerVi
 	
 	private OTOverlay getCurrentOverlay() {
 		String title = tabbedPane.getTitleAt(tabbedPane.getSelectedIndex());
-		OTUserObject userObj = (OTUserObject) overlayToUserObjectMap.get(title);
+		OTUserObject userObj = overlayToUserObjectMap.get(title);
 		return overlayManager.getOverlay(userObj);
 	}
 	

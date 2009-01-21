@@ -3,7 +3,7 @@
  */
 package org.concord.otrunk.datamodel;
 
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,7 +20,7 @@ public class Copier
 	OTDatabase sourceDb;
 	OTDataObject root;
 	
-	Vector toBeCopied;
+	ArrayList<CopyEntry> toBeCopied;
 	private OTDataList orphanList;
 	private OTExternalIDProvider idProvider;
 	private OTDataObjectFinder dataObjectFinder;
@@ -44,7 +44,7 @@ public class Copier
 	{
 		this.destinationDb = destinationDb;
 		this.sourceDb = sourceDb;
-		this.toBeCopied = new Vector();
+		this.toBeCopied = new ArrayList<CopyEntry>();
 		this.orphanList = orphanDataList;
 		this.idProvider = idProvider;
 		this.dataObjectFinder = dataObjectFinder;
@@ -62,7 +62,7 @@ public class Copier
     private CopyEntry getCopyEntry(OTID originalId)
     {
     	for(int i=0; i<toBeCopied.size(); i++){
-    		CopyEntry entry = (CopyEntry)toBeCopied.get(i);
+    		CopyEntry entry = toBeCopied.get(i);
     		String entryObjectExternalID;
     		String originalExternalID;
     		
@@ -146,7 +146,7 @@ public class Copier
     		String [] keys = original.getResourceKeys();
     		
     		// This is used to handle a hack for strings which reference objects
-    		Vector secondPassKeys = new Vector();
+    		ArrayList<String> secondPassKeys = new ArrayList<String>();
     		
     		for(int i=0; i<keys.length; i++){
     			Object resource = original.getResource(keys[i]);
@@ -214,7 +214,6 @@ public class Copier
     	String key, CopyEntry entry) throws Exception
     {
     	OTDataObject original = entry.original;
-    	OTDataObject copy = entry.copy;
 		Pattern pattern = Pattern.compile(attributeName + "=\"([^\"]*)\"");
 		Matcher matcher = pattern.matcher(xmlStringContent);
 		StringBuffer copiedStringBuf = new StringBuffer();

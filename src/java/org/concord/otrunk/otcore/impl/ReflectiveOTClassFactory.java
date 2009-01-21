@@ -50,7 +50,7 @@ public class ReflectiveOTClassFactory
 
     public static ReflectiveOTClassFactory singleton = new ReflectiveOTClassFactory(); 
     
-    ArrayList newlyRegisteredOTClasses = new ArrayList();
+    ArrayList<OTClass> newlyRegisteredOTClasses = new ArrayList<OTClass>();
     
     /**
      * 
@@ -58,7 +58,7 @@ public class ReflectiveOTClassFactory
      * @param javaSchemaClass if the OTObject class is not an interface then it must also have a schemaClass
      *   which is the interface extending OTResourceSchema
      */
-    public OTClass registerClass(Class javaClass)
+    public OTClass registerClass(Class<?> javaClass)
     {
     	String otClassName = javaClass.getName();
     	OTClass otClass = OTrunkImpl.getOTClass(otClassName);
@@ -77,11 +77,11 @@ public class ReflectiveOTClassFactory
 		OTrunkImpl.putOTClass(otClassName, otClass);
 		newlyRegisteredOTClasses.add(otClass);
 
-		Class constructorSchemaClass = null;
+		Class<?> constructorSchemaClass = null;
 		if(!javaClass.isInterface()){
-			Constructor [] memberConstructors = javaClass.getConstructors();
-			Constructor resourceConstructor = memberConstructors[0]; 
-			Class [] params = resourceConstructor.getParameterTypes();
+			Constructor<?> [] memberConstructors = javaClass.getConstructors();
+			Constructor<?> resourceConstructor = memberConstructors[0]; 
+			Class<?> [] params = resourceConstructor.getParameterTypes();
 
 			if(AbstractOTObject.class.isAssignableFrom(javaClass)){
 				if(memberConstructors.length > 1 || (params != null && params.length != 0)){
@@ -113,15 +113,15 @@ public class ReflectiveOTClassFactory
 		}
 
 		// now we need to register the parent classes.
-		Class [] interfaces = javaClass.getInterfaces();
+		Class<?> [] interfaces = javaClass.getInterfaces();
 		
 		for(int j=0; j<interfaces.length; j++){
-			Class parentInterface = interfaces[j];
+			Class<?> parentInterface = interfaces[j];
 
 			processSuperType(otClass, parentInterface);
 		}
 
-		Class javaSuperclass = javaClass.getSuperclass();
+		Class<?> javaSuperclass = javaClass.getSuperclass();
 		if(javaSuperclass != null){
 			processSuperType(otClass, javaSuperclass);
 		}
@@ -130,7 +130,7 @@ public class ReflectiveOTClassFactory
 		return otClass;
     }
     
-    public void processSuperType(OTClass otClass, Class javaSuperType)
+    public void processSuperType(OTClass otClass, Class<?> javaSuperType)
     {
 		if(!OTObject.class.isAssignableFrom(javaSuperType)){
 			// this interface isn't an OTClass
@@ -162,7 +162,7 @@ public class ReflectiveOTClassFactory
 		// just in this class.  The class will have a list of parent classes that it will
 		// combine to return all of the possible class properties when they are requested.
 
-		Class schemaInterface =  ((OTClassImpl)otClass).getSchemaInterface();
+		Class<?> schemaInterface =  ((OTClassImpl)otClass).getSchemaInterface();
 		
 		if(DefaultOTObject.class.isAssignableFrom(schemaInterface)){
 			throw new IllegalStateException("the schemaInterface can't be a DefaultOTObject: "
@@ -189,7 +189,7 @@ public class ReflectiveOTClassFactory
 				continue;
 			}
 			
-			Class resourceClass = methods[j].getReturnType();			
+			Class<?> resourceClass = methods[j].getReturnType();			
 			String resourceName = null;
 			
 			if(methodName.startsWith("get")){
@@ -258,10 +258,10 @@ public class ReflectiveOTClassFactory
 		}		
 	}	
 
-	public ArrayList loadClasses(Class [] classList)
+	public ArrayList<OTClass> loadClasses(Class<?> [] classList)
 	{		
 		for(int i=0; i<classList.length; i++){
-			Class nextClass = classList[i];
+			Class<?> nextClass = classList[i];
 			registerClass(nextClass);
 		}
 		
@@ -274,24 +274,24 @@ public class ReflectiveOTClassFactory
 	 * @param classList
 	 * @return
 	 */
-	synchronized public ArrayList loadClasses(List classList)
+	synchronized public ArrayList<OTClass> loadClasses(List<Class<?>> classList)
 	{		
-		for(Iterator i=classList.iterator(); i.hasNext();){
-			Class nextClass = (Class) i.next();
+		for(Iterator<Class<?>> i=classList.iterator(); i.hasNext();){
+			Class<?> nextClass = i.next();
 			registerClass(nextClass);
 		}
 		
 		return processAllNewlyRegisteredClasses();
 	}
 	
-	public ArrayList processAllNewlyRegisteredClasses()
+	public ArrayList<OTClass> processAllNewlyRegisteredClasses()
 	{
 		for(int i=0; i<newlyRegisteredOTClasses.size(); i++){
 			OTClass nextOTClass = (OTClass) newlyRegisteredOTClasses.get(i);
 			addClassProperties(nextOTClass);
 		}
 		
-		ArrayList newOTClasses = (ArrayList) newlyRegisteredOTClasses.clone();
+		ArrayList<OTClass> newOTClasses = new ArrayList<OTClass>(newlyRegisteredOTClasses);
 		
 		newlyRegisteredOTClasses.clear();
 		
@@ -305,7 +305,7 @@ public class ReflectiveOTClassFactory
 	 * @param klass
 	 * @return
 	 */
-	public static String getObjectPrimitiveType(Class klass)
+	public static String getObjectPrimitiveType(Class<?> klass)
 	{
 		String type = getPrimitiveType(klass);
 		
@@ -335,7 +335,7 @@ public class ReflectiveOTClassFactory
      * @param klass
      * @return
      */
-	public static String getPrimitiveType(Class klass)
+	public static String getPrimitiveType(Class<?> klass)
 	{
 		if(String.class.isAssignableFrom(klass)) {
 			return STRING;
@@ -361,7 +361,7 @@ public class ReflectiveOTClassFactory
 		return null;
 	}
 	
-	public static OTType getOTType(String resourceType, Class resourceTypeClass)
+	public static OTType getOTType(String resourceType, Class<?> resourceTypeClass)
 	{
 		OTType otType = null;
 		

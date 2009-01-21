@@ -2,8 +2,8 @@ package org.concord.otrunk.overlay;
 
 import java.awt.event.ActionListener;
 import java.net.Authenticator;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTResourceSchema;
@@ -12,6 +12,7 @@ import org.concord.framework.otrunk.view.OTAction;
 import org.concord.framework.otrunk.view.OTActionContext;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.util.StandardPasswordAuthenticator;
 import org.concord.otrunk.view.OTViewer;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -39,11 +40,11 @@ public class OTOverlaySaveAction extends DefaultOTObject
 		OTrunkImpl otrunk = (OTrunkImpl) objService.getOTrunkService(OTrunk.class);
 		
 		OTUserOverlayManager userOverlayManager = 
-			(OTUserOverlayManager) context.getViewContext().getViewService(OTUserOverlayManager.class);
+			context.getViewContext().getViewService(OTUserOverlayManager.class);
 		try {
-			Vector allDatabases = userOverlayManager.getOverlayDatabases();
+			ArrayList<OTDatabase> allDatabases = userOverlayManager.getOverlayDatabases();
 
-			for (Iterator databases = allDatabases.iterator(); databases.hasNext();) {
+			for (Iterator<OTDatabase> databases = allDatabases.iterator(); databases.hasNext();) {
 				XMLDatabase db = (XMLDatabase) ((CompositeDatabase) databases.next()).getActiveOverlayDb();
 				otrunk.remoteSaveData(db, OTViewer.HTTP_PUT, authenticator);
 			}

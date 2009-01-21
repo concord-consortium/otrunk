@@ -34,7 +34,7 @@ package org.concord.otrunk.overlay;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTPackage;
@@ -64,12 +64,13 @@ public class CompositeDatabase
      * The base object could be in the root database or it could be an object created 
      * in the overlay
      */
-	protected Hashtable dataObjectMap = new Hashtable();
+	protected HashMap<OTID, CompositeDataObject> dataObjectMap = 
+		new HashMap<OTID, CompositeDataObject>();
     
 	OTDataObjectFinder objectFinder;
 	OTDatabase activeOverlayDb;
 	Overlay activeOverlay;
-	ArrayList middleOverlays;
+	ArrayList<Overlay> middleOverlays;
 	OTID databaseId;
 
 	private OverlayListener overlayListener = new OverlayListener(){
@@ -78,8 +79,7 @@ public class CompositeDatabase
         {
 			// see if we have a this baseObject in a our list, update its
 			// middleObjects if we do
-	    	CompositeDataObject compDataObject = 
-	    		(CompositeDataObject)dataObjectMap.get(baseObject.getGlobalId());
+	    	CompositeDataObject compDataObject = dataObjectMap.get(baseObject.getGlobalId());
 	        if(compDataObject == null) {
 	        	return;
 	        }
@@ -101,11 +101,11 @@ public class CompositeDatabase
 	    databaseId = OTUUID.createOTUUID();
 	}
 	
-	public void setOverlays(ArrayList overlays)
+	public void setOverlays(ArrayList<Overlay> overlays)
 	{
-	    this.middleOverlays = overlays;	
-	    for(int i=0; i<overlays.size(); i++){
-	    	((Overlay)overlays.get(i)).addOverlayListener(overlayListener);
+	    this.middleOverlays = overlays;
+	    for (Overlay overlay : overlays) {	        
+	    	overlay.addOverlayListener(overlayListener);
 	    }
 	}
 			
@@ -200,7 +200,7 @@ public class CompositeDatabase
     {
     	childId = resolveID(childId);
 
-    	CompositeDataObject userDataObject = (CompositeDataObject)dataObjectMap.get(childId);
+    	CompositeDataObject userDataObject = dataObjectMap.get(childId);
         if(userDataObject != null) {
         	//System.out.println("v1. " + userDataObject.getGlobalId());
             return userDataObject;
@@ -253,11 +253,11 @@ public class CompositeDatabase
     {
 	    OTDataObject middleDeltas [] = null;
         if(middleOverlays != null){
-        	ArrayList middleDeltasList = new ArrayList();
+        	ArrayList<OTDataObject> middleDeltasList = new ArrayList<OTDataObject>();
         	// if we have middle overlays then we need to see if any of them have a delta for this
         	// object
         	for(int i=0; i<middleOverlays.size(); i++){
-        		Overlay middleOverlay = (Overlay)middleOverlays.get(i);
+        		Overlay middleOverlay = middleOverlays.get(i);
         		OTDataObject middleDelta = middleOverlay.getDeltaObject(baseObject);
         		if(middleDelta != null){
         			middleDeltasList.add(middleDelta);

@@ -7,7 +7,7 @@ public class OTPrimitiveTypeImpl extends OTTypeImpl
 {
 	String primitiveName;
 	
-	public OTPrimitiveTypeImpl(String primitiveName, Class instanceClass)
+	public OTPrimitiveTypeImpl(String primitiveName, Class<?> instanceClass)
 	{
 		super(instanceClass);
 		this.primitiveName = primitiveName;
