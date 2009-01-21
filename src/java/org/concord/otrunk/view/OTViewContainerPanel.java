@@ -39,7 +39,7 @@ import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -96,7 +96,8 @@ public class OTViewContainerPanel extends JPanel
 	private boolean updateable = false;
 	private OTViewContainer parentContainer;
 	
-	Vector containerListeners = new Vector();
+	ArrayList<OTViewContainerListener> containerListeners = 
+		new ArrayList<OTViewContainerListener>();
 	
 	MyViewContainer viewContainer;
 

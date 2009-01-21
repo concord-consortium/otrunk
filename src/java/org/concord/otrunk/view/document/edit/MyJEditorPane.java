@@ -3,7 +3,6 @@ package org.concord.otrunk.view.document.edit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.util.logging.Level;
 
 import javax.swing.JEditorPane;
 

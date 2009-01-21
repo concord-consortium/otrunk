@@ -71,10 +71,10 @@ public class VirtualFolder
 	 * @see org.concord.portfolio.objects.PfFolder#getChildVector()
 	 */
 	@SuppressWarnings("unchecked")
-    public Vector<Object> getChildVector()
+    public Vector<OTObject> getChildVector()
 	{
 		// TODO Auto-generated method stub
-		return (Vector<Object>) (children.clone());
+		return (Vector<OTObject>) (children.clone());
 	}
 	
 	

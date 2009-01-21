@@ -147,7 +147,7 @@ public class OTPrototypeEventMappingHelper
 				OTObjectList srcList = (OTObjectList) propertyValue;
 				OTObjectList destList = 
 					(OTObjectList) OTrunkUtil.getPropertyValue(destProperty, dest);
-				destList.removeAll();
+				destList.clear();
 				for(int i=0; i<srcList.size(); i++){
 					destList.add(srcList.get(i));
 				}					

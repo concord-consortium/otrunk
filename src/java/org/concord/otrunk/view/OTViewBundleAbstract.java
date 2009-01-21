@@ -91,7 +91,7 @@ public abstract class OTViewBundleAbstract extends AbstractOTObject
     	if (serviceContext.getService(OTViewFactory.class) == null) {
     		// this is changed due to class interdepencency it doesn't need
     		// to be changed to use the new Abstract OTClass pattern
-			OTViewFactoryImpl factory = null;
+			OTViewFactoryImpl factory = new OTViewFactoryImpl((OTViewBundle)null);
 			factory.setDefaultViewMode(getCurrentMode());
 			serviceContext.addService(OTViewFactory.class, factory);
 		} else {
@@ -150,7 +150,8 @@ public abstract class OTViewBundleAbstract extends AbstractOTObject
     		
     		// this is changed due to class interdepencency it doesn't need
     		// to be changed to use the new Abstract OTClass pattern
-    		// factory.addViewBundle(this);    		
+    		// factory.addViewBundle(this); 
+    		factory.getClass();
     	}
     }
 

@@ -23,6 +23,7 @@ package org.concord.otrunk.view.document.edit;
 
 import java.awt.event.ActionEvent;
 import java.util.StringTokenizer;
+
 import javax.swing.JEditorPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTML;
@@ -30,8 +31,8 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import com.hexidec.ekit.EkitCore;
-import com.hexidec.ekit.component.*;
-
+import com.hexidec.ekit.component.HTMLUtilities;
+import com.hexidec.ekit.component.SimpleInfoDialog;
 import com.hexidec.util.Translatrix;
 
 /** Class for automatically creating bulleted lists from selected text
@@ -40,7 +41,6 @@ public class ListAutomationAction extends HTMLEditorKit.InsertHTMLTextAction
 {
 	protected EkitCore parentEkit;
 	private HTML.Tag baseTag;
-	private String sListType;
 	private HTMLUtilities htmlUtilities;
 
 	public ListAutomationAction(EkitCore ekit, String sLabel, HTML.Tag listType)

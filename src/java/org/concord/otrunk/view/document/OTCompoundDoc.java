@@ -167,7 +167,7 @@ public class OTCompoundDoc extends OTFolderObject
 	 * 
 	 * @return
 	 */
-	public Vector getDocumentRefs()
+	public Vector<OTObject> getDocumentRefs()
 	{
 		String bodyText = getBodyText();
 
@@ -200,13 +200,13 @@ public class OTCompoundDoc extends OTFolderObject
 		// From now on no duplicates should be added, but in learner mode
 		// we don't want to remove existing duplicates because it will generate overriding
 		// learner data that isn't good.  
-		Vector references = resources.getDocumentRefs().getVector();
-		Vector uniqueReferences = new Vector();
-		for(int i=0; i<references.size(); i++){
-			if(uniqueReferences.contains(references.get(i))){
+		OTObjectList references = resources.getDocumentRefs();
+		Vector<OTObject> uniqueReferences = new Vector<OTObject>();
+		for(OTObject reference: references){
+			if(uniqueReferences.contains(reference)){
 				continue;
 			}
-			uniqueReferences.add(references.get(i));
+			uniqueReferences.add(reference);
 		}
 		return uniqueReferences;
 	}
@@ -218,7 +218,7 @@ public class OTCompoundDoc extends OTFolderObject
 	public void removeAllDocumentReference()
 	{
 		OTObjectList embedded = resources.getDocumentRefs();
-		embedded.removeAll();
+		embedded.clear();
 	}
 
 	public String getDocumentText()

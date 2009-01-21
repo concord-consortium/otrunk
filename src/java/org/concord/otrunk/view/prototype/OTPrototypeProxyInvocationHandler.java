@@ -44,16 +44,16 @@ public class OTPrototypeProxyInvocationHandler implements InvocationHandler
 			String translation = view.getProperty(property);
 			if(translation != null){
 				// get the method from the model class
-				Class modelClass = model.getClass();
+				Class<?> modelClass = model.getClass();
 				Method modelMethod = modelClass.getMethod("get" + 
 						translation.substring(0,1).toUpperCase() +
-						translation.substring(1), null);
-				return modelMethod.invoke(model, null);
+						translation.substring(1));
+				return modelMethod.invoke(model);
 			}
 		}
 
 		if(method.getName().startsWith("set") && 
-				(args != null || args.length == 1)){
+				(args != null && args.length == 1)){
 			String propertyPart = method.getName().substring(4);
 			String property = method.getName().substring(3,4).toLowerCase() +
 				propertyPart;
@@ -65,7 +65,7 @@ public class OTPrototypeProxyInvocationHandler implements InvocationHandler
 				// really this is becoming a lot like script though
 				// so perhaps it is best to replace this whole thing
 				// dynamically generated javascript or beanshell.
-				Class modelClass = model.getClass();
+				Class<?> modelClass = model.getClass();
 				Method modelMethod = modelClass.getMethod("set" + 
 						translation.substring(0,1).toUpperCase() +
 						translation.substring(1), method.getParameterTypes());
@@ -75,7 +75,7 @@ public class OTPrototypeProxyInvocationHandler implements InvocationHandler
 		
 		
 		// get the same method from the viewTemplate and call that
-		Class viewTemplateClass = viewTemplate.getClass();
+		Class<?> viewTemplateClass = viewTemplate.getClass();
 		
 		Method viewTemplateMethod = 
 			viewTemplateClass.getMethod(method.getName(), method.getParameterTypes());

@@ -61,7 +61,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -100,6 +99,7 @@ import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
+import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.OTExternalAppService;
 import org.concord.framework.otrunk.view.OTFrameManager;
@@ -180,9 +180,6 @@ public class OTViewer extends JFrame
     JMenuBar menuBar;
     private JPanel statusPanel;
     String baseFrameTitle;
-    String startupMessage = ""; //FIXME Is it being used at all?
-
-    Hashtable otContainers = new Hashtable(); //FIXME Is it being used at all?
 
     boolean showTree = false;
     private boolean useScrollPane;
@@ -198,7 +195,8 @@ public class OTViewer extends JFrame
     private static OTrunkImpl otrunk;
     XMLDatabase xmlDB;
     private OTSystem userSystem;
-    private ArrayList services = new ArrayList();
+    private ArrayList<OTrunkServiceEntry<?>> services = 
+    	new ArrayList<OTrunkServiceEntry<?>>();
 
     private OTChangeListener systemChangeListener;
 
@@ -359,9 +357,9 @@ public class OTViewer extends JFrame
      * @param serviceInterface
      * @param service
      */
-    public void addService(Class serviceInterface, Object service)
+    public <T> void addService(Class<T> serviceInterface, T service)
     {
-        OTrunkServiceEntry entry = new OTrunkServiceEntry(service, serviceInterface);
+        OTrunkServiceEntry<T> entry = new OTrunkServiceEntry<T>(service, serviceInterface);
         services.add(entry);
     }
     
@@ -803,7 +801,7 @@ public class OTViewer extends JFrame
         factoryContext.addViewService(OTExternalAppService.class,
                 new OTExternalAppServiceImpl());
         factoryContext.addViewService(OTUserListService.class, new OTUserListService() {
-            public Vector getUserList() {
+            public Vector<OTUser> getUserList() {
                 return otrunk.getUsers();
             }
         });

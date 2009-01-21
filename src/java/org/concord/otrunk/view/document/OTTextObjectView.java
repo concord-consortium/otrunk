@@ -43,7 +43,6 @@ import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTChangeNotifying;
 import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.view.AbstractOTJComponentView;
 import org.concord.otrunk.view.AbstractOTJComponentContainerView;
 
 /**

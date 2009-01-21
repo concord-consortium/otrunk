@@ -30,9 +30,7 @@
 package org.concord.otrunk.view;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
@@ -57,8 +55,8 @@ import org.concord.otrunk.OTrunkUtil;
 public class OTViewFactoryImpl implements OTViewFactory 
 {
     OTViewFactoryImpl parent;
-    Vector viewMap = new Vector();
-    ArrayList viewBundles = new ArrayList();
+    ArrayList<InternalViewEntry> viewMap = new ArrayList<InternalViewEntry>();
+    ArrayList<OTViewBundle> viewBundles = new ArrayList<OTViewBundle>();
     OTViewContextImpl viewContext;
 	private String mode;
     
@@ -95,8 +93,8 @@ public class OTViewFactoryImpl implements OTViewFactory
     }
     
     class InternalViewEntry {
-        Class objectClass;
-        Class viewClass;
+        Class<? extends OTObject> objectClass;
+        Class<? extends OTView> viewClass;
         OTID otEntryID;
 
         /**
@@ -128,7 +126,7 @@ public class OTViewFactoryImpl implements OTViewFactory
     /**
 	 * @see org.concord.otrunk.view.OTViewFactory#getView(org.concord.framework.otrunk.OTObject, java.lang.Class)
 	 */
-    public OTView getView(OTObject otObject, Class viewInterface)
+    public <T extends OTView> T getView(OTObject otObject, Class<T> viewInterface)
     {
     	return getView(otObject, viewInterface, null);
     }
@@ -136,14 +134,15 @@ public class OTViewFactoryImpl implements OTViewFactory
 	/**
 	 * @see org.concord.framework.otrunk.view.OTViewFactory#getView(org.concord.framework.otrunk.OTObject, java.lang.Class, java.lang.String)
 	 */
-	public OTView getView(OTObject otObject, Class viewInterface, String modeStr) 
+	@SuppressWarnings("unchecked")
+    public <T extends OTView> T getView(OTObject otObject, Class<T> viewInterface, String modeStr) 
 	{		
 		InternalViewEntry entry = getViewInternal(otObject, viewInterface);
 		if(entry == null) {
 			// we did not find the view using its specific viewInterface, but perhaps there is a view
 			// with a different interface and the mode provide a view with the correct interface
 			// for efficiency we should check if a view mode will be used.  
-			entry = getViewInternal(otObject, (Class)null);
+			entry = getViewInternal(otObject, (Class<?>)null);
 			if(entry == null) {
 				return null;
 			}
@@ -160,7 +159,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 			return null;
 		}
 		
-		return view; 
+		return (T)view; 
 	}
     
     protected void initView(OTView view, OTViewEntry viewEntry)
@@ -190,7 +189,7 @@ public class OTViewFactoryImpl implements OTViewFactory
         ClassLoader loader = getClass().getClassLoader();
 		
         try {
-            Class objectClass = loader.loadClass(objClassStr);
+            Class<?> objectClass = loader.loadClass(objClassStr);
 
             if(!objectClass.isInstance(otObject)){
         		throw new RuntimeException("viewEntry: " + viewEntry + 
@@ -203,7 +202,7 @@ public class OTViewFactoryImpl implements OTViewFactory
             }
             
             OTView view = null;
-            Class viewClass = loader.loadClass(viewClassStr);
+            Class<?> viewClass = loader.loadClass(viewClassStr);
             view = (OTView)viewClass.newInstance();
 
             initView(view, viewEntry);
@@ -228,10 +227,9 @@ public class OTViewFactoryImpl implements OTViewFactory
 	 * @param viewInterface
 	 * @return
 	 */
-    private InternalViewEntry getViewInternal(OTObject otObject, Class viewInterface)
+    private InternalViewEntry getViewInternal(OTObject otObject, Class<?> viewInterface)
     {
-        for(int i=0; i<viewMap.size(); i++) {
-            InternalViewEntry entry = (InternalViewEntry)viewMap.get(i);
+    	for(InternalViewEntry entry: viewMap){
             if(entry.objectClass.isInstance(otObject) &&
             		(viewInterface == null || viewInterface.isAssignableFrom(entry.viewClass))) {
             	return entry;
@@ -257,6 +255,7 @@ public class OTViewFactoryImpl implements OTViewFactory
         viewMap.add(internalEntry);
     }
     
+    @SuppressWarnings("unchecked")
     protected InternalViewEntry createInternalViewEntry(OTViewEntry entry)
     {
         String objClassStr = entry.getObjectClass();
@@ -266,10 +265,10 @@ public class OTViewFactoryImpl implements OTViewFactory
         
         try {
             InternalViewEntry internalEntry = new InternalViewEntry();
-            internalEntry.objectClass = loader.loadClass(objClassStr);
+            internalEntry.objectClass = (Class<? extends OTObject>) loader.loadClass(objClassStr);
             
             if(viewClassStr != null){
-            	internalEntry.viewClass = loader.loadClass(viewClassStr);
+            	internalEntry.viewClass = (Class<? extends OTView>) loader.loadClass(viewClassStr);
             }
 
             internalEntry.otEntryID = entry.getGlobalId();
@@ -327,7 +326,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 		OTViewMode firstMode = null;
 		OTViewEntry modeViewEntry = null;
 		
-		List allViewBundles = getViewBundles();
+		List<OTViewBundle> allViewBundles = getViewBundles();
     	for(int j=0; j<allViewBundles.size() && modeViewEntry == null; j++){
     		OTViewBundle viewBundle = (OTViewBundle) allViewBundles.get(j);
     		OTObjectList modes = viewBundle.getModes();
@@ -392,9 +391,9 @@ public class OTViewFactoryImpl implements OTViewFactory
 	 * Return a combined list of view bundles.
 	 * @return
 	 */
-	public List getViewBundles()
+	public List<OTViewBundle> getViewBundles()
 	{
-		ArrayList combinedBundles = new ArrayList();
+		ArrayList<OTViewBundle> combinedBundles = new ArrayList<OTViewBundle>();
 		combinedBundles.addAll(viewBundles);
 		if (!(parent == null)){
 			combinedBundles.addAll(parent.getViewBundles());
@@ -455,20 +454,17 @@ public class OTViewFactoryImpl implements OTViewFactory
 
 	public String [] getModeNames()
     {
-		ArrayList names = new ArrayList();
-		List allViewBundles = getViewBundles();
-		for(int i=0; i<allViewBundles.size(); i++){
-			OTViewBundle bundle = (OTViewBundle) allViewBundles.get(i);
-			OTObjectList modes = bundle.getModes();
-			for(int j=0; j<modes.size(); j++){
-				OTObject curMode = modes.get(j);
+		ArrayList<String> names = new ArrayList<String>();
+
+		for(OTViewBundle bundle: getViewBundles()){
+			for (OTObject curMode : bundle.getModes()) {
 				if(!names.contains(curMode.getName())){
 					names.add(curMode.getName());
 				}				
 			}
 		}
 
-		return (String[]) names.toArray(new String[names.size()]);
+		return names.toArray(new String[names.size()]);
     }
 
 	/**
@@ -480,12 +476,10 @@ public class OTViewFactoryImpl implements OTViewFactory
 	 */
 	public void addViewBundle(OTViewBundle viewBundle)
     {
-		// Add view entries
-		Vector viewEntries = viewBundle.getViewEntries().getVector();
-		Iterator it = viewEntries.iterator();
-		Vector tempViewMap = new Vector();
-		while (it.hasNext()){
-			InternalViewEntry internalViewEntry = createInternalViewEntry((OTViewEntry)it.next());
+		// Add view entries		
+		ArrayList<InternalViewEntry> tempViewMap = new ArrayList<InternalViewEntry>();
+		for(OTObject entry: viewBundle.getViewEntries()){
+			InternalViewEntry internalViewEntry = createInternalViewEntry((OTViewEntry) entry);
 			if(internalViewEntry == null){
 				continue;
 			}

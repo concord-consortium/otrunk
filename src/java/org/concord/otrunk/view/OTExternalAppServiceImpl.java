@@ -48,7 +48,7 @@ public class OTExternalAppServiceImpl
 	public boolean jnlpShowDocument(URL url)
 	{
 		try {
-			Class serviceManager = Class
+			Class<?> serviceManager = Class
 					.forName("javax.jnlp.ServiceManager");
 			Method lookupMethod = serviceManager.getMethod(
 					"lookup", new Class[] { String.class });

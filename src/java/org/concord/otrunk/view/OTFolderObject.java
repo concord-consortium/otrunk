@@ -87,26 +87,23 @@ public class OTFolderObject extends DefaultOTObject
 	public void removeAllChildren()
 	{
 		OTObjectList children = resources.getChildren();
-		children.removeAll();
+		children.clear();
 	}
 	
-	public Vector getChildVector()
+	public Vector<OTObject> getChildVector()
 	{
 		OTObjectList children = resources.getChildren();
 		return children.getVector();		
 	}
 	
-	public void setChildVector(Vector childVector)
+	public void setChildVector(Vector<OTObject> childVector)
 	{
 		OTObjectList children = resources.getChildren();
 		
 		// TODO should compare to see if the list has changed
 		
-		children.removeAll();
-		for(int i=0; i<childVector.size(); i++) {
-			OTObject otObject = (OTObject)childVector.get(i);
-			children.add(otObject);
-		}
+		children.clear();
+		children.addAll(childVector);
 	}
 	
 	public int getChildCount()

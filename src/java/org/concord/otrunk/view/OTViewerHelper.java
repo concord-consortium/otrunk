@@ -194,7 +194,7 @@ public class OTViewerHelper
 			factoryContext.addViewService(OTExternalAppService.class,
 				new OTExternalAppServiceImpl());
 			factoryContext.addViewService(OTUserListService.class, new OTUserListService() {
-				public Vector getUserList() {
+				public Vector<OTUser> getUserList() {
 		            return ((OTrunkImpl)otrunk).getUsers();
 	            }
 			});
@@ -475,12 +475,13 @@ public class OTViewerHelper
 		return setupMessageHandler();
 	}
 
-	public Object findService(Class serviceInterface)
+	@SuppressWarnings("unchecked")
+    public <T> T findService(Class<T> serviceInterface)
 	{
 		for(int i=0; i<services.size(); i++){
-			OTrunkServiceEntry entry = (OTrunkServiceEntry) services.get(i);
+			OTrunkServiceEntry<?> entry = services.get(i);
 			if(serviceInterface.equals(entry.serviceInterface)){
-				return entry.service;
+				return (T)entry.service;
 			}
 		}
 
