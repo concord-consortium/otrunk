@@ -38,9 +38,9 @@ package org.concord.otrunk.xml;
  */
 public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler 
 {
-	Class primitiveClass;
+	Class<?> primitiveClass;
 	
-	public PrimitiveResourceTypeHandler(String primitiveName, Class primitiveClass)
+	public PrimitiveResourceTypeHandler(String primitiveName, Class<?> primitiveClass)
 	{
 		super(primitiveName);
 		this.primitiveClass = primitiveClass;
@@ -63,7 +63,7 @@ public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler
 		return handleElement(element.getTextTrim());
 	}
 	
-	public Class getPrimitiveClass()
+	public Class<?> getPrimitiveClass()
 	{
 		return primitiveClass;
 	}

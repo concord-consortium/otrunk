@@ -209,7 +209,7 @@ public class EditBar extends JToolBar implements ActionListener
 			jMenuFontSize.add(new JMenuItem(new StyledEditorKit.FontSizeAction(Translatrix.getTranslationString("FontSize7"), 32)));
 	//	jMenuFont.add(jMenuFontSize);
 	//	jMenuFont.addSeparator();
-		JMenu jMenuFontSub      = new JMenu(Translatrix.getTranslationString("Font"));
+	//	JMenu jMenuFontSub      = new JMenu(Translatrix.getTranslationString("Font"));
 	// JMenuItem jmiSelectFont = new JMenuItem(actionSelectFont);
 	// jmiSelectFont.setText(Translatrix.getTranslationString("FontSelect") +
 	// menuDialog); if(showMenuIcons) {

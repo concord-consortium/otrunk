@@ -32,8 +32,8 @@
 */
 package org.concord.otrunk.xml;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.otrunk.OTrunkImpl;
@@ -52,24 +52,24 @@ import org.concord.otrunk.otcore.impl.ReflectiveOTClassFactory;
  */
 public class ReflectionTypeDefinitions
 {
-	public static void registerTypes(List importedOTObjectClasses, TypeService typeService,
+	public static void registerTypes(List<String> importedOTObjectClasses, TypeService typeService,
 			XMLDatabase xmlDB)
 	throws Exception
 	{
 	    registerTypes(importedOTObjectClasses, typeService, xmlDB, true);
 	}
     
-	public static void registerTypes(List importedOTObjectClasses, TypeService typeService,
+	public static void registerTypes(List<String> importedOTObjectClasses, TypeService typeService,
 			XMLDatabase xmlDB, boolean addShortcuts)
 		throws Exception 
 	{
 		ClassLoader classloader = ReflectionTypeDefinitions.class.getClassLoader();
-		Vector typeClasses = new Vector();
+		ArrayList<Class<?>> typeClasses = new ArrayList<Class<?>>();
 		
 		for(int i=0; i<importedOTObjectClasses.size(); i++) {
 	        String className = (String)importedOTObjectClasses.get(i);			
 		    try {
-		        Class typeClass = classloader.loadClass(className);
+		        Class<?> typeClass = classloader.loadClass(className);
 		        typeClasses.add(typeClass);
 		    } catch (ClassNotFoundException e) {
 		        System.err.println("Error importing class: " + className);
@@ -92,7 +92,7 @@ public class ReflectionTypeDefinitions
 		typeService.registerUserType(baseObjectClass, typeService.getElementHandler("object"));
 		
 		for(int i=0; i<typeClasses.size(); i++) {
-			Class otObjectClass = (Class)typeClasses.get(i); 
+			Class<?> otObjectClass = typeClasses.get(i); 
 			String className = otObjectClass.getName();
 			
 			OTClassImpl otClass = (OTClassImpl) OTrunkImpl.getOTClass(className);
@@ -102,7 +102,7 @@ public class ReflectionTypeDefinitions
 				continue;
 			}
 			
-			Class resourceSchemaClass = otClass.getSchemaInterface();
+			Class<?> resourceSchemaClass = otClass.getSchemaInterface();
 
 			if(resourceSchemaClass == null) {
 				throw new RuntimeException("Can't find valid schema class for: " +

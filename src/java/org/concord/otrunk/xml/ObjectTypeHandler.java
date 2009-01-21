@@ -154,8 +154,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		OTDataObjectType type = new OTDataObjectType(getClassName());
 		obj.setType(type);
 		
-		List attributes = element.getAttributes();
-		for(Iterator attIter = attributes.iterator(); attIter.hasNext(); ) {
+		List<?> attributes = element.getAttributes();
+		for(Iterator<?> attIter = attributes.iterator(); attIter.hasNext(); ) {
 			OTXMLAttribute attrib = (OTXMLAttribute)attIter.next();
 			String attribName = attrib.getName();
 			if(attribName.equals("id") ||
@@ -201,10 +201,10 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			}
 		}
 
-		List content = element.getContent();
+		List<?> content = element.getContent();
 		String previousComment = null;
 		
-		for(Iterator childIter = content.iterator(); childIter.hasNext(); ) {
+		for(Iterator<?> childIter = content.iterator(); childIter.hasNext(); ) {
 		    OTXMLContent childContent = (OTXMLContent)childIter.next();
 		    if(childContent instanceof OTXMLComment){
 		    	previousComment = ((OTXMLComment) childContent).getText();
@@ -312,7 +312,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			// If this element doesn't have a reference id then 
 			// then the first child of this element is object 
 			if(childRefId == null) {
-				List children = child.getChildren();
+				List<?> children = child.getChildren();
 				if(children.size() < 1) {
 					// empty object tag
 					// this happens a lot in the current xml so

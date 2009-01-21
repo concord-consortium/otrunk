@@ -46,11 +46,9 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.Map.Entry;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTPackage;
@@ -87,12 +85,12 @@ public class XMLDatabase
 
 	OTID rootId = null;
 
-	ArrayList importedOTObjectClasses = new ArrayList();
+	ArrayList<String> importedOTObjectClasses = new ArrayList<String>();
 
 	HashMap<OTID, XMLDataObject> dataObjects = new HashMap<OTID, XMLDataObject>();
 
 	// a map of xml file ids to UUIDs
-	Hashtable localIdMap = new Hashtable();
+	HashMap<String, OTID> localIdMap = new HashMap<String, OTID>();
 
 	// track whether any object in this database
 	// has changed
@@ -105,7 +103,8 @@ public class XMLDatabase
 	private ArrayList<Class<? extends OTPackage>> packageClasses = 
 		new ArrayList<Class<? extends OTPackage>>();
 
-	private Hashtable processedOTPackages = new Hashtable();
+	private HashMap<String, Class<? extends OTPackage>> processedOTPackages = 
+		new HashMap<String, Class<? extends OTPackage>>();
 
 	private boolean trackResourceInfo = false;
 
@@ -115,11 +114,12 @@ public class XMLDatabase
 	
 	private URL sourceURL = null;
 
-	private ArrayList listeners;
+	private ArrayList<XMLDatabaseChangeListener> listeners;
 
 	String label;
 
-	private HashMap reverseReferences = new HashMap();
+	private HashMap<OTID, ArrayList<OTDataObject>> reverseReferences = 
+		new HashMap<OTID, ArrayList<OTDataObject>>();
 
 
 	private long urlOpenTime;
@@ -348,8 +348,8 @@ public class XMLDatabase
 			throw new RuntimeException("<imports> element is missing");
 		}
 
-		List imports = importsElement.getChildren();
-		for (Iterator iterator = imports.iterator(); iterator.hasNext();) {
+		List<?> imports = importsElement.getChildren();
+		for (Iterator<?> iterator = imports.iterator(); iterator.hasNext();) {
 			OTXMLElement currentImport = (OTXMLElement) iterator.next();
 			String className = currentImport.getAttributeValue("class");
 			importedOTObjectClasses.add(className);
@@ -358,7 +358,7 @@ public class XMLDatabase
 			// save them.  The OTrunkImpl will then ask for these packages from the 
 			// the database when it loads it and then initialize the packages
 
-			Class packageClass = findPackageClass(className);
+			Class<? extends OTPackage> packageClass = findPackageClass(className);
 			if (packageClass != null && !packageClasses.contains(packageClass)) {
 				packageClasses.add(packageClass);
 			}
@@ -372,8 +372,8 @@ public class XMLDatabase
 		// by a human-readable local_id within the otml file
 		OTXMLElement idMapElement = rootElement.getChild("idMap");
 		if (idMapElement != null) {
-			List idMappings = idMapElement.getChildren();
-			for (Iterator it = idMappings.iterator(); it.hasNext();) {
+			List<?> idMappings = idMapElement.getChildren();
+			for (Iterator<?> it = idMappings.iterator(); it.hasNext();) {
 				OTXMLElement mapping = (OTXMLElement) it.next();
 				String idStr = mapping.getAttributeValue("id");
 				String localIdStr = mapping.getAttributeValue("local_id");
@@ -392,7 +392,7 @@ public class XMLDatabase
 		// This also makes a list of all these objects so we
 		// can handle them linearly in the next pass.
 		OTXMLElement objects = rootElement.getChild("objects");
-		List xmlObjects = objects.getChildren();
+		List<?> xmlObjects = objects.getChildren();
 		if (xmlObjects.size() != 1) {
 			throw new Exception("Can only load files that contain a single root object");
 		}
@@ -435,7 +435,7 @@ public class XMLDatabase
 				+ " loaded ot db in " + (endMillis - startMillis) + "ms" );
 	}
 
-	public static class PackageNotFound
+	public static abstract class PackageNotFound implements OTPackage
 	{
 	};
 
@@ -455,13 +455,14 @@ public class XMLDatabase
 	 * @param className
 	 * @return
 	 */
-	private Class findPackageClass(String className)
+	@SuppressWarnings("unchecked")
+    private Class<? extends OTPackage> findPackageClass(String className)
 	{
 		int lastDot = className.lastIndexOf('.');
 		String packageName = className.substring(0, lastDot);
 
-		Class otPackageClass;
-		otPackageClass = (Class) processedOTPackages.get(packageName);
+		Class<? extends OTPackage> otPackageClass;
+		otPackageClass = processedOTPackages.get(packageName);
 		if (otPackageClass == PackageNotFound.class) {
 			// we looked for this package before but couldn't find it
 			return null;
@@ -508,7 +509,7 @@ public class XMLDatabase
 		String fullyQualifiedOTPackageClassName = packageName + "." + otPackageClassName;
 
 		try {
-			otPackageClass =
+			otPackageClass = (Class<? extends OTPackage>) 
 			    getClass().getClassLoader().loadClass(fullyQualifiedOTPackageClassName);
 			if (TRACE_PACKAGES) {
 				System.err.println("loaded package: " + otPackageClass);
@@ -598,8 +599,8 @@ public class XMLDatabase
 		            : XMLDatabaseChangeEvent.STATE_CLEAN;
 		changeEvent.setValue(status);
 
-		for (int i = 0; i < listeners.size(); i++) {
-			((XMLDatabaseChangeListener) listeners.get(i)).stateChanged(changeEvent);
+		for(XMLDatabaseChangeListener listener: listeners){
+			listener.stateChanged(changeEvent);
 		}
 	}
 
@@ -610,7 +611,7 @@ public class XMLDatabase
 		}
 
 		if (listeners == null) {
-			listeners = new ArrayList();
+			listeners = new ArrayList<XMLDatabaseChangeListener>();
 		}
 
 		listeners.add(listener);
@@ -698,7 +699,7 @@ public class XMLDatabase
 	 * org.concord.otrunk.datamodel.OTDatabase#createCollection(org.concord.
 	 * otrunk.datamodel.OTDataObject, java.lang.Class)
 	 */
-	public OTDataCollection createCollection(OTDataObject parent, Class collectionClass)
+	public OTDataCollection createCollection(OTDataObject parent, Class<?> collectionClass)
 	    throws Exception
 	{
 		if (collectionClass.equals(OTDataList.class)) {
@@ -751,22 +752,21 @@ public class XMLDatabase
 	public void secondPass()
 	    throws Exception
 	{
-		Collection objects = dataObjects.values();
+		Collection<XMLDataObject> objects = dataObjects.values();
 
-		for (Iterator iter = objects.iterator(); iter.hasNext();) {
+		for (Iterator<XMLDataObject> iter = objects.iterator(); iter.hasNext();) {
 			XMLDataObject xmlDObj = (XMLDataObject) iter.next();
 			if (xmlDObj instanceof XMLDataObjectRef) {
 				throw new Exception("Found a reference in object list");
 			}
 
-			Collection entries = xmlDObj.getResourceEntries();
-			Vector removedKeys = new Vector();
+			Collection<Entry<String, Object>> entries = xmlDObj.getResourceEntries();
+			ArrayList<String> removedKeys = new ArrayList<String>();
 
-			for (Iterator entriesIter = entries.iterator(); entriesIter.hasNext();) {
-				Map.Entry resourceEntry = (Map.Entry) entriesIter.next();
+			for(Entry<String, Object> resourceEntry: entries){
 				Object resourceValue = resourceEntry.getValue();
 				Object newResourceValue = null;
-				String resourceKey = (String) resourceEntry.getKey();
+				String resourceKey = resourceEntry.getKey();
 				if (resourceValue instanceof XMLDataObject) {
 					XMLDataObject resourceValueObj = (XMLDataObject) resourceValue;
 					if (!(resourceValueObj instanceof XMLDataObjectRef)) {
@@ -879,7 +879,7 @@ public class XMLDatabase
 		return xmlDObj.getGlobalId();
 	}
 
-	public Hashtable getLocalIDMap()
+	public HashMap<String, OTID> getLocalIDMap()
 	{
 		return localIdMap;
 	}
@@ -937,7 +937,7 @@ public class XMLDatabase
 		this.trackResourceInfo = trackResourceInfo;
 	}
 
-	public ArrayList getImportedOTObjectClasses()
+	public ArrayList<String> getImportedOTObjectClasses()
 	{
 		return importedOTObjectClasses;
 	}
@@ -949,11 +949,11 @@ public class XMLDatabase
 
 	public void recordReference(OTID parent, OTID child)
 	{
-		ArrayList refs = (ArrayList) reverseReferences.get(parent);
+		ArrayList<OTDataObject> refs = reverseReferences.get(parent);
 		if (refs == null) {
 			// it is probably better to use a link list here instead because we are going
 			// to want a custom object to record which property is making this reference
-			refs = new ArrayList();
+			refs = new ArrayList<OTDataObject>();
 		}
 	}
 	

@@ -38,9 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.framework.otrunk.otcore.OTClassProperty;
@@ -183,22 +181,23 @@ public class RNGSchemaGenerator
             Element rootElement = document.getRootElement();
             
             
-            Vector importedOTObjectClasses = new Vector();
+            ArrayList<Class<?>> importedOTObjectClasses = new ArrayList<Class<?>>();
             
             Element importsElement = rootElement;
-            List imports = importsElement.getChildren();        
-            for(Iterator iterator=imports.iterator();iterator.hasNext();) {
-                Element currentImport=(Element)iterator.next();
+            List<?> imports = importsElement.getChildren();            
+            for(Object obj: imports) {
+                Element currentImport=(Element)obj;
                 String className = currentImport.getAttributeValue("class");
                 try{
-                	Class importClass = Class.forName(className);
+                	Class<?> importClass = Class.forName(className);
                 	importedOTObjectClasses.add(importClass);
                 } catch (ClassNotFoundException e){
                 	System.err.println("Can't find class: " + className + " skipping it");
                 }
             }       
             
-    		ArrayList referrencedOTClasses = ReflectiveOTClassFactory.singleton.loadClasses(importedOTObjectClasses);
+    		ArrayList<OTClass> referrencedOTClasses = 
+    			ReflectiveOTClassFactory.singleton.loadClasses(importedOTObjectClasses);
 
     		for(int i=0; i<referrencedOTClasses.size(); i++){
     			OTClass otClass = (OTClass) referrencedOTClasses.get(i);
@@ -226,7 +225,7 @@ public class RNGSchemaGenerator
     
     public static Element createOTObjectDef(OTClass otClass)
     {
-        Vector printedResources = new Vector();
+        ArrayList<String> printedResources = new ArrayList<String>();
 
         String name = otClass.getName();
         int lastDot = name.lastIndexOf(".");
@@ -266,7 +265,7 @@ public class RNGSchemaGenerator
             }
         }
         
-        ArrayList properties = otClass.getOTAllClassProperties();
+        ArrayList<OTClassProperty> properties = otClass.getOTAllClassProperties();
         if(properties == null || properties.size() == 0) {
             return objectDef;
         }

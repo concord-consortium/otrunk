@@ -64,7 +64,7 @@ public class ListTypeHandler extends ResourceTypeHandler
 	{
 		XMLDataList list = new XMLDataList(parent);
 		
-		List content = element.getContent();
+		List<?> content = element.getContent();
 		String previousComment = null;
 
 		OTDatabase otDB = parent.getDatabase();
@@ -74,7 +74,7 @@ public class ListTypeHandler extends ResourceTypeHandler
 		}
 		
 		int index = 0;
-		for(Iterator childIter = content.iterator(); childIter.hasNext(); ) {			
+		for(Iterator<?> childIter = content.iterator(); childIter.hasNext(); ) {			
 		    OTXMLContent childContent = (OTXMLContent)childIter.next();
 		    if(childContent instanceof OTXMLComment){
 		    	previousComment = ((OTXMLComment) childContent).getText();

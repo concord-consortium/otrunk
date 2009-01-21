@@ -33,8 +33,7 @@
 package org.concord.otrunk.xml;
 
 import java.net.URL;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.HashMap;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
@@ -79,7 +78,7 @@ public class TypeService
      * @param klass
      * @return
      */
-	public static String getPrimitiveType(Class klass)
+	public static String getPrimitiveType(Class<?> klass)
 	{
 		if(String.class.isAssignableFrom(klass)) {
 			return STRING;
@@ -112,7 +111,7 @@ public class TypeService
 	 * @param klass
 	 * @return
 	 */
-	public static String getObjectPrimitiveType(Class klass)
+	public static String getObjectPrimitiveType(Class<?> klass)
 	{
 		String type = getPrimitiveType(klass);
 		
@@ -148,7 +147,7 @@ public class TypeService
 	 * @param klass
 	 * @return
 	 */
-	public static String getDataPrimitiveType(Class klass)
+	public static String getDataPrimitiveType(Class<?> klass)
 	{
 		String type = getPrimitiveType(klass);
 		
@@ -169,10 +168,10 @@ public class TypeService
 		return null;
 	}
 	
-	Hashtable handlerMap = new Hashtable();
-	Vector dataObjects = new Vector();
-	private Hashtable shortcutMap = new Hashtable();
-	private Hashtable handlerByOTClassMap = new Hashtable();
+	HashMap<String, ResourceTypeHandler> handlerMap = new HashMap<String, ResourceTypeHandler>();
+	private HashMap<String, OTClass> shortcutMap = new HashMap<String, OTClass>();
+	private HashMap<OTType, ResourceTypeHandler> handlerByOTClassMap = 
+		new HashMap<OTType, ResourceTypeHandler>();
 
 	public TypeService(URL contextURL)
 	{	
@@ -226,7 +225,7 @@ public class TypeService
 	
 	public OTClass getClassByShortcut(String shortcut)
 	{
-		return (OTClass) shortcutMap.get(shortcut);
+		return shortcutMap.get(shortcut);
 	}
 	
 	/**
@@ -237,7 +236,7 @@ public class TypeService
 	 */
 	public ResourceTypeHandler getElementHandler(String nodeName)
 	{
-		ResourceTypeHandler handler = (ResourceTypeHandler) handlerMap.get(nodeName);
+		ResourceTypeHandler handler = handlerMap.get(nodeName);
 		
 		return handler;
 	}
@@ -311,10 +310,5 @@ public class TypeService
 			return null;
 		}
 		
-	}
-	
-	public Hashtable getHandlerMap()
-	{
-		return handlerMap;
-	}
+	}	
 }

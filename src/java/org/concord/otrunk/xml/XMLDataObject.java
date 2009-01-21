@@ -36,6 +36,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataCollection;
@@ -78,8 +80,8 @@ public class XMLDataObject
 	 */
 	private boolean saveNulls = false;
 	
-	HashMap resources = new LinkedHashMap();
-	HashMap referenceInfoMap = new HashMap();
+	HashMap<String, Object> resources = new LinkedHashMap<String, Object>();
+	HashMap<String, XMLReferenceInfo> referenceInfoMap = new HashMap<String, XMLReferenceInfo>();
 	XMLDataObject container = null;
 	String containerResourceKey = null;
 	
@@ -170,7 +172,7 @@ public class XMLDataObject
 	
 	public XMLReferenceInfo getReferenceInfo(String key)
 	{
-		return (XMLReferenceInfo) referenceInfoMap.get(key);
+		return referenceInfoMap.get(key);
 	}
 	
 	/* (non-Javadoc)
@@ -178,10 +180,8 @@ public class XMLDataObject
 	 */
 	public String[] getResourceKeys()
 	{
-		Object [] keys = resources.keySet().toArray();
-		String [] strKeys = new String [keys.length];
-		System.arraycopy(keys, 0, strKeys, 0, keys.length);
-		return strKeys;
+		Set<String> keySet = resources.keySet();
+		return keySet.toArray(new String [keySet.size()]);
 	}
 
 	/* (non-Javadoc)
@@ -200,7 +200,7 @@ public class XMLDataObject
 	    database.setDirty(true);
 	}
 	
-	public Collection getResourceEntries()
+	public Collection<Entry<String, Object>> getResourceEntries()
 	{
 		return resources.entrySet();
 	}
@@ -220,11 +220,13 @@ public class XMLDataObject
 		this.localId = localId;
 	}
 	
-	public OTDataCollection getResourceCollection(String key, Class collectionClass)
+	@SuppressWarnings("unchecked")
+    public <T extends OTDataCollection> T getResourceCollection(String key, 
+		Class<T> collectionClass)
 	{
 		Object listObj = getResource(key);
 		if(collectionClass.isInstance(listObj)) {
-			return (OTDataCollection)listObj;
+			return (T)listObj;
 		}
 
 	    OTDataCollection collection = null;
@@ -238,7 +240,7 @@ public class XMLDataObject
 		    // don't mark the object as dirty until the collection has actually be modified
 		    setResource(key, collection, false);
 		}
-	    return collection;
+	    return (T)collection;
 	}
 
 	public OTDataObjectType getType()

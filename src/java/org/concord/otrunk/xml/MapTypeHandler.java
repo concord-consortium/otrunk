@@ -66,15 +66,15 @@ public class MapTypeHandler extends ResourceTypeHandler
 	{
 		XMLDataMap map = new XMLDataMap(parent);
 		
-		List children = element.getChildren();
-		for(Iterator childIter = children.iterator(); childIter.hasNext(); ) {			
+		List<?> children = element.getChildren();
+		for(Iterator<?> childIter = children.iterator(); childIter.hasNext(); ) {			
 		    OTXMLElement entry = (OTXMLElement)childIter.next();
 			if(!entry.getName().equals("entry")) {
 				throw new RuntimeException("Invalid tag: " + entry.getName() + " inside of map element.");
 			}
 			
 			String key = entry.getAttributeValue("key");
-			List entryChildren = entry.getChildren();
+			List<?> entryChildren = entry.getChildren();
 			Object value = null;
 			if(entryChildren.size() != 1) {
 				System.err.println("Warning invalid entry in map element");
