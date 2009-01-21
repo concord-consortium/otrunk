@@ -144,7 +144,7 @@ public class OTrunkUtil
 						" newValue: " + value);
 			}
 
-			Class paramType = property.getType().getInstanceClass();
+			Class<?> paramType = property.getType().getInstanceClass();
 			if(value instanceof String){
 				String valueStr = (String) value;
 				if(paramType == Float.class){
@@ -238,9 +238,9 @@ public class OTrunkUtil
 	{
 		OTObjectService objectService = keyObject.getOTObjectService();
 		
-		Vector keys = map.getObjectKeys();
+		Vector<String> keys = map.getObjectKeys();
 		for(int i=0; i<keys.size(); i++) {
-		    String currentKey = (String)keys.get(i);
+		    String currentKey = keys.get(i);
 		    
 		    OTID currentKeyId = objectService.getOTID(currentKey);
 		    try {
@@ -291,9 +291,9 @@ public class OTrunkUtil
 	public static void printObject(OTObject otObject)
 	{
 		OTClass otClass = otObject.otClass();
-		ArrayList allClassProperties = otClass.getOTAllClassProperties();
+		 ArrayList<OTClassProperty> allClassProperties = otClass.getOTAllClassProperties();
 		for(int i=0; i<allClassProperties.size(); i++){
-			OTClassProperty property = (OTClassProperty) allClassProperties.get(i);
+			OTClassProperty property = allClassProperties.get(i);
 			Object value = otObject.otGet(property);
 			System.out.println("  " + property.getName() + "=" + value);
 		}		
@@ -314,7 +314,7 @@ public class OTrunkUtil
 			return false;
 		}
 		
-		ArrayList allClassProperties = otClass.getOTAllClassProperties();
+		ArrayList<OTClassProperty> allClassProperties = otClass.getOTAllClassProperties();
 		for(int i=0; i<allClassProperties.size(); i++){
 			OTClassProperty property = (OTClassProperty) allClassProperties.get(i);
 		
@@ -365,7 +365,7 @@ public class OTrunkUtil
 					return false;
 				}
 				
-				Vector objectKeys = map1.getObjectKeys();
+				Vector<String> objectKeys = map1.getObjectKeys();
 				for(int j=0; j<objectKeys.size(); j++){
 					String key = (String) objectKeys.get(j);
 					if(!compareObjects(map1.getObject(key), map2.getObject(key))){

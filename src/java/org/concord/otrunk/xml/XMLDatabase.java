@@ -53,6 +53,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTPackage;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
@@ -101,7 +102,8 @@ public class XMLDatabase
 
 	PrintStream statusStream = null;
 
-	private Vector packageClasses = new Vector();
+	private ArrayList<Class<? extends OTPackage>> packageClasses = 
+		new ArrayList<Class<? extends OTPackage>>();
 
 	private Hashtable processedOTPackages = new Hashtable();
 
@@ -919,9 +921,10 @@ public class XMLDatabase
 	 * 
 	 * @see org.concord.otrunk.datamodel.OTDatabase#getPackageClasses()
 	 */
-	public Vector getPackageClasses()
+	@SuppressWarnings("unchecked")
+    public ArrayList<Class<? extends OTPackage>> getPackageClasses()
 	{
-		return (Vector) packageClasses.clone();
+		return (ArrayList<Class<? extends OTPackage>>) packageClasses.clone();
 	}
 
 	public boolean isTrackResourceInfo()

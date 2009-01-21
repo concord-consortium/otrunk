@@ -86,7 +86,7 @@ public interface OTDataObject
 	 * @param collectionClass
 	 * @return
 	 */
-	public OTDataCollection getResourceCollection(String key, Class collectionClass);
+	public <T extends OTDataCollection> T getResourceCollection(String key, Class<T> collectionClass);
 	
 	public OTObjectRevision getCurrentRevision();
 	

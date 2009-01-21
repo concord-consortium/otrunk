@@ -69,7 +69,7 @@ public class OTViewerHelper
 
 	private int userMode = OTConfig.NO_USER_MODE;
 
-	private ArrayList services = new ArrayList();
+	private ArrayList<OTrunkServiceEntry<?>> services = new ArrayList<OTrunkServiceEntry<?>>();
 	
 	URL authoredContentURL = null;
 
@@ -560,9 +560,9 @@ public class OTViewerHelper
 	 * @param serviceInterface
 	 * @param service
 	 */
-	public void addService(Class serviceInterface, Object service)
+	public <T> void addService(Class<T> serviceInterface, T service)
 	{
-		OTrunkServiceEntry entry = new OTrunkServiceEntry(service, serviceInterface);
+		OTrunkServiceEntry<T> entry = new OTrunkServiceEntry<T>(service, serviceInterface);
 		services.add(entry);
 	}
 }

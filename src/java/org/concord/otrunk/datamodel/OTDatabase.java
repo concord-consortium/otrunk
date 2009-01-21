@@ -33,9 +33,10 @@
 package org.concord.otrunk.datamodel;
 
 import java.net.URL;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTPackage;
 
 
 /**
@@ -104,5 +105,5 @@ public interface OTDatabase
 
 	public BlobResource createBlobResource(URL url);
 	
-	public Vector getPackageClasses();
+	public ArrayList<Class<? extends OTPackage>> getPackageClasses();
 }

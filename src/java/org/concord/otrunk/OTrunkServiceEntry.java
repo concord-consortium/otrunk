@@ -3,12 +3,12 @@
  */
 package org.concord.otrunk;
 
-public class OTrunkServiceEntry
+public class OTrunkServiceEntry<T>
 {
-	public Object service;
-	public Class serviceInterface;
+	public T service;
+	public Class<T> serviceInterface;
 	
-	public OTrunkServiceEntry(Object service, Class serviceInterface)
+	public OTrunkServiceEntry(T service, Class<T> serviceInterface)
 	{
 		this.service = service;
 		this.serviceInterface = serviceInterface;

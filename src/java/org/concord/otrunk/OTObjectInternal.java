@@ -21,6 +21,7 @@ import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.framework.otrunk.otcore.OTClassProperty;
 import org.concord.framework.otrunk.otcore.OTType;
 import org.concord.otrunk.datamodel.BlobResource;
+import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
@@ -66,7 +67,7 @@ public class OTObjectInternal implements OTObjectInterface
 
 	private int hashCode;
 
-	private HashMap referencedObjects;
+	private HashMap<String, Object> referencedObjects;
 	
 	public OTObjectInternal()
 	{		
@@ -431,8 +432,8 @@ public class OTObjectInternal implements OTObjectInterface
 	        
 	    } else if(OTResourceMap.class.isAssignableFrom(returnType)) {
 	        try {
-	        	OTDataMap list = 
-	        		(OTDataMap) getResourceCollection(resourceName, OTDataMap.class, overriddenValue);
+	        	OTDataMap list = getResourceCollection(resourceName, OTDataMap.class, 
+	        		overriddenValue);
 	            return new OTResourceMapImpl(resourceName, list, this);
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -441,8 +442,8 @@ public class OTObjectInternal implements OTObjectInterface
 	        return null;
 	    } else if(OTObjectMap.class.isAssignableFrom(returnType)) {
 	        try {
-	        	OTDataMap list = 
-	        		(OTDataMap) getResourceCollection(resourceName, OTDataMap.class, overriddenValue);
+	        	OTDataMap list = getResourceCollection(resourceName, OTDataMap.class, 
+	        		overriddenValue);
 	            return new OTObjectMapImpl(resourceName, list, this);
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -451,8 +452,8 @@ public class OTObjectInternal implements OTObjectInterface
 	        return null;				
 	    } else if(OTResourceList.class.isAssignableFrom(returnType)) {
 	        try {
-	        	OTDataList list = 
-	        		(OTDataList) getResourceCollection(resourceName, OTDataList.class, overriddenValue);
+	        	OTDataList list = getResourceCollection(resourceName, OTDataList.class, 
+	        		overriddenValue);
 	            return new OTResourceListImpl(resourceName, list, this);
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -461,8 +462,8 @@ public class OTObjectInternal implements OTObjectInterface
 	        return null;				
 	    } else if(OTObjectList.class.isAssignableFrom(returnType)) {
 	        try {					
-	        	OTDataList list = 
-	        		(OTDataList) getResourceCollection(resourceName, OTDataList.class, overriddenValue);
+	        	OTDataList list = getResourceCollection(resourceName, OTDataList.class, 
+	        		overriddenValue);
 	            return new OTObjectListImpl(resourceName, list, this);
 	        } catch (Exception e) {
 	            e.printStackTrace();
@@ -512,11 +513,12 @@ public class OTObjectInternal implements OTObjectInterface
     	return dataObject.getResource(resourceName);
     }
 
-	public Object getResourceCollection(String resourceName, Class collectionClass,
-		Object overriddenValue)
+	@SuppressWarnings("unchecked")
+    public <T extends OTDataCollection> T getResourceCollection(String resourceName, 
+		Class<T> collectionClass, Object overriddenValue)
 	{
     	if(overriddenValue != null){
-    		return overriddenValue;
+    		return (T)overriddenValue;
     	} else {
     		return dataObject.getResourceCollection(resourceName, collectionClass);
     	}		
@@ -594,7 +596,7 @@ public class OTObjectInternal implements OTObjectInterface
 	protected void saveReference(String key, Object value)
 	{
 		if(referencedObjects == null){
-			referencedObjects = new HashMap();
+			referencedObjects = new HashMap<String, Object>();
 		}
 		referencedObjects.put(key, value);
 	}
@@ -609,8 +611,8 @@ public class OTObjectInternal implements OTObjectInterface
 			if(changeListeners != null){
 				// Check for the case where there is just the TraceListener
 				if(changeListeners.size() == 1){
-					WeakReference ref = (WeakReference)changeListeners.get(0);
-					Object listener = ref.get();
+					WeakReference<OTChangeListener> ref = changeListeners.get(0);
+					OTChangeListener listener = ref.get();
 					if(listener instanceof InternalListener){
 						// don't print anything here
 						return;
@@ -619,8 +621,8 @@ public class OTObjectInternal implements OTObjectInterface
 
 				System.out.println("listeners on finalized object: " + internalToString());
 				for(int i=0; i<changeListeners.size(); i++){
-					WeakReference ref = (WeakReference)changeListeners.get(i);
-					Object listener = ref.get();
+					WeakReference<OTChangeListener> ref = changeListeners.get(i);
+					OTChangeListener listener = ref.get();
 					if(listener instanceof InternalListener){
 						// skip the trace listener
 						continue;
@@ -715,7 +717,7 @@ public class OTObjectInternal implements OTObjectInterface
 		return objectService.getExternalID(changeEventSource);
     }
 
-	public ArrayList getOTChangeListeners()
+	public ArrayList<WeakReference<OTChangeListener>> getOTChangeListeners()
     {
 	    return changeListeners;
     }

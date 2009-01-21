@@ -59,7 +59,7 @@ public class OTObjectMapImpl extends OTCollectionImpl
      * This is used to store references to the OTObjects, this prevents them from 
      * getting garbage collected as long as this collection is referenced.
      */
-    protected HashMap referenceMap;
+    protected HashMap<String, OTObject> referenceMap;
     
 	public OTObjectMapImpl(String resourceName, OTDataMap map, OTObjectInternal handler)
 	{
@@ -75,7 +75,7 @@ public class OTObjectMapImpl extends OTCollectionImpl
 	protected void saveReference(String key, OTObject value)
 	{
 		if(referenceMap == null){
-			referenceMap = new HashMap();
+			referenceMap = new HashMap<String, OTObject>();
 		}
 		referenceMap.put(key, value);		
 	}
@@ -97,9 +97,9 @@ public class OTObjectMapImpl extends OTCollectionImpl
 		return null;
 	}
 	
-	public Vector getObjectKeys()
+	public Vector<String> getObjectKeys()
 	{
-		Vector names = new Vector();
+		Vector<String> names = new Vector<String>();
 		
 		String [] keys = map.getKeys();
 		
