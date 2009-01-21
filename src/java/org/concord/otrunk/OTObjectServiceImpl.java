@@ -35,7 +35,7 @@ package org.concord.otrunk;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
 import java.net.URL;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.concord.framework.otrunk.OTControllerRegistry;
 import org.concord.framework.otrunk.OTControllerService;
@@ -43,6 +43,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.OTPackage;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.otrunk.asm.GeneratedClassLoader;
@@ -65,7 +66,8 @@ public class OTObjectServiceImpl
     protected OTrunkImpl otrunk;
     protected OTDatabase creationDb;
     protected OTDatabase mainDb;
-    protected Vector listeners = new Vector();
+    protected ArrayList<OTObjectServiceListener> listeners = 
+    	new ArrayList<OTObjectServiceListener>();
 
     public OTObjectServiceImpl(OTrunkImpl otrunk)
     {
@@ -92,16 +94,17 @@ public class OTObjectServiceImpl
     	return mainDb;
     }
     
-    public OTObject createObject(Class objectClass) 
+    public <T extends OTObject> T createObject(Class<T> objectClass) 
         throws Exception
     {
     	OTObjectInternal otObjectImpl = createOTObjectInternal(objectClass);
-        OTObject newObject = loadOTObject(otObjectImpl, objectClass);
+        T newObject = loadOTObject(otObjectImpl, objectClass);
 
         return newObject;
     }
 
-    protected OTObjectInternal createOTObjectInternal(Class objectClass)
+    protected OTObjectInternal createOTObjectInternal(
+    	Class<? extends OTObject> objectClass)
     	throws Exception
     {
     	String className = objectClass.getName();
@@ -125,6 +128,7 @@ public class OTObjectServiceImpl
     	return otObjectImpl;
     }
     
+    @SuppressWarnings("unchecked")
     public OTObject getOTObject(OTID childID) throws Exception
     {
         // sanity check
@@ -157,7 +161,8 @@ public class OTObjectServiceImpl
         if(otObjectClassStr == null) {
             return null;
         }            
-        Class otObjectClass = Class.forName(otObjectClassStr);
+        Class<? extends OTObject> otObjectClass = 
+        	(Class<? extends OTObject>) Class.forName(otObjectClassStr);
         
     	OTObjectInternal otObjectInternal = 
     		new OTObjectInternal(childDataObject, this, OTrunkImpl.getOTClass(otObjectClassStr));
@@ -182,16 +187,17 @@ public class OTObjectServiceImpl
     GeneratedClassLoader gClassLoader = 
     	new GeneratedClassLoader(OTObjectServiceImpl.class.getClassLoader());
     
-    public OTObject loadOTObject(OTObjectInternal otObjectImpl, Class otObjectClass)
+    @SuppressWarnings("unchecked")
+    public <T extends OTObject> T loadOTObject(OTObjectInternal otObjectImpl, Class<T> otObjectClass)
     throws  Exception
     {
-        OTObject otObject = null;
+        T otObject = null;
         
         if(otObjectClass.isInterface()) {
         	if(OTConfig.getBooleanProp(OTConfig.USE_ASM, false)){
-        		Class generatedClass = gClassLoader.generateClass(otObjectClass, otObjectImpl.otClass());
-        		OTObjectInternal internalObj = (OTObjectInternal) generatedClass.newInstance();
-        		otObject = internalObj;
+        		Class<? extends AbstractOTObject> generatedClass = gClassLoader.generateClass(otObjectClass, otObjectImpl.otClass());
+        		OTObjectInternal internalObj = generatedClass.newInstance();
+        		otObject = (T)internalObj;
         		internalObj.setup(otObjectImpl);
         		internalObj.setEventSource(internalObj);
         	} else {        	
@@ -199,7 +205,7 @@ public class OTObjectServiceImpl
         		OTBasicObjectHandler handler = new OTBasicObjectHandler(otObjectImpl, otrunk, otObjectClass);
 
         		try {
-        			otObject = (OTObject)Proxy.newProxyInstance(otObjectClass.getClassLoader(),
+        			otObject = (T)Proxy.newProxyInstance(otObjectClass.getClassLoader(),
         				new Class[] { otObjectClass }, handler);
         			handler.setOTObject(otObject);
         		} catch (ClassCastException e){
@@ -208,9 +214,9 @@ public class OTObjectServiceImpl
         		}
         	}
         } else if(AbstractOTObject.class.isAssignableFrom(otObjectClass)){
-    		Class generatedClass = gClassLoader.generateClass(otObjectClass, otObjectImpl.otClass());
-    		OTObjectInternal internalObj = (OTObjectInternal) generatedClass.newInstance();
-    		otObject = internalObj;
+    		Class<? extends AbstractOTObject> generatedClass = gClassLoader.generateClass(otObjectClass, otObjectImpl.otClass());
+    		OTObjectInternal internalObj = generatedClass.newInstance();
+    		otObject = (T)internalObj;
     		internalObj.setup(otObjectImpl);
     		internalObj.setEventSource(internalObj);        	
         } else {
@@ -244,11 +250,12 @@ public class OTObjectServiceImpl
      * @param dataObject
      * @param otObject
      */
-    public OTObject setResourcesFromSchema(OTObjectInternal otObjectImpl, Class otObjectClass)
+    @SuppressWarnings("unchecked")
+    public <T extends OTObject> T setResourcesFromSchema(OTObjectInternal otObjectImpl, Class<T> otObjectClass)
     {
-        Constructor [] memberConstructors = otObjectClass.getConstructors();
-        Constructor resourceConstructor = memberConstructors[0]; 
-        Class [] params = resourceConstructor.getParameterTypes();
+        Constructor<T> [] memberConstructors = (Constructor<T> [])otObjectClass.getConstructors();
+        Constructor<T> resourceConstructor = memberConstructors[0]; 
+        Class<?> [] params = resourceConstructor.getParameterTypes();
         
         if(memberConstructors.length > 1) {
             System.err.println("OTObjects should only have 1 constructor");
@@ -257,7 +264,7 @@ public class OTObjectServiceImpl
         
         if(params == null | params.length == 0) {
             try {
-                return (OTObject)otObjectClass.newInstance();
+                return otObjectClass.newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
@@ -270,11 +277,12 @@ public class OTObjectServiceImpl
         int nextParam = 0;
         if(params[0].isInterface() && 
                 OTResourceSchema.class.isAssignableFrom(params[0])){
-            Class schemaClass = params[0];
+            Class<? extends OTResourceSchema> schemaClass = (Class<? extends OTResourceSchema>)params[0];
                 
-            handler = new OTResourceSchemaHandler(otObjectImpl, otrunk, schemaClass);
+            handler = new OTResourceSchemaHandler(otObjectImpl, otrunk, 
+            	 schemaClass);
 
-            Class [] interfaceList = new Class[] { schemaClass };
+            Class<?> [] interfaceList = new Class[] { schemaClass };
             
             Object resources = 
                 Proxy.newProxyInstance(schemaClass.getClassLoader(),
@@ -297,9 +305,9 @@ public class OTObjectServiceImpl
             }
         }
         
-        OTObject otObject = null;
+        T otObject = null;
         try {
-            otObject = (OTObject)resourceConstructor.newInstance(constructorParams);
+            otObject = resourceConstructor.newInstance(constructorParams);
             
             // now we need to pass the otObject to the schema handler so it can
             // set that as the source of OTChangeEvents
@@ -380,7 +388,7 @@ public class OTObjectServiceImpl
 		// make a copy of the original objects data object
 		// it is easier to copy data objects than the actual objects
 		
-		OTDataObject originalDataObject = OTInvocationHandler.getOTDataObject(original);
+		OTDataObject originalDataObject = getOTDataObject(original);
 		
 		// Assume the object list is our object list impl
 		OTDataList orphanDataList = 
@@ -409,7 +417,7 @@ public class OTObjectServiceImpl
 	/* (non-Javadoc)
      * @see org.concord.framework.otrunk.OTObjectService#registerPackageClass(java.lang.Class)
      */
-    public void registerPackageClass(Class packageClass)
+    public void registerPackageClass(Class<? extends OTPackage> packageClass)
     {
     	otrunk.registerPackageClass(packageClass);	    
     }
@@ -417,7 +425,7 @@ public class OTObjectServiceImpl
 	/* (non-Javadoc)
      * @see org.concord.framework.otrunk.OTObjectService#getOTrunkService(java.lang.Class)
      */
-    public Object getOTrunkService(Class serviceInterface)
+    public <T> T getOTrunkService(Class<T> serviceInterface)
     {
     	return otrunk.getService(serviceInterface);
     }
@@ -441,11 +449,19 @@ public class OTObjectServiceImpl
 		return otid.toExternalForm();
     }
 
+	static OTDataObject getOTDataObject(OTObject otObject)
+	{
+		if(otObject instanceof OTObjectInternal){
+			return ((OTObjectInternal)otObject).dataObject;
+		}
+		
+		return OTInvocationHandler.getOTDataObject(otObject);
+	}
+	
 	public URL getCodebase(OTObject otObject)
     {
-		OTID id = otObject.getGlobalId();
 		try {
-	        OTDataObject dataObject = OTInvocationHandler.getOTDataObject(otObject);
+	        OTDataObject dataObject = getOTDataObject(otObject); 
 	        return dataObject.getCodebase();
         } catch (Exception e) {
 	        e.printStackTrace();

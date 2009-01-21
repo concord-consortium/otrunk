@@ -35,9 +35,9 @@ package org.concord.otrunk.overlay;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Vector;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTPackage;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectFinder;
@@ -322,7 +322,7 @@ public class CompositeDatabase
 	/* (non-Javadoc)
      * @see org.concord.otrunk.datamodel.OTDatabase#getPackageClasses()
      */
-    public Vector getPackageClasses()
+    public ArrayList<Class<? extends OTPackage>> getPackageClasses()
     {
 	    // TODO Auto-generated method stub
 	    return null;

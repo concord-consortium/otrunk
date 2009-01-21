@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
-import java.util.WeakHashMap;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -91,11 +90,12 @@ import org.concord.otrunk.xml.XMLDatabase;
  */
 public class OTrunkImpl implements OTrunk
 {
-	protected Hashtable loadedObjects = new Hashtable();
-	protected Hashtable compositeDatabases = new Hashtable();
-    protected Hashtable userObjectServices = new Hashtable();
-	protected Hashtable userDataObjects = new Hashtable();
-	protected WeakHashMap objectWrappers = new WeakHashMap();
+	protected Hashtable<OTID, Reference<OTObject>> loadedObjects = 
+		new Hashtable<OTID, Reference<OTObject>>();
+	protected Hashtable<OTID, CompositeDatabase> compositeDatabases = 
+		new Hashtable<OTID, CompositeDatabase>();
+    protected Hashtable<OTID, OTObjectService> userObjectServices = 
+    	new Hashtable<OTID, OTObjectService>();
 
 	OTServiceContext serviceContext = new OTServiceContextImpl();	
 
@@ -104,15 +104,16 @@ public class OTrunkImpl implements OTrunk
 	
     protected OTObjectServiceImpl rootObjectService;
     
-	ArrayList databases = new ArrayList();
-	Vector users = new Vector();
+	ArrayList<OTDatabase> databases = new ArrayList<OTDatabase>();
+	Vector<OTUser> users = new Vector<OTUser>();
 	
-    Vector objectServices = new Vector();
+    ArrayList<OTObjectServiceImpl> objectServices = new ArrayList<OTObjectServiceImpl>();
 
-	private Vector registeredPackageClasses = new Vector();
+	private ArrayList<Class<? extends OTPackage>> registeredPackageClasses = 
+		new ArrayList<Class<? extends OTPackage>>();
 	private OTObjectServiceImpl systemObjectService;;
 
-	private static HashMap otClassMap = new HashMap(); 
+	private static HashMap<String, OTClass> otClassMap = new HashMap<String, OTClass>(); 
 	
 	OTDataObjectFinder dataObjectFinder = new OTDataObjectFinder()
 	{
@@ -135,15 +136,16 @@ public class OTrunkImpl implements OTrunk
     
     public OTrunkImpl(OTDatabase db)
 	{
-		this((OTDatabase)null, db, (ArrayList)null);
+		this((OTDatabase)null, db, (ArrayList<OTrunkServiceEntry<?>>)null);
 	}
 
-	public OTrunkImpl(OTDatabase db, ArrayList services)
+	public OTrunkImpl(OTDatabase db, ArrayList<OTrunkServiceEntry<?>> services)
 	{	
 		this(null, db, services);
 	}
 	
-	public OTrunkImpl(OTDatabase systemDb, OTDatabase db, ArrayList services) 
+	@SuppressWarnings("unchecked")
+    public OTrunkImpl(OTDatabase systemDb, OTDatabase db, ArrayList<OTrunkServiceEntry<?>> services) 
 	{	
 		try {
 			ConcordHostnameVerifier verifier = new ConcordHostnameVerifier();
@@ -173,7 +175,10 @@ public class OTrunkImpl implements OTrunk
         
 		if(services != null) {
 			for(int i=0; i<services.size(); i++){
-				OTrunkServiceEntry entry = (OTrunkServiceEntry) services.get(i);
+				// there might be a better way to make this type safe.  
+				// it seems like the compiler should be able to figure out it is safe
+				// but instead the suppress warnings is added to remove the warning here
+				OTrunkServiceEntry entry = services.get(i);
 				serviceContext.addService(entry.serviceInterface, entry.service);
 			}
 		}
@@ -212,7 +217,7 @@ public class OTrunkImpl implements OTrunk
 				System.err.println("Warning: both OTSystem.services and OTSystem.bundles are being used.  OTSystem.services is deprecated");
 			}
 			
-			Vector combined = new Vector();
+			ArrayList<OTObject> combined = new ArrayList<OTObject>();
 			combined.addAll(serviceList.getVector());
 			combined.addAll(bundleList.getVector());
 			
@@ -245,7 +250,7 @@ public class OTrunkImpl implements OTrunk
 	
     /* (non-Javadoc)
 	 */
-	public OTObject createObject(Class objectClass)
+	public <T extends OTObject> T createObject(Class<T> objectClass)
 		throws Exception
 	{
         return rootObjectService.createObject(objectClass);
@@ -307,8 +312,7 @@ public class OTrunkImpl implements OTrunk
 	        return null;
 	    }
 	    
-	    for(int i=0; i<databases.size(); i++) {
-	        OTDatabase db = (OTDatabase)databases.get(i);
+	    for (OTDatabase db : databases) {	     	   
 	        if(db.contains(id)) {
 	            return db;
 	        }
@@ -335,7 +339,7 @@ public class OTrunkImpl implements OTrunk
 		return rootObjectService.getOTObject(childID); 
 	}
 	
-	public Object getService(Class serviceInterface)
+	public <T> T getService(Class<T> serviceInterface)
 	{
 		return serviceContext.getService(serviceInterface);
 	}
@@ -420,8 +424,7 @@ public class OTrunkImpl implements OTrunk
 		// seem like the database has already been loaded.
 		// FIXME this should check the url of the database, and only print this message
 		// if the urls are different.
-		for(int i=0; i<objectServices.size(); i++){
-			OTObjectServiceImpl objectService = (OTObjectServiceImpl) objectServices.get(i);
+    	for (OTObjectServiceImpl objectService : objectServices) {
 			OTDatabase db = objectService.getMainDb();
 			if(db.equals(includeDb)){
 				return objectService;
@@ -440,8 +443,7 @@ public class OTrunkImpl implements OTrunk
     	throws Exception
     {    	
     	// first see if we have a database with the same context url
-    	for(int i=0; i<databases.size(); i++){
-    		OTDatabase db = (OTDatabase) databases.get(i);
+    	for (OTDatabase db : databases) {
     		if(!(db instanceof XMLDatabase)) continue;
     		
     		XMLDatabase xmlDatabase = (XMLDatabase) db;
@@ -558,7 +560,7 @@ public class OTrunkImpl implements OTrunk
     		
     	// need to make a new composite database.
     	// the user database should remain the same.
-        OTDatabase oldCompositeDB = (OTDatabase) compositeDatabases.remove(userId);	
+        OTDatabase oldCompositeDB = compositeDatabases.remove(userId);	
         userObjectServices.remove(userId);
         
         databases.remove(oldCompositeDB);
@@ -595,10 +597,10 @@ public class OTrunkImpl implements OTrunk
         // OTOverlayGroup objects are useful so an overlay or user can insert
         // an overlay into the list without modifying the whole overlay list.
     	try {
-        	ArrayList overlays = null;
+        	ArrayList<Overlay> overlays = null;
 	        OTObjectList otOverlays = getSystemOverlays(user);
 	        if(otOverlays != null && otOverlays.size() > 0){
-	        	overlays = new ArrayList();
+	        	overlays = new ArrayList<Overlay>();
 		        userDb.setOverlays(overlays);
 	        	for(int i=0; i<otOverlays.size(); i++){
 	        		OTOverlay otOverlay;
@@ -630,11 +632,11 @@ public class OTrunkImpl implements OTrunk
         return userObjService;
     }
     
-    public Hashtable getCompositeDatabases() {
+    public Hashtable<OTID, CompositeDatabase> getCompositeDatabases() {
     	return compositeDatabases;
     }
     
-    public Vector getUsers() {
+    public Vector<OTUser> getUsers() {
     	return users;
     }
     
@@ -646,7 +648,7 @@ public class OTrunkImpl implements OTrunk
 
     public boolean isModifiedInTopOverlay(OTObject otObject)
     {
-    	OTDataObject dataObject = OTInvocationHandler.getOTDataObject(otObject);
+    	OTDataObject dataObject = OTObjectServiceImpl.getOTDataObject(otObject);
     	
         if(dataObject instanceof CompositeDataObject) {
             OTDataObject overlayModifications = ((CompositeDataObject)dataObject).getActiveDeltaObject();
@@ -663,10 +665,11 @@ public class OTrunkImpl implements OTrunk
         if(!databases.contains(db)) {
             databases.add(db);
             
-            Vector packageClasses = db.getPackageClasses();
+            ArrayList<Class<? extends OTPackage>> packageClasses = 
+            	db.getPackageClasses();
             if(packageClasses != null){
             	for(int i=0; i<packageClasses.size(); i++){
-            		registerPackageClass((Class)packageClasses.get(i));
+            		registerPackageClass(packageClasses.get(i));
             	}
             }
         }
@@ -675,7 +678,7 @@ public class OTrunkImpl implements OTrunk
 	/**
      * @param class1
      */
-    public void registerPackageClass(Class packageClass)
+    public void registerPackageClass(Class<? extends OTPackage> packageClass)
     {
     	// check to see if this package has already been registered
     	if(registeredPackageClasses.contains(packageClass)){
@@ -685,11 +688,11 @@ public class OTrunkImpl implements OTrunk
     	registeredPackageClasses.add(packageClass);
     	OTPackage otPackage;
         try {
-	        otPackage = (OTPackage)packageClass.newInstance();
-	        Class [] dependencies = otPackage.getPackageDependencies();
+	        otPackage = packageClass.newInstance();
+	        Class<? extends OTPackage> [] dependencies = otPackage.getPackageDependencies();
 	        if(dependencies != null){
-	        	for(int i=0; i<dependencies.length; i++){
-	        		registerPackageClass(dependencies[i]);
+	        	for (Class<? extends OTPackage> dependency : dependencies) {
+	        		registerPackageClass(dependency);
 	        	}
 	        }
 	        
@@ -712,8 +715,7 @@ public class OTrunkImpl implements OTrunk
 		
 		OTID authoredId = authoredObject.getGlobalId();
 		OTID userId = user.getUserId();
-        OTObjectService objService = 
-            (OTObjectService)userObjectServices.get(userId);
+        OTObjectService objService = userObjectServices.get(userId);
 
         // the objService should be non null if not this is coding error
         // that needs to be fixed so we will just let it throw an null pointer
@@ -741,7 +743,7 @@ public class OTrunkImpl implements OTrunk
 			return userObject;
 		}
 				
-		CompositeDatabase db = (CompositeDatabase)compositeDatabases.get(userId);
+		CompositeDatabase db = compositeDatabases.get(userId);
 				
 		//System.out.println("is relative");
 		Object objectMapToken = ((OTTransientMapID) objectId).getMapToken();
@@ -804,16 +806,16 @@ public class OTrunkImpl implements OTrunk
 
     void putLoadedObject(OTObject otObject, OTID otId)
     {
-    	WeakReference objRef = new WeakReference(otObject);
+    	WeakReference<OTObject> objRef = new WeakReference<OTObject>(otObject);
     	loadedObjects.put(otId, objRef);    		
     }
     
     OTObject getLoadedObject(OTID otId)
     {
     	OTObject otObject = null;
-    	Reference otObjectRef = (Reference)loadedObjects.get(otId);
+    	Reference<OTObject> otObjectRef = loadedObjects.get(otId);
     	if(otObjectRef != null) {
-    		otObject = (OTObject)otObjectRef.get();
+    		otObject = otObjectRef.get();
     	}
 
     	if(otObject != null) {
@@ -839,7 +841,7 @@ public class OTrunkImpl implements OTrunk
         throws Exception
     {
         for(int i=0; i<objectServices.size(); i++) {
-            OTObjectServiceImpl objService = (OTObjectServiceImpl)objectServices.get(i);
+            OTObjectServiceImpl objService = objectServices.get(i);
             // To avoid infinite loop, the objService must not equal to oldService
             if(objService.managesObject(childID) && objService != oldService) {
             	return objService.getOTObject(childID);
@@ -856,7 +858,7 @@ public class OTrunkImpl implements OTrunk
 	
 	public static OTClass getOTClass(String className)
 	{
-		return (OTClass) otClassMap.get(className);
+		return otClassMap.get(className);
 	}
 	
 	public static void putOTClass(String className, OTClass otClass)

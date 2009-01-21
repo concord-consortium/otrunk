@@ -50,7 +50,7 @@ import org.concord.otrunk.view.OTFolder;
 public class VirtualFolder 
 	implements OTFolder
 {
-	Vector children = new Vector();
+	Vector<Object> children = new Vector<Object>();
 	String name = "virtual folder";
 	
 	public void addVirtualChild(Object child)
@@ -70,17 +70,20 @@ public class VirtualFolder
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.objects.PfFolder#getChildVector()
 	 */
-	public Vector getChildVector()
+	@SuppressWarnings("unchecked")
+    public Vector<Object> getChildVector()
 	{
 		// TODO Auto-generated method stub
-		return (Vector) (children.clone());
+		return (Vector<Object>) (children.clone());
 	}
 	
 	
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.objects.PfFolder#setChildVector(java.util.Vector)
+	 * the warnings are suppressed to keep the same signature as before
 	 */
-	public void setChildVector(Vector children)
+	@SuppressWarnings("unchecked")
+    public void setChildVector(Vector children)
 	{
 	}
 	

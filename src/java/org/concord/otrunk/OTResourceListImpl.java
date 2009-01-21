@@ -109,9 +109,9 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 		return list.size();
 	}
 	
-	public boolean containsAll(Collection c)
+	public boolean containsAll(Collection<?> c)
     {
-		Iterator iterator = c.iterator();
+		Iterator<?> iterator = c.iterator();
 		while(iterator.hasNext()){
 			if(!contains(iterator.next())){
 				return false;
@@ -126,15 +126,16 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 		return toArray(new Object[list.size()]);
     }
 
-	public Object[] toArray(Object[] array)
+	@SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] array)
     {
 		int size = list.size();
 		if(array.length < size){
-            array = (Object[])Array.newInstance(array.getClass().getComponentType(), size);		
+            array = (T[])Array.newInstance(array.getClass().getComponentType(), size);		
 		}
 
 		for(int i=0; i<size; i++) {
-			array[i] = list.get(i);
+			array[i] = (T)list.get(i);
 		}		
 		
         if (array.length > size) {
@@ -149,9 +150,9 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 		return list.contains(obj);		
     }
 
-	public Iterator iterator()
+	public Iterator<Object> iterator()
     {
-		return new Iterator(){
+		return new Iterator<Object>(){
 			/**
 			 * This points to the current object index;
 			 */
@@ -175,17 +176,17 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 		};
     }	
 
-	public boolean addAll(Collection c)
+	public boolean addAll(Collection<?> c)
 	{
 		throw new UnsupportedOperationException();
 	}
 	
-	public boolean removeAll(Collection c)
+	public boolean removeAll(Collection<?> c)
     {
 		throw new UnsupportedOperationException();
     }
 
-	public boolean retainAll(Collection c)
+	public boolean retainAll(Collection<?> c)
     {
 		throw new UnsupportedOperationException();
     }

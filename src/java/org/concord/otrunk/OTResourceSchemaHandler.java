@@ -29,6 +29,8 @@
  */
 package org.concord.otrunk;
 
+import org.concord.framework.otrunk.OTResourceSchema;
+
 
 /**
  * This class is here as a marker so it is more clear which instances are
@@ -45,7 +47,8 @@ public class OTResourceSchemaHandler extends OTInvocationHandler
      * @param dataObject
      * @param db
      */
-    public OTResourceSchemaHandler(OTObjectInternal otObjectImpl, OTrunkImpl db, Class schemaInterface)
+    public OTResourceSchemaHandler(OTObjectInternal otObjectImpl, OTrunkImpl db, 
+    	Class<? extends OTResourceSchema> schemaInterface)
     {
     	super(otObjectImpl, db, schemaInterface);
     }

@@ -9,12 +9,12 @@ import org.concord.framework.otrunk.OTServiceContext;
 
 class OTServiceContextImpl implements OTServiceContext
 {
-	HashMap serviceMap = new HashMap();
+	HashMap<Class<?>,Object> serviceMap = new HashMap<Class<?>, Object>();
 
 	/* (non-Javadoc)
      * @see org.concord.framework.otrunk.OTServiceContext#addService(java.lang.Class, java.lang.Object)
      */
-    public void addService(Class serviceClass, Object service)
+    public <T> void addService(Class<T> serviceClass, T service)
     {
 		serviceMap.put(serviceClass, service);        
     }
@@ -22,9 +22,10 @@ class OTServiceContextImpl implements OTServiceContext
 	/* (non-Javadoc)
      * @see org.concord.framework.otrunk.OTServiceContext#getService(java.lang.Class)
      */
-    public Object getService(Class serviceClass)
+    @SuppressWarnings("unchecked")
+    public <T> T getService(Class<T> serviceClass)
     {
-		return serviceMap.get(serviceClass);
+		return (T) serviceMap.get(serviceClass);
     }
 	
 }

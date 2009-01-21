@@ -170,7 +170,13 @@ implements OTObjectServiceListener, OTChangeListener, InternalListener
         OTChangeLogger changeLoggerService = new OTChangeLogger()
         {
 
-			public Iterator getPreviousValues(OTObject otObject, OTClassProperty property)
+        	/**
+        	 * FIXME This method is not complete it always returns null
+        	 * 
+        	 * @see org.concord.framework.otrunk.OTChangeLogger#getPreviousValues(org.concord.framework.otrunk.OTObject, org.concord.framework.otrunk.otcore.OTClassProperty)
+        	 */
+			@SuppressWarnings("unchecked")
+            public Iterator getPreviousValues(OTObject otObject, OTClassProperty property)
             {
 				Document document = saxHandler.getDocument();
 				XPath xpath;
@@ -181,7 +187,8 @@ implements OTObjectServiceListener, OTChangeListener, InternalListener
                     	property.getName() + "[@op='set']/node()");
 	                List selectNodes = xpath.selectNodes(document);
 	                for(Iterator it = selectNodes.iterator();it.hasNext();){
-	                	Object node = it.next();
+	                	@SuppressWarnings("unused")
+                        Object node = it.next();
 	                }
                 } catch (JDOMException e) {
 	                // TODO Auto-generated catch block
@@ -200,7 +207,8 @@ implements OTObjectServiceListener, OTChangeListener, InternalListener
 	 * This is a temporary test method.  It is specific to a particular otml file.   Using
 	 * it requires jaxen on the classapth.
 	 */
-	public void testXPathQuery()
+	@SuppressWarnings("unchecked")
+    public void testXPathQuery()
 	{
 		Document document = saxHandler.getDocument();
 		try {
