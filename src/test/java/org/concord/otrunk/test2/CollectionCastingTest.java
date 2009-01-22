@@ -36,6 +36,13 @@ public class CollectionCastingTest extends TestCase
 
         new ArrayList<OTObject>(objectList);
     }
+
+    public void testToValidArray() throws Exception {
+        OTObjectList objectList = initObjectList();
+
+        objectList.toArray(new Object[0]);
+    }
+
     
     public void testToInvalidArray() throws Exception {
         OTObjectList objectList = initObjectList();
