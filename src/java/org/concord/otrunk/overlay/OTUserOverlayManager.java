@@ -3,8 +3,8 @@ package org.concord.otrunk.overlay;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
@@ -22,18 +22,18 @@ import org.concord.otrunk.xml.XMLDatabase;
 public class OTUserOverlayManager
 {
 	Logger logger = Logger.getLogger(this.getClass().getName());
-	HashMap<OTOverlay, OTObjectService> overlayToObjectServiceMap = 
+	HashMap<OTOverlay, OTObjectService> overlayToObjectServiceMap =
 		new HashMap<OTOverlay, OTObjectService>();
 	HashMap<OTUserObject, OTOverlay> userToOverlayMap = new HashMap<OTUserObject, OTOverlay>();
 	ArrayList<OTDatabase> overlayDatabases = new ArrayList<OTDatabase>();
 	OTrunkImpl otrunk;
 	ArrayList<OverlayImpl> globalOverlays = new ArrayList<OverlayImpl>();
-	private StandardPasswordAuthenticator authenticator = new StandardPasswordAuthenticator();
-	
+	private final StandardPasswordAuthenticator authenticator = new StandardPasswordAuthenticator();
+
 	public OTUserOverlayManager(OTrunkImpl otrunk) {
 		this.otrunk = otrunk;
 	}
-	
+
 	/**
 	 * Add an overlay to the UserOverlayManager. This can be used when you have a URL to an otml snippet which contains an OTOverlay object
 	 * and you don't want to fetch the object yourself.
@@ -59,17 +59,17 @@ public class OTUserOverlayManager
 			try {
 				logger.info("Creating empty overlay database on the fly...");
     			XMLDatabase xmldb = new XMLDatabase();
-    			overlay = (OTOverlay) contextObject.getOTObjectService().createObject(OTOverlay.class);
-    			
-    			// FIXME this approach bypasses the normal way of adding a data object to the 
+    			overlay = contextObject.getOTObjectService().createObject(OTOverlay.class);
+
+    			// FIXME this approach bypasses the normal way of adding a data object to the
     			// database.  It seems like it should be changed to create an object service for
     			// the newly created database and then make the overlay in that object service.
     			// that should get around the code below
-    			xmldb.getDataObjects().put(overlay.getGlobalId(), 
+    			xmldb.getDataObjects().put(overlay.getGlobalId(),
     				(XMLDataObject) otrunk.getDataObjectFinder().findDataObject(overlay.getGlobalId()));
     			xmldb.setRoot(overlay.getGlobalId());
     			otrunk.remoteSaveData(xmldb, overlayURL, OTViewer.HTTP_PUT, new StandardPasswordAuthenticator());
-    			
+
     			overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, contextObject.getOTObjectService());
 			} catch (Exception e) {
 				// still an error. skip the overlay for this user/url
@@ -85,7 +85,7 @@ public class OTUserOverlayManager
 			add(overlay, objService, userObject);
 		}
 	}
-	
+
 	/**
 	 * Creates an OTObjectService object for an OTOverlay
 	 * @param overlay
@@ -100,7 +100,7 @@ public class OTUserOverlayManager
 		}
 		// set up the CompositeDatabase
 		CompositeDatabase db = new CompositeDatabase(otrunk.getDataObjectFinder(), myOverlay);
-		
+
 		// if it's not a global overlay, add all the global overlays to its stack of overlays
 		if(!isGlobal){
 			ArrayList<Overlay> overlays = new ArrayList<Overlay>();
@@ -113,29 +113,29 @@ public class OTUserOverlayManager
 	  	OTObjectService objService = otrunk.createObjectService(db);
 	  	return objService;
 	}
-	
+
 	public void add(OTOverlay otOverlay, OTObjectService objService, OTUserObject userObject) {
 		overlayToObjectServiceMap.put(otOverlay, objService);
 		userToOverlayMap.put(userObject, otOverlay);
-		
+
 		if (objService instanceof OTObjectServiceImpl) {
 			overlayDatabases.add(getDatabase(otOverlay));
 		}
 	}
-	
+
 	public OTObjectService getObjectService(OTOverlay overlay) {
 		return overlayToObjectServiceMap.get(overlay);
 	}
-	
+
 	public OTObjectService getObjectService(OTUserObject userObj) {
 		return overlayToObjectServiceMap.get(userToOverlayMap.get(userObj));
 	}
-	
+
 	public OTOverlay getOverlay(OTUserObject userObj) {
-		return (OTOverlay) userToOverlayMap.get(userObj);
+		return userToOverlayMap.get(userObj);
 	}
-	
-	public OTOverlay getOverlay(OTObjectService objService) {		
+
+	public OTOverlay getOverlay(OTObjectService objService) {
 		for (Entry<OTOverlay,OTObjectService> entry : overlayToObjectServiceMap.entrySet()) {
 			if(entry.getValue() == objService){
 				return entry.getKey();
@@ -143,7 +143,7 @@ public class OTUserOverlayManager
         }
 		return null;
 	}
-	
+
 	public OTUserObject getUserObject(OTOverlay overlay) {
 		for (Entry<OTUserObject, OTOverlay> entry : userToOverlayMap.entrySet()) {
 			if(entry.getValue() == overlay){
@@ -152,24 +152,24 @@ public class OTUserOverlayManager
         }
 		return null;
 	}
-	
+
 	public OTUserObject getUserObject(OTObjectService objService) {
 		OTOverlay overlay = getOverlay(objService);
 		return getUserObject(overlay);
 	}
-	
+
 	public ArrayList<OTDatabase> getOverlayDatabases() {
 		return this.overlayDatabases;
 	}
-	
+
 	public Set<OTOverlay> getOverlays() {
 		return this.overlayToObjectServiceMap.keySet();
 	}
-	
+
 	public OTObject getOTObject(OTUserObject userObject, OTID id) throws Exception {
 		return getOTObject(getOverlay(userObject), id);
 	}
-	
+
 	public OTObject getOTObject(OTOverlay overlay, OTID id) throws Exception {
 		OTObjectService objService = getObjectService(overlay);
 		if (objService == null) {
@@ -177,7 +177,7 @@ public class OTUserOverlayManager
 		}
 		return objService.getOTObject(id);
 	}
-	
+
 	public OTDatabase getDatabase(OTOverlay overlay) {
 		OTObjectServiceImpl objService = (OTObjectServiceImpl) getObjectService(overlay);
 		if (objService != null) {
@@ -196,33 +196,36 @@ public class OTUserOverlayManager
     	}
     	return null;
     }
-	
+
 	public void remove(OTOverlay overlay) {
 		OTUserObject userObject = getUserObject(overlay);
 		OTObjectService objService = getObjectService(overlay);
-		
+
 		remove(userObject, overlay, objService);
     }
 
 	public void remove(OTUserObject userObject) {
 		OTOverlay otOverlay = getOverlay(userObject);
 		OTObjectService objService = getObjectService(otOverlay);
-		
+
 		remove(userObject, otOverlay, objService);
     }
-	
+
 	private void remove(OTUserObject userObject, OTOverlay otOverlay, OTObjectService objService) {
 		otrunk.removeObjectService((OTObjectServiceImpl) objService);
 		overlayToObjectServiceMap.remove(otOverlay);
 		userToOverlayMap.remove(userObject);
-		
+
 		if (objService instanceof OTObjectServiceImpl) {
 			overlayDatabases.add(getDatabase(otOverlay));
 		}
 	}
-	
+
 	public void remoteSave(OTOverlay overlay) throws Exception {
-		// FIXME need to check if we're in read-only mode or not
-		otrunk.remoteSaveData(getXMLDatabase(overlay), OTViewer.HTTP_PUT, authenticator);
+		if (otrunk.isSailSavingDisabled()) {
+			logger.info("Not saving overlay because SAIL saving is disabled");
+		} else {
+			otrunk.remoteSaveData(getXMLDatabase(overlay), OTViewer.HTTP_PUT, authenticator);
+		}
 	}
 }

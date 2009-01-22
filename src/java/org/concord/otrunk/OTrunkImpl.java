@@ -111,9 +111,11 @@ public class OTrunkImpl implements OTrunk
 
 	private ArrayList<Class<? extends OTPackage>> registeredPackageClasses = 
 		new ArrayList<Class<? extends OTPackage>>();
-	private OTObjectServiceImpl systemObjectService;;
+	private OTObjectServiceImpl systemObjectService;
 
 	private static HashMap<String, OTClass> otClassMap = new HashMap<String, OTClass>(); 
+	
+	private boolean sailSavingDisabled = false;
 	
 	OTDataObjectFinder dataObjectFinder = new OTDataObjectFinder()
 	{
@@ -989,5 +991,21 @@ public class OTrunkImpl implements OTrunk
     		((XMLDatabase)db).setDirty(false);
     		((XMLDatabase)db).setSourceVerified(true);
     	}
+    }
+
+	/**
+     * @param sailSavingDisabled true if SAIL is set to not return learner data
+     */
+    public void setSailSavingDisabled(boolean sailSavingDisabled)
+    {
+	    this.sailSavingDisabled = sailSavingDisabled;
+    }
+
+	/**
+     * @return true if SAIL is set to not return learner data
+     */
+    public boolean isSailSavingDisabled()
+    {
+	    return sailSavingDisabled;
     }
 }

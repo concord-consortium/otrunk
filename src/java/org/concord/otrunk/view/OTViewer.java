@@ -604,6 +604,8 @@ public class OTViewer extends JFrame
         throws Exception
     {
         loadURL(url);
+        
+        otrunk.setSailSavingDisabled(noClassAssignedForStudent());
 
         OTMainFrame mainFrame = (OTMainFrame) otrunk.getService(OTMainFrame.class);
 
