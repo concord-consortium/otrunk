@@ -139,7 +139,7 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 						try {
 		    			  	synchronized (this){
 		        				// map the object service/overlay to the user
-		    			  		overlayManager.add(overlayURL, ref, userObject, false);
+		    			  		overlayManager.add(overlayURL, userObject, false);
 		    			  	}
 						} catch (Exception e) {
 							logger.log(Level.SEVERE, "Couldn't initialize user overlay", e);
@@ -176,7 +176,7 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 			}
 
 			long start = System.currentTimeMillis();
-			overlayManager.add(root.getGroupOverlayURL(), root, null, true);
+			overlayManager.add(root.getGroupOverlayURL(), null, true);
 	        System.out.println("group overlay load time: " + 
 	        	(System.currentTimeMillis() - start) + "ms");
 		} catch (Exception e) {

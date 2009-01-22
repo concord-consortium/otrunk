@@ -63,7 +63,7 @@ public class OTClassListManager extends DefaultOTObject
 	public void registerServices(OTServiceContext serviceContext)
 	{
 		serviceContext.addService(OTClassListManager.class, this);
-		overlayManager = (OTUserOverlayManager) serviceContext.getService(OTUserOverlayManager.class);
+		overlayManager = serviceContext.getService(OTUserOverlayManager.class);
 		if (overlayManager == null) {
 			overlayManager = new OTUserOverlayManager(otrunk);
 			serviceContext.addService(OTUserOverlayManager.class, overlayManager);
@@ -105,9 +105,10 @@ public class OTClassListManager extends DefaultOTObject
     			try {
     				if (reload) {
     					// to avoid problems where the overlayManager still references different versions of the overlay, we'll remove the old ones first
-    					overlayManager.remove(classMember.getUserObject());
+    					overlayManager.reload(classMember.getUserObject());
+    				} else {
+    					overlayManager.add(classMember.getOverlayURL(), classMember.getUserObject(), false);
     				}
-    				overlayManager.add(classMember.getOverlayURL(), classMember, classMember.getUserObject(), false);
     			} catch (Exception e) {
     				logger.log(Level.WARNING, "Couldn't load overlay for user: " + classMember.getName(), e);
     			}

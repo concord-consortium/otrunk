@@ -1,6 +1,8 @@
 package org.concord.otrunk.overlay;
 
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -43,11 +45,11 @@ public class OTUserOverlayManager
 	 * @param isGlobal
 	 * @throws Exception
 	 */
-	public void add(URL overlayURL, OTObject contextObject, OTUserObject userObject, boolean isGlobal) throws Exception {
+	public void add(URL overlayURL, OTUserObject userObject, boolean isGlobal) throws Exception {
 		// get the OTOverlay OTObject from the otml at the URL specified
 		OTOverlay overlay = null;
 		try {
-			overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, contextObject.getOTObjectService(), true);
+			overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, otrunk.getRootObjectService(), true);
 		} catch (Exception e) {
 			// some error occurred...
 			logger.warning("Couldn't get overlay for user\n" + overlayURL + "\n" + e.getMessage());
@@ -59,7 +61,7 @@ public class OTUserOverlayManager
 			try {
 				logger.info("Creating empty overlay database on the fly...");
     			XMLDatabase xmldb = new XMLDatabase();
-    			overlay = contextObject.getOTObjectService().createObject(OTOverlay.class);
+    			overlay = otrunk.getRootObjectService().createObject(OTOverlay.class);
 
     			// FIXME this approach bypasses the normal way of adding a data object to the
     			// database.  It seems like it should be changed to create an object service for
@@ -70,7 +72,7 @@ public class OTUserOverlayManager
     			xmldb.setRoot(overlay.getGlobalId());
     			otrunk.remoteSaveData(xmldb, overlayURL, OTViewer.HTTP_PUT, new StandardPasswordAuthenticator());
 
-    			overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, contextObject.getOTObjectService());
+    			overlay = (OTOverlay) otrunk.getExternalObject(overlayURL, otrunk.getRootObjectService());
 			} catch (Exception e) {
 				// still an error. skip the overlay for this user/url
 				logger.warning("Couldn't create a default overlay for user\n" + overlayURL + "\n" + e.getMessage());
@@ -218,6 +220,28 @@ public class OTUserOverlayManager
 
 		if (objService instanceof OTObjectServiceImpl) {
 			overlayDatabases.add(getDatabase(otOverlay));
+		}
+	}
+	
+	public void reload(OTUserObject userObject) throws Exception {
+		// check the last modified of the URL and the existing db, if they're different, remove and add the db again
+		XMLDatabase xmlDb = getXMLDatabase(getOverlay(userObject));
+		long existingTime = xmlDb.getUrlLastModifiedTime();
+		
+		URLConnection conn = xmlDb.getSourceURL().openConnection();
+		if (conn instanceof HttpURLConnection) {
+			((HttpURLConnection) conn).setRequestMethod(OTViewer.HTTP_HEAD);
+		}
+		
+		long serverTime = conn.getLastModified();
+		
+		if (existingTime != 0 && serverTime != 0 && existingTime == serverTime) {
+			// no reload needed
+			logger.info("Not reloading overlay as modified time is the same as the currently loaded version");
+		} else {
+			logger.info("Modified times indicated reload needed. current: " + existingTime + ", server: " + serverTime);
+			remove(userObject);
+			add(xmlDb.getSourceURL(), userObject, false);
 		}
 	}
 
