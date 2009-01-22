@@ -4,25 +4,18 @@
     <import class="org.concord.otrunk.OTSystem"/>
     <import class="org.concord.otrunk.view.OTViewBundle"/>
     <import class="org.concord.otrunk.view.OTViewEntry"/>
-    <import class="org.concord.otrunk.view.document.OTCompoundDoc" />
+    <import class="org.concord.otrunk.test.OTListTestObject" />
   </imports>
   <objects>
     <OTSystem>
-      <bundles>
-        <OTViewBundle>
-          <viewEntries>
-            <OTViewEntry 
-              objectClass="org.concord.otrunk.view.document.OTDocument" 
-              viewClass="org.concord.otrunk.view.document.OTDocumentView" />
-          </viewEntries>
-        </OTViewBundle>
-      </bundles>
       <root>
-        <OTCompoundDoc name="doc">
-          <bodyText>
-            Hello
-          </bodyText>
-        </OTCompoundDoc>
+        <OTListTestObject name="list">
+          <objectList>
+           <OTListTestObject name="subList1"/>
+           <OTListTestObject name="subList2"/>
+           <OTListTestObject name="subList3"/>
+          </objectList>
+        </OTListTestObject>
       </root>
     </OTSystem>
   </objects>
