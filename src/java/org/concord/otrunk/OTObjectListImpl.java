@@ -342,23 +342,26 @@ public class OTObjectListImpl extends OTCollectionImpl
 	@SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] array)
     {
-		if(!(array instanceof OTObject[])){
-			throw new IllegalArgumentException("need to pass an OTObject array");
-		}
 		int size = list.size();
+		Class<?> componentType = array.getClass().getComponentType();
 		if(array.length < size){
-            array = (T[])Array.newInstance(array.getClass().getComponentType(), size);		
+            array = (T[])Array.newInstance(componentType, size);		
 		}
 
+		Object objToBeStored = null;
 		for(int i=0; i<size; i++) {
 			try {	
 				OTID childID = getId(i);
 				if(childID == null){
 					array[i] = null;
 				} else {
-					array[i] = (T) objectInternal.getOTObject(childID);										
+					objToBeStored = objectInternal.getOTObject(childID); 
+					array[i] = (T) objToBeStored;										
 				}
-			} catch (Exception e) {
+			} catch (ClassCastException cce) {
+				throw new ArrayStoreException("Can't store " + objToBeStored + " at index: " + i +
+					 " in array of type: " + componentType + ": " + cce.getMessage());
+			} catch (Exception e)  {
 				e.printStackTrace();
 			}
 		}		
