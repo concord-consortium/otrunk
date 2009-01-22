@@ -358,9 +358,9 @@ public class OTObjectListImpl extends OTCollectionImpl
 					objToBeStored = objectInternal.getOTObject(childID); 
 					array[i] = (T) objToBeStored;										
 				}
-			} catch (ClassCastException cce) {
+			} catch (ArrayStoreException ase) {
 				throw new ArrayStoreException("Can't store " + objToBeStored + " at index: " + i +
-					 " in array of type: " + componentType + ": " + cce.getMessage());
+					 " in array of type: " + componentType + ": " + ase.getMessage());
 			} catch (Exception e)  {
 				e.printStackTrace();
 			}
