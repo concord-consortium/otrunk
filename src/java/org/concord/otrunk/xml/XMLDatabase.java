@@ -128,6 +128,8 @@ public class XMLDatabase
 
 	private boolean sourceVerified = false;
 	
+	private long urlLastModifiedTime = -1;
+	
 	protected static String getLabel(URL contextURL)
 	{
 		if (contextURL == null) {
@@ -160,6 +162,7 @@ public class XMLDatabase
 		InputStream urlInStream = urlStreamHandler.getURLStream();		
 		urlOpenTime = System.currentTimeMillis() - openingStart;
 		
+		urlLastModifiedTime = urlStreamHandler.getLastModified();
 		
 		// parse the xml file...
 		long startMillis = -1;
@@ -253,7 +256,8 @@ public class XMLDatabase
 
 	}
 
-	public boolean equals(Object object)
+	@Override
+    public boolean equals(Object object)
 	{
 		if (object == this) {
 			return true;
@@ -560,7 +564,7 @@ public class XMLDatabase
 		if (rootId == null) {
 			return null;
 		}
-		return (OTDataObject) dataObjects.get(rootId);
+		return dataObjects.get(rootId);
 	}
 
 	public OTID getDatabaseId()
@@ -722,7 +726,7 @@ public class XMLDatabase
 	    throws Exception
 	{
 		// we are going to ignore the dataParent for now
-		return (OTDataObject) dataObjects.get(childID);
+		return dataObjects.get(childID);
 	}
 
 	/*
@@ -755,7 +759,7 @@ public class XMLDatabase
 		Collection<XMLDataObject> objects = dataObjects.values();
 
 		for (Iterator<XMLDataObject> iter = objects.iterator(); iter.hasNext();) {
-			XMLDataObject xmlDObj = (XMLDataObject) iter.next();
+			XMLDataObject xmlDObj = iter.next();
 			if (xmlDObj instanceof XMLDataObjectRef) {
 				throw new Exception("Found a reference in object list");
 			}
@@ -847,7 +851,7 @@ public class XMLDatabase
 			// the
 			// the Iterator
 			for (int keyIndex = 0; keyIndex < removedKeys.size(); keyIndex++) {
-				xmlDObj.setResource((String) removedKeys.get(keyIndex), null);
+				xmlDObj.setResource(removedKeys.get(keyIndex), null);
 			}
 		}
 	}
@@ -860,7 +864,7 @@ public class XMLDatabase
 				return null;
 			}
 			String localId = idStr.substring(2, idStr.length() - 1);
-			OTID globalId = (OTID) localIdMap.get(localId);
+			OTID globalId = localIdMap.get(localId);
 			if (globalId == null) {
 				System.err.println("Can't find local id: " + localId);
 			}
@@ -996,4 +1000,22 @@ public class XMLDatabase
 	public void setSourceVerified(boolean verified) {
 		this.sourceVerified = verified;
 	}
+
+	/**
+	 * Sets the time that the document located at the sourceURL was last modified, or 0 if unknown
+     * @param urlLastModifiedTime the urlLastModifiedTime to set
+     */
+    public void setUrlLastModifiedTime(long urlLastModifiedTime)
+    {
+	    this.urlLastModifiedTime = urlLastModifiedTime;
+    }
+
+	/**
+	 * The time at which the sourceURL document was last modified, in ms since Jan 1, 1970, or 0 if unknown. This can be used to determine if an update is needed.
+     * @return the urlLastModifiedTime
+     */
+    public long getUrlLastModifiedTime()
+    {
+	    return urlLastModifiedTime;
+    }
 }

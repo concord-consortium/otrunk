@@ -157,6 +157,7 @@ public class OTViewer extends JFrame
 
     public final static String HTTP_PUT = "PUT";
     public final static String HTTP_POST = "POST";
+    public final static String HTTP_HEAD = "HEAD";
 
     final static String DEFAULT_BASE_FRAME_TITLE = "OTrunk Viewer";
 
@@ -271,6 +272,7 @@ public class OTViewer extends JFrame
             setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         
             addWindowListener(new WindowAdapter() {
+                @Override
                 public void windowClosing(WindowEvent e)
                 {
                     exitAction.actionPerformed(null);
@@ -534,6 +536,7 @@ public class OTViewer extends JFrame
             
             // It takes a while for xmlDM to be initialized...
             Thread waitForDB = new Thread() {
+                @Override
                 public void run()
                 {
                     while (xmlDB == null) {
@@ -607,7 +610,7 @@ public class OTViewer extends JFrame
         
         otrunk.setSailSavingDisabled(noClassAssignedForStudent());
 
-        OTMainFrame mainFrame = (OTMainFrame) otrunk.getService(OTMainFrame.class);
+        OTMainFrame mainFrame = otrunk.getService(OTMainFrame.class);
 
         if (OTConfig.getBooleanProp(HIDE_TREE_PROP, false)
                 || !mainFrame.getShowLeftPanel()) {
@@ -789,7 +792,7 @@ public class OTViewer extends JFrame
         otrunk = new OTrunkImpl(systemDB, xmlDB, services);
 
         OTViewFactory myViewFactory =
-            (OTViewFactory) otrunk.getService(OTViewFactory.class);
+            otrunk.getService(OTViewFactory.class);
 
         if (myViewFactory != null) {
             otViewFactory = myViewFactory;
@@ -916,9 +919,9 @@ public class OTViewer extends JFrame
 
         if (showTree && !overrideShowTree) {
             folderTreeModel.fireTreeStructureChanged(new TreePath(
-                (SimpleTreeNode) folderTreeModel.getRoot()));
+                folderTreeModel.getRoot()));
             dataTreeModel.fireTreeStructureChanged(new TreePath(
-                (SimpleTreeNode) dataTreeModel.getRoot()));
+                dataTreeModel.getRoot()));
         }
 
         Frame frame = (Frame) SwingUtilities.getRoot(this);
@@ -1763,7 +1766,7 @@ public class OTViewer extends JFrame
                         }
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(
-                            (Frame) SwingUtilities.getRoot(OTViewer.this),
+                            SwingUtilities.getRoot(OTViewer.this),
                                         "There was an error saving. Check your URL and try again.",
                             "Error Saving", JOptionPane.ERROR_MESSAGE);
                         e.printStackTrace();
@@ -1888,7 +1891,7 @@ public class OTViewer extends JFrame
 
                 int returnVal =
                     CustomDialog.showOKCancelDialog(
-                        (Frame) SwingUtilities.getRoot(OTViewer.this), // parent
+                        SwingUtilities.getRoot(OTViewer.this), // parent
                         panel, // custom content
                         "Save URL", // title
                         false, // resizeable
@@ -1909,7 +1912,7 @@ public class OTViewer extends JFrame
                     } catch (Exception e) {
                         System.err.println("Bad URL. Not saving.");
                         JOptionPane.showMessageDialog(
-                            (Frame) SwingUtilities.getRoot(OTViewer.this),
+                            SwingUtilities.getRoot(OTViewer.this),
                                         "There was an error saving. Check your URL and try again.",
                             "Error Saving", JOptionPane.ERROR_MESSAGE);
                         e.printStackTrace();
@@ -2059,6 +2062,7 @@ public class OTViewer extends JFrame
 
 class HtmlFileFilter extends javax.swing.filechooser.FileFilter
 {
+    @Override
     public boolean accept(File f)
     {
         if (f == null)
@@ -2069,6 +2073,7 @@ class HtmlFileFilter extends javax.swing.filechooser.FileFilter
         return (f.getName().toLowerCase().endsWith(".html"));
     }
 
+    @Override
     public String getDescription()
     {
         return "HTML files";

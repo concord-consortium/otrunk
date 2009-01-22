@@ -15,6 +15,7 @@ public class URLStreamHandler
 	URLConnection connection;
 	URL url;
 	InputStream inStream;
+	long lastModified;
 	
 	public URLStreamHandler(URL url)
 	{
@@ -97,6 +98,7 @@ public class URLStreamHandler
     		if((responseCode / 100) != 2) {
     			printAndThrowURLError("Server returned error for", true, null);
     		}
+    		lastModified = ((HttpURLConnection)connection).getLastModified();
     	}					
     
     	try {
@@ -111,5 +113,9 @@ public class URLStreamHandler
     	}
         return inStream;
     }
+	
+	public long getLastModified() {
+		return lastModified;
+	}
 
 }
