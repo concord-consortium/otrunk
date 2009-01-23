@@ -18,10 +18,9 @@ import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerAware;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewContextAware;
+import org.concord.framework.otrunk.view.OTViewConversionService;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
-import org.concord.framework.otrunk.view.OTXHTMLView;
-import org.concord.otrunk.view.document.OTDocumentView;
 
 /**
  * @author scott
@@ -100,13 +99,22 @@ public class OTJComponentServiceImpl implements OTJComponentService
         	if(genericView == null) {
         		genericView = viewFactory.getView(otObject, OTView.class, mode);
         		
+        		OTViewContext viewContext2 = viewFactory.getViewContext();
+        		OTViewConversionService conversionService = 
+        			viewContext2.getViewService(OTViewConversionService.class);
+        		
         		// check if we can handle translating this to a OTJComponentView
         		// currently only OTXHTMLViews can be translated
-        		if(!(genericView instanceof OTXHTMLView)){
+        		if(conversionService == null ||
+        				(conversionService != null && 
+        				!conversionService.canConvert(genericView, OTJComponentView.class))){
+        			if(conversionService == null){
+        				System.err.println("No OTViewConversionService available");
+        			}
         			System.err.println("No OTJComponentView or compatible view for the object");
         			System.err.println("  obj: " + otObject);
         			System.err.println("  mode: " + mode);
-        		}
+        		} 
         	}
     	}
 
@@ -123,33 +131,20 @@ public class OTJComponentServiceImpl implements OTJComponentService
     	if(genericView instanceof OTJComponentView){
     		view = (OTJComponentView) genericView;
     	} else {
-    		// FIXME this should abstracted so new translations can
-    		// be plugged in for example a SWT translation.
-    		if(genericView instanceof OTXHTMLView){
-    			// make an OTDocumentView with this as the text
-    			// but to maintain the correct lifecycle order this can't
-    			// happen until the getComponent is called on the view
-    			// so a wrapper view is used which does this on the getComponent method    			
-    			OTXHTMLView xhtmlView = (OTXHTMLView) genericView;
+    		OTViewContext viewContext2 = viewFactory.getViewContext();
+    		OTViewConversionService conversionService = 
+    			viewContext2.getViewService(OTViewConversionService.class);
 
-    			OTXHTMLWrapperDoc wrapperDoc = new OTXHTMLWrapperDoc(xhtmlView, otObject, viewEntry);
-    			
-    			// we look up a view for the wrapper doc in the default view entries 
-    			view = (OTJComponentView) viewFactory.getView(wrapperDoc, OTJComponentView.class, OTViewFactory.NO_VIEW_MODE);
-    			if(view == null){
-    				System.err.println("No view entry found for OTDocument this is required to use a OTXHTMLView");
-    			}   
-    			
-    			// FIXME by having to cast to this to OTDocumentView we are breaking the abstraction 
-    			view = new OTXHTMLWrapperView((OTDocumentView)view, wrapperDoc);    			
-    		}
-
+    		if(conversionService != null){	
+    			view = conversionService.convert(genericView, OTJComponentView.class,
+    				viewFactory, viewEntry);
+    		} 
     	}
     	
     	
     	if(view == null){
     		// We could not translate the genericView to a OTJComponentView
-    		System.err.println("Could not translate genericView to OTJComponentView");
+    		System.err.println("Could not convert genericView to OTJComponentView");
     		System.err.println("  obj: " + otObject);
     		System.err.println("  genericView: " + genericView);
     		System.err.println("  mode: " + mode);

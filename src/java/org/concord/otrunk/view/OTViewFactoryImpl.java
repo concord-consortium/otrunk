@@ -29,6 +29,7 @@
  */
 package org.concord.otrunk.view;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,7 @@ import org.concord.framework.otrunk.view.OTRequestedViewEntryAware;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewContextAware;
+import org.concord.framework.otrunk.view.OTViewConversionService;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTViewFactory;
@@ -90,6 +92,26 @@ public class OTViewFactoryImpl implements OTViewFactory
     		viewContextParent = parent.getViewContext();
     	}
         viewContext = new OTViewContextImpl(this, viewContextParent);  
+        viewContext.addViewService(OTViewConversionService.class, 
+        	new OTViewConversionServiceImpl());
+    }
+    
+    /**
+     * This should be called after the bundles have been added and any view services
+     * have been added to the viewContext
+     */
+    public void contextSetupComplete()
+    {
+    	for(InternalViewEntry viewEntry: viewMap){        	
+        	try {
+    	        Method otInit = viewEntry.viewClass.getMethod("otInit", OTViewContext.class);
+    	        otInit.invoke(null, getViewContext());
+            } catch (NoSuchMethodException e) {
+            	// this class doesn't have an otInit method
+            } catch (Throwable t) {
+            	t.printStackTrace();
+            }
+    	}
     }
     
     class InternalViewEntry {
@@ -251,7 +273,7 @@ public class OTViewFactoryImpl implements OTViewFactory
     	if(internalEntry == null){
     		return;
     	}
-
+    	
         viewMap.add(internalEntry);
     }
     

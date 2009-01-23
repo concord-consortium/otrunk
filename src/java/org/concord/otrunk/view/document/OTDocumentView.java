@@ -73,6 +73,8 @@ import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.framework.otrunk.view.OTView;
 import org.concord.framework.otrunk.view.OTViewContainer;
 import org.concord.framework.otrunk.view.OTViewContainerChangeEvent;
+import org.concord.framework.otrunk.view.OTViewContext;
+import org.concord.framework.otrunk.view.OTViewConversionService;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewEntryAware;
 import org.concord.framework.otrunk.view.OTXHTMLView;
@@ -122,6 +124,13 @@ public class OTDocumentView extends AbstractOTDocumentView implements
 
 	public final static String XHTML_SUFFIX = "</body>\n" + "</html>";
 
+	public static void otInit(OTViewContext viewContext)
+	{
+		OTViewConversionService conversionService = 
+			viewContext.getViewService(OTViewConversionService.class);
+		conversionService.addConverter(new OTXHTMLViewToJComponentConverter());
+	}
+	
 	protected void setup(OTObject doc) {
 		// Don't call super.setup() to avoid listening to the ot object
 		// inneccesarily

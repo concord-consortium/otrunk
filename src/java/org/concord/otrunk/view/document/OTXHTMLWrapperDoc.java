@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.concord.otrunk.view;
+package org.concord.otrunk.view.document;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
@@ -10,7 +10,6 @@ import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.framework.otrunk.otcore.OTClassProperty;
 import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTXHTMLView;
-import org.concord.otrunk.view.document.OTDocument;
 
 /**
  * @author scott
