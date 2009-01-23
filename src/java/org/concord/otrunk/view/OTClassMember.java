@@ -13,4 +13,5 @@ public interface OTClassMember extends OTObjectInterface
 	public static boolean DEFAULT_isCurrentUser = false;
 	public boolean getIsCurrentUser();
 
+	public String getUuid();
 }
