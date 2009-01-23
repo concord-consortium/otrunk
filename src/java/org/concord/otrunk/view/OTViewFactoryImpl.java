@@ -91,9 +91,13 @@ public class OTViewFactoryImpl implements OTViewFactory
     	if(parent != null){
     		viewContextParent = parent.getViewContext();
     	}
-        viewContext = new OTViewContextImpl(this, viewContextParent);  
-        viewContext.addViewService(OTViewConversionService.class, 
-        	new OTViewConversionServiceImpl());
+        viewContext = new OTViewContextImpl(this, viewContextParent);
+        
+        // we might have a view conversion service registered already, so don't override it. 
+        if(viewContext.getViewService(OTViewConversionService.class) == null){
+            viewContext.addViewService(OTViewConversionService.class, 
+            	new OTViewConversionServiceImpl());
+        }
     }
     
     /**

@@ -12,8 +12,19 @@ import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 
+/**
+ * OTXHTMLWrapperView <br>
+ * This class implements OTXHTMLView so the OTMLToXHTMLConverter can property export it.
+ * That should be fixed somehow.
+ * 
+ * <p>
+ * Date created: Jan 23, 2009
+ * 
+ * @author scytacki<p>
+ *
+ */
 public class OTXHTMLWrapperView
-    implements OTJComponentView, OTViewContainerAware, OTViewContextAware
+    implements OTJComponentView, OTViewContainerAware, OTViewContextAware, OTXHTMLView
 {
 	private OTDocumentView view;
 	private OTXHTMLWrapperDoc doc;
@@ -71,5 +82,15 @@ public class OTXHTMLWrapperView
 	public void setViewContext(OTViewContext viewContext)
     {
 		this.passedViewContext = viewContext;
+    }
+
+	public boolean getEmbedXHTMLView()
+    {
+		return xhtmlView.getEmbedXHTMLView();
+    }
+
+	public String getXHTMLText(OTObject otObject)
+    {
+		return xhtmlView.getXHTMLText(otObject);
     }
 }

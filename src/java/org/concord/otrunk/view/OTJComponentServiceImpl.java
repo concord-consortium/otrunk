@@ -135,7 +135,9 @@ public class OTJComponentServiceImpl implements OTJComponentService
     		OTViewConversionService conversionService = 
     			viewContext2.getViewService(OTViewConversionService.class);
 
-    		if(conversionService != null){	
+    		if(conversionService == null){
+    			System.err.println("No View Conversion service");
+    		} else {    			
     			view = conversionService.convert(genericView, OTJComponentView.class,
     				viewFactory, viewEntry);
     		} 
