@@ -810,6 +810,7 @@ public class OTViewer extends JFrame
                 return otrunk.getUsers();
             }
         });
+        ((OTViewFactoryImpl)otViewFactory).contextSetupComplete();
 
         currentURL = url;
     }

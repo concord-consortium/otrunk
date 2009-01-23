@@ -198,6 +198,8 @@ public class OTViewerHelper
 		            return ((OTrunkImpl)otrunk).getUsers();
 	            }
 			});
+	        ((OTViewFactoryImpl)viewFactory).contextSetupComplete();
+
 		}
 		
 	}
