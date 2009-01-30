@@ -184,9 +184,8 @@ public class OTUserOverlayManager
 		OTObjectServiceImpl objService = (OTObjectServiceImpl) getObjectService(overlay);
 		if (objService != null) {
 			return objService.getCreationDb();
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 	public XMLDatabase getXMLDatabase(OTOverlay overlay) {
