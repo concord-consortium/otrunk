@@ -5,9 +5,9 @@ import java.net.URL;
 import org.concord.framework.otrunk.OTObjectInterface;
 import org.concord.otrunk.user.OTUserObject;
 
-public interface OTClassMember extends OTObjectInterface
+public interface OTGroupMember extends OTObjectInterface
 {
-	public URL getOverlayURL();
+	public URL getDataURL();
 	public OTUserObject getUserObject();
 	
 	public static boolean DEFAULT_isCurrentUser = false;

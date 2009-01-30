@@ -3,7 +3,7 @@ package org.concord.otrunk.user;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectInterface;
 import org.concord.framework.otrunk.OTObjectList;
-import org.concord.otrunk.view.OTClassMember;
+import org.concord.otrunk.view.OTGroupMember;
 
 public interface OTWorkgroupMemberChooser
     extends OTObjectInterface
@@ -12,17 +12,17 @@ public interface OTWorkgroupMemberChooser
 	 * The current user
 	 * @return
 	 */
-	public void setLeadMember(OTClassMember member);
-	public OTClassMember getLeadMember();
+	public void setLeadMember(OTGroupMember member);
+	public OTGroupMember getLeadMember();
 	
 	/**
-	 * A List of OTClassMember objects, all of which are copied from the OTClassListManager
+	 * A List of OTGroupMember objects, all of which are copied from the OTGroupListManager
 	 * @return
 	 */
 	public OTObjectList getOtherWorkgroupMembers();
 	
 	/**
-	 * A List of OTClassMember objects, all of which were dynamically created on the fly by the current user
+	 * A List of OTGroupMember objects, all of which were dynamically created on the fly by the current user
 	 * @return
 	 */
 	public OTObjectList getCustomWorkgroupMembers();

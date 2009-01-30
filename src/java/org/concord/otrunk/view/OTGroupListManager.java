@@ -14,9 +14,8 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
-import org.concord.otrunk.user.OTUserObject;
 
-public class OTClassListManager extends DefaultOTObject
+public class OTGroupListManager extends DefaultOTObject
     implements OTBundle
 {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
@@ -29,19 +28,19 @@ public class OTClassListManager extends DefaultOTObject
 	}
 	private ResourceSchema resources;
 	
-	// the userListURL should point to an otrunk document with the main object being a OTObjectSet,
-	// which encapsulates an OTObjectList of OTClassMember objects
-	private URL userListURL;
+	// the groupListURL should point to an otrunk document with the main object being a OTObjectSet,
+	// which encapsulates an OTObjectList of OTGroupMember objects
+	private URL groupListURL;
 	
 	// userList is a list of OTClassMember objects
 	private OTObjectList userList;
 	private OTrunkImpl otrunk;
 	
-	private OTClassMember currentClassMember;
+	private OTGroupMember currentGroupMember;
 
 	private OTUserOverlayManager overlayManager;
 	
-	public OTClassListManager(ResourceSchema resources)
+	public OTGroupListManager(ResourceSchema resources)
     {
 	    super(resources);
 	    this.resources = resources;
@@ -52,8 +51,8 @@ public class OTClassListManager extends DefaultOTObject
 	{
 		userList = resources.getUserList();
 		
-		userListURL = resources.getUserListURL();
-		if (userListURL != null) {
+		groupListURL = resources.getUserListURL();
+		if (groupListURL != null) {
 			initializeUserListFromURL();
 		}
 		
@@ -62,7 +61,7 @@ public class OTClassListManager extends DefaultOTObject
 
 	public void registerServices(OTServiceContext serviceContext)
 	{
-		serviceContext.addService(OTClassListManager.class, this);
+		serviceContext.addService(OTGroupListManager.class, this);
 		overlayManager = serviceContext.getService(OTUserOverlayManager.class);
 		if (overlayManager == null) {
 			overlayManager = new OTUserOverlayManager(otrunk);
@@ -73,11 +72,11 @@ public class OTClassListManager extends DefaultOTObject
 	
 	private void initializeUserListFromURL() {
 		try {
-	        OTObjectSet set = (OTObjectSet) otrunk.getExternalObject(userListURL, resources.getOTObjectService());
+	        OTObjectSet set = (OTObjectSet) otrunk.getExternalObject(groupListURL, resources.getOTObjectService());
 	        
 	        userList.addAll(set.getObjects());
         } catch (Exception e) {
-	        logger.log(Level.SEVERE, "Couldn't initialize class list from URL: " + userListURL, e);
+	        logger.log(Level.SEVERE, "Couldn't initialize class list from URL: " + groupListURL, e);
         }
 	}
 
@@ -94,34 +93,30 @@ public class OTClassListManager extends DefaultOTObject
     	// for each user
     	
     	for(OTObject obj: userList){
-    		OTClassMember classMember = (OTClassMember) obj;
+    		OTGroupMember groupMember = (OTGroupMember) obj;
 
     		// if current user is set, make it the current user
-    		if (classMember.getIsCurrentUser()) {
-    			this.currentClassMember = classMember;
+    		if (groupMember.getIsCurrentUser()) {
+    			this.currentGroupMember = groupMember;
     		}
     		// if overlay url is set, load and register overlay
-    		if (classMember.getOverlayURL() != null) {
+    		if (groupMember.getDataURL() != null) {
     			try {
     				if (reload) {
     					// to avoid problems where the overlayManager still references different versions of the overlay, we'll remove the old ones first
-    					overlayManager.reload(classMember.getUserObject());
+    					overlayManager.reload(groupMember.getUserObject());
     				} else {
-    					overlayManager.add(classMember.getOverlayURL(), classMember.getUserObject(), false);
+    					overlayManager.add(groupMember.getDataURL(), groupMember.getUserObject(), false);
     				}
     			} catch (Exception e) {
-    				logger.log(Level.WARNING, "Couldn't load overlay for user: " + classMember.getName(), e);
+    				logger.log(Level.WARNING, "Couldn't load overlay for user: " + groupMember.getName(), e);
     			}
     		}
     	}
     }
     
-    public OTClassMember getCurrentClassMember() {
-    	return this.currentClassMember;
-    }
-    
-    public OTUserObject getCurrentClassMemberUserObject() {
-    	return this.currentClassMember.getUserObject();
+    public OTGroupMember getCurrentGroupMember() {
+    	return this.currentGroupMember;
     }
     
     public void reloadAll() {

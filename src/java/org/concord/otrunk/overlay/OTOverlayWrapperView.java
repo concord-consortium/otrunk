@@ -15,7 +15,7 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.AbstractOTJComponentContainerView;
-import org.concord.otrunk.view.OTClassListManager;
+import org.concord.otrunk.view.OTGroupListManager;
 
 public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 {
@@ -24,32 +24,30 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	private OTObject wrappedObject;
 	private JComponent subview;
 	private OTOverlayWrapper wrapper;
-	private OTClassListManager classListManager;
+	private OTGroupListManager groupListManager;
 	private OTUserOverlayManager overlayManager;
 	private JButton submitButton;
 	
 	public JComponent getComponent(OTObject otObject)
 	{
-		// logger.info("Initializing overlay wrapper");
-		// FIXME Changes to the object will ONLY be save in the overlay! We should probably mirror
-		// the changes to the current user's session overlay, too!
-		// logger.info("Initializing");
+		// FIXME This should be changed so that the user data is stored in the user session layer,
+		// and only when the overlay data is saved remotely should it get copied into the overlay
 		wrapper = (OTOverlayWrapper) otObject;
 		overlay = wrapper.getOverlay();
-		classListManager = (OTClassListManager) wrapper.getOTObjectService().getOTrunkService(OTClassListManager.class);
-		overlayManager = (OTUserOverlayManager) wrapper.getOTObjectService().getOTrunkService(OTUserOverlayManager.class);
+		groupListManager = wrapper.getOTObjectService().getOTrunkService(OTGroupListManager.class);
+		overlayManager = wrapper.getOTObjectService().getOTrunkService(OTUserOverlayManager.class);
 		wrappedObject = wrapper.getWrappedObject();
 		
 		/* String msg = "\nwrapped object is: " + wrappedObject;
 		msg += "\noverlay object is: " + overlay;
-		msg += "\nclass list manager is: " + classListManager;
+		msg += "\ngroup list manager is: " + groupListManager;
 		msg += "\noverlay manager is: " + overlayManager;
 		logger.info(msg);
 		*/
-		if (overlay == null && classListManager != null && overlayManager != null) {
-			// logger.info("Using class list manager/overlay manager");
-			OTUserObject currentClassMember = classListManager.getCurrentClassMemberUserObject();
-			overlay = overlayManager.getOverlay(currentClassMember);
+		if (overlay == null && groupListManager != null && overlayManager != null) {
+			// logger.info("Using group list manager/overlay manager");
+			OTUserObject currentGroupMember = groupListManager.getCurrentGroupMember().getUserObject();
+			overlay = overlayManager.getOverlay(currentGroupMember);
 		}
 
 		// logger.info("overlay object is: " + overlay);
@@ -91,7 +89,8 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		return mainPanel;
 	}
 	
-	public void viewClosed() {
+	@Override
+    public void viewClosed() {
 		// logger.info("Closing the wrapped object's views");
 		removeAllSubViews();
 		saveData();
