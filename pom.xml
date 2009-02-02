@@ -54,12 +54,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.concord.external</groupId>
-      <artifactId>ekit</artifactId>
-      <version>1.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>asm</groupId>
       <artifactId>asm</artifactId>
       <version>3.1</version>
