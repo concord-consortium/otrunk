@@ -421,20 +421,32 @@ public class OTMLToXHTMLConverter
 				String id = otObject.otExternalId();
 				id = id.replaceAll("/", "_");
 				id = id.replaceAll("'", "");
-				id = id.replaceAll("!", "") + ".png";
+				id = id.replaceAll("!", "");
 				
 				if (!folder.isDirectory()) {
 					text = null;
 					return;
 				}
 
-				File newFile = new File(folder, id);
-
+				File newFile = new File(folder, id + ".png");
+				String originalId = id;
+				
+				// This is a hack so when multiple students objects are shown at the same time
+				// the file names don't overlap because all of them will return the same thing from
+				// otExternalId().  This approach isn't perfect though because the same object 
+				// might be referenced twice so in that case the same image should be used.
+				int i=1;
+				while(newFile.exists()){
+					id = originalId + "_" + i;
+					i++;
+					newFile = new File(folder, id + ".png");
+				}				
+				
 				BufferedImage bim = ComponentScreenshot
 				        .makeComponentImageAlpha(comp, scaleX, scaleY);
 				ComponentScreenshot.saveImageAsFile(bim, newFile, "png");
 
-				text = folderPath + "/" + id;
+				text = folderPath + "/" + id + ".png";
 				return;
 
 			} catch (Throwable t) {
