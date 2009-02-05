@@ -14,6 +14,7 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
+import org.concord.otrunk.user.OTUserObject;
 
 public class OTGroupListManager extends DefaultOTObject
     implements OTBundle
@@ -25,12 +26,15 @@ public class OTGroupListManager extends DefaultOTObject
 		// list of users that are in this class. specify the URL or the list
 		URL getUserListURL();
 		OTObjectList getUserList();
+		URL getGroupDataURL();
 	}
 	private ResourceSchema resources;
 	
 	// the groupListURL should point to an otrunk document with the main object being a OTObjectSet,
 	// which encapsulates an OTObjectList of OTGroupMember objects
 	private URL groupListURL;
+	private URL groupDataURL;
+	private OTUserObject groupUserObject;
 	
 	// userList is a list of OTClassMember objects
 	private OTObjectList userList;
@@ -50,12 +54,20 @@ public class OTGroupListManager extends DefaultOTObject
 	public void initializeBundle(OTServiceContext serviceContext)
 	{
 		userList = resources.getUserList();
-		
+		groupDataURL = resources.getGroupDataURL();
 		groupListURL = resources.getUserListURL();
 		if (groupListURL != null) {
 			initializeUserListFromURL();
 		}
-		
+		if (groupDataURL != null) {
+			try {
+	            groupUserObject = resources.getOTObjectService().createObject(OTUserObject.class);
+	            overlayManager.add(groupDataURL, groupUserObject, false);
+            } catch (Exception e) {
+	            logger.log(Level.WARNING, "Couldn't set up group datastore.", e);
+	            groupUserObject = null;
+            }
+		}
 		processUserList(false);
 	}
 
@@ -86,6 +98,10 @@ public class OTGroupListManager extends DefaultOTObject
     public OTObjectList getUserList()
     {
 	    return userList;
+    }
+    
+    public OTUserObject getGroupUser() {
+    	return groupUserObject;
     }
     
     private void processUserList(boolean reload) {
@@ -120,7 +136,16 @@ public class OTGroupListManager extends DefaultOTObject
     }
     
     public void reloadAll() {
+    	try {
+	        overlayManager.reload(groupUserObject);
+        } catch (Exception e) {
+        	logger.log(Level.WARNING, "Couldn't load overlay for group", e);
+        }
     	processUserList(true);
+    }
+    
+    public boolean isGroupEnabled() {
+    	return groupUserObject == null;
     }
 
 }
