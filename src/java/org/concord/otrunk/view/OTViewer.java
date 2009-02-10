@@ -111,6 +111,7 @@ import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.text.UserMessageHandler;
+import org.concord.framework.util.IResourceLoader;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTMLToXHTMLConverter;
 import org.concord.otrunk.OTSystem;
@@ -219,6 +220,8 @@ public class OTViewer extends JFrame
     private boolean launchedBySailOTViewer = false;
 
     private boolean sailSaveEnabled = true;
+    
+    private IResourceLoader rrLoader = null;
 
     // Temp, to close the window
     AbstractAction exitAction;
@@ -741,6 +744,8 @@ public class OTViewer extends JFrame
     public void loadURL(URL url)
         throws Exception
     {
+    	IResourceLoader oldRRLoader = XMLDatabase.getRequiredResourceLoader();
+    	XMLDatabase.setRequiredResourceLoader(rrLoader);
         XMLDatabase systemDB = null;
 
         try {
@@ -813,6 +818,8 @@ public class OTViewer extends JFrame
         ((OTViewFactoryImpl)otViewFactory).contextSetupComplete();
 
         currentURL = url;
+        
+        XMLDatabase.setRequiredResourceLoader(oldRRLoader);
     }
 
     // This method was refactored out of loadURL
@@ -1552,6 +1559,10 @@ public class OTViewer extends JFrame
     
     public boolean isLaunchedBySailOTViewer(){
         return launchedBySailOTViewer;
+    }
+    
+    public void setRequiredResourceLoader(IResourceLoader loader) {
+    	this.rrLoader = loader;
     }
 
     /*

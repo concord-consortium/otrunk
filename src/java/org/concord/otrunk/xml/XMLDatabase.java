@@ -52,6 +52,7 @@ import java.util.Map.Entry;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTPackage;
+import org.concord.framework.util.IResourceLoader;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
@@ -130,6 +131,8 @@ public class XMLDatabase
 	
 	private long urlLastModifiedTime = -1;
 	
+	private static IResourceLoader rrLoader = null;
+	
 	protected static String getLabel(URL contextURL)
 	{
 		if (contextURL == null) {
@@ -156,17 +159,18 @@ public class XMLDatabase
 	public XMLDatabase(URL xmlURL, PrintStream statusStream) throws Exception
 	{
 		initialize(xmlURL, xmlURL.toExternalForm(), statusStream);
-
 		long openingStart = System.currentTimeMillis();
-		URLStreamHandler urlStreamHandler = new URLStreamHandler(xmlURL);
-		InputStream urlInStream = urlStreamHandler.getURLStream();		
+		InputStream urlInStream;
+		if (rrLoader == null) {
+			rrLoader = new URLStreamHandler(xmlURL);
+		}
+		urlInStream = rrLoader.getRemoteResource(xmlURL);
+		urlLastModifiedTime = rrLoader.getLastModified();
 		urlOpenTime = System.currentTimeMillis() - openingStart;
-		
-		urlLastModifiedTime = urlStreamHandler.getLastModified();
 		
 		// parse the xml file...
 		long startMillis = -1;
-		JDOMDocument document = null;
+		JDOMDocument xmlDocument = null;
 		InputStream inputStream = urlInStream;
 		if(OTConfig.getBooleanProp(OTConfig.TRACE_DB_LOAD_TIME, false)){				
 			long transferStart = System.currentTimeMillis();
@@ -178,13 +182,15 @@ public class XMLDatabase
 		}
 		startMillis = System.currentTimeMillis();
 		try {
-			document = new JDOMDocument(inputStream);
+			xmlDocument = new JDOMDocument(inputStream);
 		} catch (Exception e){
-			urlStreamHandler.printAndThrowURLError("Error reading xml from", false, e);
+			if (rrLoader instanceof URLStreamHandler) {
+				((URLStreamHandler)rrLoader).printAndThrowURLError("Error reading xml from", false, e);
+			}
 		}
 		parseTime = System.currentTimeMillis() - startMillis;
 
-		initializeDoc(document);
+		initializeDoc(xmlDocument);
 	}
 
 	public XMLDatabase(InputStream xmlStream, URL contextURL, PrintStream statusStream)
@@ -203,7 +209,7 @@ public class XMLDatabase
 
 		// parse the xml file...
 		long startMillis = -1;
-		JDOMDocument document = null;
+		JDOMDocument xmlDocument = null;
 		try {
 			InputStream inputStream = xmlStream;
 			if(OTConfig.getBooleanProp(OTConfig.TRACE_DB_LOAD_TIME, false)){				
@@ -215,7 +221,7 @@ public class XMLDatabase
 				downloadTime = System.currentTimeMillis() - transferStart;
 			}
 			startMillis = System.currentTimeMillis();
-			document = new JDOMDocument(inputStream);
+			xmlDocument = new JDOMDocument(inputStream);
 		} catch (Exception e) {
 
 			if (contextURL != null) {
@@ -234,7 +240,7 @@ public class XMLDatabase
 		}
 		parseTime = System.currentTimeMillis() - startMillis;
 
-		initializeDoc(document);
+		initializeDoc(xmlDocument);
 	}
 
 	public XMLDatabase(Reader xmlReader, URL contextURL, PrintStream statusStream)
@@ -249,10 +255,10 @@ public class XMLDatabase
 		initialize(contextURL, label, statusStream);
 		// printStatus("Opening otml: " + label);
 		long startMillis = System.currentTimeMillis();		
-		JDOMDocument document = new JDOMDocument(xmlReader);
+		JDOMDocument xmlDocument = new JDOMDocument(xmlReader);
 		parseTime = System.currentTimeMillis() - startMillis;
 		
-		initializeDoc(document);
+		initializeDoc(xmlDocument);
 
 	}
 
@@ -1017,5 +1023,13 @@ public class XMLDatabase
     public long getUrlLastModifiedTime()
     {
 	    return urlLastModifiedTime;
+    }
+    
+    public static void setRequiredResourceLoader(IResourceLoader loader) {
+    	rrLoader = loader;
+    }
+    
+    public static IResourceLoader getRequiredResourceLoader() {
+    	return rrLoader;
     }
 }
