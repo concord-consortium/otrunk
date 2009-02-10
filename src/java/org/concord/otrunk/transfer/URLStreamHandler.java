@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 
-public class URLStreamHandler
+import org.concord.framework.util.IResourceLoader;
+
+public class URLStreamHandler implements IResourceLoader
 {
 	URLConnection connection;
 	URL url;
@@ -117,5 +119,16 @@ public class URLStreamHandler
 	public long getLastModified() {
 		return lastModified;
 	}
+
+	public InputStream getRemoteResource(URL resourceUrl)
+    {
+	    this.url = resourceUrl;
+	    try {
+	    	return getURLStream();
+	    } catch (Exception e) {
+	    	System.err.println("Error getting resource: " + resourceUrl.toString() + "\n" + e.getMessage());
+	    	return null;
+	    }
+    }
 
 }

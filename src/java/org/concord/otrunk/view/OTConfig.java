@@ -25,6 +25,7 @@ public class OTConfig
 	public final static String SHOW_DESTRUCTIVE_MENU_ITEMS_PROP = "otrunk.view.destructive_menu";	// "New" and "Open"
 	public final static String TRACE_DB_LOAD_TIME = "otrunk.db.trace.load";
 	public final static String USE_ASM = "otrunk.use.asm";
+	public final static String IGNORE_LOAD_ERRORS = "otrunk.db.ignore_errors";
 	
 	/**
      * This is yet another hack to support something like layers or mutliple files.
