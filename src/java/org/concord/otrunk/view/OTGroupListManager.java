@@ -13,10 +13,12 @@ import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
+import org.concord.framework.util.IResourceLoader;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
 import org.concord.otrunk.user.OTUserObject;
+import org.concord.otrunk.xml.XMLDatabase;
 
 public class OTGroupListManager extends DefaultOTObject
     implements OTBundle
@@ -55,6 +57,8 @@ public class OTGroupListManager extends DefaultOTObject
 
 	public void initializeBundle(OTServiceContext serviceContext)
 	{
+		IResourceLoader originalLoader = XMLDatabase.getRequiredResourceLoader();
+		XMLDatabase.setRequiredResourceLoader(null);
 		userList = resources.getUserList();
 		groupDataURL = resources.getGroupDataURL();
 		groupListURL = resources.getUserListURL();
@@ -71,6 +75,7 @@ public class OTGroupListManager extends DefaultOTObject
             }
 		}
 		processUserList(false);
+		XMLDatabase.setRequiredResourceLoader(originalLoader);
 	}
 
 	public void registerServices(OTServiceContext serviceContext)
