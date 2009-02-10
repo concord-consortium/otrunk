@@ -167,6 +167,10 @@ public class OTUserOverlayManager
 	public Set<OTOverlay> getOverlays() {
 		return this.overlayToObjectServiceMap.keySet();
 	}
+	
+	public OTObject getOTObject(OTUserObject userObject, OTObject object) throws Exception {
+		return getOTObject(userObject, object.getGlobalId());
+	}
 
 	public OTObject getOTObject(OTUserObject userObject, OTID id) throws Exception {
 		return getOTObject(getOverlay(userObject), id);
@@ -250,5 +254,9 @@ public class OTUserOverlayManager
 		} else {
 			otrunk.remoteSaveData(getXMLDatabase(overlay), OTViewer.HTTP_PUT, authenticator);
 		}
+	}
+	
+	public void remoteSave(OTUserObject user) throws Exception {
+		remoteSave(getOverlay(user));
 	}
 }
