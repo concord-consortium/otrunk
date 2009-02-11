@@ -429,16 +429,7 @@ public class OTViewer extends JFrame
     }
 
     public void initArgs(String[] args) {
-    	// We need to add protocol handler early, before resources are loaded
-    	String existingHandlerPackages = System.getProperty("java.protocol.handler.pkgs");
-    	System.out.println("Test: Adding handlers");
-    	if (existingHandlerPackages != null){
-    		System.setProperty("java.protocol.handler.pkgs", existingHandlerPackages + "|org.concord.otrunk.handlers");
-    	} else {
-    		System.setProperty("java.protocol.handler.pkgs", "org.concord.otrunk.handlers");
-    	}
-    	
-        URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
+    	URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
         
         if (authorOTMLURL == null && System.getProperty(OTML_URL_PROP, null) != null) {
             try {
@@ -484,6 +475,15 @@ public class OTViewer extends JFrame
     }
 
     public void init(String url) {
+    	// We need to add protocol handler early, before resources are loaded
+    	String existingHandlerPackages = System.getProperty("java.protocol.handler.pkgs");
+    	System.out.println("Test: Adding handlers");
+    	if (existingHandlerPackages != null){
+    		System.setProperty("java.protocol.handler.pkgs", existingHandlerPackages + "|org.concord.otrunk.handlers");
+    	} else {
+    		System.setProperty("java.protocol.handler.pkgs", "org.concord.otrunk.handlers");
+    	}
+    	
         updateRemoteURL(url);
         createActions();
         updateMenuBar();
