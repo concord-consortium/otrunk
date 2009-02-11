@@ -430,9 +430,12 @@ public class OTViewer extends JFrame
 
     public void initArgs(String[] args) {
     	// We need to add protocol handler early, before resources are loaded
-    	if (System.getProperty("java.protocol.handler.pkgs") == null){
-			System.setProperty("java.protocol.handler.pkgs", "org.concord.otrunk.handlers");
-		}
+    	String existingHandlerPackages = System.getProperty("java.protocol.handler.pkgs");
+    	if (existingHandlerPackages != null){
+    		System.setProperty("java.protocol.handler.pkgs", existingHandlerPackages + "|org.concord.otrunk.handlers");
+    	} else {
+    		System.setProperty("java.protocol.handler.pkgs", "org.concord.otrunk.handlers");
+    	}
     	
         URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
         
