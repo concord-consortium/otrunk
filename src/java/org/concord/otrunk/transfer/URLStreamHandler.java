@@ -58,17 +58,31 @@ public class URLStreamHandler implements IResourceLoader
     
     	try {
     
+    		String encoding = connection.getContentEncoding();
     		if(httpConnection != null){
     			InputStream errorStream = httpConnection.getErrorStream();
-    			StreamUtil.printFromStream("Error Message", errorStream);
+
+    			StreamUtil.printFromStream("Error Message", errorStream, encoding);
     		}
     
     		if(printInStream){
     			if(inStream == null){
     				// Open the connection stream if it hasn't been passed in
-    				inStream = connection.getInputStream();
+    				try {
+    					inStream = connection.getInputStream();
+    				} catch (Exception inStreamException) {
+    					// If we are in this method we already know there is a problem
+    					// and it turns out that if the problem is a 404 then a FileNotFoundException
+    					// will be thrown when calling getInputStream().  For now lets include
+    					// that if the passed in exception is null
+    					if (e == null){
+    						e = inStreamException;
+    					}
+    					// And in this case inStream will be null so the printFromStream will just
+    					// print nothing.
+    				}
     			}
-    			StreamUtil.printFromStream("Response Body", inStream);
+    			StreamUtil.printFromStream("Response Body", inStream, encoding);
     		}
     	} catch (Throwable t){
     		// Don't throw errors caused by trying to print out errors
