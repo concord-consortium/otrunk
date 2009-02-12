@@ -168,11 +168,24 @@ public class OTMLToXHTMLConverter
 			
 			OTControllerServiceFactory controllerServiceFactory = new OTControllerServiceFactory(){
 
-				public OTControllerService createControllerService()
+				public OTControllerService createControllerService(OTObjectService objectService)
                 {
 					OTControllerService subControllerService = 
-						((OTControllerServiceImpl) controllerService).createSubControllerService();						
+						((OTControllerServiceImpl) controllerService).createSubControllerService(objectService);						
 					return subControllerService;
+                }
+
+				/**
+				 * @deprecated the object service should be passed in otherwise applications which
+				 * use multiple overlay databases will not function properly
+				 * 
+				 * @see org.concord.framework.otrunk.view.OTControllerServiceFactory#createControllerService()
+				 */
+				public OTControllerService createControllerService()
+                {
+					OTObjectService objectService = 
+						((OTControllerServiceImpl) controllerService).getObjectService();
+					return createControllerService(objectService);
                 }
 				
 			};
