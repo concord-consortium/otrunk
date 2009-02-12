@@ -30,7 +30,7 @@ public class UrlStreamHandlerFactory implements URLStreamHandlerFactory {
     return instance;
   }
 
-  public static void registerHandlerClass(Class handlerClass) {
+  public static void registerHandlerClass(Class handlerClass) throws Exception {
     synchronized (UrlStreamHandlerFactory.class) {
       if (null == instance) {
         instance = new UrlStreamHandlerFactory();
@@ -43,7 +43,7 @@ public class UrlStreamHandlerFactory implements URLStreamHandlerFactory {
         	  System.err.println("This handler is a BaseUrlStreamHandler, so we'll try to register system properties");
             UrlStreamHandlerDelegate.registerSystemProperty();
           } else
-            throw new RuntimeException("A URL stream handler factory has been set already! "
+            throw new Exception("A URL stream handler factory has been set already! "
                 + "You can try to register a BaseUrlStreamHandler class instead.");
         }
       }
