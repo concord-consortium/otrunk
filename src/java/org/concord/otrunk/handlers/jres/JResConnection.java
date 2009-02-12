@@ -1,4 +1,4 @@
-package sun.net.www.protocol.jres;
+package org.concord.otrunk.handlers.jres;
 
 import java.io.IOException;
 import java.net.URL;

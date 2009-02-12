@@ -118,6 +118,7 @@ import org.concord.otrunk.OTSystem;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkServiceEntry;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.handlers.UrlStreamHandlerFactory;
 import org.concord.otrunk.overlay.OTOverlayGroup;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.ExporterJDOM;
@@ -476,13 +477,8 @@ public class OTViewer extends JFrame
 
     public void init(String url) {
     	// We need to add protocol handler early, before resources are loaded
-    	String existingHandlerPackages = System.getProperty("java.protocol.handler.pkgs");
-    	System.out.println("Test: Adding handlers. Was "+existingHandlerPackages);
-//    	if (existingHandlerPackages != null){
-//    		System.setProperty("java.protocol.handler.pkgs", existingHandlerPackages + "|org.concord.otrunk.handlers");
-//    	} else {
-//    		System.setProperty("java.protocol.handler.pkgs", "org.concord.otrunk.handlers");
-//    	}
+    	System.err.println("Trying to register handers");
+    	UrlStreamHandlerFactory.registerHandlerClass(org.concord.otrunk.handlers.jres.Handler.class);
     	
         updateRemoteURL(url);
         createActions();
