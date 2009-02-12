@@ -56,13 +56,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -478,23 +475,22 @@ public class OTViewer extends JFrame
         return authorOTMLURL.toString();
     }
     
-    private static Object getURLStreamHandlerFactoryLock()
-	    throws IllegalAccessException
-	{
-		Object lock;
-		try {
-			Field streamHandlerLockField = URL.class.getDeclaredField("streamHandlerLock"); //$NON-NLS-1$
-			streamHandlerLockField.setAccessible(true);
-			lock = streamHandlerLockField.get(null);
-		} catch (NoSuchFieldException noField) {
-			// could not find the lock, lets sync on the class object
-			lock = URL.class;
-		}
-		return lock;
-	}
+//    private static Object getURLStreamHandlerFactoryLock()
+//	    throws IllegalAccessException
+//	{
+//		Object lock;
+//		try {
+//			Field streamHandlerLockField = URL.class.getDeclaredField("streamHandlerLock"); //$NON-NLS-1$
+//			streamHandlerLockField.setAccessible(true);
+//			lock = streamHandlerLockField.get(null);
+//		} catch (NoSuchFieldException noField) {
+//			// could not find the lock, lets sync on the class object
+//			lock = URL.class;
+//		}
+//		return lock;
+//	}
     
     private void registerURLStreamHandlers(){
-    	System.err.println("Trying to register handers");
     	try {
     		UrlStreamHandlerFactory.registerHandlerClass(org.concord.otrunk.handlers.jres.Handler.class);
     	} catch (Exception e){
