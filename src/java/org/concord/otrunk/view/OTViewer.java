@@ -56,10 +56,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -474,12 +477,59 @@ public class OTViewer extends JFrame
 
         return authorOTMLURL.toString();
     }
+    
+    private static Object getURLStreamHandlerFactoryLock()
+	    throws IllegalAccessException
+	{
+		Object lock;
+		try {
+			Field streamHandlerLockField = URL.class.getDeclaredField("streamHandlerLock"); //$NON-NLS-1$
+			streamHandlerLockField.setAccessible(true);
+			lock = streamHandlerLockField.get(null);
+		} catch (NoSuchFieldException noField) {
+			// could not find the lock, lets sync on the class object
+			lock = URL.class;
+		}
+		return lock;
+	}
+    
+    private void registerURLStreamHandlers(){
+    	System.err.println("Trying to register handers");
+    	try {
+    		UrlStreamHandlerFactory.registerHandlerClass(org.concord.otrunk.handlers.jres.Handler.class);
+    	} catch (Exception e){
+    		// don't do anything here. If SailStreamHandlerFactory has already been
+    		// created, SailOTViewer should have already added the handlers
+    	}
+    	
+    /*
+     * If we wanted to do something clever at a later date, the reflection code below would
+     * allow us to get the current URLStreamHandlerFactory
+     */
+//        Field factoryField = null;
+//		Field[] fields = URL.class.getDeclaredFields();
+//		for (int i = 0; i < fields.length; i++) {
+//			if (Modifier.isStatic(fields[i].getModifiers())
+//			        && fields[i].getType().equals(URLStreamHandlerFactory.class)) {
+//				factoryField = fields[i];
+//				break;
+//			}
+//		}
+//		factoryField.setAccessible(true);
+//		try {
+//	        URLStreamHandlerFactory factory = (URLStreamHandlerFactory) factoryField.get(null);
+//	        if (factory == null){
+//	        	UrlStreamHandlerFactory.registerHandlerClass(org.concord.otrunk.handlers.jres.Handler.class);
+//	        }
+//        } catch (Exception e) {
+//	        // TODO Auto-generated catch block
+//	        e.printStackTrace();
+//        }
+    	
+    }
 
     public void init(String url) {
-    	// We need to add protocol handler early, before resources are loaded
-//    	System.err.println("Trying to register handers");
-//    	UrlStreamHandlerFactory.registerHandlerClass(org.concord.otrunk.handlers.jres.Handler.class);
-    	
+    	registerURLStreamHandlers();
         updateRemoteURL(url);
         createActions();
         updateMenuBar();
