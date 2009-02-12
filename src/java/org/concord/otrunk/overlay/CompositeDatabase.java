@@ -32,6 +32,8 @@
 */
 package org.concord.otrunk.overlay;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -283,6 +285,25 @@ public class CompositeDatabase
                 // authored database or an id of a brand new object in
                 // the user database
                 return mappedID.getMappedId();
+            } else {
+            	// this transient id is not in our database.  So probably this is a case where
+            	// multiple overlays are being used. So this object is coming from another 
+            	// composite database. Currently this isn't handled.  So this throws an exception
+            	// to make it a little easier to track down the source of the problem.
+            	OTID underlyingId = mappedID.getMappedId();
+            	OTDataObject dataObject = null;
+            	try {
+            		dataObject = objectFinder.findDataObject(underlyingId);
+            	} catch (Exception e) {
+            		e.printStackTrace();            		
+            	}
+            	URI dbURI = null;
+            	if(dataObject != null){
+            		OTDatabase database = dataObject.getDatabase();
+            		dbURI = database.getURI();
+            	}
+            	throw new RuntimeException("Can't resolve id: " + mappedID.toInternalForm() + 
+            		"\n   whose underlying object is from database with uri: " + dbURI);            	
             }
         }
         
@@ -326,6 +347,17 @@ public class CompositeDatabase
     {
 	    // TODO Auto-generated method stub
 	    return null;
+    }
+
+	public URI getURI()
+    {
+		try {
+	        return new URI("composite-db:/" + getDatabaseId());
+        } catch (URISyntaxException e) {
+	        e.printStackTrace();
+        }
+        
+        return null;
     }
 
 }
