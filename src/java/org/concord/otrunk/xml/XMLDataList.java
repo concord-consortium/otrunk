@@ -81,6 +81,7 @@ public class XMLDataList
 	 */
 	public boolean add(Object object)
 	{
+		XMLDatabase.checkObject(object);
 		boolean added = list.add(object);
 		updateModifiedTime();
 		return added;
@@ -91,12 +92,14 @@ public class XMLDataList
 	 */
 	public void add(int index, Object object)
 	{
+		XMLDatabase.checkObject(object);
 		list.add(index, object);
 		updateModifiedTime();
 	}
 
 	public Object set(int index, Object object)
 	{
+		XMLDatabase.checkObject(object);
 		Object previousValue = list.set(index, object);
 		updateModifiedTime();
 		return previousValue;

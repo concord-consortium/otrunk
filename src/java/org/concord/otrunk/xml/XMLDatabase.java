@@ -41,6 +41,8 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -63,6 +65,7 @@ import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
+import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.datamodel.OTUUID;
 import org.concord.otrunk.transfer.Transfer;
 import org.concord.otrunk.transfer.URLStreamHandler;
@@ -1031,5 +1034,36 @@ public class XMLDatabase
     
     public static IResourceLoader getRequiredResourceLoader() {
     	return rrLoader;
+    }
+    
+    /**
+     * This verifies the particular object is valid to add to this database.
+     * If not it throws a runtime exception. 
+     * Invalid objects are transient otobjects, or objects that are not primitives, otid, lists, 
+     * maps, or blobs.
+     * @param obj
+     */
+    final static void checkObject(Object obj)
+    {
+    	if(obj instanceof OTTransientMapID){
+    		throw new RuntimeException("Can't add transient id to XMLDatabase. id: " + 
+    			((OTTransientMapID)obj).toInternalForm());
+    	}
+    }
+    
+    public URI getURI()
+    {
+    	URL srcURL = getSourceURL();
+    	try {
+    		if(srcURL != null){
+    			return srcURL.toURI();
+    		} else {
+    			return new URI("xml-db:/" + getDatabaseId());
+    		}
+    	} catch (URISyntaxException e) {
+    		e.printStackTrace();
+    	}    		
+    	
+    	return null;
     }
 }

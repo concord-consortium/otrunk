@@ -32,6 +32,7 @@
 */
 package org.concord.otrunk.datamodel;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -106,4 +107,10 @@ public interface OTDatabase
 	public BlobResource createBlobResource(URL url);
 	
 	public ArrayList<Class<? extends OTPackage>> getPackageClasses();
+	
+	/**
+	 * This is a second more human readable identifier for the database
+	 * @return
+	 */
+	public URI getURI();
 }
