@@ -59,6 +59,8 @@ public class OTObjectListViewer extends JPanel
 	protected OTObject currentSelectedOTObj;
 	
 	protected JCheckBox copyCheck;
+
+	private boolean showPreview;
 	
 	/**
 	 * Convenience method to show this viewer in a modal dialog and let the user choose an object
@@ -80,6 +82,30 @@ public class OTObjectListViewer extends JPanel
 	public static OTObject showDialog(Component parent, String title, OTFrameManager frameManager, OTViewFactory viewFactory,
 			OTObjectList objList, OTObjectService otObjService, boolean enableCopyOption, boolean defaultCopyOption)
 	{
+		return showDialog(parent, title, frameManager, viewFactory, objList, otObjService, enableCopyOption, defaultCopyOption, false);
+	}
+	
+	/**
+	 * Convenience method to show this viewer in a modal dialog and let the user choose an object
+	 * It returns the object chosen by the user. If the "copy object" checkbox was checked, it
+	 * makes a copy of the object and returns it.
+	 * It receives a bunch of parameters in order to display the OT objects.
+	 * The most crutial parameter is viewConfig, which has the list of objects to be displayed in the dialog
+	 * 
+	 * @param parent		Parent of the dialog
+	 * @param title			Title of the dialog to be displayed
+	 * @param frameManager	the OT frame manager, used to pass it to the views of the objects displayed in the dialog
+	 * @param viewFactory	the OT View factory, used to create the views for the objects displayed in the dialog
+	 * @param objList		An list of OT objects to choose from 
+	 * @param otObjService	An OT Object service, used to make a copy of the OT object, or null, if object copying is not needed.
+	 * @param enableCopyOption	Determines whether the "copy object" checkbox should be enabled or not
+	 * @param defaultCopyOption	Determines if the "copy object" checkbox is selected by default or not
+	 * @param showPreview	Whether a preview of the object should be displayed
+	 * @return	The OT object selected by the user
+	 */
+	public static OTObject showDialog(Component parent, String title, OTFrameManager frameManager, OTViewFactory viewFactory,
+			OTObjectList objList, OTObjectService otObjService, boolean enableCopyOption, boolean defaultCopyOption, boolean showPreview)
+	{
 		OTObject otObj;
 		
 		//Show the user all the possible objects to insert so he can choose
@@ -88,7 +114,7 @@ public class OTObjectListViewer extends JPanel
 			return null;
 		}
 				
-		OTObjectListViewer selectPanel = new OTObjectListViewer(frameManager);
+		OTObjectListViewer selectPanel = new OTObjectListViewer(frameManager, showPreview);
 		selectPanel.setOTViewFactory(viewFactory);
 		selectPanel.setOtObjList(objList);
 		selectPanel.configCopyObjectOption(enableCopyOption, defaultCopyOption);
@@ -132,10 +158,11 @@ public class OTObjectListViewer extends JPanel
 	/**
 	 * 
 	 */
-	public OTObjectListViewer(OTFrameManager frameManager)
+	public OTObjectListViewer(OTFrameManager frameManager, boolean showPreview)
 	{
 		super();
 		this.frameManager = frameManager;
+		this.showPreview = showPreview;
 		currentSelectedOTObj = null;
 		
 		setLayout(new BorderLayout());
@@ -174,20 +201,23 @@ public class OTObjectListViewer extends JPanel
 		JTree tree = new JTree(folderTreeModel);
 		tree.addTreeSelectionListener(this);
 		
-		//Create the objectView
-		viewPanel = new OTViewContainerPanel(frameManager);
-		viewPanel.setOTViewFactory(oTViewFactory);
-		viewPanel.setVisible(false);
-		
-		JPanel rightPanel = new JPanel();
-		rightPanel.setPreferredSize(new Dimension(300,200));
-		rightPanel.add(viewPanel);
+		if (showPreview ){
+    		//Create the objectView
+    		viewPanel = new OTViewContainerPanel(frameManager);
+    		viewPanel.setOTViewFactory(oTViewFactory);
+    		viewPanel.setVisible(false);
+    		
+    		JPanel rightPanel = new JPanel();
+    		rightPanel.setPreferredSize(new Dimension(300,200));
+    		rightPanel.add(viewPanel);
+    		
+    		add(rightPanel);
+		}
 		
 		copyCheck = new JCheckBox("Make just a copy of the object");
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.add(copyCheck);
 		
-		add(rightPanel);
 		add(tree, BorderLayout.WEST);
 		add(bottomPanel, BorderLayout.SOUTH);
 	}
@@ -229,7 +259,11 @@ public class OTObjectListViewer extends JPanel
 		
 		if (node != null){
 			currentSelectedOTObj = node.getPfObject();
+		} else {
+			currentSelectedOTObj = null;
+		}
 			
+		if (showPreview){
 			viewPanel.setCurrentObject(currentSelectedOTObj);
 			if (currentSelectedOTObj != null){
 				viewPanel.setVisible(true);
@@ -238,10 +272,6 @@ public class OTObjectListViewer extends JPanel
 				viewPanel.setVisible(false);				
 			}
 		}
-		else{
-			viewPanel.setCurrentObject(null);
-			viewPanel.setVisible(false);
-		}
 	}
 
 	/**
@@ -249,6 +279,8 @@ public class OTObjectListViewer extends JPanel
 	 */
 	public void close()
 	{
-		viewPanel.setCurrentObject(null);
+		if (showPreview){
+			viewPanel.setCurrentObject(null);
+		}
 	}
 }
