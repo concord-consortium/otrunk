@@ -580,10 +580,10 @@ public class OTControllerServiceImpl implements OTControllerService
     	this.sharedService = sharedService;
     }
 
-	public OTControllerService createSubControllerService()
+	public OTControllerService createSubControllerService(OTObjectService subObjectService)
 	{
 		OTControllerServiceImpl subService = 
-			new OTControllerServiceImpl(objectService, registry);
+			new OTControllerServiceImpl(subObjectService, registry);
 		subService.setSharedService(this);
 		return subService;
 	}
@@ -599,4 +599,9 @@ public class OTControllerServiceImpl implements OTControllerService
     {
 		return (T) serviceMap.get(serviceClass);
     }
+	
+	public OTObjectService getObjectService()
+	{
+		return objectService;
+	}
 }

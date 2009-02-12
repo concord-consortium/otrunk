@@ -51,6 +51,7 @@ import javax.swing.SwingUtilities;
 
 import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.view.OTControllerServiceFactory;
 import org.concord.framework.otrunk.view.OTFrameManager;
 import org.concord.framework.otrunk.view.OTJComponentService;
@@ -171,12 +172,26 @@ public class OTViewContainerPanel extends JPanel
 		if(isTopLevelContainer()){			
 			OTControllerServiceFactory controllerServiceFactory = new OTControllerServiceFactory(){
 
+				/**
+				 * @deprecated the object service should be passed in otherwise applications which
+				 * use multiple overlay databases will not function properly
+				 * 
+				 * @see org.concord.framework.otrunk.view.OTControllerServiceFactory#createControllerService()
+				 */
 				public OTControllerService createControllerService()
                 {
+					OTObjectService objectService = 
+						((OTControllerServiceImpl) controllerService).getObjectService();
+					return createControllerService(objectService);
+                }
+                
+				public OTControllerService createControllerService(OTObjectService objService)
+                {
 					OTControllerService subControllerService = 
-						((OTControllerServiceImpl) controllerService).createSubControllerService();						
+						((OTControllerServiceImpl) controllerService).createSubControllerService(objService);						
 					return subControllerService;
                 }
+
 				
 			};
 			OTViewContext factoryContext = factory.getViewContext();
