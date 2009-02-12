@@ -477,12 +477,12 @@ public class OTViewer extends JFrame
     public void init(String url) {
     	// We need to add protocol handler early, before resources are loaded
     	String existingHandlerPackages = System.getProperty("java.protocol.handler.pkgs");
-    	System.out.println("Test: Adding handlers");
-    	if (existingHandlerPackages != null){
-    		System.setProperty("java.protocol.handler.pkgs", existingHandlerPackages + "|org.concord.otrunk.handlers");
-    	} else {
-    		System.setProperty("java.protocol.handler.pkgs", "org.concord.otrunk.handlers");
-    	}
+    	System.out.println("Test: Adding handlers. Was "+existingHandlerPackages);
+//    	if (existingHandlerPackages != null){
+//    		System.setProperty("java.protocol.handler.pkgs", existingHandlerPackages + "|org.concord.otrunk.handlers");
+//    	} else {
+//    		System.setProperty("java.protocol.handler.pkgs", "org.concord.otrunk.handlers");
+//    	}
     	
         updateRemoteURL(url);
         createActions();

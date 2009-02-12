@@ -77,6 +77,8 @@ public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 			URL url = new URL(contextURL, urlStr);
 			return new BlobResource(url);			
 		} catch(Exception e) {
+		//	e.printStackTrace();
+			System.err.println("Could not load "+urlStr);
 			throw new HandleElementException("malformed url for blob");
 		} 		
 	}
