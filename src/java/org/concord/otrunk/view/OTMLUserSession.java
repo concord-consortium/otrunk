@@ -188,6 +188,8 @@ public class OTMLUserSession
 	{
 		// need to make a brand new stateDB
 		userDataDB = new XMLDatabase();
+		otrunk.addDatabase(userDataDB);
+		
 		// System.out.println("otrunk: " + otrunk + " userDatabase: " +
 		// userDataDB);
 		OTObjectService objService = otrunk.createObjectService(userDataDB);
