@@ -477,8 +477,8 @@ public class OTViewer extends JFrame
 
     public void init(String url) {
     	// We need to add protocol handler early, before resources are loaded
-    	System.err.println("Trying to register handers");
-    	UrlStreamHandlerFactory.registerHandlerClass(org.concord.otrunk.handlers.jres.Handler.class);
+//    	System.err.println("Trying to register handers");
+//    	UrlStreamHandlerFactory.registerHandlerClass(org.concord.otrunk.handlers.jres.Handler.class);
     	
         updateRemoteURL(url);
         createActions();
