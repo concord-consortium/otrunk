@@ -164,11 +164,15 @@ public class XMLDatabase
 		initialize(xmlURL, xmlURL.toExternalForm(), statusStream);
 		long openingStart = System.currentTimeMillis();
 		InputStream urlInStream;
+		URLStreamHandler urlStreamHandler = null;
 		if (rrLoader == null) {
-			rrLoader = new URLStreamHandler(xmlURL);
+			urlStreamHandler = new URLStreamHandler(xmlURL);
+			urlInStream = urlStreamHandler.getURLStream();
+			urlLastModifiedTime = urlStreamHandler.getLastModified();
+		} else {
+			urlInStream = rrLoader.getRemoteResource(xmlURL);			
+			urlLastModifiedTime = rrLoader.getLastModified();
 		}
-		urlInStream = rrLoader.getRemoteResource(xmlURL);
-		urlLastModifiedTime = rrLoader.getLastModified();
 		urlOpenTime = System.currentTimeMillis() - openingStart;
 		
 		// parse the xml file...
@@ -187,8 +191,8 @@ public class XMLDatabase
 		try {
 			xmlDocument = new JDOMDocument(inputStream);
 		} catch (Exception e){
-			if (rrLoader instanceof URLStreamHandler) {
-				((URLStreamHandler)rrLoader).printAndThrowURLError("Error reading xml from", false, e);
+			if (urlStreamHandler != null) {
+				urlStreamHandler.printAndThrowURLError("Error reading xml from", false, e);
 			}
 		}
 		parseTime = System.currentTimeMillis() - startMillis;
