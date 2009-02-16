@@ -101,6 +101,11 @@ public class OTLabbookManagerImpl
 	}
 	
 	public void remove(OTObject labbookEntry){
+		remove(labbookEntry, true);
+	}
+	
+	public void remove(OTObject labbookEntry, boolean showLabbook){
+		tempShowLabbook = showLabbook;
 		resources.getEntries().remove(labbookEntry);
 	}
 	
@@ -142,6 +147,10 @@ public class OTLabbookManagerImpl
     {
 	    return (resources.getEntries().getVector().isEmpty());
     }
+	
+	public void setAllowViewUpdates(boolean allowViewUpdates){
+		
+	}
 	
 	/**
 	 * Change events on the bundle will get passed straight through to listeners
