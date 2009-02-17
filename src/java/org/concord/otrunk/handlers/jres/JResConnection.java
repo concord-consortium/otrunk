@@ -1,5 +1,6 @@
 package org.concord.otrunk.handlers.jres;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 
@@ -22,6 +23,9 @@ public class JResConnection extends java.net.URLConnection
     		throws java.io.IOException {
       
       URL resourceURL = this.getClass().getResource(getURL().getFile());
+      if(resourceURL == null) {
+    	  throw new FileNotFoundException(getURL().toString());
+      }
       return resourceURL.openStream();
     }
 
