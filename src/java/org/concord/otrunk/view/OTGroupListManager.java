@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTBundle;
-import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
@@ -14,7 +13,6 @@ import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
 import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
 import org.concord.otrunk.user.OTUserObject;
 
@@ -152,19 +150,30 @@ public class OTGroupListManager extends DefaultOTObject
     
     public OTObject getObjectForUser(OTObject otObject, OTUserObject user) {
     	OTObject newObject = otObject;
-    	
-    	OTID id = otObject.getGlobalId();
-		if (id instanceof OTTransientMapID) {
-			id = ((OTTransientMapID) id).getMappedId();
-		}
         try {
-	        newObject = overlayManager.getOTObject(user, id);
+	        newObject = overlayManager.getOTObject(user, otObject);
         } catch (Exception e) {
 	        // TODO Auto-generated catch block
 	        e.printStackTrace();
         }
     	
     	return newObject;
+    }
+    
+    public OTGroupMember getMember(OTUserObject user) {
+    	// get the root authored user object first, then run through the list
+		try {
+            user = otrunk.getRuntimeAuthoredObject(user);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Couldn't get the authored version of the object!", e);
+        }
+    	for (OTObject mem : userList) {
+    		OTGroupMember member = (OTGroupMember) mem;
+    		if (member.getUserObject().equals(user)) {
+    			return member;
+    		}
+    	}
+    	return null;
     }
 
 }
