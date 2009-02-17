@@ -766,6 +766,31 @@ public class OTrunkImpl implements OTrunk
 		
 	    return userObject;
 	}
+	/**
+	 * Get the base "authored" object for a particular object, using the root object service to resolve the object
+	 * @param otObject
+	 * @return
+	 * @throws Exception
+	 */
+	public OTObject getRuntimeAuthoredObject(OTObject otObject) throws Exception {
+		return getRuntimeAuthoredObject(otObject, getRootObjectService());
+	}
+	
+	/**
+	 * Get the base "authored" object for a particular object, using a particular object service to resolve the object
+	 * @param otObject
+	 * @param objService
+	 * @return
+	 * @throws Exception
+	 */
+	public OTObject getRuntimeAuthoredObject(OTObject otObject, OTObjectService objService) throws Exception {
+		OTID id = otObject.getGlobalId();
+		if (id instanceof OTTransientMapID) {
+			OTID realID = ((OTTransientMapID) id).getMappedId();
+			return objService.getOTObject(realID);
+		}
+		return otObject;
+	}
 
 	public OTObject getRootObject(OTDatabase db)
 		throws Exception
