@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
@@ -117,6 +118,7 @@ public class OTUserOverlayManager
 	}
 
 	public void add(OTOverlay otOverlay, OTObjectService objService, OTUserObject userObject) {
+		userObject = getAuthoredObject(userObject);
 		overlayToObjectServiceMap.put(otOverlay, objService);
 		userToOverlayMap.put(userObject, otOverlay);
 
@@ -130,10 +132,12 @@ public class OTUserOverlayManager
 	}
 
 	public OTObjectService getObjectService(OTUserObject userObj) {
+		userObj = getAuthoredObject(userObj);
 		return overlayToObjectServiceMap.get(userToOverlayMap.get(userObj));
 	}
 
 	public OTOverlay getOverlay(OTUserObject userObj) {
+		userObj = getAuthoredObject(userObj);
 		return userToOverlayMap.get(userObj);
 	}
 
@@ -169,10 +173,13 @@ public class OTUserOverlayManager
 	}
 	
 	public OTObject getOTObject(OTUserObject userObject, OTObject object) throws Exception {
+		userObject = getAuthoredObject(userObject);
+		object = getAuthoredObject(object);
 		return getOTObject(userObject, object.getGlobalId());
 	}
 
 	public OTObject getOTObject(OTUserObject userObject, OTID id) throws Exception {
+		userObject = getAuthoredObject(userObject);
 		return getOTObject(getOverlay(userObject), id);
 	}
 
@@ -210,6 +217,7 @@ public class OTUserOverlayManager
     }
 
 	public void remove(OTUserObject userObject) {
+		userObject = getAuthoredObject(userObject);
 		OTOverlay otOverlay = getOverlay(userObject);
 		OTObjectService objService = getObjectService(otOverlay);
 
@@ -227,6 +235,7 @@ public class OTUserOverlayManager
 	}
 	
 	public void reload(OTUserObject userObject) throws Exception {
+		userObject = getAuthoredObject(userObject);
 		// check the last modified of the URL and the existing db, if they're different, remove and add the db again
 		XMLDatabase xmlDb = getXMLDatabase(getOverlay(userObject));
 		long existingTime = xmlDb.getUrlLastModifiedTime();
@@ -257,6 +266,16 @@ public class OTUserOverlayManager
 	}
 	
 	public void remoteSave(OTUserObject user) throws Exception {
+		user = getAuthoredObject(user);
 		remoteSave(getOverlay(user));
+	}
+	
+	private <T extends OTObject> T getAuthoredObject(T object) {
+		try {
+			object = otrunk.getRuntimeAuthoredObject(object);
+		} catch (Exception e) {
+			logger.log(Level.WARNING, "Couldn't get authored version of user object!", e);
+		}
+		return object;
 	}
 }
