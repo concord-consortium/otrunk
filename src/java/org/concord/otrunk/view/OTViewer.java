@@ -111,7 +111,6 @@ import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.text.UserMessageHandler;
-import org.concord.framework.util.IResourceLoader;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTMLToXHTMLConverter;
 import org.concord.otrunk.OTSystem;
@@ -222,8 +221,6 @@ public class OTViewer extends JFrame
 
     private boolean sailSaveEnabled = true;
     
-    private IResourceLoader rrLoader = null;
-
     // Temp, to close the window
     AbstractAction exitAction;
 
@@ -523,8 +520,13 @@ public class OTViewer extends JFrame
 //        }
     	
     }
-
-    public void init(String url) {
+    
+    /**
+     * 
+     * @param url
+     * @return true if the url was loaded, return false if an error happens and it wasn't loaded
+     */
+    public boolean init(String url) {
     	registerURLStreamHandlers();
         updateRemoteURL(url);
         createActions();
@@ -551,7 +553,7 @@ public class OTViewer extends JFrame
         initFrameDimensions();
 
         if (url == null) {
-            return;
+            return false;
         }
 
         try {
@@ -563,8 +565,10 @@ public class OTViewer extends JFrame
             // FIXME: this should popup a dialog
             System.err.println("Can't load url");
             e.printStackTrace();
-            return;
+            return false;
         }
+        
+        return true;
     }
 
     /*
@@ -795,8 +799,6 @@ public class OTViewer extends JFrame
     public void loadURL(URL url)
         throws Exception
     {
-    	IResourceLoader oldRRLoader = XMLDatabase.getRequiredResourceLoader();
-    	XMLDatabase.setRequiredResourceLoader(rrLoader);
         XMLDatabase systemDB = null;
 
         try {
@@ -805,7 +807,7 @@ public class OTViewer extends JFrame
                 OTConfig.getStringProp(OTConfig.SYSTEM_OTML_PROP);
             if(systemOtmlUrlStr != null){
                 URL systemOtmlUrl = new URL(systemOtmlUrlStr);
-                systemDB = new XMLDatabase(systemOtmlUrl, System.out);
+                systemDB = new XMLDatabase(systemOtmlUrl, true, System.out);
 
                 // don't track the resource info on the system db.
 
@@ -815,11 +817,9 @@ public class OTViewer extends JFrame
             e.printStackTrace();
             systemDB = null;
         }
-
         
-        try {
-            
-            xmlDB = new XMLDatabase(url, System.out);
+        try {            
+            xmlDB = new XMLDatabase(url, true, System.out);
             
             // Only track the resource info when there isn't a user. Currently
             // all classroom uses
@@ -868,9 +868,7 @@ public class OTViewer extends JFrame
         });
         ((OTViewFactoryImpl)otViewFactory).contextSetupComplete();
 
-        currentURL = url;
-        
-        XMLDatabase.setRequiredResourceLoader(oldRRLoader);
+        currentURL = url;        
     }
 
     // This method was refactored out of loadURL
@@ -1612,10 +1610,6 @@ public class OTViewer extends JFrame
         return launchedBySailOTViewer;
     }
     
-    public void setRequiredResourceLoader(IResourceLoader loader) {
-    	this.rrLoader = loader;
-    }
-
     /*
      * (non-Javadoc)
      * 

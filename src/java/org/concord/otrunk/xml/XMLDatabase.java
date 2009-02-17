@@ -55,6 +55,7 @@ import java.util.Map.Entry;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTPackage;
 import org.concord.framework.util.IResourceLoader;
+import org.concord.framework.util.IResourceLoaderFactory;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataCollection;
 import org.concord.otrunk.datamodel.OTDataList;
@@ -67,8 +68,8 @@ import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.datamodel.OTUUID;
+import org.concord.otrunk.net.IndentingPrintWriter;
 import org.concord.otrunk.transfer.Transfer;
-import org.concord.otrunk.transfer.URLStreamHandler;
 import org.concord.otrunk.view.OTConfig;
 import org.concord.otrunk.xml.jdom.JDOMDocument;
 
@@ -133,8 +134,11 @@ public class XMLDatabase
 	private boolean sourceVerified = false;
 	
 	private long urlLastModifiedTime = -1;
+
+	private IResourceLoader resourceLoader;
 	
-	private static IResourceLoader rrLoader = null;
+	private static IResourceLoaderFactory resourceLoaderFactory =
+		new org.concord.otrunk.net.OTrunkResourceLoaderFactory();
 	
 	protected static String getLabel(URL contextURL)
 	{
@@ -161,18 +165,34 @@ public class XMLDatabase
 
 	public XMLDatabase(URL xmlURL, PrintStream statusStream) throws Exception
 	{
+		this(xmlURL, false, statusStream);
+	}
+	
+	/**
+	 * This will print information about the url if there is an exception loading it.  This should
+	 * be refactored because in some cases this method might be used to see if the URL exists.
+	 * So it will throw a 404 and that shouldn't be printed. 
+	 * 
+	 * @param xmlURL
+	 * @param required If implemented correctly required might prompt the user to retry the url
+	 *    and if that fails it will throw an Error with the intention of stopping the application.
+	 * @param statusStream
+	 * @throws Exception
+	 */
+	public XMLDatabase(URL xmlURL, boolean promptRetryQuit, PrintStream statusStream) throws Exception
+	{
 		initialize(xmlURL, xmlURL.toExternalForm(), statusStream);
 		long openingStart = System.currentTimeMillis();
-		InputStream urlInStream;
-		URLStreamHandler urlStreamHandler = null;
-		if (rrLoader == null) {
-			urlStreamHandler = new URLStreamHandler(xmlURL);
-			urlInStream = urlStreamHandler.getURLStream();
-			urlLastModifiedTime = urlStreamHandler.getLastModified();
-		} else {
-			urlInStream = rrLoader.getRemoteResource(xmlURL);			
-			urlLastModifiedTime = rrLoader.getLastModified();
+		InputStream urlInStream = null;
+		resourceLoader = resourceLoaderFactory.getResourceLoader(xmlURL, promptRetryQuit);
+		try {
+			urlInStream = resourceLoader.getInputStream();
+		} catch (Exception e) {
+			printErrorDetails();
+			throw e;
 		}
+		urlLastModifiedTime = resourceLoader.getLastModified();
+
 		urlOpenTime = System.currentTimeMillis() - openingStart;
 		
 		// parse the xml file...
@@ -191,15 +211,22 @@ public class XMLDatabase
 		try {
 			xmlDocument = new JDOMDocument(inputStream);
 		} catch (Exception e){
-			if (urlStreamHandler != null) {
-				urlStreamHandler.printAndThrowURLError("Error reading xml from", false, e);
-			}
+			printErrorDetails();
+			throw e;
 		}
 		parseTime = System.currentTimeMillis() - startMillis;
 
 		initializeDoc(xmlDocument);
 	}
 
+	public void printErrorDetails()
+    {
+	    IndentingPrintWriter writer = new IndentingPrintWriter(System.err);
+	    writer.printFirstln("Error Loading XMLDatabase: ");
+	    resourceLoader.writeResourceErrorDetails(writer, true);
+	    writer.flush();
+    }
+	
 	public XMLDatabase(InputStream xmlStream, URL contextURL, PrintStream statusStream)
 	        throws Exception
 	{
@@ -1032,14 +1059,10 @@ public class XMLDatabase
 	    return urlLastModifiedTime;
     }
     
-    public static void setRequiredResourceLoader(IResourceLoader loader) {
-    	rrLoader = loader;
+    public static void setResourceLoaderFactory(IResourceLoaderFactory factory) {
+    	resourceLoaderFactory = factory;
     }
-    
-    public static IResourceLoader getRequiredResourceLoader() {
-    	return rrLoader;
-    }
-    
+
     /**
      * This verifies the particular object is valid to add to this database.
      * If not it throws a runtime exception. 

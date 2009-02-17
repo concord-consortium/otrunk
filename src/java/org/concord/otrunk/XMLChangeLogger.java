@@ -35,6 +35,18 @@ import org.xml.sax.helpers.AttributesImpl;
  * This extends TraceListener so it will be ignored in all the same places that
  * tracelistener is ignored.
  * 
+ * To reduce duplicate information this could just store the old value
+ * not the new one.  The newest value will be in the learner data.
+ * However this will require storing the lastModified information in the learner data.
+ * Except for the fact that we won't know which property changed in that last modification
+ * so then the log won't reflect that.  So in conclusion it is better to log everything.
+ * 
+ * Another issue with this log approach is trying to find an old version of an object.  If you
+ * want to look at an old version of a graph you need to access the whole collection of graph
+ * objects. With the log this could be done by replaying the log up to the point that is 
+ * necessary.  But this would be slow if done a lot.  And there are issues of having 2 versions
+ * of the same object available at the same time.  I guess it could be done as an overlay.
+ * 
  * @author scott
  *
  */
