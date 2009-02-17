@@ -58,6 +58,7 @@ public class OTrunkResourceLoader implements IResourceLoader{
 	private InputStream urlInputStream;
 	private int tryCount;
 	private int responseCode = -1;
+	private static int ATTEMPTS_BEFORE_PROMPTING = 2;
 	
 	// FIXME this will fail in a secure environment that can't access system properties
 	private static boolean silentMode = Boolean.getBoolean("sail.rloader.silent");
@@ -165,12 +166,12 @@ public class OTrunkResourceLoader implements IResourceLoader{
 		tryCount++;
 		logger.info("Failed attempt: " + message + 
 				". Count: " + tryCount);
-		if (tryCount > 1 || promptForAction() == false) {
+		if (tryCount >= ATTEMPTS_BEFORE_PROMPTING && !userRequestsRetry()) {
 			throw new ResourceLoadException(message, this, e, connectionOpen);
 		}
 	}
 		
-	private boolean promptForAction() {
+	private boolean userRequestsRetry() {
 		if (silentMode || !promptRetryQuit) { return false; }
 		String[] options = new String[]{"Retry", "Quit"};
 		int choice = JOptionPane.showOptionDialog(null, "There was an error downloading one or more required resources.\nPlease ensure you are connected to the Internet and retry,\n or select quit and launch the project again.", "Download Error", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
