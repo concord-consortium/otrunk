@@ -271,6 +271,9 @@ public class OTUserOverlayManager
 	}
 	
 	private <T extends OTObject> T getAuthoredObject(T object) {
+		if (object == null) {
+			return null;
+		}
 		try {
 			object = otrunk.getRuntimeAuthoredObject(object);
 		} catch (Exception e) {
