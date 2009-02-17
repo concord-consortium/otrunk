@@ -25,6 +25,9 @@
 
 package org.concord.otrunk.net;
 
+import java.awt.BorderLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -37,7 +40,12 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import org.concord.framework.util.IResourceLoader;
 
@@ -166,16 +174,61 @@ public class OTrunkResourceLoader implements IResourceLoader{
 		tryCount++;
 		logger.info("Failed attempt: " + message + 
 				". Count: " + tryCount);
-		if (tryCount >= ATTEMPTS_BEFORE_PROMPTING && !userRequestsRetry()) {
+		if (tryCount >= ATTEMPTS_BEFORE_PROMPTING && !userRequestsRetry(e, message)) {
 			throw new ResourceLoadException(message, this, e, connectionOpen);
 		}
 	}
 		
-	private boolean userRequestsRetry() {
+	private boolean userRequestsRetry(final IOException e, final String message) {
 		if (silentMode || !promptRetryQuit) { return false; }
-		String[] options = new String[]{"Retry", "Quit"};
-		int choice = JOptionPane.showOptionDialog(null, "There was an error downloading one or more required resources.\nPlease ensure you are connected to the Internet and retry,\n or select quit and launch the project again.", "Download Error", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-		return choice == 0;
+		String[] options = new String[]{"Retry", "Quit", "Details"};
+		final JOptionPane optionsPane = new JOptionPane("There was an error downloading one or more required resources.\nPlease ensure you are connected to the Internet and retry,\n or select quit and launch the project again.", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+		final JDialog dialog = new JDialog((JFrame)null, 
+                "Download Error",
+                true);
+		dialog.setContentPane(optionsPane);
+		
+		optionsPane.addPropertyChangeListener(
+			    new PropertyChangeListener() {
+			        public void propertyChange(PropertyChangeEvent e1) {
+			            String prop = e1.getPropertyName();
+
+			            if (dialog.isVisible() 
+			             && (e1.getSource() == optionsPane)
+			             && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+			                if (((String)e1.getNewValue()).equalsIgnoreCase("Details")){
+			                	showErrorDetails(e);
+			                } else {
+			                	dialog.setVisible(false);
+			                }
+			            }
+			        }
+
+					private void showErrorDetails(IOException e)
+                    {
+						JTextArea textArea = new JTextArea(5, 10);
+						textArea.setLineWrap(true);
+						textArea.setWrapStyleWord(true);
+						String details = "Error downloading resource from "+url+"\n\n";
+						details += "================\n\n";
+						details += "Error:\n";
+						details += message+"\n";
+						if (e != null){
+							details += e.getLocalizedMessage();
+						}
+						textArea.setText(details);
+						JScrollPane scroll = new JScrollPane(textArea);
+						textArea.setCaretPosition(0);
+	                    dialog.getContentPane().add(scroll, BorderLayout.SOUTH);
+	                    dialog.pack();
+                    }
+			    });
+		dialog.pack();
+		dialog.setVisible(true);
+
+		String choice = (String) optionsPane.getValue();
+		//	int choice = JOptionPane.showOptionDialog(null, "There was an error downloading one or more required resources.\nPlease ensure you are connected to the Internet and retry,\n or select quit and launch the project again.", "Download Error", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+		return choice.equalsIgnoreCase("Retry");
 	}
 	
 	public long getLastModified() {
