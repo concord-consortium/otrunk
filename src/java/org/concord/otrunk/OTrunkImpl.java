@@ -772,7 +772,7 @@ public class OTrunkImpl implements OTrunk
 	 * @return
 	 * @throws Exception
 	 */
-	public OTObject getRuntimeAuthoredObject(OTObject otObject) throws Exception {
+	public <T extends OTObject> T getRuntimeAuthoredObject(T otObject) throws Exception {
 		return getRuntimeAuthoredObject(otObject, getRootObjectService());
 	}
 	
@@ -783,11 +783,11 @@ public class OTrunkImpl implements OTrunk
 	 * @return
 	 * @throws Exception
 	 */
-	public OTObject getRuntimeAuthoredObject(OTObject otObject, OTObjectService objService) throws Exception {
+	public <T extends OTObject> T getRuntimeAuthoredObject(T otObject, OTObjectService objService) throws Exception {
 		OTID id = otObject.getGlobalId();
 		if (id instanceof OTTransientMapID) {
 			OTID realID = ((OTTransientMapID) id).getMappedId();
-			return objService.getOTObject(realID);
+			return (T) objService.getOTObject(realID);
 		}
 		return otObject;
 	}
