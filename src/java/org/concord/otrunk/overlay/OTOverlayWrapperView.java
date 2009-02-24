@@ -1,11 +1,12 @@
 package org.concord.otrunk.overlay;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -27,6 +28,8 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	private OTGroupListManager groupListManager;
 	private OTUserOverlayManager overlayManager;
 	private JButton submitButton;
+	private GridBagConstraints noStretchConstraints;
+	private GridBagConstraints stretchConstraints;
 	
 	public JComponent getComponent(OTObject otObject)
 	{
@@ -70,13 +73,29 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		subview = createSubViewComponent(wrappedObject);
 		
 		JPanel mainPanel = new JPanel();
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		mainPanel.setLayout(new GridBagLayout());
 		
-		mainPanel.add(subview);
+		noStretchConstraints = new GridBagConstraints();
+		noStretchConstraints.anchor = GridBagConstraints.NORTHWEST;
+		noStretchConstraints.weightx = 0;
+		noStretchConstraints.weighty = 0;
+		noStretchConstraints.fill = GridBagConstraints.NONE;
+		noStretchConstraints.gridwidth = GridBagConstraints.REMAINDER;
+		noStretchConstraints.ipady = 5;
+		
+		stretchConstraints = new GridBagConstraints();
+		stretchConstraints.anchor = GridBagConstraints.NORTHWEST;
+		stretchConstraints.weightx = 1;
+		stretchConstraints.weighty = 0;
+		stretchConstraints.fill = GridBagConstraints.HORIZONTAL;
+		stretchConstraints.gridwidth = GridBagConstraints.REMAINDER;
+		stretchConstraints.ipady = 5;
+		
+		mainPanel.add(subview, stretchConstraints);
 		
 		if (wrapper.getShowButton()) {
 			submitButton = new JButton(wrapper.getButtonText());
-			mainPanel.add(submitButton);
+			mainPanel.add(submitButton, noStretchConstraints);
 			
 			submitButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e)
