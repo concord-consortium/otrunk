@@ -182,7 +182,7 @@ public class OTObjectServiceImpl
 
     public OTControllerService createControllerService() {
     	OTControllerRegistry registry = 
-    		(OTControllerRegistry) otrunk.getService(OTControllerRegistry.class);
+    		otrunk.getService(OTControllerRegistry.class);
     	return new OTControllerServiceImpl(this, registry);
     }
     
@@ -244,7 +244,7 @@ public class OTObjectServiceImpl
 	protected void notifyLoaded(OTObject otObject) 
 	{
 		for(int i=0; i < listeners.size(); i++) {
-			((OTObjectServiceListener)listeners.get(i)).objectLoaded(otObject);
+			(listeners.get(i)).objectLoaded(otObject);
 		}
 	}
 
@@ -258,7 +258,7 @@ public class OTObjectServiceImpl
     @SuppressWarnings("unchecked")
     public <T extends OTObject> T setResourcesFromSchema(OTObjectInternal otObjectImpl, Class<T> otObjectClass)
     {
-        Constructor<T> [] memberConstructors = (Constructor<T> [])otObjectClass.getConstructors();
+        Constructor<T> [] memberConstructors = otObjectClass.getConstructors();
         Constructor<T> resourceConstructor = memberConstructors[0]; 
         Class<?> [] params = resourceConstructor.getParameterTypes();
         
@@ -401,9 +401,37 @@ public class OTObjectServiceImpl
 		
 		OTDataObject copyDataObject = 
 			DataObjectUtil.copy(originalDataObject, creationDb, 
-					orphanDataList, maxDepth, this, otrunk.getDataObjectFinder());
+					orphanDataList, maxDepth, this, otrunk.getDataObjectFinder(), false);
 
 		return getOTObject(copyDataObject.getGlobalId());		
+	}
+	
+	public void copyInto(OTObject source, OTObject destination, int maxDepth, boolean onlyModifications) throws Exception {
+		OTObjectList orphanObjectList = null;
+		
+		OTDataObject rootDO = otrunk.getRootDataObject();		
+		OTObject root = getOTObject(rootDO.getGlobalId());
+		if(root instanceof OTSystem) {
+			orphanObjectList = ((OTSystem)root).getLibrary();
+		}
+		
+		// make a copy of the original objects data object
+		// it is easier to copy data objects than the actual objects
+		
+		OTDataObject sourceDO = getOTDataObject(source);
+		OTDataObject destDO = getOTDataObject(destination);
+		
+		// Assume the object list is our object list impl
+		OTDataList orphanDataList = null;
+		if (orphanObjectList != null) {
+			orphanDataList = ((OTObjectListImpl)orphanObjectList).getDataList();
+		}
+		
+		// OTDataObject copyDataObject = DataObjectUtil.copy(originalDataObject, creationDb, orphanDataList, maxDepth, this, otrunk.getDataObjectFinder());
+		ArrayList<OTObjectService> idProviders = new ArrayList<OTObjectService>();
+		idProviders.add(source.getOTObjectService());
+		idProviders.add(destination.getOTObjectService());
+		DataObjectUtil.copyInto(sourceDO, destDO, orphanDataList, maxDepth, this, otrunk.getDataObjectFinder(), onlyModifications);
 	}
 
 	public void addObjectServiceListener(OTObjectServiceListener listener)

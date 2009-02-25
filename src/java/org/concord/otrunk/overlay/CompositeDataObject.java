@@ -400,4 +400,20 @@ public class CompositeDataObject
     {
 	    return middleDeltas;
     }
+	
+	/**
+	 * A helper method to determine if this object has a modification, or is a modification
+	 * in the case of a newly created object.
+	 * @return
+	 */
+	public boolean isModified() {
+		if (composite) {
+			if (getActiveDeltaObject() != null) {
+				return true;
+			}
+		} else {
+			return true;
+		}
+		return false;
+	}
 }
