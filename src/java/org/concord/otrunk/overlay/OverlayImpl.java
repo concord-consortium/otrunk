@@ -69,7 +69,7 @@ public class OverlayImpl
                     stateObject.getGlobalId());
 			
             for(int i=0; i<listeners.size(); i++){
-            	((OverlayListener)listeners.get(i)).newDeltaObject(this, baseObject);
+            	(listeners.get(i)).newDeltaObject(this, baseObject);
             }
             
             return stateObject;

@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTXMLString;
+import org.concord.otrunk.overlay.CompositeDataObject;
 
 /**
  * @author scott
@@ -24,6 +25,7 @@ public class Copier
 	private OTDataList orphanList;
 	private OTExternalIDProvider idProvider;
 	private OTDataObjectFinder dataObjectFinder;
+	private boolean onlyModifications;
 
     private static class CopyEntry
     {    	
@@ -40,7 +42,7 @@ public class Copier
     }
 	
 	public Copier(OTDatabase sourceDb, OTDatabase destinationDb, OTDataList orphanDataList, 
-		OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder)
+		OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder, boolean onlyModifications)
 	{
 		this.destinationDb = destinationDb;
 		this.sourceDb = sourceDb;
@@ -48,6 +50,7 @@ public class Copier
 		this.orphanList = orphanDataList;
 		this.idProvider = idProvider;
 		this.dataObjectFinder = dataObjectFinder;
+		this.onlyModifications = onlyModifications;
 	}
 	
 	/**
@@ -89,6 +92,7 @@ public class Copier
 		if(child instanceof OTID && (maxDepth == -1 || maxDepth > 0)){
 			// check if this id has already been seen
 			CopyEntry itemCopyEntry = getCopyEntry((OTID)child);
+			
 			if(itemCopyEntry == null){
 				OTDataObject itemObj = 
 					sourceDb.getOTDataObject(root, (OTID)child);
@@ -98,15 +102,25 @@ public class Copier
 						throw new IllegalStateException("Can't find child id: " + child);
 					}
 				}
-				OTDataObject itemCopy = 
-					destinationDb.createDataObject(itemObj.getType());
-				int copyMaxDepth = -1;
-				if(maxDepth != -1){
-					copyMaxDepth = maxDepth-1; 
-				}
-				itemCopyEntry = new CopyEntry(itemObj, copyMaxDepth, itemCopy);
-				toBeCopied.add(itemCopyEntry);
 				
+				if (onlyModifications && itemObj instanceof CompositeDataObject && ! ((CompositeDataObject) itemObj).isModified()) {
+					// don't copy the object if it's not modified and onlyModifications is true
+					// instead, include an object reference to the original
+					OTID itemID = itemObj.getGlobalId();
+					if (itemID instanceof OTTransientMapID) {
+						itemID = ((OTTransientMapID)itemID).getMappedId();
+					}
+					itemCopyEntry = new CopyEntry(itemObj, -1, destinationDb.getOTDataObject(root, itemID));
+				} else {
+    				int copyMaxDepth = -1;
+    				OTDataObject itemCopy = 
+    					destinationDb.createDataObject(itemObj.getType());
+    				if(maxDepth != -1){
+    					copyMaxDepth = maxDepth-1; 
+    				}
+    				itemCopyEntry = new CopyEntry(itemObj, copyMaxDepth, itemCopy);
+    				toBeCopied.add(itemCopyEntry);
+				}
 			} else {
 				// we should not return here, it should just use the copy's global id
 			}
@@ -119,11 +133,11 @@ public class Copier
     }
     
     public static void copyInto(OTDataObject source, OTDataObject dest,
-	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder)
+	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder, boolean onlyModifications)
 	    throws Exception
 	{
 		Copier copier =
-		    new Copier(source.getDatabase(), dest.getDatabase(), orphanDataList, idProvider, dataObjectFinder);
+		    new Copier(source.getDatabase(), dest.getDatabase(), orphanDataList, idProvider, dataObjectFinder, onlyModifications);
 		copier.internalCopyInto(source, dest, maxDepth);
 	}
     
@@ -135,7 +149,7 @@ public class Copier
     	
     	int currentIndex = 0;
     	while(currentIndex < toBeCopied.size()){
-    		CopyEntry entry = (CopyEntry)toBeCopied.get(currentIndex);
+    		CopyEntry entry = toBeCopied.get(currentIndex);
     		OTDataObject original = entry.original; 
     	//	System.out.println(original+" ; "+original.getType());
     		OTDataObject copy = entry.copy;
@@ -153,8 +167,8 @@ public class Copier
 
     			if(resource instanceof OTDataList){
     				OTDataList copyList =
-    					(OTDataList)copy.getResourceCollection(keys[i], 
-    							OTDataList.class);
+    					copy.getResourceCollection(keys[i], 
+                    		OTDataList.class);
     				OTDataList list = (OTDataList)resource;
     				copyList.removeAll();
     				for(int j=0; j<list.size(); j++){
@@ -165,27 +179,27 @@ public class Copier
     				}
     			} else if(resource instanceof OTDataMap){
     				OTDataMap copyMap =
-    					(OTDataMap)copy.getResourceCollection(keys[i], 
-    							OTDataMap.class);                    
+    					copy.getResourceCollection(keys[i], 
+                    		OTDataMap.class);                    
     				OTDataMap map = (OTDataMap)resource;
     				copyMap.removeAll();
     				String [] mapKeys = map.getKeys();
     				for(int j=0; j<mapKeys.length; j++){
     					Object item = map.get(mapKeys[j]);
-    					item = handleChild(item, entry.maxDepth);    					
+    					item = handleChild(item, entry.maxDepth);
     					copyMap.put(mapKeys[j], item);
     				}
     			} else if(resource instanceof OTXMLString) { 
     				secondPassKeys.add(keys[i]);
     			} else {
-    				resource = handleChild(resource, entry.maxDepth);    
+    				resource = handleChild(resource, entry.maxDepth);
     				copy.setResource(keys[i], resource);
     			}
     		}
     		
     		for(int i=0; i<secondPassKeys.size(); i++){
     			System.out.println("loop secondpass");
-    			String key = (String)secondPassKeys.get(i);
+    			String key = secondPassKeys.get(i);
     			Object resource = original.getResource(key);
 
     			System.out.println("text copying " + key);
