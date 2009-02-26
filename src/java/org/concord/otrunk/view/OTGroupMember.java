@@ -14,4 +14,10 @@ public interface OTGroupMember extends OTObjectInterface
 	public boolean getIsCurrentUser();
 
 	public String getUuid();
+	
+	/**
+	 * This is an MD5 hex digest of the password
+	 * @return
+	 */
+	public String getPasswordHash();
 }
