@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.WeakHashMap;
 import java.util.Map.Entry;
 
@@ -39,6 +40,7 @@ import org.concord.framework.otrunk.OTController;
 import org.concord.framework.otrunk.OTControllerRegistry;
 import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
 
 public class OTControllerServiceImpl implements OTControllerService 
@@ -98,6 +100,23 @@ public class OTControllerServiceImpl implements OTControllerService
 		realObject = setupRealObject(otObject, null);
 			
 		return realObject;		
+	}
+	
+	/**
+	 * A helper method to get a Vector of real objects from an
+	 * OTObjectList, so that we don't have to first get the OTObjectList
+	 * and then create all the RealObjects ourselves.
+	 * 
+	 * @param otObjectList
+	 * @return
+	 */
+	public Vector<Object> getRealObjects(OTObjectList otObjectList){
+		Vector<OTObject> otVector = otObjectList.getVector();
+		Vector<Object> objVector = new Vector<Object>();
+		for (OTObject otObject : otVector) {
+	        objVector.add(getRealObject(otObject));
+        }
+		return objVector;
 	}
 
 	private OTController getExistingControllerFromOTObject(OTObject otObject)
