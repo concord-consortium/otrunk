@@ -103,18 +103,29 @@ public class Copier
 					}
 				}
 				
+				OTID itemID = itemObj.getGlobalId();
+				if (itemID instanceof OTTransientMapID) {
+					itemID = ((OTTransientMapID)itemID).getMappedId();
+				}
+				System.err.println("Copying object: " + itemObj.getGlobalId());
 				if (onlyModifications && itemObj instanceof CompositeDataObject && ! ((CompositeDataObject) itemObj).isModified()) {
+					// System.err.println("Not modified: only a reference");
 					// don't copy the object if it's not modified and onlyModifications is true
 					// instead, include an object reference to the original
-					OTID itemID = itemObj.getGlobalId();
-					if (itemID instanceof OTTransientMapID) {
-						itemID = ((OTTransientMapID)itemID).getMappedId();
-					}
 					itemCopyEntry = new CopyEntry(itemObj, -1, destinationDb.getOTDataObject(root, itemID));
 				} else {
+					OTDataObject itemCopy;
+					if (onlyModifications && itemObj instanceof CompositeDataObject && ((CompositeDataObject) itemObj).isModified() && (((CompositeDataObject) itemObj).getActiveDeltaObject() != null)) {
+						// System.err.println("Modified: changed copy");
+						// if the object has an active delta object, then it's only modified (not newly created) so if we request the data object from the destination db, it will handle creating the deltamap for us
+						itemCopy = destinationDb.getOTDataObject(root, itemID);
+					} else {
+						// System.err.println("Modified: full copy");
+						// the object is newly created *or* we're forcing a full copy
+						itemCopy = destinationDb.createDataObject(itemObj.getType());
+					}
     				int copyMaxDepth = -1;
-    				OTDataObject itemCopy = 
-    					destinationDb.createDataObject(itemObj.getType());
+    				
     				if(maxDepth != -1){
     					copyMaxDepth = maxDepth-1; 
     				}
