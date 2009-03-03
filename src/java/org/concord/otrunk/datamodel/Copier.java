@@ -107,7 +107,7 @@ public class Copier
 				if (itemID instanceof OTTransientMapID) {
 					itemID = ((OTTransientMapID)itemID).getMappedId();
 				}
-				System.err.println("Copying object: " + itemObj.getGlobalId());
+				// System.err.println("Copying object: " + itemObj.getGlobalId());
 				if (onlyModifications && itemObj instanceof CompositeDataObject && ! ((CompositeDataObject) itemObj).isModified()) {
 					// System.err.println("Not modified: only a reference");
 					// don't copy the object if it's not modified and onlyModifications is true
