@@ -2,6 +2,7 @@ package org.concord.otrunk.test;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectInterface;
+import org.concord.framework.otrunk.wrapper.OTBlob;
 
 public interface OTBasicTestObject
     extends OTObjectInterface
@@ -20,4 +21,7 @@ public interface OTBasicTestObject
 	
 	public void setReference(OTObject reference);
 	public OTObject getReference();
+	
+	public void setBlob(OTBlob blob);
+	public OTBlob getBlob();
 }
