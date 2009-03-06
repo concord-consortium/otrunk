@@ -239,7 +239,7 @@ public class ExporterJDOM
 			Element importEl = new Element("import");
 			importsEl.addContent(importEl);
 
-			importEl.setAttribute("class", (String)processedClasses.get(i));
+			importEl.setAttribute("class", processedClasses.get(i));
 		}
 		
 		Element objectsEl = new Element("objects"); 
@@ -582,6 +582,15 @@ public class ExporterJDOM
 			// in that case it should be written out anyhow.  I'm not sure how to 
 			// do that yet.
 			ArrayList<OTDataObject> incomingReferences = incomingReferenceMap.get(id);
+			if (parentResourceName != null && parentResourceName.equals("nonDeltaObjects")) {
+				if (incomingReferences == null || incomingReferences.size() <= 1) {
+					// FIXME if we're in a non-delta map, skip rendering the object altogether
+					objectEl.setAttribute("toBeRemoved", "true");
+					// for (Object att : objectEl.getAttributes()) {
+					// 	objectEl.removeAttribute((Attribute) att);
+					// }
+				}
+			}
 			if((xmlDO != null && xmlDO.isPreserveUUID() && id instanceof OTUUID) ||
 					(incomingReferences != null && incomingReferences.size() > 1)){
 				objectEl.setAttribute("id", id.toExternalForm());

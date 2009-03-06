@@ -2,7 +2,6 @@
 <otrunk id="33754150-b594-11d9-9669-0800200c9a66" >
   <imports>
     <import class="org.concord.otrunk.OTSystem"/>
-    <import class="org.concord.otrunk.ui.OTImage"/>
     <import class="org.concord.otrunk.view.OTFolderObject"/> 
     <import class="org.concord.otrunk.test.OTDocumentTestObject"/>
     <import class="org.concord.otrunk.test.OTBasicTestObject"/>

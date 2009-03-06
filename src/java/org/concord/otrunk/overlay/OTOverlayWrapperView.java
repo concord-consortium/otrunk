@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.AbstractOTJComponentContainerView;
@@ -53,24 +54,6 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 			overlay = overlayManager.getOverlay(currentGroupMember);
 		}
 
-		// logger.info("overlay object is: " + overlay);
-		
-		// FIXME This should be removed once the copyInto method is fixed.
-		if (overlay != null) {
-			// logger.info("had an overlay");
-    		try {
-    			OTID id = wrappedObject.getGlobalId();
-    			if (id instanceof OTTransientMapID) {
-    				id = ((OTTransientMapID) id).getMappedId();
-    			}
-    	        wrappedObject = overlayManager.getOTObject(overlay, id);
-    	        
-            } catch (Exception e) {
-    	        logger.log(Level.SEVERE, "Couldn't get the object from the overlay!", e);
-            }
-		}
-		
-		// logger.info("wrapped object is: " + wrappedObject);
 		subview = createSubViewComponent(wrappedObject);
 		
 		JPanel mainPanel = new JPanel();
@@ -119,22 +102,22 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	
 	private void saveData() {
 		// save everything
-		// FIXME This is how we *should* be doing it, once the copyInto() method works properly
-//		if (overlay != null) {
-//			// logger.info("had an overlay");
-//    		try {
-//    			OTID id = wrappedObject.getGlobalId();
-//    			if (id instanceof OTTransientMapID) {
-//    				id = ((OTTransientMapID) id).getMappedId();
-//    			}
-//    	        OTObject newWrappedObject = overlayManager.getOTObject(overlay, id);
-//    	        ((OTObjectServiceImpl) wrappedObject.getOTObjectService()).copyInto(wrappedObject, newWrappedObject, -1, true);
-//    	        
-//    	        overlayManager.remoteSave(overlay);
-//            } catch (Exception e) {
-//    	        logger.log(Level.SEVERE, "Couldn't get the object from the overlay!", e);
-//            }
-//		}
+		if (overlay != null) {
+			// logger.info("had an overlay");
+    		try {
+    			OTID id = wrappedObject.getGlobalId();
+    			if (id instanceof OTTransientMapID) {
+    				id = ((OTTransientMapID) id).getMappedId();
+    			}
+    	        OTObject newWrappedObject = overlayManager.getOTObject(overlay, id);
+    	        ((OTObjectServiceImpl) wrappedObject.getOTObjectService()).copyInto(wrappedObject, newWrappedObject, -1, true);
+    	        
+    	        overlayManager.remoteSave(overlay);
+            } catch (Exception e) {
+    	        logger.log(Level.SEVERE, "Couldn't get the object from the overlay!", e);
+    	        logger.log(Level.FINER, "stack trace:", e);
+            }
+		}
 		
 		try {
 	        overlayManager.remoteSave(overlay);
