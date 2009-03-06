@@ -19,7 +19,6 @@ import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.util.StandardPasswordAuthenticator;
 import org.concord.otrunk.view.OTViewer;
-import org.concord.otrunk.xml.XMLDataObject;
 import org.concord.otrunk.xml.XMLDatabase;
 
 public class OTUserOverlayManager
@@ -62,14 +61,9 @@ public class OTUserOverlayManager
 			try {
 				logger.info("Creating empty overlay database on the fly...");
     			XMLDatabase xmldb = new XMLDatabase();
-    			overlay = otrunk.getRootObjectService().createObject(OTOverlay.class);
+    			OTObjectService objService = otrunk.createObjectService(xmldb);
+    			overlay = objService.createObject(OTOverlay.class);
 
-    			// FIXME this approach bypasses the normal way of adding a data object to the
-    			// database.  It seems like it should be changed to create an object service for
-    			// the newly created database and then make the overlay in that object service.
-    			// that should get around the code below
-    			xmldb.getDataObjects().put(overlay.getGlobalId(),
-    				(XMLDataObject) otrunk.getDataObjectFinder().findDataObject(overlay.getGlobalId()));
     			xmldb.setRoot(overlay.getGlobalId());
     			otrunk.remoteSaveData(xmldb, overlayURL, OTViewer.HTTP_PUT, new StandardPasswordAuthenticator());
 

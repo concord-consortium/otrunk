@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="fabc17f5-09a8-11de-aebf-37f53627f26a">
+  <imports>
+    <import class="org.concord.otrunk.OTStateRoot" />
+    <import class="org.concord.otrunk.user.OTUserObject" />
+    <import class="org.concord.otrunk.user.OTReferenceMap" />
+    <import class="org.concord.otrunk.test.OTPrimitivesTestObject" />
+    <import class="org.concord.otrunk.test.OTMapTestObject" />
+    <import class="org.concord.otrunk.test.OTObjectMapTestObject" />
+    <import class="org.concord.otrunk.test.OTObjectListTestObject" />
+    <import class="org.concord.otrunk.test.OTResourceListTestObject" />
+    <import class="org.concord.otrunk.test.OTDocumentTestObject" />
+    <import class="org.concord.framework.otrunk.wrapper.OTBlob" />
+    <import class="org.concord.otrunk.test.OTBasicTestObject" />
+  </imports>
+  <objects>
+    <OTStateRoot formatVersionString="1.0">
+      <userMap>
+        <entry key="c4eceaa0-09a8-11de-aebf-37f53627f26a">
+          <OTReferenceMap>
+            <user>
+              <OTUserObject id="c4eceaa0-09a8-11de-aebf-37f53627f26a" name="anon_single_user" />
+            </user>
+            <map>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/primitive_some_changes">
+                <OTPrimitivesTestObject float="23.12" string="a changed string" />
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/primitive_all_changes">
+                <OTPrimitivesTestObject long='2147483648' double='23423.65235' boolean='true'
+                  float="12.435" string="another changed string" int="42" />
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/blob_some_changes">
+                <OTBlob>
+                  <src>gzb64:H4sIAOJAsEkAA8tIzcnJVyjPL8pJUdBVKMnILFYAouSMxLz01BQApwRloR0AAAA=</src>
+                </OTBlob>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/blob_add_changes">
+                <OTBlob>
+                  <src>gzb64:H4sIAOJAsEkAA8tIzcnJVyjPL8pJUdBVKMnILFYAouSMxLz01BQApwRloR0AAAA=</src>
+                </OTBlob>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/blob_delete_changes">
+                <OTBlob>
+                  <src />
+                </OTBlob>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/resource_map_change_value">
+                <OTMapTestObject>
+                  <resourceMap>
+                    <entry key="item1">
+                      <int>32</int>
+                    </entry>
+                    <entry key="item2">
+                      <string>12</string>
+                    </entry>
+                  </resourceMap>
+                </OTMapTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/resource_map_add_entry">
+                <OTMapTestObject>
+                  <resourceMap>
+                    <entry key="item1">
+                      <int>20</int>
+                    </entry>
+                    <entry key="item2">
+                      <string>40</string>
+                    </entry>
+                    <entry key="item3">
+                      <string>45</string>
+                    </entry>
+                  </resourceMap>
+                </OTMapTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/resource_map_delete_entry">
+                <OTMapTestObject>
+                  <resourceMap>
+                    <entry key="item2">
+                      <string>40</string>
+                    </entry>
+                  </resourceMap>
+                </OTMapTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/resource_list_some_change">
+                <OTResourceListTestObject>
+                  <resourceList>
+                    <int>14</int>
+                    <string>Stuff to say has changed</string>
+                    <float>124.41</float>
+                  </resourceList>
+                </OTResourceListTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/resource_list_add_change">
+                <OTResourceListTestObject>
+                  <resourceList>
+                    <int>12</int>
+                    <string>Stuff to say</string>
+                    <float>124.41</float>
+                    <double>834848128.123124865</double>
+                  </resourceList>
+                </OTResourceListTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/resource_list_delete_change">
+                <OTResourceListTestObject>
+                  <resourceList>
+                    <int>12</int>
+                    <float>124.41</float>
+                  </resourceList>
+                </OTResourceListTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/object_map_one_change">
+                <OTObjectMapTestObject>
+                  <objectMap>
+                    <entry key="object1">
+                      <object refid="9d4f759c-3166-4c54-a6ab-416e546d9f62!/primitive_all_changes" />
+                    </entry>
+                    <entry key="object2">
+                      <object refid="9d4f759c-3166-4c54-a6ab-416e546d9f62!/primitive_no_changes" />
+                    </entry>
+                  </objectMap>
+                </OTObjectMapTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/object_map_add_change">
+                <OTObjectMapTestObject>
+                  <objectMap>
+                    <entry key="object1">
+                      <object refid="9d4f759c-3166-4c54-a6ab-416e546d9f62!/primitive_no_changes" />
+                    </entry>
+                    <entry key="object1">
+                      <OTPrimitivesTestObject float="4.243" int="45" string="this is a string" />
+                    </entry>
+                  </objectMap>
+                </OTObjectMapTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/object_map_delete_change">
+                <OTObjectMapTestObject>
+                  <objectMap>
+                    <entry key="object2">
+                      <OTPrimitivesTestObject float="4.243" int="45" string="this is a string" />
+                    </entry>
+                  </objectMap>
+                </OTObjectMapTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/object_list_add_change">
+                <OTObjectListTestObject>
+                  <objectList>
+                    <object refid="9d4f759c-3166-4c54-a6ab-416e546d9f62!/primitive_no_changes" />
+                    <OTPrimitivesTestObject float="4.243" int="45" string="this is a string" />
+                  </objectList>
+                </OTObjectListTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/object_list_delete_change">
+                <OTObjectListTestObject>
+                  <objectList>
+                    <object refid="9d4f759c-3166-4c54-a6ab-416e546d9f62!/primitive_no_changes" />
+                    <object refid="9d4f759c-3166-4c54-a6ab-416e546d9f62!/blob_no_changes" />
+                  </objectList>
+                </OTObjectListTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/document_text_change">
+                <OTDocumentTestObject>
+                  <bodyText>
+                    <p>This is an XML text blob and the text has changed</p>
+                    <object refid="9d4f759c-3166-4c54-a6ab-416e546d9f62!/primitive_no_changes" />
+                  </bodyText>
+                </OTDocumentTestObject>
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/basic_reference_add_change">
+                <OTBasicTestObject reference="${primitive_no_changes}" />
+              </entry>
+              <entry key="9d4f759c-3166-4c54-a6ab-416e546d9f62!/basic_reference_delete_change">
+                <OTBasicTestObject><reference /></OTBasicTestObject>
+              </entry>
+            </map>
+          </OTReferenceMap>
+        </entry>
+      </userMap>
+    </OTStateRoot>
+  </objects>
+</otrunk>

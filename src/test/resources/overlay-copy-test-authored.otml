@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="9d4f759c-3166-4c54-a6ab-416e546d9f62">
+  <imports>
+    <import class="org.concord.otrunk.OTSystem" />
+    <import class="org.concord.otrunk.view.OTFolderObject" />
+    <import class="org.concord.otrunk.test.OTBasicTestObject" />
+    <import class="org.concord.otrunk.test.OTPrimitivesTestObject" />
+    <import class="org.concord.otrunk.test.OTMapTestObject" />
+    <import class="org.concord.otrunk.test.OTObjectMapTestObject" />
+    <import class="org.concord.otrunk.test.OTResourceListTestObject" />
+    <import class="org.concord.otrunk.test.OTObjectListTestObject" />
+    <import class="org.concord.otrunk.test.OTDocumentTestObject" />
+    <import class="org.concord.otrunk.test.OTBasicTestObject" />
+    <import class="org.concord.framework.otrunk.wrapper.OTBlob" />
+  </imports>
+  <objects>
+    <OTSystem>
+      <root>
+        <OTFolderObject>
+          <children>
+            <!-- PRIMITIVES -->
+            <OTPrimitivesTestObject local_id="primitive_no_changes" float="4.243" int="45"
+              string="this is a string" />
+            <OTPrimitivesTestObject local_id="primitive_some_changes" float="62346.234" int="13" />
+            <OTPrimitivesTestObject local_id="primitive_all_changes" float="943.234" int="98"
+              string="some good stuff" />
+
+            <!-- OTBLOB -->
+            <OTBlob local_id="blob_no_changes">
+              <src>gzb64:H4sIAI1AsEkAA8tIzcnJVyjPL8pJAQCFEUoNCwAAAA==
+              </src>
+            </OTBlob>
+            <OTBlob local_id="blob_some_changes">
+              <src>gzb64:H4sIAI1AsEkAA8tIzcnJVyjPL8pJAQCFEUoNCwAAAA==
+              </src>
+            </OTBlob>
+            <OTBlob local_id="blob_add_changes" />
+            <OTBlob local_id="blob_delete_changes">
+              <src>gzb64:H4sIAI1AsEkAA8tIzcnJVyjPL8pJAQCFEUoNCwAAAA==
+              </src>
+            </OTBlob>
+
+            <!-- RESOURCE MAP -->
+            <OTMapTestObject local_id="resource_map_no_changes">
+              <resourceMap>
+                <entry key="item1">
+                  <int>20</int>
+                </entry>
+                <entry key="item2">
+                  <string>40</string>
+                </entry>
+              </resourceMap>
+            </OTMapTestObject>
+            <OTMapTestObject local_id="resource_map_change_value">
+              <resourceMap>
+                <entry key="item1">
+                  <int>20</int>
+                </entry>
+                <entry key="item2">
+                  <string>40</string>
+                </entry>
+              </resourceMap>
+            </OTMapTestObject>
+            <OTMapTestObject local_id="resource_map_add_entry">
+              <resourceMap>
+                <entry key="item1">
+                  <int>20</int>
+                </entry>
+                <entry key="item2">
+                  <string>40</string>
+                </entry>
+              </resourceMap>
+            </OTMapTestObject>
+            <OTMapTestObject local_id="resource_map_delete_entry">
+              <resourceMap>
+                <entry key="item1">
+                  <int>20</int>
+                </entry>
+                <entry key="item2">
+                  <string>40</string>
+                </entry>
+              </resourceMap>
+            </OTMapTestObject>
+
+            <!-- RESOURCE LIST -->
+            <OTResourceListTestObject local_id="resource_list_no_change">
+              <resourceList>
+                <int>12</int>
+                <string>Stuff to say</string>
+                <float>124.41</float>
+              </resourceList>
+            </OTResourceListTestObject>
+            <OTResourceListTestObject local_id="resource_list_some_change">
+              <resourceList>
+                <int>12</int>
+                <string>Stuff to say</string>
+                <float>124.41</float>
+              </resourceList>
+            </OTResourceListTestObject>
+            <OTResourceListTestObject local_id="resource_list_add_change">
+              <resourceList>
+                <int>12</int>
+                <string>Stuff to say</string>
+                <float>124.41</float>
+              </resourceList>
+            </OTResourceListTestObject>
+            <OTResourceListTestObject local_id="resource_list_delete_change">
+              <resourceList>
+                <int>12</int>
+                <string>Stuff to say</string>
+                <float>124.41</float>
+              </resourceList>
+            </OTResourceListTestObject>
+
+            <!-- OBJECT MAP -->
+            <OTObjectMapTestObject local_id="object_map_no_change">
+              <objectMap>
+                <entry key="object1">
+                  <object refid="${primitive_no_changes}" />
+                </entry>
+              </objectMap>
+            </OTObjectMapTestObject>
+            <OTObjectMapTestObject local_id="object_map_one_change">
+              <objectMap>
+                <entry key="object1">
+                  <object refid="${primitive_all_changes}" />
+                </entry>
+                <entry key="object2">
+                  <object refid="${primitive_no_changes}" />
+                </entry>
+              </objectMap>
+            </OTObjectMapTestObject>
+            <OTObjectMapTestObject local_id="object_map_add_change">
+              <objectMap>
+                <entry key="object1">
+                  <object refid="${primitive_no_changes}" />
+                </entry>
+              </objectMap>
+            </OTObjectMapTestObject>
+            <OTObjectMapTestObject local_id="object_map_delete_change">
+              <objectMap>
+                <entry key="object1">
+                  <object refid="${primitive_no_changes}" />
+                </entry>
+                <entry key="object2">
+                  <OTPrimitivesTestObject float="4.243" int="45" string="this is a string" />
+                </entry>
+              </objectMap>
+            </OTObjectMapTestObject>
+
+            <!-- OBJECT LIST -->
+            <OTObjectListTestObject local_id="object_list_no_change">
+              <objectList>
+                <object refid="${primitive_no_changes}" />
+              </objectList>
+            </OTObjectListTestObject>
+            <OTObjectListTestObject local_id="object_list_some_change">
+              <objectList>
+                <object refid="${primitive_no_changes}" />
+                <object refid="${primitive_all_changes}" />
+              </objectList>
+            </OTObjectListTestObject>
+            <OTObjectListTestObject local_id="object_list_add_change">
+              <objectList>
+                <object refid="${primitive_no_changes}" />
+              </objectList>
+            </OTObjectListTestObject>
+            <OTObjectListTestObject local_id="object_list_delete_change">
+              <objectList>
+                <object refid="${primitive_no_changes}" />
+                <object refid="${resource_map_no_changes}" />
+                <object refid="${blob_no_changes}" />
+              </objectList>
+            </OTObjectListTestObject>
+
+            <!-- DOCUMENT -->
+            <OTDocumentTestObject local_id="document_no_change">
+              <bodyText>
+                <p>This is an XML text blob</p>
+                <object refid="${primitive_no_changes}" />
+              </bodyText>
+            </OTDocumentTestObject>
+            <OTDocumentTestObject local_id="document_text_change">
+              <bodyText>
+                <p>This is an XML text blob</p>
+                <object refid="${primitive_no_changes}" />
+              </bodyText>
+            </OTDocumentTestObject>
+            <OTDocumentTestObject local_id="document_reference_change">
+              <bodyText>
+                <p>This is an XML text blob</p>
+                <object refid="${primitive_all_changes}" />
+              </bodyText>
+            </OTDocumentTestObject>
+
+            <!-- OBJECT CONTAINMENT -->
+            <OTBasicTestObject local_id="basic_reference_no_change" reference="${primitive_no_changes}" />
+            <OTBasicTestObject local_id="basic_reference_all_change" reference="${primitive_all_changes}" />
+            <OTBasicTestObject local_id="basic_reference_add_change" />
+            <OTBasicTestObject local_id="basic_reference_delete_change" reference="${primitive_no_changes}" />
+
+            <!-- NESTED-NESS -->
+            <OTBasicTestObject local_id="nested_grandchild_change" reference="${basic_reference_all_change}" />
+            <OTBasicTestObject local_id="nested_greatgrandchild_change" reference="${nested_grandchild_change}" />
+            <OTBasicTestObject local_id="nested_great2grandchild_change" reference="${nested_greatgrandchild_change}" />
+            <OTBasicTestObject local_id="nested_great3grandchild_change" reference="${nested_great2grandchild_change}" />
+
+            <!-- OBJECT -> OBJECT -> * -->
+            <OTBasicTestObject local_id="object_object_resourcemap" reference="${resource_map_change_value}" />
+            <OTBasicTestObject local_id="object_object_resourcelist" reference="${resource_list_some_change}" />
+            <OTBasicTestObject local_id="object_object_objectmap" reference="${object_map_one_change}" />
+            <OTBasicTestObject local_id="object_object_objectlist" reference="${object_list_some_change}" />
+
+            <!-- OBJECT -> DOCUMENT -> OBJECT -> * -->
+            <OTBasicTestObject local_id="object_document_resourcemap">
+              <reference>
+                <OTDocumentTestObject>
+                  <bodyText>
+                    <p>This is an XML text blob</p>
+                    <object refid="${resource_map_change_value}" />
+                  </bodyText>
+                </OTDocumentTestObject>
+              </reference>
+            </OTBasicTestObject>
+            <OTBasicTestObject local_id="object_document_resourcelist">
+              <reference>
+                <OTDocumentTestObject>
+                  <bodyText>
+                    <p>This is an XML text blob</p>
+                    <object refid="${resource_list_some_change}" />
+                  </bodyText>
+                </OTDocumentTestObject>
+              </reference>
+            </OTBasicTestObject>
+            <OTBasicTestObject local_id="object_document_objectmap">
+              <reference>
+                <OTDocumentTestObject>
+                  <bodyText>
+                    <p>This is an XML text blob</p>
+                    <object refid="${object_map_one_change}" />
+                  </bodyText>
+                </OTDocumentTestObject>
+              </reference>
+            </OTBasicTestObject>
+            <OTBasicTestObject local_id="object_document_objectlist">
+              <reference>
+                <OTDocumentTestObject>
+                  <bodyText>
+                    <p>This is an XML text blob</p>
+                    <object refid="${object_list_some_change}" />
+                  </bodyText>
+                </OTDocumentTestObject>
+              </reference>
+            </OTBasicTestObject>
+          </children>
+        </OTFolderObject>
+      </root>
+    </OTSystem>
+  </objects>
+</otrunk>

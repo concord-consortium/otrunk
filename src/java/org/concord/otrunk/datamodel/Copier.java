@@ -205,19 +205,7 @@ public class Copier
     			Object resource = original.getResource(keys[i]);
     			boolean keyModified = false;
     			if (onlyModifications) {
-        			if (original instanceof CompositeDataObject) {
-        				if (((CompositeDataObject) original).isModified()) {
-            				OTDataObject deltaObj = ((CompositeDataObject) original).getActiveDeltaObject();
-            				if (deltaObj != null && deltaObj.containsKey(keys[i])) {
-            					logger.finer("Delta object contains key!");
-            					keyModified = true;
-            				} else if (deltaObj == null) {
-            					// composite data object without an active delta object means it was newly created
-            					logger.finer("Original is newly created! Key counts as modified!");
-            					keyModified = true;
-            				}
-            			}
-        			}
+    				keyModified = isAttributeModified(original, keys[i]);
     			}
 
     			if(resource instanceof OTDataList){
@@ -300,13 +288,8 @@ public class Copier
         				}
     				}
     			} else if(resource instanceof OTXMLString) {
-    				if (onlyModifications) {
-        				if ((! onlyRecurse) && keyModified) {
-        					secondPassKeys.add(keys[i]);
-        				}
-    				} else {
-    					secondPassKeys.add(keys[i]);
-    				}
+					// the xhtml needs parsing so that object references can be resolved
+					secondPassKeys.add(keys[i]);
     			} else {
     				resource = handleChild(resource, entry.maxDepth);
     				if (! onlyRecurse) {
@@ -335,11 +318,36 @@ public class Copier
 				copiedString = updateXMLString("href", copiedString, otDb, key, entry);
 				    	
 				OTXMLString copiedXmlString = new OTXMLString(copiedString);
-				copy.setResource(key, copiedXmlString);
+				if (onlyModifications) {
+					// don't store it if it wasn't modified
+					if ((! onlyRecurse) && isAttributeModified(original, key)) {
+						// attribute was modified, so copy the string
+						copy.setResource(key, copiedXmlString);
+					}
+				} else {
+					copy.setResource(key, copiedXmlString);
+				}
 
     		}
     		currentIndex++;
     	}
+    }
+    
+    private boolean isAttributeModified(OTDataObject original, String key) {
+    	if (original instanceof CompositeDataObject) {
+			if (((CompositeDataObject) original).isModified()) {
+				OTDataObject deltaObj = ((CompositeDataObject) original).getActiveDeltaObject();
+				if (deltaObj != null && deltaObj.containsKey(key)) {
+					logger.finer("Delta object contains key!");
+					return true;
+				} else if (deltaObj == null) {
+					// composite data object without an active delta object means it was newly created
+					logger.finer("Original is newly created! Key counts as modified!");
+					return true;
+				}
+			}
+		}
+    	return false;
     }
 
     public String updateXMLString(String attributeName, String xmlStringContent, OTDatabase otDb,
@@ -406,12 +414,18 @@ public class Copier
 					// Just use the original id
 					copiedId = otid;							
 				} else {
-					copiedId = (OTID)handleChild(otid, entry.maxDepth);							
-					orphanList.add(copiedId);
+					copiedId = (OTID)handleChild(otid, entry.maxDepth);
+					if (onlyModifications && (copiedId instanceof OTTransientMapID)) {
+						// ignore it
+					} else {
+						orphanList.add(copiedId);
+					}
 				}						
 			}
-								
+			
+			logger.finer("trying to copy: " + copiedId);
 			// replace the id with the new id
+			if (! (copiedId instanceof OTTransientMapID)) {
 			String copiedExternalId;
 			if (idProvider != null){
 				copiedExternalId = idProvider.getExternalID(copiedId);
@@ -420,7 +434,9 @@ public class Copier
     		}
 			matcher.appendReplacement(copiedStringBuf, 
 				  attributeName + "=\"" + copiedExternalId + "\"");
-			
+			} else {
+				logger.warning("skipping replacing id because it is transient");
+			}
 			// now the next problem is where to store this copied object
 			// if it was already handled we don't need to figure out 
 			// where to store it.  If we had a record of the containment
