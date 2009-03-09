@@ -40,6 +40,8 @@ public class OverlayObjectCopyTest extends TestCase
 	
 	/*
 	 * Ways to embed objects and tests for them
+	 * (- test description                          [testMethodName] )
+	 * 
 	 *  - object with primitive attributes (int, float, String, ...)
 	 *    - none changed                            [testSimpleCopyNoChange]
 	 *    - one changed
