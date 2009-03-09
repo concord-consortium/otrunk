@@ -719,7 +719,7 @@ public class OTrunkImpl implements OTrunk
 	public OTObject getUserRuntimeObject(OTObject authoredObject, OTUser user)
 		throws Exception
 	{
-		//authoredObject = getRuntimeAuthoredObject(authoredObject, user);
+		authoredObject = getRuntimeAuthoredObject(authoredObject);
 		
 		OTID authoredId = authoredObject.getGlobalId();
 		OTID userId = user.getUserId();
