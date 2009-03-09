@@ -341,7 +341,7 @@ public class OTMLToXHTMLConverter
 		if (jComponentService == null) {
 			OTViewContext viewContext = viewFactory.getViewContext();
 			OTJComponentServiceFactory serviceFactory =
-			    (OTJComponentServiceFactory) viewContext.getViewService(OTJComponentServiceFactory.class);
+			    viewContext.getViewService(OTJComponentServiceFactory.class);
 			jComponentService = serviceFactory.createOTJComponentService(viewFactory, false);
 		}
 		if (viewEntry != null) {
@@ -363,7 +363,7 @@ public class OTMLToXHTMLConverter
 	{
 		OTView view = viewFactory.getView(obj, OTPrintDimension.class);
 		if (view == null) {
-			view = (OTView) viewFactory.getView(obj, OTJComponentView.class);
+			view = viewFactory.getView(obj, OTJComponentView.class);
 		}
 		
 		if (view instanceof OTXHTMLView) {
@@ -372,6 +372,11 @@ public class OTMLToXHTMLConverter
 		}
 
 		view = getOTJComponentView(obj, null, viewEntry);
+		if (view instanceof OTXHTMLView) {
+			String objectText = ((OTXHTMLView) view).getXHTMLText(obj);
+			return objectText;
+		}
+		
 		JComponent comp = ((OTJComponentView)view).getComponent(obj);
 
 		Dimension printDim = null;
@@ -477,7 +482,7 @@ public class OTMLToXHTMLConverter
 	public OTObject getRuntimeObject(OTObject object, String userStr) {
 		try {
 			OTObjectService objectService = object.getOTObjectService();
-			OTrunk otrunk = (OTrunk)objectService.getOTrunkService(OTrunk.class);
+			OTrunk otrunk = objectService.getOTrunkService(OTrunk.class);
 			OTID userId = objectService.getOTID(userStr);
 			OTUser user = (OTUser) objectService.getOTObject(userId);
 			return otrunk.getUserRuntimeObject(object, user);
