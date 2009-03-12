@@ -749,6 +749,32 @@
             <text />
           </optional>
         </element>
+        <element name="OTTimeLimitDataProducerFilter">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="timeLimit" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="sourceChannel" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="units" />
+            <text />
+          </optional>
+          <element name="source">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTTimerDataStoreDataProducer">
           <optional>
             <attribute name="local_id">
@@ -945,6 +971,9 @@
             <attribute name="labelFormat" />
             <text />
           </optional>
+          <element name="customGridLabels">
+            <ref name="mapContents" />
+          </element>
           <optional>
             <attribute name="max" />
             <data type="float" />
@@ -2824,6 +2853,577 @@
             <text />
           </optional>
         </element>
+        <element name="OTBreedOffspring">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="fatherOrganism">
+            <ref name="otObject" />
+          </element>
+          <element name="motherOrganism">
+            <ref name="otObject" />
+          </element>
+          <element name="childOrganism">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTCharacteristic">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTChromosome">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="organism">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTChromosomeZoom">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="organism">
+            <ref name="otObject" />
+          </element>
+          <element name="species">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="zoomLevel" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="chromosomePositionInCM" />
+            <data type="double" />
+          </optional>
+          <optional>
+            <attribute name="chromosomePositionInBasePairs" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="drawTracks" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="gBrowseURLTemplate" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTDna">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="chromosome">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTEnvironment">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="world">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="environmentWidth" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="environmentHeight" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="environmentType" />
+            <text />
+          </optional>
+          <element name="organismPlacements">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="showRunButton" />
+            <data type="boolean" />
+          </optional>
+          <element name="rules">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTFamily">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="children">
+            <ref name="listContents" />
+          </element>
+          <element name="father">
+            <ref name="otObject" />
+          </element>
+          <element name="mother">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMultipleOrganism">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="organisms">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="organismImageSize" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTOrganism">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="world">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="sex" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="allowFatalCharacteristic" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="alleles" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="strain" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="listenForChanges" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTOrganismPlacement">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="organism">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="unitX" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="unitY" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTPedigree">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="organisms">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="organismImageSize" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="sexTextVisible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="organismImagesVisible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSex">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="fatherOrganism">
+            <ref name="otObject" />
+          </element>
+          <element name="motherOrganism">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="replayButtonEnabled" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="controlledCrossoverEnabled" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="crossoverControlVisible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="controlledAlignmentEnabled" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="alignmentControlVisible" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="width" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="height" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTSpecies">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTStaticOrganism">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="organism">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTWorld">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="speciesPath" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTQTL">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="chromosome" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="locationInCM" />
+            <data type="double" />
+          </optional>
+          <optional>
+            <attribute name="additiveEffect" />
+            <data type="double" />
+          </optional>
+          <optional>
+            <attribute name="dominanceDeviation" />
+            <data type="double" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTQTLFilter">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="phenotypeChannel" />
+            <text />
+          </optional>
+          <element name="channelLocations">
+            <ref name="mapContents" />
+          </element>
+          <element name="inputDataStore">
+            <ref name="otObject" />
+          </element>
+          <element name="inputDataGraphable">
+            <ref name="otObject" />
+          </element>
+          <element name="description">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="numberChannels" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="dt" />
+            <data type="float" />
+          </optional>
+          <element name="values">
+            <ref name="listContents" />
+          </element>
+          <element name="channelDescriptions">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="valuesString" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="virtualChannels" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTQTLSimulation">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="dataGraph">
+            <ref name="otObject" />
+          </element>
+          <element name="locations">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="numberOfIndividuals" />
+            <text />
+          </optional>
+          <element name="chromosomeLengths">
+            <ref name="listContents" />
+          </element>
+          <element name="thresholdValues">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="scanMethod" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="numberOfMarkersPerChromosome" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTRule">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="conditions">
+            <ref name="listContents" />
+          </element>
+          <element name="consequences">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTRuleCondition">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="isForEnvironment" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="equalsValue" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="equals" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="property" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="minValue" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="maxValue" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTRuleConsequence">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="newValueString" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="newValueFloat" />
+            <data type="float" />
+          </optional>
+          <optional>
+            <attribute name="property" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTMozSwing">
           <optional>
             <attribute name="local_id">
@@ -3032,6 +3632,9 @@
             <attribute name="mozSwing" />
             <text />
           </optional>
+          <element name="mozSwingForVideo">
+            <ref name="otObject" />
+          </element>
           <optional>
             <attribute name="nextToShow" />
             <text />
@@ -3291,6 +3894,27 @@
             <attribute name="viewClass" />
             <text />
           </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMultiUser">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="users">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="refreshButtonLabel" />
+            <text />
+          </optional>
+          <element name="object">
+            <ref name="otObject" />
+          </element>
           <optional>
             <attribute name="name" />
             <text />
@@ -5481,6 +6105,56 @@
             <text />
           </optional>
         </element>
+        <element name="OTSection">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <optional>
+            <attribute name="viewContainerIsUpdateable" />
+            <data type="boolean" />
+          </optional>
+          <element name="header">
+            <ref name="otObject" />
+          </element>
+          <element name="footer">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="enabled" />
+            <data type="boolean" />
+          </optional>
+          <element name="branchActivities">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="branchesStartPage" />
+            <text />
+          </optional>
+          <element name="content">
+            <ref name="otObject" />
+          </element>
+          <element name="south">
+            <ref name="otObject" />
+          </element>
+          <element name="north">
+            <ref name="otObject" />
+          </element>
+          <element name="east">
+            <ref name="otObject" />
+          </element>
+          <element name="west">
+            <ref name="otObject" />
+          </element>
+          <element name="center">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTSlider">
           <optional>
             <attribute name="local_id">
@@ -5634,6 +6308,111 @@
             <text />
           </optional>
         </element>
+        <element name="OTMenu">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="cardContainer">
+            <ref name="otObject" />
+          </element>
+          <element name="menuRule">
+            <ref name="otObject" />
+          </element>
+          <element name="css">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="showBorder" />
+            <data type="boolean" />
+          </optional>
+          <element name="hideElements">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTMenuRule">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="rules">
+            <ref name="listContents" />
+          </element>
+          <element name="scope">
+            <ref name="listContents" />
+          </element>
+          <optional>
+            <attribute name="remainInScope" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="jumpToAnyCard" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="jumpToViewedCard" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="jumpAhead" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="jumpBack" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="stepAhead" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="stepBack" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
+        <element name="OTNavBar">
+          <optional>
+            <attribute name="local_id">
+              <text />
+            </attribute>
+          </optional>
+          <element name="topLevelCardContainer">
+            <ref name="otObject" />
+          </element>
+          <element name="coaches">
+            <ref name="otObject" />
+          </element>
+          <element name="album">
+            <ref name="otObject" />
+          </element>
+          <element name="menuView">
+            <ref name="otObject" />
+          </element>
+          <element name="menuRule">
+            <ref name="otObject" />
+          </element>
+          <element name="cssColor">
+            <ref name="otObject" />
+          </element>
+          <optional>
+            <attribute name="showHome" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="name" />
+            <text />
+          </optional>
+        </element>
         <element name="OTNotebook">
           <optional>
             <attribute name="local_id">
@@ -5705,6 +6484,14 @@
           </optional>
           <optional>
             <attribute name="locked" />
+            <data type="boolean" />
+          </optional>
+          <optional>
+            <attribute name="defaultScaffoldLevel" />
+            <text />
+          </optional>
+          <optional>
+            <attribute name="isLevelFrozen" />
             <data type="boolean" />
           </optional>
           <element name="additionalInputTypes">
