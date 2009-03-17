@@ -83,7 +83,8 @@ import org.jdom.output.XMLOutputter;
 public class ExporterJDOM
 {
 	public static boolean useFullClassNames = false;
-
+	public static boolean preserveImports = true;
+	
 	private static Pattern refidPattern = Pattern.compile("(refid=\")([^\"]*)(\")");
 
 	private static Pattern viewidPattern = Pattern.compile("(viewid=\")([^\"]*)(\")");
@@ -200,7 +201,8 @@ public class ExporterJDOM
 		// If this is a XMLDatabase pre-populate the written classes with the databases existing classes.
 		// This preserves any imported classes that might not have been actually used in the otml file
 		// these imported classes are currently the only way to load in packages, so they need to be preserved.
-		if(db instanceof XMLDatabase){
+		
+		if(preserveImports && db instanceof XMLDatabase){
 			ArrayList<String> importedClasses = ((XMLDatabase)db).getImportedOTObjectClasses();
 			processedClasses.addAll(importedClasses);
 		}
