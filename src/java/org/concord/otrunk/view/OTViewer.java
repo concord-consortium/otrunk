@@ -178,7 +178,7 @@ public class OTViewer extends JFrame
      */
     private JDialog commDialog;
     
-    JFrame consoleFrame;
+    private static JFrame consoleFrame;
     JMenuBar menuBar;
     private JPanel statusPanel;
     String baseFrameTitle;
@@ -281,27 +281,32 @@ public class OTViewer extends JFrame
             });
         }
 
-        createConsoleFrame();
         commDialog = new JDialog(this, true);
         registerDebugEventListeners();
     }
 
-    private void createConsoleFrame() {
-        consoleFrame = new JFrame("Console");
-        StreamRecord record = new StreamRecord(50000);
-        StreamRecordView view = new StreamRecordView(record);
-        consoleFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        System.setOut((PrintStream) view.addOutputStream(System.out, "Console"));
-        System.setErr((PrintStream) view.addOutputStream(System.err, System.out));
-
-        consoleFrame.getContentPane().add(view);
-        consoleFrame.setSize(800, 600);
-
-        if (OTConfig.getBooleanProp(SHOW_CONSOLE_PROP, false)) {
-            consoleFrame.setVisible(true);
-        }
+    private static void createConsoleFrame() {
+    	if (consoleFrame == null) {
+            consoleFrame = new JFrame("Console");
+            StreamRecord record = new StreamRecord(50000);
+            StreamRecordView view = new StreamRecordView(record);
+            consoleFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+            System.setOut((PrintStream) view.addOutputStream(System.out, "Console"));
+            System.setErr((PrintStream) view.addOutputStream(System.err, System.out));
+    
+            consoleFrame.getContentPane().add(view);
+            consoleFrame.setSize(800, 600);
+    
+            if (OTConfig.getBooleanProp(SHOW_CONSOLE_PROP, false)) {
+                consoleFrame.setVisible(true);
+            }
+    	}
     }
 
+    public static void setConsoleFrame(JFrame frame) {
+    	consoleFrame = frame;
+    }
+    
     private void registerDebugEventListeners() {
         // for debugging
         // add a breakpoint below, run in debugging mode, and then hit Meta-B
@@ -2084,6 +2089,8 @@ public class OTViewer extends JFrame
 
     public static void main(String[] args) {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
+        
+        createConsoleFrame();
 
         OTViewer viewer = new OTViewer();
 
