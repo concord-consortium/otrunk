@@ -28,6 +28,7 @@ public class OTMLUserSession
 	File currentUserFile;
 	URL currentUserUrl;
 	XMLDatabase userDataDB;
+	protected URL contextURL;
 	
 	String userName;	
 
@@ -195,17 +196,17 @@ public class OTMLUserSession
 		OTObjectService objService = otrunk.createObjectService(userDataDB);
 
 		OTStateRoot stateRoot =
-		    (OTStateRoot) objService.createObject(OTStateRoot.class);
+		    objService.createObject(OTStateRoot.class);
 		userDataDB.setRoot(stateRoot.getGlobalId());
 		stateRoot.setFormatVersionString("1.0");
 
-		OTUserObject userObject = (OTUserObject) objService.createObject(OTUserObject.class);
+		OTUserObject userObject = objService.createObject(OTUserObject.class);
 
         OTID userId = userObject.getUserId();
                         
         OTObjectMap userStateMapMap = stateRoot.getUserMap();
 
-        refMap = (OTReferenceMap)objService.createObject(OTReferenceMap.class);
+        refMap = objService.createObject(OTReferenceMap.class);
         userStateMapMap.putObject(userId.toExternalForm(), refMap);
         refMap.setUser(userObject);
 
@@ -333,7 +334,7 @@ public class OTMLUserSession
 		// find the user from this database.
 		// this currently is the first user in the userMap
 		Vector<String> keys = userMap.getObjectKeys();
-		refMap = (OTReferenceMap)userMap.getObject((String)keys.get(0));
+		refMap = (OTReferenceMap)userMap.getObject(keys.get(0));
 	}
 
 	public boolean isInitialized()
@@ -373,4 +374,14 @@ public class OTMLUserSession
 	{
 		
 	}
+
+	public void setContextURL(URL url)
+    {
+		this.contextURL = url;
+    }
+	
+	public URL getContextURL()
+    {
+		return this.contextURL;
+    }
 }
