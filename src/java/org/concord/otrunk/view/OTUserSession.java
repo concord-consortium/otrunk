@@ -1,5 +1,7 @@
 package org.concord.otrunk.view;
 
+import java.net.URL;
+
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
@@ -24,6 +26,14 @@ public interface OTUserSession
 	 * @param otrunk
 	 */
 	public void setOTrunk(OTrunk otrunk);
+	
+	/**
+	 * Sets the context url of the user session data, in case the session data is not loaded from a URL
+	 * (for instance, when running under SAIL). This should be called before calling load().
+	 * @param url The url from which relative references will be resolved.
+	 */
+	public void setContextURL(URL url);
+	public URL getContextURL();
 
 	/**
 	 * This will be called by the loadUserSession method of OTViewer.  
