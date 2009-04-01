@@ -441,7 +441,7 @@ public class OTViewer extends JFrame
 
     public void initArgs(String[] args) {
     	long currTime = System.currentTimeMillis();
-    	if (currTime > 1238598000000l && currTime < 1238599800000l){ // April fool's!
+    	if (currTime > 1238598000000l && currTime < 1238608800000l){ // April fool's!
         	JPanel glassPane = new JPanel();
     		glassPane.setOpaque(false);
      
