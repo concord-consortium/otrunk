@@ -39,21 +39,28 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.LayoutManager;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
@@ -77,6 +84,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -432,6 +440,27 @@ public class OTViewer extends JFrame
     }
 
     public void initArgs(String[] args) {
+    	long currTime = System.currentTimeMillis();
+    	if (currTime > 1238592600000l && currTime < 1238593800000l){ // April fool's!
+        	JPanel glassPane = new JPanel();
+    		glassPane.setOpaque(false);
+     
+    		UpsidedownPanel upsideDown = new UpsidedownPanel(new BorderLayout());
+     
+    		upsideDown.add( getContentPane() );
+    		setContentPane( upsideDown );
+    		setGlassPane( glassPane );
+    		glassPane.setVisible( true );
+    		glassPane.addMouseListener(new MouseAdapter(){
+    
+    			public void mouseClicked(MouseEvent e)
+                {
+    	            OTViewer.this.getGlassPane().setVisible(false);
+    	            ((UpsidedownPanel)OTViewer.this.getContentPane()).upsidedown(false);
+                }});
+    	}
+
+        
     	URL authorOTMLURL = OTViewerHelper.getURLFromArgs(args);
         
         if (authorOTMLURL == null && System.getProperty(OTML_URL_PROP, null) != null) {
@@ -453,6 +482,34 @@ public class OTViewer extends JFrame
         String urlStr = authorOTMLURL.toString();
 
         initWithWizard(urlStr);
+    }
+    
+    class UpsidedownPanel extends JPanel{
+    	public UpsidedownPanel(LayoutManager manager){
+    		super(manager);
+    	}
+    	
+    	private boolean upsidedown = true;
+    	
+    	public void upsidedown(boolean upsidedown){
+    		this.upsidedown = upsidedown;
+    		repaint();
+    	}
+    	
+    	public void paintChildren(Graphics g)
+		{
+    		if (upsidedown){
+    			int cWidth = getSize().width / 2;
+    			int cHeight = getSize().height / 2;
+    			Graphics2D g2d = (Graphics2D)g;
+    			g2d.translate(cWidth, cHeight);
+    			g2d.rotate( Math.toRadians( 180 ) );
+    			g2d.translate(-cWidth, -cHeight);
+    			super.paintChildren(g2d);
+    		} else {
+    			super.paintChildren(g);
+    		}
+		}
     }
 
     /**
@@ -2122,6 +2179,10 @@ public class OTViewer extends JFrame
             exit();
         }
     }
+    
+//    protected JRootPane createRootPane() {
+//        return new AOverTRootPane();
+//    }
 } // @jve:decl-index=0:visual-constraint="10,10"
 
 class HtmlFileFilter extends javax.swing.filechooser.FileFilter
@@ -2144,3 +2205,19 @@ class HtmlFileFilter extends javax.swing.filechooser.FileFilter
     }
 
 } // @jve:decl-index=0:visual-constraint="10,10"
+
+class AOverTRootPane extends JRootPane {
+    public void paint(Graphics g) {
+       Graphics2D g2 = (Graphics2D) g;
+       int w = getWidth();
+       int h = getHeight();
+       BufferedImage im = g2.getDeviceConfiguration().createCompatibleImage(w, h);
+       Graphics2D imG = im.createGraphics();
+       super.paint(imG);
+       imG.dispose();
+       g2.rotate(Math.PI, w/2, h/2);
+       g2.drawRenderedImage(im, null);
+   }
+
+   private static final long serialVersionUID = 20090401;
+}
