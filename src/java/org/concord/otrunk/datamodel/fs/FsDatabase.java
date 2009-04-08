@@ -283,7 +283,7 @@ public class FsDatabase implements OTDatabase
 	public OTDataObject getOTDataObject(OTDataObject dataParent, OTID childID)
 		throws Exception
 	{
-		return (OTDataObject)dbIndex.get(childID);
+		return dbIndex.get(childID);
 	}
 
 	/* (non-Javadoc)
@@ -342,5 +342,20 @@ public class FsDatabase implements OTDatabase
     {
 	    // TODO Auto-generated method stub
 	    return null;
+    }
+
+	public HashMap<OTID, FsDataObject> getDataObjects()
+    {
+	    return dbIndex;
+    }
+
+	public ArrayList<OTID> getChildObjectIds(OTID otid)
+    {
+		throw new UnsupportedOperationException("not implemented yet");
+    }
+
+	public ArrayList<OTID> getParentObjectIds(OTID otid)
+    {
+		throw new UnsupportedOperationException("not implemented yet");
     }
 }

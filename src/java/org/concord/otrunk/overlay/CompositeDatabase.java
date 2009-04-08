@@ -138,7 +138,7 @@ public class CompositeDatabase
      * @see org.concord.otrunk.datamodel.OTDatabase#createDataObject()
      */
     public OTDataObject createDataObject(OTDataObjectType type) throws Exception
-    {        
+    {
         // in this case we need to create a new state object and wrap it
         OTDataObject childObject = activeOverlayDb.createDataObject(type);
         CompositeDataObject compositeDataObject = 
@@ -358,6 +358,21 @@ public class CompositeDatabase
         }
         
         return null;
+    }
+
+	public HashMap<OTID, CompositeDataObject> getDataObjects()
+    {
+	    return dataObjectMap;
+    }
+
+	public ArrayList<OTID> getChildObjectIds(OTID otid)
+    {
+		return activeOverlayDb.getChildObjectIds(otid);
+    }
+
+	public ArrayList<OTID> getParentObjectIds(OTID otid)
+    {
+		return activeOverlayDb.getParentObjectIds(otid);
     }
 
 }

@@ -47,6 +47,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -90,6 +93,7 @@ import org.concord.otrunk.xml.XMLDatabase;
  */
 public class OTrunkImpl implements OTrunk
 {
+	private static final Logger logger = Logger.getLogger(OTrunkImpl.class.getName());
 	protected Hashtable<OTID, Reference<OTObject>> loadedObjects = 
 		new Hashtable<OTID, Reference<OTObject>>();
 	protected Hashtable<OTID, CompositeDatabase> compositeDatabases = 
@@ -153,7 +157,7 @@ public class OTrunkImpl implements OTrunk
 			ConcordHostnameVerifier verifier = new ConcordHostnameVerifier();
 			HttpsURLConnection.setDefaultHostnameVerifier(verifier);
 		} catch (Exception e) {
-			System.err.println("Couldn't initialize the Concord HostnameVerifier!");
+			logger.warning("Couldn't initialize the Concord HostnameVerifier!");
 		}
 		
 		try {
@@ -162,10 +166,10 @@ public class OTrunkImpl implements OTrunk
 	        openConnection.setDefaultUseCaches(true);
         } catch (MalformedURLException e1) {
 	        // TODO Auto-generated catch block
-	        e1.printStackTrace();
+	        logger.log(Level.WARNING, "Malformed URL", e1);
         } catch (IOException e) {
 	        // TODO Auto-generated catch block
-	        e.printStackTrace();
+        	logger.log(Level.WARNING, "IO problem", e);
         }
 		
 		// Setup the services this has to be done before addDatabase
@@ -206,7 +210,7 @@ public class OTrunkImpl implements OTrunk
 					
 			OTSystem otSystem = getSystem();
 			if(otSystem == null){
-				System.err.println("Warning: No OTSystem object found");
+				logger.warning("No OTSystem object found");
 				return;
 			}
 			
@@ -216,7 +220,7 @@ public class OTrunkImpl implements OTrunk
 			OTObjectList bundleList = otSystem.getBundles();
 			
 			if(serviceList.size() > 0 && bundleList.size() > 0){
-				System.err.println("Warning: both OTSystem.services and OTSystem.bundles are being used.  OTSystem.services is deprecated");
+				logger.warning("Both OTSystem.services and OTSystem.bundles are being used.  OTSystem.services is deprecated");
 			}
 			
 			ArrayList<OTObject> combined = new ArrayList<OTObject>();
@@ -237,7 +241,7 @@ public class OTrunkImpl implements OTrunk
 				}
 			}			
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.WARNING, "Error registering and initializing bundles and services", e);
 		}
 	}
 
@@ -437,7 +441,7 @@ public class OTrunkImpl implements OTrunk
 			}
 		}
 		
-		System.err.println("Cannot find objectService for database: " + includeDb.getDatabaseId());
+		logger.warning("Cannot find objectService for database: " + includeDb.getDatabaseId());
 		return null;			    	
     }
     
@@ -455,12 +459,12 @@ public class OTrunkImpl implements OTrunk
     		XMLDatabase xmlDatabase = (XMLDatabase) db;
     		URL contextURL = xmlDatabase.getContextURL();
     		if (contextURL == null) {
-    			System.err.println("Database without a context url! " + xmlDatabase.getDatabaseId());
+    			logger.info("Database without a context url! " + xmlDatabase.getDatabaseId());
     		}
     		else if (contextURL.equals(url)){
     			if (reload) {
     				// remove the current database, so we can reload it below
-    				System.err.println("Removing database so we can reload it.");
+    				logger.info("Removing database so we can reload it.");
     				databases.remove(xmlDatabase);
     				removeObjectService(getExistingObjectService(xmlDatabase));
     				break;
@@ -474,7 +478,7 @@ public class OTrunkImpl implements OTrunk
 
 		// load the data base		
 		if(databases.contains(includeDb)){
-			System.err.println("already loaded database with id: " + includeDb.getDatabaseId() + 
+			logger.info("already loaded database with id: " + includeDb.getDatabaseId() + 
 				" database: " + includeDb.getContextURL().toExternalForm() + " will not be loaded again");
 		
 			return getExistingObjectService(includeDb);
@@ -551,8 +555,7 @@ public class OTrunkImpl implements OTrunk
 			try {
 				loadDatabase(hrefUrl);
 			} catch (Exception e) {
-				e.printStackTrace();
-				System.err.println("trying to continue");
+				logger.log(Level.WARNING, "Error while loading database. Trying to continue.", e);
 				continue;
 			}
 		}
@@ -633,7 +636,7 @@ public class OTrunkImpl implements OTrunk
 	        }
         } catch (Exception e) {
 	        // TODO Auto-generated catch block
-	        e.printStackTrace();
+	        logger.log(Level.WARNING, "Error register overlays", e);
         }    	
     	
 
@@ -662,7 +665,7 @@ public class OTrunkImpl implements OTrunk
             OTDataObject overlayModifications = ((CompositeDataObject)dataObject).getActiveDeltaObject();
             return overlayModifications != null;
         } else {
-        	System.err.println("Warning: this object isn't from an Overlay");
+        	logger.warning("This object isn't from an Overlay");
         }
     	
     	return false;
@@ -707,10 +710,10 @@ public class OTrunkImpl implements OTrunk
 	    	otPackage.initialize(this);
         } catch (InstantiationException e) {
 	        // TODO Auto-generated catch block
-	        e.printStackTrace();
+        	logger.log(Level.WARNING, "Error registering package dependencies", e);
         } catch (IllegalAccessException e) {
 	        // TODO Auto-generated catch block
-	        e.printStackTrace();
+        	logger.log(Level.WARNING, "Error registering package dependencies", e);
         }
 
     	return;
@@ -753,12 +756,12 @@ public class OTrunkImpl implements OTrunk
 				
 		CompositeDatabase db = compositeDatabases.get(userId);
 				
-		//System.out.println("is relative");
+		//logger.finer("is relative");
 		Object objectMapToken = ((OTTransientMapID) objectId).getMapToken();
 		if(objectMapToken != null && objectMapToken == db.getDatabaseId()) {
-			//System.out.print("   equals to databaseid");
+			//logger.finer("   equals to databaseid");
 			objectId = ((OTTransientMapID) objectId).getMappedId();
-			//System.out.println(": " + objectId.toString());
+			//logger.finer(": " + objectId.toString());
 
 			return getOTObject(objectId);		    			
 		}
@@ -892,7 +895,7 @@ public class OTrunkImpl implements OTrunk
             }
         }
         
-        System.err.println("Data object is not found for: " + childID);
+        logger.warning("Data object is not found for: " + childID);
         return null;
     }
 
@@ -1032,5 +1035,88 @@ public class OTrunkImpl implements OTrunk
     public boolean isSailSavingDisabled()
     {
 	    return sailSavingDisabled;
+    }
+    
+    public ArrayList<OTObject> getAllObjects(Class<? extends Object> klass) {
+    	return getAllObjects(klass, getRootObjectService());
+    }
+    
+    public ArrayList<OTObject> getAllObjects(Class<? extends Object> klass, OTObjectService objService) {
+    	logger.finest("Getting all objects for class: " + klass.getName());
+    	ArrayList<OTObject> allObjects = new ArrayList<OTObject>();
+    	logger.finest("Datases: " + databases.size());
+    	for (OTDatabase db : databases) {
+    		logger.finest("Searching db: " + db.getURI());
+    		HashMap<OTID, ? extends OTDataObject> map = db.getDataObjects();
+    		logger.finest("db has " + map.size() + " objects");
+    		for (Entry<OTID, ? extends OTDataObject> entry : map.entrySet()) {
+    			OTDataObject dataObj = entry.getValue();
+    			OTID id = entry.getKey();
+    			logger.finest("Data object class is: " + dataObj.getType().getClassName());
+                    try {
+	                    Class<?> objClass = Class.forName(dataObj.getType().getClassName());
+            			if (klass.isAssignableFrom(objClass)) {
+            				logger.finest("It's a match! Adding it.");
+            				allObjects.add(objService.getOTObject(id));
+            			}
+                    } catch (ClassNotFoundException e) {
+                    	logger.log(Level.WARNING, "Couldn't instantiate class: " + dataObj.getType().getClassName(), e);
+                    } catch (Exception e) {
+     					logger.log(Level.WARNING, "Couldn't get OTObject for object: " + id.toExternalForm(), e);
+     				}
+    		}
+    	}
+    	return allObjects;
+    }
+    
+    public ArrayList<OTID> getParents(OTID obj) {
+    	return getParents(obj, Object.class, false, null);
+    }
+    
+    public ArrayList<OTID> getParents(OTID obj, Class<?> klass, boolean recurse, ArrayList<OTID> seenIds) {
+    	ArrayList<OTID> allParents = new ArrayList<OTID>();
+    	if (seenIds == null) {
+    		seenIds = new ArrayList<OTID>();
+    	}
+    	// XXX Should we be searching all databases?
+    	for (OTDatabase db : databases) {
+        	try {
+    	        ArrayList<OTID> parents = db.getParentObjectIds(obj);
+    	        if (parents != null) {
+        	        logger.finest("Found " + parents.size() + " parents");
+        	        for (OTID pId : parents) {
+        	        	if (! seenIds.contains(pId)) {
+        	        		logger.finest("Found parent id: " + pId);
+        	        		seenIds.add(pId);
+                	        OTDataObject parentObj = db.getOTDataObject(null, pId);
+                	        logger.finest("Filter class: " + klass.getSimpleName() + ", parent class: " + parentObj.getType().getClassName());
+                	        if (klass.isAssignableFrom(Class.forName(parentObj.getType().getClassName()))) {
+                	        	logger.finest("Found a matching parent: " + parentObj);
+                	        	allParents.add(pId);
+                	        }
+            	        	if (recurse) {
+            	        		
+            	        		allParents.addAll(getParents(pId, klass, true, seenIds));
+            	        	}
+        	        	} else {
+        	        		logger.finest("Already seen this id: " + pId);
+        	        	}
+        	        }
+    	        } else {
+    	        	logger.finest("null parents");
+    	        }
+            } catch (Exception e) {
+    	        // TODO Auto-generated catch block
+            	logger.log(Level.WARNING, "Error finding parents", e);
+            }
+    	}
+    	return allParents;
+    }
+    
+    public ArrayList<OTID> getParents(OTID obj, Class<?> klass, boolean recurse) {
+    	logger.finer("Finding parents for: " + obj + " with class: " + klass.getName() + " and recursion: " + recurse);
+    	ArrayList<OTID> parents = getParents(obj, klass, recurse, null);
+    	logger.finer("found " + parents.size() + " matching parents");
+    	return parents;
     }
 }

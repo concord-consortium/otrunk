@@ -137,7 +137,9 @@ public class OTGroupListManager extends DefaultOTObject
     
     public void reloadAll() {
     	try {
-	        overlayManager.reload(groupUserObject);
+    		if (groupUserObject != null) {
+    			overlayManager.reload(groupUserObject);
+    		}
         } catch (Exception e) {
         	logger.log(Level.WARNING, "Couldn't load overlay for group", e);
         }

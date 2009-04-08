@@ -34,6 +34,8 @@ package org.concord.otrunk.xml;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.otcore.OTClass;
@@ -55,6 +57,7 @@ import org.concord.otrunk.datamodel.OTUUID;
  */
 public class ObjectTypeHandler extends ResourceTypeHandler
 {
+	private static final Logger logger = Logger.getLogger(ObjectTypeHandler.class.getName());
 	OTClass otClass;
 	TypeService typeService;	
 	String objectName = null;
@@ -109,7 +112,12 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		if(isObjectReferenceHandler()){
 			String refid = element.getAttributeValue("refid");
 			if(refid != null && refid.length() > 0){
-				return new XMLDataObjectRef(refid, element);
+				XMLDataObjectRef ref = new XMLDataObjectRef(refid, element);
+				if (parent != null) {
+    				logger.finest("Processed refid: " + refid + " of parent: " + parent.getGlobalId());
+    				xmlDB.recordReference(parent.getGlobalId(), OTIDFactory.createOTID(refid));
+				}
+				return ref;
 			}
 		}
 		
@@ -141,7 +149,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		        }
 		    }
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.log(Level.WARNING, "Failed to created data object", e);
 			return null;
 		}
 
@@ -164,9 +172,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			}
 			
 			if(isObjectReferenceHandler()){
-				System.err.println("Invalid <object> attribute: " +						
+				logger.warning("Invalid <object> attribute: " +						
 						TypeService.attributePath(attrib));
-				System.err.println("  Only viable <object> attribute is \"refid\"");
+				logger.warning("  Only viable <object> attribute is \"refid\"");
 				continue;
 			}
 			
@@ -196,7 +204,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 					info.type = XMLReferenceInfo.ATTRIBUTE;				
 				}
 			} catch (HandleElementException e) {
-				System.err.println(e.getMessage() + " in attribute: " +
+				logger.warning(e.getMessage() + " in attribute: " +
 						TypeService.attributePath(attrib));
 			}
 		}
@@ -233,13 +241,17 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 					info.type = XMLReferenceInfo.ELEMENT;									
 				}
 			} catch (HandleElementException e) {
-				System.err.println("error in element: " +
-						TypeService.elementPath(child));
-				e.printStackTrace();				
+				logger.log(Level.WARNING, "error in element: " +
+						TypeService.elementPath(child), e);
 			}
 			
 			// Clear the previous comment so it isn't picked up by the next element
 			previousComment = null;
+		}
+		
+		if (parent != null) {
+			logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
+			xmlDB.recordReference(parent.getGlobalId(), obj.getGlobalId());
 		}
 		
 		return obj;
@@ -270,7 +282,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	{
 		OTClassProperty otProperty = otClass.getProperty(childName);
 		if(otProperty == null) {
-			System.err.println("error reading property \"" + childName + "\"" +
+			logger.warning("error reading property \"" + childName + "\"" +
 					" it is not defined for type: " + getObjectName());
 			return null;
 		}
@@ -294,13 +306,20 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		    // this is an object reference
 			String refid = (String)childObj;
 			if(refid != null && refid.length() > 0){
-				return new XMLDataObjectRef(refid, parentElement);
+				XMLDataObjectRef ref = new XMLDataObjectRef(refid, parentElement);
+				if (parent != null) {
+    				logger.finer("Processed refid: " + refid + " of parent: " + parent.getGlobalId());
+    				xmlDB.recordReference(parent.getGlobalId(), OTIDFactory.createOTID(refid));
+				} else {
+					logger.finer("Not processed refid: " + refid + " of parent: null");
+				}
+				return ref;
 			}		    
 		}
 		
 		if(otType instanceof OTClass) {
 			if(!(childObj instanceof OTXMLElement)) {
-				System.err.println("child of type object must be an element or string");
+				logger.warning("child of type object must be an element or string");
 				return null;
 			}
 			OTXMLElement child = (OTXMLElement)childObj;
@@ -325,7 +344,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				}
 				childObj = children.get(0);
                 if(children.size() > 1) {
-                    System.err.println("Warning: Only the first element is returned from " +
+                    logger.warning("Warning: Only the first element is returned from " +
                             TypeService.elementPath(child));
                 }
 				String childElementName = ((OTXMLElement)childObj).getName();
@@ -356,7 +375,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		ResourceTypeHandler resHandler = typeService.getElementHandler(otType);
 		
 		if(resHandler == null){
-			System.err.println("Can't find type handler for: " +
+			logger.warning("Can't find type handler for: " +
 					otType.getName());
 			return null;
 		}
@@ -382,7 +401,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 
 			parentType = (ObjectTypeHandler)typeService.getElementHandler(parentObjectName);
 			if(parentType == null) {
-				System.err.println("can't find parent: " + parentObjectName +
+				logger.warning("can't find parent: " + parentObjectName +
 						" of: " + getObjectName());
 			}
 			return parentType;
