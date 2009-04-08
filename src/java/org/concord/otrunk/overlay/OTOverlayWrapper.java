@@ -29,4 +29,6 @@ public interface OTOverlayWrapper
 	 * @return
 	 */
 	public String getButtonText();
+	
+	public OTObject getResultsObject();
 }
