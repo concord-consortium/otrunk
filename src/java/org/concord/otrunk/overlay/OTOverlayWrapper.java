@@ -31,4 +31,7 @@ public interface OTOverlayWrapper
 	public String getButtonText();
 	
 	public OTObject getResultsObject();
+	
+	public static boolean DEFAULT_autoSubmit = false;
+	public boolean getAutoSubmit();
 }
