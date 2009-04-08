@@ -35,6 +35,7 @@ package org.concord.otrunk.datamodel;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTPackage;
@@ -113,4 +114,10 @@ public interface OTDatabase
 	 * @return
 	 */
 	public URI getURI();
+	
+	public HashMap<OTID, ? extends OTDataObject> getDataObjects();
+	
+	public ArrayList<OTID> getParentObjectIds(OTID otid);
+	
+	public ArrayList<OTID> getChildObjectIds(OTID otid);
 }

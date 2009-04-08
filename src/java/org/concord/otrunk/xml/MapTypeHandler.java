@@ -34,6 +34,10 @@ package org.concord.otrunk.xml;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
+
+import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDatabase;
 
 
 /**
@@ -47,6 +51,7 @@ import java.util.List;
  */
 public class MapTypeHandler extends ResourceTypeHandler
 {
+	private static final Logger logger = Logger.getLogger(MapTypeHandler.class.getName());
 	TypeService typeService;
 	
 	/**
@@ -66,6 +71,12 @@ public class MapTypeHandler extends ResourceTypeHandler
 	{
 		XMLDataMap map = new XMLDataMap(parent);
 		
+		OTDatabase otDB = parent.getDatabase();
+		XMLDatabase xmlDB = null;
+		if(otDB instanceof XMLDatabase){
+			xmlDB = (XMLDatabase) otDB;
+		}
+		
 		List<?> children = element.getChildren();
 		for(Iterator<?> childIter = children.iterator(); childIter.hasNext(); ) {			
 		    OTXMLElement entry = (OTXMLElement)childIter.next();
@@ -77,7 +88,7 @@ public class MapTypeHandler extends ResourceTypeHandler
 			List<?> entryChildren = entry.getChildren();
 			Object value = null;
 			if(entryChildren.size() != 1) {
-				System.err.println("Warning invalid entry in map element");
+				logger.warning("Warning invalid entry in map element");
 				continue;
 			}
 			
@@ -88,6 +99,13 @@ public class MapTypeHandler extends ResourceTypeHandler
 
 		    OTXMLElement valueElement = (OTXMLElement)entryChildren.get(0);
 		    value = typeService.handleLiteralElement(valueElement, childRelativePath);
+		    if (value instanceof OTDataObject) {
+				OTDataObject obj = (OTDataObject) value;
+				if (parent != null) {
+					logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
+					xmlDB.recordReference(parent.getGlobalId(), obj.getGlobalId());
+				}
+			}
 		    map.put(key, value);
 		}
 

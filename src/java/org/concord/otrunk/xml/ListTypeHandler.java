@@ -34,7 +34,9 @@ package org.concord.otrunk.xml;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
+import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDatabase;
 
 /**
@@ -48,6 +50,7 @@ import org.concord.otrunk.datamodel.OTDatabase;
  */
 public class ListTypeHandler extends ResourceTypeHandler
 {
+	private static final Logger logger = Logger.getLogger(ListTypeHandler.class.getName());
 	TypeService typeService;
 	
 	public ListTypeHandler(TypeService dots)
@@ -101,6 +104,13 @@ public class ListTypeHandler extends ResourceTypeHandler
 		        childRelativePath = relativePath + "[" + index + "]";		        
 		    }
 			Object resValue = typeService.handleLiteralElement(child, childRelativePath);
+			if (resValue instanceof OTDataObject) {
+				OTDataObject obj = (OTDataObject) resValue;
+				if (parent != null) {
+					logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
+					xmlDB.recordReference(parent.getGlobalId(), obj.getGlobalId());
+				}
+			}
 			list.add(resValue);
 			index++;
 			

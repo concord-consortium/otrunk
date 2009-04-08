@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTPackage;
@@ -85,6 +86,7 @@ import org.concord.otrunk.xml.jdom.JDOMDocument;
 public class XMLDatabase
     implements OTDatabase
 {
+	private static final Logger logger = Logger.getLogger(XMLDatabase.class.getName());
 	public static boolean TRACE_PACKAGES =
 	    OTConfig.getBooleanProp(OTConfig.TRACE_PACKAGES_PROP, false);
 
@@ -123,9 +125,11 @@ public class XMLDatabase
 
 	String label;
 
-	private HashMap<OTID, ArrayList<OTDataObject>> reverseReferences = 
-		new HashMap<OTID, ArrayList<OTDataObject>>();
-
+	private HashMap<OTID, ArrayList<OTID>> parentReferences = 
+		new HashMap<OTID, ArrayList<OTID>>();
+	
+	private HashMap<OTID, ArrayList<OTID>> childReferences = 
+		new HashMap<OTID, ArrayList<OTID>>();
 
 	private long urlOpenTime;
 	private long downloadTime = -1;
@@ -261,13 +265,13 @@ public class XMLDatabase
 			if (contextURL != null) {
 				URLConnection connection = contextURL.openConnection();
 				if (connection instanceof HttpURLConnection) {
-					System.err.println("Error created xml document");
-					System.err.println("Response code for " + contextURL + ":");
-					System.err.println("   "
+					logger.severe("Error created xml document");
+					logger.severe("Response code for " + contextURL + ":");
+					logger.severe("   "
 					        + ((HttpURLConnection) connection).getResponseCode());
 				}
-				System.err.println("Length of xmlstream from " + contextURL + ":");
-				System.err.println("   " + connection.getInputStream().available());
+				logger.severe("Length of xmlstream from " + contextURL + ":");
+				logger.severe("   " + connection.getInputStream().available());
 			}
 
 			throw e;
@@ -425,7 +429,7 @@ public class XMLDatabase
 
 				Object oldId = localIdMap.put(localIdStr, otid);
 				if (oldId != null) {
-					System.err.println("repeated local id: " + localIdStr);
+					logger.warning("repeated local id: " + localIdStr);
 				}
 			}
 
@@ -556,14 +560,14 @@ public class XMLDatabase
 			otPackageClass = (Class<? extends OTPackage>) 
 			    getClass().getClassLoader().loadClass(fullyQualifiedOTPackageClassName);
 			if (TRACE_PACKAGES) {
-				System.err.println("loaded package: " + otPackageClass);
+				logger.info("loaded package: " + otPackageClass);
 			}
 			processedOTPackages.put(packageName, otPackageClass);
 			return otPackageClass;
 		} catch (ClassNotFoundException e) {
 			if (TRACE_PACKAGES) {
-				System.err.println("no OTPackage for: " + packageName);
-				System.err.println("  the classname should be: "
+				logger.info("no OTPackage for: " + packageName);
+				logger.info("  the classname should be: "
 				        + fullyQualifiedOTPackageClassName);
 			}
 			// add to a list of notfound otpackages so we don't look for it
@@ -701,7 +705,7 @@ public class XMLDatabase
 
 				Object oldId = localIdMap.put(localIdStr, dataObject.getGlobalId());
 				if (oldId != null) {
-					System.err.println("repeated local id: " + localIdStr);
+					logger.warning("repeated local id: " + localIdStr);
 				}
 			}
 		}
@@ -900,13 +904,13 @@ public class XMLDatabase
 	{
 		if (idStr.startsWith("${")) {
 			if(!idStr.endsWith("}")){
-				System.err.println("local id reference must end with }: " + idStr.substring(2,idStr.length()));
+				logger.warning("local id reference must end with }: " + idStr.substring(2,idStr.length()));
 				return null;
 			}
 			String localId = idStr.substring(2, idStr.length() - 1);
 			OTID globalId = localIdMap.get(localId);
 			if (globalId == null) {
-				System.err.println("Can't find local id: " + localId);
+				logger.warning("Can't find local id: " + localId);
 			}
 			return globalId;
 		} else {
@@ -990,15 +994,26 @@ public class XMLDatabase
 	{
 		return contextURL;
 	}
+	
+	public void recordReference(OTID parent, String refId) {
+		// FIXME need to do a second pass through these to get the OTIDs of the referenced object
+	}
 
 	public void recordReference(OTID parent, OTID child)
 	{
-		ArrayList<OTDataObject> refs = reverseReferences.get(parent);
-		if (refs == null) {
-			// it is probably better to use a link list here instead because we are going
-			// to want a custom object to record which property is making this reference
-			refs = new ArrayList<OTDataObject>();
+		ArrayList<OTID> parents = parentReferences.get(child);
+		ArrayList<OTID> children = childReferences.get(parent);
+		if (parents == null) {
+			parents = new ArrayList<OTID>();
 		}
+		if (children == null) {
+			children = new ArrayList<OTID>();
+		}
+		parents.add(parent);
+		children.add(child);
+		
+		parentReferences.put(child, parents);
+		childReferences.put(parent, children);
 	}
 	
 	/**
@@ -1092,5 +1107,15 @@ public class XMLDatabase
     	}    		
     	
     	return null;
+    }
+
+	public ArrayList<OTID> getParentObjectIds(OTID otid)
+    {
+	    return parentReferences.get(otid);
+    }
+	
+	public ArrayList<OTID> getChildObjectIds(OTID otid)
+    {
+	    return childReferences.get(otid);
     }
 }
