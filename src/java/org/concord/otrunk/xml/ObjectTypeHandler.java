@@ -308,10 +308,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			if(refid != null && refid.length() > 0){
 				XMLDataObjectRef ref = new XMLDataObjectRef(refid, parentElement);
 				if (parent != null) {
-    				logger.finer("Processed refid: " + refid + " of parent: " + parent.getGlobalId());
+    				logger.finest("Processed refid: " + refid + " of parent: " + parent.getGlobalId());
     				xmlDB.recordReference(parent.getGlobalId(), OTIDFactory.createOTID(refid));
-				} else {
-					logger.finer("Not processed refid: " + refid + " of parent: null");
 				}
 				return ref;
 			}		    
