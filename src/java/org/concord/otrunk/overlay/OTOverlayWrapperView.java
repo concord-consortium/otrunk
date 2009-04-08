@@ -4,11 +4,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.concord.framework.otrunk.OTID;
@@ -31,6 +34,8 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	private JButton submitButton;
 	private GridBagConstraints noStretchConstraints;
 	private GridBagConstraints stretchConstraints;
+	private OTObject resultsObject;
+	private JFrame resultsFrame;
 	
 	public JComponent getComponent(OTObject otObject)
 	{
@@ -89,20 +94,58 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 			});
 		}
 		
+		resultsObject = wrapper.getResultsObject();
+		if (resultsObject != null) {
+    		JButton resultsButton = new JButton("Results");
+    		mainPanel.add(resultsButton, noStretchConstraints);
+    		
+    		resultsButton.addActionListener(new ActionListener() {
+    			public void actionPerformed(ActionEvent e)
+                {
+                    popUpResults();
+                }
+    		});
+		}
+		
 		return mainPanel;
+	}
+	
+	private void popUpResults() {
+		final JComponent resultsSubview = createSubViewComponent(resultsObject);
+		resultsSubview.addComponentListener(new ComponentListener() {
+			public void componentHidden(ComponentEvent e) { }
+			public void componentShown(ComponentEvent e) { }
+			public void componentMoved(ComponentEvent e) { }
+
+			public void componentResized(ComponentEvent e)
+            {
+				resultsSubview.removeComponentListener(this);
+				resultsFrame.pack();
+            }
+		});
+		if (resultsFrame == null) {
+    		resultsFrame = new JFrame("Results");
+    		resultsFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		}
+		resultsFrame.getContentPane().removeAll();
+		resultsFrame.getContentPane().add(resultsSubview);
+		resultsFrame.pack();
+		resultsFrame.setVisible(true);
 	}
 	
 	@Override
     public void viewClosed() {
 		// logger.info("Closing the wrapped object's views");
 		removeAllSubViews();
-		saveData();
+		if (wrapper.getAutoSubmit()) {
+			saveData();
+		}
 		super.viewClosed();
 	}
 	
 	private void saveData() {
 		// save everything
-		if (overlay != null) {
+		if (overlayManager != null && overlay != null) {
 			// logger.info("had an overlay");
     		try {
     			OTID id = wrappedObject.getGlobalId();
@@ -117,13 +160,12 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
     	        logger.log(Level.SEVERE, "Couldn't get the object from the overlay!", e);
     	        logger.log(Level.FINER, "stack trace:", e);
             }
+            try {
+    	        overlayManager.remoteSave(overlay);
+            } catch (Exception e) {
+            	logger.log(Level.SEVERE, "Couldn't save the user's overlay!", e);
+            }
 		}
-		
-		try {
-	        overlayManager.remoteSave(overlay);
-        } catch (Exception e) {
-        	logger.log(Level.SEVERE, "Couldn't save the user's overlay!", e);
-        }
 	}
 
 }
