@@ -249,7 +249,7 @@ public class OTMLToXHTMLConverter
 					}
 
 					// System.out.println(referencedObject.getClass());
-					String url = embedOTObject(referencedObject, viewEntry);
+					String url = Matcher.quoteReplacement(embedOTObject(referencedObject, viewEntry));
 					// String url = objView.getXHTMLText(folder,
 					// containerDisplayWidth, containerDisplayHeight);
 					if (url != null) {
@@ -257,6 +257,9 @@ public class OTMLToXHTMLConverter
 							m.appendReplacement(parsed, url);
 						} catch (IllegalArgumentException e) {
 							System.err.println("bad replacement: " + url);
+							e.printStackTrace();
+						} catch (IndexOutOfBoundsException e) {
+							System.err.println("bad replacement (non-matching group reference): " + url);
 							e.printStackTrace();
 						}
 					}
