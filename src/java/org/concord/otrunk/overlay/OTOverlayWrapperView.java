@@ -1,5 +1,6 @@
 package org.concord.otrunk.overlay;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -82,9 +83,12 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		
 		mainPanel.add(subview, stretchConstraints);
 		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
 		if (wrapper.getShowButton()) {
 			submitButton = new JButton(wrapper.getButtonText());
-			mainPanel.add(submitButton, noStretchConstraints);
+			buttonPanel.add(submitButton);
 			
 			submitButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e)
@@ -97,7 +101,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		resultsObject = wrapper.getResultsObject();
 		if (resultsObject != null) {
     		JButton resultsButton = new JButton("Results");
-    		mainPanel.add(resultsButton, noStretchConstraints);
+    		buttonPanel.add(resultsButton);
     		
     		resultsButton.addActionListener(new ActionListener() {
     			public void actionPerformed(ActionEvent e)
@@ -106,6 +110,8 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
                 }
     		});
 		}
+		
+		mainPanel.add(buttonPanel, stretchConstraints);
 		
 		return mainPanel;
 	}
