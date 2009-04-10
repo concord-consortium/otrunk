@@ -365,14 +365,14 @@ public class CompositeDatabase
 	    return dataObjectMap;
     }
 
-	public ArrayList<OTID> getChildObjectIds(OTID otid)
+	public ArrayList<OTID> getOutgoingReferences(OTID otid)
     {
-		return activeOverlayDb.getChildObjectIds(otid);
+		return activeOverlayDb.getOutgoingReferences(otid);
     }
 
-	public ArrayList<OTID> getParentObjectIds(OTID otid)
+	public ArrayList<OTID> getIncomingReferences(OTID otid)
     {
-		return activeOverlayDb.getParentObjectIds(otid);
+		return activeOverlayDb.getIncomingReferences(otid);
     }
 
 }

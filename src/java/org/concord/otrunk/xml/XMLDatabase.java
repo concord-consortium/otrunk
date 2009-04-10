@@ -125,10 +125,10 @@ public class XMLDatabase
 
 	String label;
 
-	private HashMap<OTID, ArrayList<OTID>> parentReferences = 
+	private HashMap<OTID, ArrayList<OTID>> incomingReferences = 
 		new HashMap<OTID, ArrayList<OTID>>();
 	
-	private HashMap<OTID, ArrayList<OTID>> childReferences = 
+	private HashMap<OTID, ArrayList<OTID>> outgoingReferences = 
 		new HashMap<OTID, ArrayList<OTID>>();
 
 	private long urlOpenTime;
@@ -994,15 +994,11 @@ public class XMLDatabase
 	{
 		return contextURL;
 	}
-	
-	public void recordReference(OTID parent, String refId) {
-		// FIXME need to do a second pass through these to get the OTIDs of the referenced object
-	}
 
 	public void recordReference(OTID parent, OTID child)
 	{
-		ArrayList<OTID> parents = parentReferences.get(child);
-		ArrayList<OTID> children = childReferences.get(parent);
+		ArrayList<OTID> parents = incomingReferences.get(child);
+		ArrayList<OTID> children = outgoingReferences.get(parent);
 		if (parents == null) {
 			parents = new ArrayList<OTID>();
 		}
@@ -1012,8 +1008,8 @@ public class XMLDatabase
 		parents.add(parent);
 		children.add(child);
 		
-		parentReferences.put(child, parents);
-		childReferences.put(parent, children);
+		incomingReferences.put(child, parents);
+		outgoingReferences.put(parent, children);
 	}
 	
 	/**
@@ -1109,13 +1105,13 @@ public class XMLDatabase
     	return null;
     }
 
-	public ArrayList<OTID> getParentObjectIds(OTID otid)
+	public ArrayList<OTID> getIncomingReferences(OTID otid)
     {
-	    return parentReferences.get(otid);
+	    return incomingReferences.get(otid);
     }
 	
-	public ArrayList<OTID> getChildObjectIds(OTID otid)
+	public ArrayList<OTID> getOutgoingReferences(OTID otid)
     {
-	    return childReferences.get(otid);
+	    return outgoingReferences.get(otid);
     }
 }

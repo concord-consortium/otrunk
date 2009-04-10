@@ -117,7 +117,7 @@ public interface OTDatabase
 	
 	public HashMap<OTID, ? extends OTDataObject> getDataObjects();
 	
-	public ArrayList<OTID> getParentObjectIds(OTID otid);
+	public ArrayList<OTID> getIncomingReferences(OTID otid);
 	
-	public ArrayList<OTID> getChildObjectIds(OTID otid);
+	public ArrayList<OTID> getOutgoingReferences(OTID otid);
 }
