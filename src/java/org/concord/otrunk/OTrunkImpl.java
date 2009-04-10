@@ -1069,34 +1069,40 @@ public class OTrunkImpl implements OTrunk
     	return allObjects;
     }
     
-    public ArrayList<OTID> getParents(OTID obj) {
-    	return getParents(obj, Object.class, false, null);
+    public ArrayList<OTID> getReferences(OTID objectID) {
+    	return getReferences(objectID, null, false, null);
     }
     
-    public ArrayList<OTID> getParents(OTID obj, Class<?> klass, boolean recurse, ArrayList<OTID> seenIds) {
+    public ArrayList<OTID> getReferences(OTID objectID, boolean getIndirectReferences) {
+    	return getReferences(objectID, null, getIndirectReferences, null);
+    }
+    
+    public ArrayList<OTID> getReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences, ArrayList<OTID> excludeIDs) {
     	ArrayList<OTID> allParents = new ArrayList<OTID>();
-    	if (seenIds == null) {
-    		seenIds = new ArrayList<OTID>();
+    	if (excludeIDs == null) {
+    		excludeIDs = new ArrayList<OTID>();
     	}
     	// XXX Should we be searching all databases?
     	for (OTDatabase db : databases) {
         	try {
-    	        ArrayList<OTID> parents = db.getParentObjectIds(obj);
+    	        ArrayList<OTID> parents = db.getParentObjectIds(objectID);
     	        if (parents != null) {
         	        logger.finest("Found " + parents.size() + " parents");
         	        for (OTID pId : parents) {
-        	        	if (! seenIds.contains(pId)) {
+        	        	if (! excludeIDs.contains(pId)) {
         	        		logger.finest("Found parent id: " + pId);
-        	        		seenIds.add(pId);
+        	        		excludeIDs.add(pId);
                 	        OTDataObject parentObj = db.getOTDataObject(null, pId);
-                	        logger.finest("Filter class: " + klass.getSimpleName() + ", parent class: " + parentObj.getType().getClassName());
-                	        if (klass.isAssignableFrom(Class.forName(parentObj.getType().getClassName()))) {
+                	        if (filterClass != null) {
+                	        	logger.finest("Filter class: " + filterClass.getSimpleName() + ", parent class: " + parentObj.getType().getClassName());
+                	        }
+                	        if (filterClass == null || filterClass.isAssignableFrom(Class.forName(parentObj.getType().getClassName()))) {
                 	        	logger.finest("Found a matching parent: " + parentObj);
                 	        	allParents.add(pId);
                 	        }
-            	        	if (recurse) {
+            	        	if (getIndirectReferences) {
             	        		
-            	        		allParents.addAll(getParents(pId, klass, true, seenIds));
+            	        		allParents.addAll(getReferences(pId, filterClass, true, excludeIDs));
             	        	}
         	        	} else {
         	        		logger.finest("Already seen this id: " + pId);
@@ -1113,10 +1119,10 @@ public class OTrunkImpl implements OTrunk
     	return allParents;
     }
     
-    public ArrayList<OTID> getParents(OTID obj, Class<?> klass, boolean recurse) {
-    	logger.finer("Finding parents for: " + obj + " with class: " + klass.getName() + " and recursion: " + recurse);
-    	ArrayList<OTID> parents = getParents(obj, klass, recurse, null);
-    	logger.finer("found " + parents.size() + " matching parents");
+    public ArrayList<OTID> getReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences) {
+    	logger.finest("Finding references for: " + objectID + " with class: " + (filterClass == null ? "null" : filterClass.getName()) + " and recursion: " + getIndirectReferences);
+    	ArrayList<OTID> parents = getReferences(objectID, filterClass, getIndirectReferences, null);
+    	logger.finest("found " + parents.size() + " matching parents");
     	return parents;
     }
 }
