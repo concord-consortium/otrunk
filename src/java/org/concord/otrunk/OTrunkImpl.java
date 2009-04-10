@@ -1085,7 +1085,7 @@ public class OTrunkImpl implements OTrunk
     	// XXX Should we be searching all databases?
     	for (OTDatabase db : databases) {
         	try {
-    	        ArrayList<OTID> parents = db.getParentObjectIds(objectID);
+    	        ArrayList<OTID> parents = db.getIncomingReferences(objectID);
     	        if (parents != null) {
         	        logger.finest("Found " + parents.size() + " parents");
         	        for (OTID pId : parents) {

@@ -349,12 +349,12 @@ public class FsDatabase implements OTDatabase
 	    return dbIndex;
     }
 
-	public ArrayList<OTID> getChildObjectIds(OTID otid)
+	public ArrayList<OTID> getOutgoingReferences(OTID otid)
     {
 		throw new UnsupportedOperationException("not implemented yet");
     }
 
-	public ArrayList<OTID> getParentObjectIds(OTID otid)
+	public ArrayList<OTID> getIncomingReferences(OTID otid)
     {
 		throw new UnsupportedOperationException("not implemented yet");
     }
