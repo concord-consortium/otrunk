@@ -130,6 +130,9 @@ public class XMLDatabase
 	
 	private HashMap<OTID, ArrayList<OTID>> outgoingReferences = 
 		new HashMap<OTID, ArrayList<OTID>>();
+	
+	private HashMap<XMLDataObjectRef, OTID> secondPassReferences = 
+		new HashMap<XMLDataObjectRef, OTID>();
 
 	private long urlOpenTime;
 	private long downloadTime = -1;
@@ -826,6 +829,14 @@ public class XMLDatabase
 						removedKeys.add(resourceKey);
 					} else {
 						xmlDObj.setResource(resourceKey, newResourceValue);
+						// update the references map
+						OTID parent = secondPassReferences.get(resourceValueObj);
+						if (parent != null) {
+							recordReference(getOTDataObject(null, parent), getOTDataObject(null, (OTID) newResourceValue));
+							secondPassReferences.remove(resourceValueObj);
+						} else {
+							logger.finer("Parent was null (object): " + newResourceValue);
+						}
 					}
 				} else if (resourceValue instanceof XMLDataList) {
 					XMLDataList list = (XMLDataList) resourceValue;
@@ -840,6 +851,14 @@ public class XMLDatabase
 
 							OTID newElement = getOTID((XMLDataObject) oldElement);
 							list.set(j, newElement);
+							// update the references map
+							OTID parent = secondPassReferences.get(oldElement);
+							if (parent != null) {
+								recordReference(getOTDataObject(null, parent), getOTDataObject(null, newElement));
+								secondPassReferences.remove(oldElement);
+							} else {
+								logger.finer("Parent was null (list): " + newElement);
+							}
 						}
 						if (oldElement instanceof XMLParsableString) {
 							newResourceValue =
@@ -875,6 +894,14 @@ public class XMLDatabase
 
 							OTID newElement = getOTID((XMLDataObject) oldElement);
 							map.put(keys[j], newElement);
+							// update the references map
+							OTID parent = secondPassReferences.get(oldElement);
+							if (parent != null) {
+								recordReference(getOTDataObject(null, parent), getOTDataObject(null, newElement));
+								secondPassReferences.remove(oldElement);
+							} else {
+								logger.finer("Parent was null (map): " + newElement);
+							}
 						}
 						if (oldElement instanceof XMLParsableString) {
 							newResourceValue =
@@ -995,21 +1022,30 @@ public class XMLDatabase
 		return contextURL;
 	}
 
-	public void recordReference(OTID parent, OTID child)
+	public void recordReference(OTDataObject parent, OTDataObject child)
 	{
-		ArrayList<OTID> parents = incomingReferences.get(child);
-		ArrayList<OTID> children = outgoingReferences.get(parent);
+		OTID parentID = parent.getGlobalId();
+		if (child instanceof XMLDataObjectRef) {
+			// save these and process them in the second pass so that we can correctly resolve the references
+			secondPassReferences.put((XMLDataObjectRef) child, parentID);
+			return;
+		}
+		OTID childID = child.getGlobalId();
+		logger.finer("Recording reference: " + parentID + " --> " + childID);	
+		
+		ArrayList<OTID> parents = incomingReferences.get(childID);
+		ArrayList<OTID> children = outgoingReferences.get(parentID);
 		if (parents == null) {
 			parents = new ArrayList<OTID>();
 		}
 		if (children == null) {
 			children = new ArrayList<OTID>();
 		}
-		parents.add(parent);
-		children.add(child);
+		parents.add(parentID);
+		children.add(childID);
 		
-		incomingReferences.put(child, parents);
-		outgoingReferences.put(parent, children);
+		incomingReferences.put(childID, parents);
+		outgoingReferences.put(parentID, children);
 	}
 	
 	/**

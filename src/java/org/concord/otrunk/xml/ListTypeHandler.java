@@ -104,11 +104,11 @@ public class ListTypeHandler extends ResourceTypeHandler
 		        childRelativePath = relativePath + "[" + index + "]";		        
 		    }
 			Object resValue = typeService.handleLiteralElement(child, childRelativePath);
-			if (resValue instanceof OTDataObject) {
-				OTDataObject obj = (OTDataObject) resValue;
-				if (parent != null) {
+			if (parent != null) {
+    			if (resValue instanceof OTDataObject) {
+    				OTDataObject obj = (OTDataObject) resValue;
 					logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
-					xmlDB.recordReference(parent.getGlobalId(), obj.getGlobalId());
+					xmlDB.recordReference(parent, obj);
 				}
 			}
 			list.add(resValue);

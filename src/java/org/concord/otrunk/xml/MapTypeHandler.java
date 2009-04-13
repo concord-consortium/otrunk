@@ -99,11 +99,11 @@ public class MapTypeHandler extends ResourceTypeHandler
 
 		    OTXMLElement valueElement = (OTXMLElement)entryChildren.get(0);
 		    value = typeService.handleLiteralElement(valueElement, childRelativePath);
-		    if (value instanceof OTDataObject) {
-				OTDataObject obj = (OTDataObject) value;
-				if (parent != null) {
+		    if (parent != null) {
+		    	if (value instanceof OTDataObject) {
+					OTDataObject obj = (OTDataObject) value;
 					logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
-					xmlDB.recordReference(parent.getGlobalId(), obj.getGlobalId());
+					xmlDB.recordReference(parent, obj);
 				}
 			}
 		    map.put(key, value);

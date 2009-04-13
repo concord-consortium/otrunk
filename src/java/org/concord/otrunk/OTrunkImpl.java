@@ -1097,7 +1097,7 @@ public class OTrunkImpl implements OTrunk
                 	        	logger.finest("Filter class: " + filterClass.getSimpleName() + ", parent class: " + parentObj.getType().getClassName());
                 	        }
                 	        if (filterClass == null || filterClass.isAssignableFrom(Class.forName(parentObj.getType().getClassName()))) {
-                	        	logger.finest("Found a matching parent: " + parentObj);
+                	        	logger.finest("Found a matching parent: " + parentObj.getGlobalId());
                 	        	allParents.add(pId);
                 	        }
             	        	if (getIndirectReferences) {

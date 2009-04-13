@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="fdb49701-ee04-4508-9bc9-23846e79bbd2">
+  <imports>
+    <import class="org.concord.otrunk.OTStateRoot" />
+    <import class="org.concord.otrunk.user.OTUserObject" />
+    <import class="org.concord.otrunk.user.OTReferenceMap" />
+    <import class="org.concord.otrunk.test.OTObjectMapTestObject" />
+    <import class="org.concord.otrunk.test.OTObjectListTestObject" />
+    <import class="org.concord.otrunk.test.OTDocumentTestObject" />
+    <import class="org.concord.otrunk.test.OTBasicTestObject" />
+  </imports>
+  <objects>
+    <OTStateRoot formatVersionString="1.0">
+      <userMap>
+        <entry key="c4eceaa0-09a8-11de-aebf-37f53627f26a">
+          <OTReferenceMap>
+            <user>
+              <OTUserObject id="c4eceaa0-09a8-11de-aebf-37f53627f26a" name="anon_single_user" />
+            </user>
+            <map>
+              <entry key="8868f212-41db-4925-a885-8794c8eaed35!/foo_bar">
+                <OTObjectMapTestObject>
+                  <objectMap />
+                </OTObjectMapTestObject>
+              </entry>
+            </map>
+          </OTReferenceMap>
+        </entry>
+      </userMap>
+    </OTStateRoot>
+  </objects>
+</otrunk>

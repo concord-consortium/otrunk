@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="8868f212-41db-4925-a885-8794c8eaed35">
+  <imports>
+    <import class="org.concord.otrunk.OTSystem" />
+    <import class="org.concord.otrunk.view.OTFolderObject" />
+    <import class="org.concord.otrunk.test.OTObjectMapTestObject" />
+    <import class="org.concord.otrunk.test.OTObjectListTestObject" />
+    <import class="org.concord.otrunk.test.OTDocumentTestObject" />
+    <import class="org.concord.otrunk.test.OTBasicTestObject" />
+  </imports>
+  <objects>
+    <OTSystem>
+      <root>
+        <OTFolderObject>
+          <children>
+            <OTBasicTestObject local_id="nlr_p1">
+              <reference>
+                <OTBasicTestObject local_id="no_learner_references" />
+              </reference>
+            </OTBasicTestObject>
+            <OTBasicTestObject local_id="nlrs_p1" reference="${no_learner_references_sibling}" />
+            <OTBasicTestObject local_id="no_learner_references_sibling" />
+            
+
+            <!-- OBJECT MAP -->
+            <OTObjectMapTestObject local_id="foo_bar">
+              <objectMap>
+                <entry key="object1">
+                  <object refid="${nlr_p1}" />
+                </entry>
+              </objectMap>
+            </OTObjectMapTestObject>
+
+            <!-- OBJECT LIST -->
+            <OTBasicTestObject local_id="object_list_sibling" />
+            <OTObjectListTestObject local_id="object_list">
+              <objectList>
+                <object refid="${object_list_sibling}" />
+              </objectList>
+            </OTObjectListTestObject>
+
+            <!-- DOCUMENT --><!--
+            <OTDocumentTestObject local_id="document_no_change">
+              <bodyText>
+                <p>This is an XML text blob</p>
+                <object refid="${primitive_no_changes}" />
+              </bodyText>
+            </OTDocumentTestObject>
+
+          --></children>
+        </OTFolderObject>
+      </root>
+    </OTSystem>
+  </objects>
+</otrunk>
