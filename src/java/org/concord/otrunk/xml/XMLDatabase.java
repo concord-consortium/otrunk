@@ -1024,6 +1024,11 @@ public class XMLDatabase
 
 	public void recordReference(OTDataObject parent, OTDataObject child)
 	{
+		if (parent == null || child == null) {
+			// can't reference "null"
+			return;
+		}
+		
 		OTID parentID = parent.getGlobalId();
 		if (child instanceof XMLDataObjectRef) {
 			// save these and process them in the second pass so that we can correctly resolve the references
@@ -1041,11 +1046,37 @@ public class XMLDatabase
 		if (children == null) {
 			children = new ArrayList<OTID>();
 		}
-		parents.add(parentID);
-		children.add(childID);
+		if (! parents.contains(parentID)) {
+			parents.add(parentID);
+			incomingReferences.put(childID, parents);
+		}
 		
-		incomingReferences.put(childID, parents);
-		outgoingReferences.put(parentID, children);
+		if (! children.contains(childID)) {
+			children.add(childID);
+			outgoingReferences.put(parentID, children);
+		}
+	}
+	
+	public void removeReference(OTDataObject parent, OTDataObject child) {
+		if (parent == null || child == null) {
+			// can't reference null
+			return;
+		}
+		
+		OTID parentID = parent.getGlobalId();
+		OTID childID = child.getGlobalId();
+		logger.finer("Removing reference: " + parentID + " --> " + childID);	
+		
+		ArrayList<OTID> parents = incomingReferences.get(childID);
+		ArrayList<OTID> children = outgoingReferences.get(parentID);
+
+		if (parents != null && parents.remove(parentID)) {
+			incomingReferences.put(childID, parents);
+		}
+		
+		if (children != null && children.remove(childID)) {
+			outgoingReferences.put(parentID, children);
+		}
 	}
 	
 	/**
