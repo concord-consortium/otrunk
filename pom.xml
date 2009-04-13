@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                        http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                        http://maven.apache.org/maven-v4_0_0.xsd" xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.concord.project-groups</groupId>
     <artifactId>otrunk</artifactId>
-    <version>2</version>
+    <version>4.0-SNAPSHOT</version>
   </parent>
   
   <groupId>org.concord</groupId>
@@ -20,19 +20,16 @@
     <dependency>
       <groupId>org.concord</groupId>
       <artifactId>framework</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.concord</groupId>
       <artifactId>frameworkview</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.concord</groupId>
       <artifactId>swing</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -50,7 +47,6 @@
     <dependency>
       <groupId>org.concord</groupId>
       <artifactId>apple-support</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -103,7 +99,7 @@
                     the dependency plugin can be used to copy a jar but why copy it when we just 
                     need to reference it -->
                 <property name="asm-jar" value="${settings.localRepository}/asm/asm/3.1/asm-3.1.jar"/>
-                <ant target="jar" inheritRefs="true"/>
+                <ant inheritRefs="true" target="jar"/>
               </tasks>
             </configuration>
           </execution>
