@@ -560,7 +560,7 @@ public class OTObjectServiceImpl
 	    }
 	    preserveUUIDCallers.put(callerStr, callerStr);
 	    logger.log(Level.FINE, "first call from method which caused bad preserveUUID call",
-	    	string);
+	    	throwable);
     }
 
 }
