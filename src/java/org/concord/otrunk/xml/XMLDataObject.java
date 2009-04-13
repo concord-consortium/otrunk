@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataCollection;
@@ -62,6 +63,7 @@ import org.concord.otrunk.datamodel.OTObjectRevision;
 public class XMLDataObject
 	implements OTDataObject
 {
+	private static final Logger logger = Logger.getLogger(XMLDataObject.class.getName());
 	private OTDataObjectType type;
 	private OTID globalId;
 	private XMLDatabase database = null;
@@ -135,12 +137,28 @@ public class XMLDataObject
 	 */
 	boolean setResource(String key, Object resource, boolean markDirty)
 	{
-		Object oldObject;		
+		Object oldObject;
 
 	    if(resource == null && !saveNulls) {
 	    	oldObject = resources.remove(key);
+	    	if (oldObject instanceof OTDataObject) {
+	    		database.removeReference(this, (OTDataObject) oldObject);
+	    	}
 	    } else {
-	    	oldObject = resources.put(key, resource);			
+	    	oldObject = resources.put(key, resource);
+	    	if (oldObject instanceof OTDataObject) {
+	    		database.removeReference(this, (OTDataObject) oldObject);
+	    	}
+	    	if (resource instanceof OTDataObject) {
+	    		database.recordReference(this, (OTDataObject) resource);
+	    	}
+	    	if (resource instanceof OTID) {
+	    		try {
+	    			database.recordReference(this, database.getOTDataObject(this, (OTID) resource));
+	    		} catch (Exception e) {
+	    			// TODO do we care?
+	    		}
+	    	}
 		}
 
 	    if(!markDirty) return true;
