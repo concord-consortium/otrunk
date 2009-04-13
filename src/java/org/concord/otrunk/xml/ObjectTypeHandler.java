@@ -115,7 +115,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				XMLDataObjectRef ref = new XMLDataObjectRef(refid, element);
 				if (parent != null) {
     				logger.finest("Processed refid: " + refid + " of parent: " + parent.getGlobalId());
-    				xmlDB.recordReference(parent.getGlobalId(), OTIDFactory.createOTID(refid));
+    				xmlDB.recordReference(parent, ref);
 				}
 				return ref;
 			}
@@ -251,7 +251,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		
 		if (parent != null) {
 			logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
-			xmlDB.recordReference(parent.getGlobalId(), obj.getGlobalId());
+			xmlDB.recordReference(parent, obj);
 		}
 		
 		return obj;
@@ -309,7 +309,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				XMLDataObjectRef ref = new XMLDataObjectRef(refid, parentElement);
 				if (parent != null) {
     				logger.finest("Processed refid: " + refid + " of parent: " + parent.getGlobalId());
-    				xmlDB.recordReference(parent.getGlobalId(), OTIDFactory.createOTID(refid));
+    				xmlDB.recordReference(parent, ref);
 				}
 				return ref;
 			}		    
