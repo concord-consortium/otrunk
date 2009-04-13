@@ -527,34 +527,40 @@ public class OTObjectServiceImpl
 		OTID id = otObject.getGlobalId();
 
 		if(!(id instanceof OTUUID)){
-			logger.warning("object does not have a UUID " + otObject);
-			// it would be good to record the stack where this happens so it is easy to 
-			// fix the problem, however that will possibly result in several duplicates
-			Throwable throwable = 
-				new IllegalArgumentException("object does not have a UUID " + otObject);
-			StackTraceElement stackTraceElement = throwable.getStackTrace()[1];
-			String callerStr = stackTraceElement.getClassName() + "." + 
-				stackTraceElement.getMethodName();
-			Object value = preserveUUIDCallers.get(callerStr);
-			if(value != null){
-				return;
-			}
-			preserveUUIDCallers.put(callerStr, callerStr);
-			logger.log(Level.FINE, "first call from method which caused bad preserveUUID call",
-				throwable);
+			logPreserveUUIDError("object does not have a UUID " + otObject);
 			return;
 		}
 				
 		try {
 	        OTDataObject dataObject = getOTDataObject(id);
 	        if(!(dataObject instanceof XMLDataObject)){
-				throw new IllegalArgumentException("object is not backed by a XMLDatabase " + otObject);	        	
+				logPreserveUUIDError("object is not backed by a XMLDatabase " + otObject);
+				return;
 	        }
 	        
 	        ((XMLDataObject)dataObject).setPreserveUUID(true);
         } catch (Exception e) {
 	        e.printStackTrace();
         }
+    }
+
+	private void logPreserveUUIDError(String string)
+    {
+		logger.warning(string);
+
+		Throwable throwable = 
+			new IllegalArgumentException(string);
+
+	    StackTraceElement stackTraceElement = throwable.getStackTrace()[2];
+	    String callerStr = stackTraceElement.getClassName() + "." + 
+	    	stackTraceElement.getMethodName();
+	    Object value = preserveUUIDCallers.get(callerStr);
+	    if(value != null){
+	    	return;
+	    }
+	    preserveUUIDCallers.put(callerStr, callerStr);
+	    logger.log(Level.FINE, "first call from method which caused bad preserveUUID call",
+	    	string);
     }
 
 }
