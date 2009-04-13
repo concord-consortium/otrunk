@@ -657,6 +657,11 @@ public class OTrunkImpl implements OTrunk
     	return isModifiedInTopOverlay(userObject);
     }
 
+    /**
+     * Check to see if the object is modified in the top overlay. Note that this DOES NOT return true if only a child object is modified.
+     * @param otObject
+     * @return
+     */
     public boolean isModifiedInTopOverlay(OTObject otObject)
     {
     	OTDataObject dataObject = OTObjectServiceImpl.getOTDataObject(otObject);
@@ -668,6 +673,34 @@ public class OTrunkImpl implements OTrunk
         	logger.warning("This object isn't from an Overlay");
         }
     	
+    	return false;
+    }
+    
+    public boolean isModified(OTObject otObject, OTObjectService objService, boolean includingChildren) {
+    	boolean isBaseModified = isModifiedInTopOverlay(otObject);
+    	if (isBaseModified) {
+    		return true;
+    	}
+    	if (includingChildren) {
+    		OTID objId = otObject.getGlobalId();
+    		if (objId instanceof OTTransientMapID) {
+    			objId = ((OTTransientMapID) objId).getMappedId();
+    		}
+    		
+    		ArrayList<OTID> references = getOutgoingReferences(objId, true);
+    		for (OTID id : references) {
+    			try {
+	                OTObject obj = objService.getOTObject(id);
+	                if (obj == null) { continue; }
+	                if (isModifiedInTopOverlay(obj)) {
+	                	return true;
+	                }
+                } catch (Exception e) {
+	                // TODO Auto-generated catch block
+	                e.printStackTrace();
+                }
+    		}
+    	}
     	return false;
     }
         
@@ -1069,15 +1102,15 @@ public class OTrunkImpl implements OTrunk
     	return allObjects;
     }
     
-    public ArrayList<OTID> getReferences(OTID objectID) {
-    	return getReferences(objectID, null, false, null);
+    public ArrayList<OTID> getIncomingReferences(OTID objectID) {
+    	return getIncomingReferences(objectID, null, false, null);
     }
     
-    public ArrayList<OTID> getReferences(OTID objectID, boolean getIndirectReferences) {
-    	return getReferences(objectID, null, getIndirectReferences, null);
+    public ArrayList<OTID> getIncomingReferences(OTID objectID, boolean getIndirectReferences) {
+    	return getIncomingReferences(objectID, null, getIndirectReferences, null);
     }
     
-    public ArrayList<OTID> getReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences, ArrayList<OTID> excludeIDs) {
+    public ArrayList<OTID> getIncomingReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences, ArrayList<OTID> excludeIDs) {
     	ArrayList<OTID> allParents = new ArrayList<OTID>();
     	if (excludeIDs == null) {
     		excludeIDs = new ArrayList<OTID>();
@@ -1102,7 +1135,7 @@ public class OTrunkImpl implements OTrunk
                 	        }
             	        	if (getIndirectReferences) {
             	        		
-            	        		allParents.addAll(getReferences(pId, filterClass, true, excludeIDs));
+            	        		allParents.addAll(getIncomingReferences(pId, filterClass, true, excludeIDs));
             	        	}
         	        	} else {
         	        		logger.finest("Already seen this id: " + pId);
@@ -1119,9 +1152,66 @@ public class OTrunkImpl implements OTrunk
     	return allParents;
     }
     
-    public ArrayList<OTID> getReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences) {
+    public ArrayList<OTID> getIncomingReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences) {
     	logger.finest("Finding references for: " + objectID + " with class: " + (filterClass == null ? "null" : filterClass.getName()) + " and recursion: " + getIndirectReferences);
-    	ArrayList<OTID> parents = getReferences(objectID, filterClass, getIndirectReferences, null);
+    	ArrayList<OTID> parents = getIncomingReferences(objectID, filterClass, getIndirectReferences, null);
+    	logger.finest("found " + parents.size() + " matching parents");
+    	return parents;
+    }
+    
+    public ArrayList<OTID> getOutgoingReferences(OTID objectID) {
+    	return getOutgoingReferences(objectID, null, false, null);
+    }
+    
+    public ArrayList<OTID> getOutgoingReferences(OTID objectID, boolean getIndirectReferences) {
+    	return getOutgoingReferences(objectID, null, getIndirectReferences, null);
+    }
+    
+    public ArrayList<OTID> getOutgoingReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences, ArrayList<OTID> excludeIDs) {
+    	ArrayList<OTID> allChildren = new ArrayList<OTID>();
+    	if (excludeIDs == null) {
+    		excludeIDs = new ArrayList<OTID>();
+    	}
+    	// XXX Should we be searching all databases?
+    	for (OTDatabase db : databases) {
+        	try {
+    	        ArrayList<OTID> children = db.getOutgoingReferences(objectID);
+    	        if (children != null) {
+        	        logger.finest("Found " + children.size() + " children");
+        	        for (OTID pId : children) {
+        	        	if (! excludeIDs.contains(pId)) {
+        	        		logger.finest("Found child id: " + pId);
+        	        		excludeIDs.add(pId);
+                	        OTDataObject childObj = db.getOTDataObject(null, pId);
+                	        if (filterClass != null) {
+                	        	logger.finest("Filter class: " + filterClass.getSimpleName() + ", child class: " + childObj.getType().getClassName());
+                	        }
+                	        if (filterClass == null || filterClass.isAssignableFrom(Class.forName(childObj.getType().getClassName()))) {
+                	        	logger.finest("Found a matching parent: " + childObj.getGlobalId());
+                	        	allChildren.add(pId);
+                	        }
+            	        	if (getIndirectReferences) {
+            	        		
+            	        		allChildren.addAll(getOutgoingReferences(pId, filterClass, true, excludeIDs));
+            	        	}
+        	        	} else {
+        	        		logger.finest("Already seen this id: " + pId);
+        	        	}
+        	        }
+    	        } else {
+    	        	logger.finest("null parents");
+    	        }
+            } catch (Exception e) {
+    	        // TODO Auto-generated catch block
+            	logger.log(Level.WARNING, "Error finding parents", e);
+            }
+    	}
+    	return allChildren;
+    }
+    
+    public ArrayList<OTID> getOutgoingReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences) {
+    	logger.finest("Finding references for: " + objectID + " with class: " + (filterClass == null ? "null" : filterClass.getName()) + " and recursion: " + getIndirectReferences);
+    	ArrayList<OTID> parents = getOutgoingReferences(objectID, filterClass, getIndirectReferences, null);
     	logger.finest("found " + parents.size() + " matching parents");
     	return parents;
     }

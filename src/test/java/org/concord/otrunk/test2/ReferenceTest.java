@@ -51,7 +51,7 @@ public class ReferenceTest extends TestCase
 		expectedReferences.add(OTIDFactory.createOTID(documentUUID + "!" + "/nlr_p1"));
 		
 		OTObject obj = getObject("no_learner_references", false);
-		ArrayList<OTID> references = otrunk.getReferences(obj.getGlobalId(), false);
+		ArrayList<OTID> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
 		makeSureArraysMatch(references, expectedReferences);
 	}
 	
@@ -63,7 +63,7 @@ public class ReferenceTest extends TestCase
 		expectedReferences.add(OTIDFactory.createOTID(documentUUID + "/" + "/root"));
 		
 		OTObject obj = getObject("no_learner_references_sibling", false);
-		ArrayList<OTID> references = otrunk.getReferences(obj.getGlobalId(), false);
+		ArrayList<OTID> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
 		makeSureArraysMatch(references, expectedReferences);
 	}
 	
@@ -75,7 +75,7 @@ public class ReferenceTest extends TestCase
 		expectedReferences.add(OTIDFactory.createOTID(documentUUID + "/" + "/root"));
 		
 		OTObject obj = getObject("nlr_p1", false);
-		ArrayList<OTID> references = otrunk.getReferences(obj.getGlobalId(), false);
+		ArrayList<OTID> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
 		makeSureArraysMatch(references, expectedReferences);
 	}
 	
@@ -87,7 +87,7 @@ public class ReferenceTest extends TestCase
 		expectedReferences.add(OTIDFactory.createOTID(documentUUID + "/" + "/root"));
 		
 		OTObject obj = getObject("object_list_sibling", false);
-		ArrayList<OTID> references = otrunk.getReferences(obj.getGlobalId(), false);
+		ArrayList<OTID> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
 		makeSureArraysMatch(references, expectedReferences);
 	}
 	
