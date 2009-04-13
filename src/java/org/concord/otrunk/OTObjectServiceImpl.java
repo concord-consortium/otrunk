@@ -36,6 +36,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTControllerRegistry;
 import org.concord.framework.otrunk.OTControllerService;
@@ -63,6 +66,9 @@ import org.concord.otrunk.xml.XMLDataObject;
 public class OTObjectServiceImpl
     implements OTObjectService, OTExternalIDProvider
 {
+	public final static Logger logger = 
+		Logger.getLogger(OTObjectServiceImpl.class.getCanonicalName());
+	
     protected OTrunkImpl otrunk;
     protected OTDatabase creationDb;
     protected OTDatabase mainDb;
@@ -189,8 +195,19 @@ public class OTObjectServiceImpl
     // This will work as long as all of the object classes are loaded by the same classloader
     // if the OTClass classes are loaded by different classloaders there will probably have
     // to be multiple GeneratedClassLoader
-    GeneratedClassLoader gClassLoader = 
-    	new GeneratedClassLoader(OTObjectServiceImpl.class.getClassLoader());
+    GeneratedClassLoader asmClassLoader = null;
+
+	private HashMap<String, String> preserveUUIDCallers = new HashMap<String, String>(); 
+    
+    public GeneratedClassLoader getASMClassLoader()
+    {
+    	if(asmClassLoader != null){
+    		return asmClassLoader;
+    	}
+    	asmClassLoader = new GeneratedClassLoader(OTObjectServiceImpl.class.getClassLoader());
+    	return asmClassLoader;
+    	
+    }
     
     @SuppressWarnings("unchecked")
     public <T extends OTObject> T loadOTObject(OTObjectInternal otObjectImpl, Class<T> otObjectClass)
@@ -200,7 +217,8 @@ public class OTObjectServiceImpl
         
         if(otObjectClass.isInterface()) {
         	if(OTConfig.getBooleanProp(OTConfig.USE_ASM, false)){
-        		Class<? extends AbstractOTObject> generatedClass = gClassLoader.generateClass(otObjectClass, otObjectImpl.otClass());
+        		Class<? extends AbstractOTObject> generatedClass = 
+        			getASMClassLoader().generateClass(otObjectClass, otObjectImpl.otClass());
         		OTObjectInternal internalObj = generatedClass.newInstance();
         		otObject = (T)internalObj;
         		internalObj.setup(otObjectImpl);
@@ -219,7 +237,8 @@ public class OTObjectServiceImpl
         		}
         	}
         } else if(AbstractOTObject.class.isAssignableFrom(otObjectClass)){
-    		Class<? extends AbstractOTObject> generatedClass = gClassLoader.generateClass(otObjectClass, otObjectImpl.otClass());
+    		Class<? extends AbstractOTObject> generatedClass = 
+    			getASMClassLoader().generateClass(otObjectClass, otObjectImpl.otClass());
     		OTObjectInternal internalObj = generatedClass.newInstance();
     		otObject = (T)internalObj;
     		internalObj.setup(otObjectImpl);
@@ -508,7 +527,22 @@ public class OTObjectServiceImpl
 		OTID id = otObject.getGlobalId();
 
 		if(!(id instanceof OTUUID)){
-			throw new IllegalArgumentException("object does not have a UUID " + otObject);
+			logger.warning("object does not have a UUID " + otObject);
+			// it would be good to record the stack where this happens so it is easy to 
+			// fix the problem, however that will possibly result in several duplicates
+			Throwable throwable = 
+				new IllegalArgumentException("object does not have a UUID " + otObject);
+			StackTraceElement stackTraceElement = throwable.getStackTrace()[1];
+			String callerStr = stackTraceElement.getClassName() + "." + 
+				stackTraceElement.getMethodName();
+			Object value = preserveUUIDCallers.get(callerStr);
+			if(value != null){
+				return;
+			}
+			preserveUUIDCallers.put(callerStr, callerStr);
+			logger.log(Level.FINE, "first call from method which caused bad preserveUUID call",
+				throwable);
+			return;
 		}
 				
 		try {
