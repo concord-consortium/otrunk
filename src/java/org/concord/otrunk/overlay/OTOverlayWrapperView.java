@@ -1,12 +1,11 @@
 package org.concord.otrunk.overlay;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +35,6 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	private GridBagConstraints noStretchConstraints;
 	private GridBagConstraints stretchConstraints;
 	private OTObject resultsObject;
-	private JFrame resultsFrame;
 	
 	public JComponent getComponent(OTObject otObject)
 	{
@@ -118,24 +116,12 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	
 	private void popUpResults() {
 		final JComponent resultsSubview = createSubViewComponent(resultsObject);
-		resultsSubview.addComponentListener(new ComponentListener() {
-			public void componentHidden(ComponentEvent e) { }
-			public void componentShown(ComponentEvent e) { }
-			public void componentMoved(ComponentEvent e) { }
-
-			public void componentResized(ComponentEvent e)
-            {
-				resultsSubview.removeComponentListener(this);
-				resultsFrame.pack();
-            }
-		});
-		if (resultsFrame == null) {
-    		resultsFrame = new JFrame("Results");
-    		resultsFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		}
-		resultsFrame.getContentPane().removeAll();
+		JFrame resultsFrame = new JFrame("Results");
+		resultsFrame = new JFrame("Results");
+		resultsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		resultsFrame.getContentPane().add(resultsSubview);
 		resultsFrame.pack();
+		resultsFrame.setSize(new Dimension(600,400));
 		resultsFrame.setVisible(true);
 	}
 	

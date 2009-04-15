@@ -43,6 +43,8 @@ public class OTGroupListManager extends DefaultOTObject
 	private OTGroupMember currentGroupMember;
 
 	private OTUserOverlayManager overlayManager;
+
+	private long lastReloadTime = 0;
 	
 	public OTGroupListManager(ResourceSchema resources)
     {
@@ -136,6 +138,12 @@ public class OTGroupListManager extends DefaultOTObject
     }
     
     public void reloadAll() {
+    	long now = System.currentTimeMillis();
+    	if (now - lastReloadTime < 10000) {
+    		logger.info("Not reloading. Only " + ((now - lastReloadTime)/1000) + " sec has passed since the last reload.");
+    		return;
+    	}
+    	lastReloadTime = now;
     	try {
     		if (groupUserObject != null) {
     			overlayManager.reload(groupUserObject);
