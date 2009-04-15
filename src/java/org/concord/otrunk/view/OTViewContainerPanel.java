@@ -201,7 +201,7 @@ public class OTViewContainerPanel extends JPanel
 		// get the OTJComponentService so we can create the OTJComponentView
 		OTViewContext viewContext = factory.getViewContext();
 		OTJComponentServiceFactory componentServiceFactory =
-			(OTJComponentServiceFactory) viewContext.getViewService(OTJComponentServiceFactory.class);
+			viewContext.getViewService(OTJComponentServiceFactory.class);
 		jComponentService = componentServiceFactory.createOTJComponentService(factory, false);		
 	}
 		
@@ -463,7 +463,7 @@ public class OTViewContainerPanel extends JPanel
 		}
 		
 	    for(int i=0; i<containerListeners.size(); i++) {
-	        ((OTViewContainerListener)containerListeners.get(i)).
+	        (containerListeners.get(i)).
 	        	currentObjectChanged(evt);
 	        	
 	    }
@@ -520,6 +520,11 @@ public class OTViewContainerPanel extends JPanel
 	    		scrollPane.setViewportView(myComponent);
 	    		
 	    		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    		
+	    		scrollPane.getVerticalScrollBar().setBlockIncrement(100);
+	    		scrollPane.getVerticalScrollBar().setBlockIncrement(20);
+	    		scrollPane.getHorizontalScrollBar().setBlockIncrement(100);
+	    		scrollPane.getHorizontalScrollBar().setBlockIncrement(20);
 	    		
 	        	boolean localScrollPanelHasBorder = scrollPanelHasBorder;
 	        	if(currentViewChild != null){
