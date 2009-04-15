@@ -450,9 +450,7 @@ public class OTViewer extends JFrame
             currentAuthoredFile = new File(authorOTMLURL.getPath());
         }
 
-        String urlStr = authorOTMLURL.toString();
-
-        initWithWizard(urlStr);
+        initWithWizard(authorOTMLURL);
     }
 
     /**
@@ -526,14 +524,24 @@ public class OTViewer extends JFrame
     	
     }
     
+    public boolean init(String url)
+    {
+        try {
+        	return init(new URL(url));
+        } catch (MalformedURLException e) {
+        	e.printStackTrace();
+        }
+        return false;
+    }
+    
     /**
      * 
      * @param url
      * @return true if the url was loaded, return false if an error happens and it wasn't loaded
      */
-    public boolean init(String url) {
+    public boolean init(URL url) {
     	registerURLStreamHandlers();
-        updateRemoteURL(url);
+        updateRemoteURL(url.toExternalForm());
         createActions();
         updateMenuBar();
         setJMenuBar(menuBar);
@@ -562,7 +570,7 @@ public class OTViewer extends JFrame
         }
 
         try {
-            initializeURL(new URL(url));
+            initializeURL(url);
         } catch (MalformedURLException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -713,6 +721,15 @@ public class OTViewer extends JFrame
     }
     
     public void initWithWizard(String url) {
+    	try {
+	        initWithWizard(new URL(url));
+        } catch (MalformedURLException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+    }
+
+    public void initWithWizard(URL url) {
         justStarted = true;
 
         init(url);
@@ -725,7 +742,8 @@ public class OTViewer extends JFrame
             });
         }
     }
-
+    
+    
     public void loadUserDataFile(File file)
     {
         try {

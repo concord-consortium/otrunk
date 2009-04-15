@@ -86,7 +86,8 @@ public class OTViewerHelper
 	public static URL getURLFromArgs(String[] args)
 	{
 		if (args.length > 0) {
-			if (args[0].equals("-f")) {
+			// javaws will pass the -open if a jnlp is used to open a local file
+			if (args[0].equals("-f") || args[0].equals("-open")) {
 				if (args.length > 1) {
 					File inFile = new File(args[1]);
 					try {
