@@ -73,6 +73,9 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 	public String getXHTMLText(OTObject otObject) {
 		logger.info("Running in XHTML mode");
 		init(otObject);
+		if (reportTemplate instanceof OTIncludeRootObject) {
+			reportTemplate = ((OTIncludeRootObject)reportTemplate).getReference();
+		}
 	    String result = "<object refid=\"" + reportTemplate.otExternalId() + "\" ";
 	    if(root.getReportTemplateViewEntry() != null){
 	    	result += "viewid=\"" + root.getReportTemplateViewEntry().otExternalId() + "\" ";
