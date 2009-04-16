@@ -1,22 +1,28 @@
 package org.concord.otrunk.overlay;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.otrunk.OTObjectServiceImpl;
+import org.concord.otrunk.OTrunkUtil;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.AbstractOTJComponentContainerView;
@@ -35,6 +41,9 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	private GridBagConstraints noStretchConstraints;
 	private GridBagConstraints stretchConstraints;
 	private OTObject resultsObject;
+	private JPanel mainPanel;
+	private JLabel submittedLabel;
+	private static DateFormat dateFormatter = SimpleDateFormat.getDateTimeInstance();
 	
 	public JComponent getComponent(OTObject otObject)
 	{
@@ -60,7 +69,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 
 		subview = createSubViewComponent(wrappedObject);
 		
-		JPanel mainPanel = new JPanel();
+		mainPanel = new JPanel();
 		mainPanel.setLayout(new GridBagLayout());
 		
 		noStretchConstraints = new GridBagConstraints();
@@ -109,6 +118,9 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
     		});
 		}
 		
+		submittedLabel = new JLabel("");
+		buttonPanel.add(submittedLabel);
+		
 		mainPanel.add(buttonPanel, stretchConstraints);
 		
 		return mainPanel;
@@ -145,9 +157,15 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
     				id = ((OTTransientMapID) id).getMappedId();
     			}
     	        OTObject newWrappedObject = overlayManager.getOTObject(overlay, id);
-    	        ((OTObjectServiceImpl) wrappedObject.getOTObjectService()).copyInto(wrappedObject, newWrappedObject, -1, true);
-    	        
-    	        overlayManager.remoteSave(overlay);
+    	        if (! OTrunkUtil.compareObjects(newWrappedObject, wrappedObject, true)) {
+    	        	mainPanel.getRootPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    	        	// only save if there are changes
+        	        ((OTObjectServiceImpl) wrappedObject.getOTObjectService()).copyInto(wrappedObject, newWrappedObject, -1, true);
+        	        
+        	        overlayManager.remoteSave(overlay);
+        	        submittedLabel.setText("Submitted: " + dateFormatter.format(new Date()));
+        	        submittedLabel.revalidate();
+    	        }
             } catch (Exception e) {
     	        logger.log(Level.SEVERE, "Couldn't get the object from the overlay!", e);
     	        logger.log(Level.FINER, "stack trace:", e);
@@ -157,6 +175,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
             } catch (Exception e) {
             	logger.log(Level.SEVERE, "Couldn't save the user's overlay!", e);
             }
+            mainPanel.getRootPane().setCursor(Cursor.getDefaultCursor());
 		}
 	}
 
