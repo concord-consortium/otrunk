@@ -12,11 +12,18 @@ public interface OTViewChild extends OTObjectInterface {
 	public OTViewEntry getViewid();
 	public void setViewid(OTViewEntry viewid);
 	
+	public static boolean DEFAULT_useScrollPane = false;	
 	public boolean getUseScrollPane();
 	
-	public static boolean DEFAULT_useScrollPane = false;
 	
-	public boolean getScrollPanelHasBorder();
+	public static boolean DEFAULT_useHorizontalScrollPane = true;
+	/**
+	 * This property will only be checked if useScrollPane is true. 
+	 * @return
+	 */
+	public boolean getUseHorizontalScrollPane();
 	
 	public static boolean DEFAULT_scrollPanelHasBorder = true;
+	public boolean getScrollPanelHasBorder();
+	
 }
