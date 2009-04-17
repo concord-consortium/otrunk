@@ -44,6 +44,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	private JPanel mainPanel;
 	private JLabel submittedLabel;
 	private static DateFormat dateFormatter = SimpleDateFormat.getDateTimeInstance();
+	private JFrame resultsFrame;
 	
 	public JComponent getComponent(OTObject otObject)
 	{
@@ -128,7 +129,7 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 	
 	private void popUpResults() {
 		final JComponent resultsSubview = createSubViewComponent(resultsObject);
-		JFrame resultsFrame = new JFrame("Results");
+		closeResultsFrame();
 		resultsFrame = new JFrame("Results");
 		resultsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		resultsFrame.getContentPane().add(resultsSubview);
@@ -137,9 +138,18 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		resultsFrame.setVisible(true);
 	}
 	
+	private void closeResultsFrame() {
+		if (resultsFrame != null) {
+			resultsFrame.setVisible(false);
+			resultsFrame.dispose();
+			resultsFrame = null;
+		}
+	}
+	
 	@Override
     public void viewClosed() {
 		// logger.info("Closing the wrapped object's views");
+		closeResultsFrame();
 		removeAllSubViews();
 		if (wrapper.getAutoSubmit()) {
 			saveData();
