@@ -105,8 +105,6 @@ public class XMLDatabase
 
 	private OTID databaseId;
 
-	PrintStream statusStream = null;
-
 	private ArrayList<Class<? extends OTPackage>> packageClasses = 
 		new ArrayList<Class<? extends OTPackage>>();
 
@@ -321,13 +319,21 @@ public class XMLDatabase
 
 		return id.equals(((XMLDatabase) object).getDatabaseId());
 	}
-	
+
+	/**
+	 * @deprecated use initialize without the statusStream
+	 * @param contextURL
+	 * @param label
+	 * @param statusStream
+	 */
 	protected void initialize(URL contextURL, String label, PrintStream statusStream)
 	{
-		this.statusStream = statusStream;
+		initialize(contextURL, label);
+	}
+	
+	protected void initialize(URL contextURL, String label)
+	{
 		this.label = label;
-
-
 		
 		// create the database Id
 		// this might get overriden when the objects are loaded in.
@@ -479,7 +485,7 @@ public class XMLDatabase
 			downloadString = " downloaded in " + downloadTime + "ms";
 			parsedLabel = "parsed xml";
 		} 
-		statusStream.println("Loaded " + dataObjects.size() + " objects from: " + label
+		logger.info("Loaded " + dataObjects.size() + " objects from: " + label
 	            + " opened url in " + urlOpenTime + "ms"
 		        + downloadString 
 				+ " " + parsedLabel + " in " + parseTime + "ms" 
@@ -579,13 +585,6 @@ public class XMLDatabase
 		}
 
 		return null;
-	}
-
-	protected void printStatus(String message)
-	{
-		if (statusStream != null) {
-			statusStream.println(message);
-		}
 	}
 
 	/*
