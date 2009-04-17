@@ -35,6 +35,7 @@ package org.concord.otrunk.overlay;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataCollection;
@@ -60,6 +61,9 @@ import org.concord.otrunk.xml.XMLDataObject;
 public class CompositeDataObject
 	implements OTDataObject
 {
+	private static final Logger logger =
+        Logger.getLogger(CompositeDataObject.class.getCanonicalName());
+	
 	private OTDataObject baseObject;
 	private OTDataObject activeDeltaObject = null;
 	private OTDataObject [] middleDeltas;
@@ -224,7 +228,7 @@ public class CompositeDataObject
 		
 		if(localActiveDelta == null) {
 			localActiveDelta = database.createActiveDeltaObject(baseObject);			
-			System.err.println("created delta object: " + localActiveDelta.getGlobalId().toExternalForm());			
+			logger.fine("created delta object: " + localActiveDelta.getGlobalId().toExternalForm());			
 		}
 		
 		return localActiveDelta;
@@ -374,12 +378,12 @@ public class CompositeDataObject
     {
 		OTDataObject deltaObject = getActiveDeltaObject();
 		if(deltaObject == null){
-			System.err.println("Doesn't have a delta object");
+			logger.warning("Doesn't have a delta object");
 			return;
 		}
 		
 		if(!(deltaObject instanceof XMLDataObject)){
-			System.err.println("Can only remove overrides on xml data objects");
+			logger.warning("Can only remove overrides on xml data objects");
 			return;			
 		}
 		
