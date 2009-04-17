@@ -2,6 +2,7 @@ package org.concord.otrunk.overlay;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -124,7 +125,28 @@ public class OTOverlayWrapperView extends AbstractOTJComponentContainerView
 		
 		mainPanel.add(buttonPanel, stretchConstraints);
 		
+		// FIXME This is a hack because certain wrapped objects aren't resizing themselves well
+		// (OTQuestions when the OTChoice is embedding the view for the choice, for example)
+		// hopefully a chain of 10 should be enough to get around all the repainting that happens when this loads...
+		invokeLater(10);
+		
 		return mainPanel;
+	}
+	
+	private void invokeLater(final int depth) {
+		EventQueue.invokeLater(new Runnable() {
+            public void run()
+            {
+            	if (depth != 0) {
+            		logger.finer("Event queue ran, but at wrong depth: " + depth);
+            		invokeLater(depth-1);
+            	} else {
+                	logger.finer("Event queue ran at the right depth.");
+    				mainPanel.setSize(new Dimension(mainPanel.getWidth()+1, mainPanel.getHeight()+1));
+    				mainPanel.validate();
+            	}
+            }
+        });
 	}
 	
 	private void popUpResults() {
