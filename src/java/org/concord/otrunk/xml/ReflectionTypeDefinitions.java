@@ -34,6 +34,8 @@ package org.concord.otrunk.xml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.otcore.OTClass;
 import org.concord.otrunk.OTrunkImpl;
@@ -52,6 +54,9 @@ import org.concord.otrunk.otcore.impl.ReflectiveOTClassFactory;
  */
 public class ReflectionTypeDefinitions
 {
+	private static final Logger logger =
+        Logger.getLogger(ReflectionTypeDefinitions.class.getCanonicalName());
+	
 	public static void registerTypes(List<String> importedOTObjectClasses, TypeService typeService,
 			XMLDatabase xmlDB)
 	throws Exception
@@ -72,15 +77,14 @@ public class ReflectionTypeDefinitions
 		        Class<?> typeClass = classloader.loadClass(className);
 		        typeClasses.add(typeClass);
 		    } catch (ClassNotFoundException e) {
-		        System.err.println("Error importing class: " + className);
-                System.err.println("  this class was listed as an import in the otml file");
+		    	logger.fine("Error importing class: " + className + "\n" +
+                            "  this class was listed as an import in the otml file");
 		    } catch (Throwable e){
 		    	// if we get something other than a class not found exception 
 		    	// then the problem is more complex so the whole stack trace is
 		    	// useful. 
-		        System.err.println("Error importing class: " + className);
-                System.err.println("  this class was listed as an import in the otml file");
-                e.printStackTrace();
+		    	logger.log(Level.INFO, "Error importing class: " + className + "\n" +
+                                       "  this class was listed as an import in the otml file", e);
 		    }
 		}		
 		
@@ -98,7 +102,7 @@ public class ReflectionTypeDefinitions
 			OTClassImpl otClass = (OTClassImpl) OTrunkImpl.getOTClass(className);
 			
 			if(otClass == null){
-				System.err.println("Warning cannot find valid OTClass for import: " + className);
+				logger.warning("Warning cannot find valid OTClass for import: " + className);
 				continue;
 			}
 			

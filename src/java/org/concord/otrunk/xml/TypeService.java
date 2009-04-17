@@ -34,6 +34,7 @@ package org.concord.otrunk.xml;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
@@ -60,6 +61,8 @@ import org.concord.otrunk.otcore.impl.OTCorePackage;
  */
 public class TypeService
 {
+	private static final Logger logger = Logger.getLogger(TypeService.class.getCanonicalName());
+	
     public final static String STRING = "string";
     public final static String XML_STRING = "xmlstring";
     public final static String BOOLEAN = "boolean";
@@ -288,25 +291,23 @@ public class TypeService
 		String childName = child.getName();
 
 		ResourceTypeHandler handler = getElementHandler(childName);
-		if(handler == null) {			
-			System.err.println("Invalid OTType: " + childName  + "\n" +
-				"   located at: " + elementPath(child) + "\n" +					
-				// FIXME we should be able to figure out if this is supposed to be a 
-				//   OTObject or a primitive based on who is calling it
-				"   if this is supposed to be an OTObject check the imports");
+		if(handler == null) {
+			logger.warning("Invalid OTType: " + childName  + "\n" +
+				"   located at: " + elementPath(child) + "\n" +
+				"   check the imports and classpath");
 			return null;
 		}
 		String childTypeName = handler.getPrimitiveName();
 		
 		if(childTypeName == null) {
-			System.err.println("unknown element: " + childTypeName);
+			logger.warning("unknown element: " + childTypeName);
 			return null;
 		}
 		
 		try {
 			return handler.handleElement(child, relativePath, null);
 		} catch (HandleElementException e) {
-			System.err.println("Error reading element: " + TypeService.elementPath(child));
+			logger.warning("Error reading element: " + TypeService.elementPath(child));
 			return null;
 		}
 		
