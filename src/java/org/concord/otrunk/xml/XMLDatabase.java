@@ -63,6 +63,7 @@ import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectType;
+import org.concord.otrunk.datamodel.OTDataPropertyReference;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
@@ -123,11 +124,11 @@ public class XMLDatabase
 
 	String label;
 
-	private HashMap<OTID, ArrayList<OTID>> incomingReferences = 
-		new HashMap<OTID, ArrayList<OTID>>();
+	private HashMap<OTID, ArrayList<OTDataPropertyReference>> incomingReferences = 
+		new HashMap<OTID, ArrayList<OTDataPropertyReference>>();
 	
-	private HashMap<OTID, ArrayList<OTID>> outgoingReferences = 
-		new HashMap<OTID, ArrayList<OTID>>();
+	private HashMap<OTID, ArrayList<OTDataPropertyReference>> outgoingReferences = 
+		new HashMap<OTID, ArrayList<OTDataPropertyReference>>();
 	
 	private HashMap<XMLDataObjectRef, OTID> secondPassReferences = 
 		new HashMap<XMLDataObjectRef, OTID>();
@@ -831,7 +832,7 @@ public class XMLDatabase
 						// update the references map
 						OTID parent = secondPassReferences.get(resourceValueObj);
 						if (parent != null) {
-							recordReference(getOTDataObject(null, parent), getOTDataObject(null, (OTID) newResourceValue));
+							recordReference(getOTDataObject(null, parent), getOTDataObject(null, (OTID) newResourceValue), resourceKey);
 							secondPassReferences.remove(resourceValueObj);
 						} else {
 							logger.finer("Parent was null (object): " + newResourceValue);
@@ -853,7 +854,7 @@ public class XMLDatabase
 							// update the references map
 							OTID parent = secondPassReferences.get(oldElement);
 							if (parent != null) {
-								recordReference(getOTDataObject(null, parent), getOTDataObject(null, newElement));
+								recordReference(getOTDataObject(null, parent), getOTDataObject(null, newElement), resourceKey);
 								secondPassReferences.remove(oldElement);
 							} else {
 								logger.finer("Parent was null (list): " + newElement);
@@ -896,7 +897,7 @@ public class XMLDatabase
 							// update the references map
 							OTID parent = secondPassReferences.get(oldElement);
 							if (parent != null) {
-								recordReference(getOTDataObject(null, parent), getOTDataObject(null, newElement));
+								recordReference(getOTDataObject(null, parent), getOTDataObject(null, newElement), resourceKey);
 								secondPassReferences.remove(oldElement);
 							} else {
 								logger.finer("Parent was null (map): " + newElement);
@@ -1021,7 +1022,7 @@ public class XMLDatabase
 		return contextURL;
 	}
 
-	public void recordReference(OTDataObject parent, OTDataObject child)
+	public void recordReference(OTDataObject parent, OTDataObject child, String property)
 	{
 		if (parent == null || child == null) {
 			// can't reference "null"
@@ -1035,23 +1036,25 @@ public class XMLDatabase
 			return;
 		}
 		OTID childID = child.getGlobalId();
-		logger.finer("Recording reference: " + parentID + " --> " + childID);	
+		logger.finer("Recording reference: " + parentID + " (" + property + ") --> " + childID);
 		
-		ArrayList<OTID> parents = incomingReferences.get(childID);
-		ArrayList<OTID> children = outgoingReferences.get(parentID);
+		OTDataPropertyReference ref = new OTDataPropertyReference(parentID, childID, property);
+		
+		ArrayList<OTDataPropertyReference> parents = incomingReferences.get(childID);
+		ArrayList<OTDataPropertyReference> children = outgoingReferences.get(parentID);
 		if (parents == null) {
-			parents = new ArrayList<OTID>();
+			parents = new ArrayList<OTDataPropertyReference>();
 		}
 		if (children == null) {
-			children = new ArrayList<OTID>();
+			children = new ArrayList<OTDataPropertyReference>();
 		}
-		if (! parents.contains(parentID)) {
-			parents.add(parentID);
+		if (! parents.contains(ref)) {
+			parents.add(ref);
 			incomingReferences.put(childID, parents);
 		}
 		
-		if (! children.contains(childID)) {
-			children.add(childID);
+		if (! children.contains(ref)) {
+			children.add(ref);
 			outgoingReferences.put(parentID, children);
 		}
 	}
@@ -1066,15 +1069,37 @@ public class XMLDatabase
 		OTID childID = child.getGlobalId();
 		logger.finer("Removing reference: " + parentID + " --> " + childID);	
 		
-		ArrayList<OTID> parents = incomingReferences.get(childID);
-		ArrayList<OTID> children = outgoingReferences.get(parentID);
+		ArrayList<OTDataPropertyReference> parents = incomingReferences.get(childID);
+		ArrayList<OTDataPropertyReference> children = outgoingReferences.get(parentID);
 
-		if (parents != null && parents.remove(parentID)) {
-			incomingReferences.put(childID, parents);
+		if (parents != null) {
+			OTDataPropertyReference refToRemove = null;
+			for (OTDataPropertyReference ref : parents) {
+				if (ref.getSource().equals(parentID) && ref.getDest().equals(childID)) {
+					refToRemove = ref;
+					break;
+				}
+			}
+			
+			if (refToRemove != null) {
+				parents.remove(refToRemove);
+				incomingReferences.put(childID, parents);
+			}
 		}
 		
-		if (children != null && children.remove(childID)) {
-			outgoingReferences.put(parentID, children);
+		if (children != null) {
+			OTDataPropertyReference refToRemove = null;
+			for (OTDataPropertyReference ref : children) {
+				if (ref.getSource().equals(parentID) && ref.getDest().equals(childID)) {
+					refToRemove = ref;
+					break;
+				}
+			}
+			
+			if (refToRemove != null) {
+				children.remove(refToRemove);
+				outgoingReferences.put(parentID, children);
+			}
 		}
 	}
 	
@@ -1171,12 +1196,12 @@ public class XMLDatabase
     	return null;
     }
 
-	public ArrayList<OTID> getIncomingReferences(OTID otid)
+	public ArrayList<OTDataPropertyReference> getIncomingReferences(OTID otid)
     {
 	    return incomingReferences.get(otid);
     }
 	
-	public ArrayList<OTID> getOutgoingReferences(OTID otid)
+	public ArrayList<OTDataPropertyReference> getOutgoingReferences(OTID otid)
     {
 	    return outgoingReferences.get(otid);
     }

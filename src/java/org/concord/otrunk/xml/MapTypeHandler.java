@@ -103,7 +103,8 @@ public class MapTypeHandler extends ResourceTypeHandler
 		    	if (value instanceof OTDataObject) {
 					OTDataObject obj = (OTDataObject) value;
 					logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
-					xmlDB.recordReference(parent, obj);
+					// FIXME Not sure what the property string is here...
+					xmlDB.recordReference(parent, obj, relativePath);
 				}
 			}
 		    map.put(key, value);

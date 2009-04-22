@@ -150,11 +150,11 @@ public class XMLDataObject
 	    		database.removeReference(this, (OTDataObject) oldObject);
 	    	}
 	    	if (resource instanceof OTDataObject) {
-	    		database.recordReference(this, (OTDataObject) resource);
+	    		database.recordReference(this, (OTDataObject) resource, key);
 	    	}
 	    	if (resource instanceof OTID) {
 	    		try {
-	    			database.recordReference(this, database.getOTDataObject(this, (OTID) resource));
+	    			database.recordReference(this, database.getOTDataObject(this, (OTID) resource), key);
 	    		} catch (Exception e) {
 	    			// TODO do we care?
 	    		}

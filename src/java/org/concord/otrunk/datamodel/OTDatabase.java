@@ -117,7 +117,19 @@ public interface OTDatabase
 	
 	public HashMap<OTID, ? extends OTDataObject> getDataObjects();
 	
-	public ArrayList<OTID> getIncomingReferences(OTID otid);
+	/**
+	 * A list of paths for all objects which refer to the passed in object, directly or indirectly.
+	 * The size of the path ArrayList is the number of references that need to be traversed in order to get from one object to the other.
+	 * @param otid
+	 * @return
+	 */
+	public ArrayList<OTDataPropertyReference> getIncomingReferences(OTID otid);
 	
-	public ArrayList<OTID> getOutgoingReferences(OTID otid);
+	/**
+	 * A list of paths for all objects which are referred to by the passed in object, directly or indirectly.
+	 * The size of the path ArrayList is the number of references that need to be traversed in order to get from one object to the other.
+	 * @param otid
+	 * @return
+	 */
+	public ArrayList<OTDataPropertyReference> getOutgoingReferences(OTID otid);
 }

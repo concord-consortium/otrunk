@@ -54,6 +54,7 @@ import org.concord.otrunk.datamodel.OTDataList;
 import org.concord.otrunk.datamodel.OTDataMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectType;
+import org.concord.otrunk.datamodel.OTDataPropertyReference;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTUUID;
@@ -349,12 +350,12 @@ public class FsDatabase implements OTDatabase
 	    return dbIndex;
     }
 
-	public ArrayList<OTID> getOutgoingReferences(OTID otid)
+	public ArrayList<OTDataPropertyReference> getOutgoingReferences(OTID otid)
     {
 		throw new UnsupportedOperationException("not implemented yet");
     }
 
-	public ArrayList<OTID> getIncomingReferences(OTID otid)
+	public ArrayList<OTDataPropertyReference> getIncomingReferences(OTID otid)
     {
 		throw new UnsupportedOperationException("not implemented yet");
     }

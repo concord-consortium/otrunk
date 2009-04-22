@@ -108,7 +108,8 @@ public class ListTypeHandler extends ResourceTypeHandler
     			if (resValue instanceof OTDataObject) {
     				OTDataObject obj = (OTDataObject) resValue;
 					logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
-					xmlDB.recordReference(parent, obj);
+					// FIXME Not sure what the property string is here...
+					xmlDB.recordReference(parent, obj, relativePath);
 				}
 			}
 			list.add(resValue);
