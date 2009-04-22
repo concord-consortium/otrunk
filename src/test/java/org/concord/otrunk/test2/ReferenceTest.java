@@ -10,6 +10,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.OTDataPropertyReference;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTTransientMapID;
@@ -50,9 +51,10 @@ public class ReferenceTest extends TestCase
 		ArrayList<OTID> expectedReferences = new ArrayList<OTID>();
 		expectedReferences.add(OTIDFactory.createOTID(documentUUID + "!" + "/nlr_p1"));
 		
-		OTObject obj = getObject("no_learner_references", false);
-		ArrayList<OTID> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
-		makeSureArraysMatch(references, expectedReferences);
+		OTObject obj = getObject("no_learner_references", false);	
+		
+		ArrayList<ArrayList<OTDataPropertyReference>> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
+		makeSureArraysMatch(extractReferences(references), expectedReferences);
 	}
 	
 	public void testNoLearnerDataSingleParentDirectAndSibling() throws Exception {
@@ -63,8 +65,8 @@ public class ReferenceTest extends TestCase
 		expectedReferences.add(OTIDFactory.createOTID(documentUUID + "/" + "/root"));
 		
 		OTObject obj = getObject("no_learner_references_sibling", false);
-		ArrayList<OTID> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
-		makeSureArraysMatch(references, expectedReferences);
+		ArrayList<ArrayList<OTDataPropertyReference>> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
+		makeSureArraysMatch(extractReferences(references), expectedReferences);
 	}
 	
 	public void testNoLearnerDataSingleParentDirectAndSiblingViaObjectMap() throws Exception {
@@ -75,8 +77,8 @@ public class ReferenceTest extends TestCase
 		expectedReferences.add(OTIDFactory.createOTID(documentUUID + "/" + "/root"));
 		
 		OTObject obj = getObject("nlr_p1", false);
-		ArrayList<OTID> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
-		makeSureArraysMatch(references, expectedReferences);
+		ArrayList<ArrayList<OTDataPropertyReference>> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
+		makeSureArraysMatch(extractReferences(references), expectedReferences);
 	}
 	
 	public void testNoLearnerDataSingleParentDirectAndSiblingViaObjectList() throws Exception {
@@ -87,8 +89,8 @@ public class ReferenceTest extends TestCase
 		expectedReferences.add(OTIDFactory.createOTID(documentUUID + "/" + "/root"));
 		
 		OTObject obj = getObject("object_list_sibling", false);
-		ArrayList<OTID> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
-		makeSureArraysMatch(references, expectedReferences);
+		ArrayList<ArrayList<OTDataPropertyReference>> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
+		makeSureArraysMatch(extractReferences(references), expectedReferences);
 	}
 	
 	private void makeSureArraysMatch(ArrayList<OTID> results, ArrayList<OTID> expected) throws Exception {
@@ -133,6 +135,14 @@ public class ReferenceTest extends TestCase
 		}
 
 		return first;
+	}
+	
+	private ArrayList<OTID> extractReferences(ArrayList<ArrayList<OTDataPropertyReference>> paths) {
+		ArrayList<OTID> references = new ArrayList<OTID>();
+		for (ArrayList<OTDataPropertyReference> path : paths) {
+			references.add(path.get(0).getSource());
+		}
+		return references;
 	}
 	
 	private void initOtrunk(boolean loadLearnerData)

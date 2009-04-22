@@ -44,6 +44,7 @@ import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectFinder;
 import org.concord.otrunk.datamodel.OTDataObjectType;
+import org.concord.otrunk.datamodel.OTDataPropertyReference;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.datamodel.OTUUID;
@@ -365,12 +366,12 @@ public class CompositeDatabase
 	    return dataObjectMap;
     }
 
-	public ArrayList<OTID> getOutgoingReferences(OTID otid)
+	public ArrayList<OTDataPropertyReference> getOutgoingReferences(OTID otid)
     {
 		return activeOverlayDb.getOutgoingReferences(otid);
     }
 
-	public ArrayList<OTID> getIncomingReferences(OTID otid)
+	public ArrayList<OTDataPropertyReference> getIncomingReferences(OTID otid)
     {
 		return activeOverlayDb.getIncomingReferences(otid);
     }
