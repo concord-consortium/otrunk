@@ -331,7 +331,7 @@ public class OTObjectListImpl extends OTCollectionImpl
 			throw new IllegalArgumentException("null object id");
 		}
 
-		return list.contains(obj);
+		return list.contains(id);
 	}
 	
 	public Object[] toArray()
