@@ -277,7 +277,7 @@ public class OTObjectServiceImpl
     @SuppressWarnings("unchecked")
     public <T extends OTObject> T setResourcesFromSchema(OTObjectInternal otObjectImpl, Class<T> otObjectClass)
     {
-        Constructor<T> [] memberConstructors = otObjectClass.getConstructors();
+        Constructor<T> [] memberConstructors = (Constructor<T> [])otObjectClass.getConstructors();
         Constructor<T> resourceConstructor = memberConstructors[0]; 
         Class<?> [] params = resourceConstructor.getParameterTypes();
         
