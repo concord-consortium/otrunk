@@ -835,7 +835,7 @@ public class XMLDatabase
 							recordReference(getOTDataObject(null, parent), getOTDataObject(null, (OTID) newResourceValue), resourceKey);
 							secondPassReferences.remove(resourceValueObj);
 						} else {
-							logger.finer("Parent was null (object): " + newResourceValue);
+							logger.finest("Parent was null (object): " + newResourceValue);
 						}
 					}
 				} else if (resourceValue instanceof XMLDataList) {
@@ -857,7 +857,7 @@ public class XMLDatabase
 								recordReference(getOTDataObject(null, parent), getOTDataObject(null, newElement), resourceKey);
 								secondPassReferences.remove(oldElement);
 							} else {
-								logger.finer("Parent was null (list): " + newElement);
+								logger.finest("Parent was null (list): " + newElement);
 							}
 						}
 						if (oldElement instanceof XMLParsableString) {
@@ -900,7 +900,7 @@ public class XMLDatabase
 								recordReference(getOTDataObject(null, parent), getOTDataObject(null, newElement), resourceKey);
 								secondPassReferences.remove(oldElement);
 							} else {
-								logger.finer("Parent was null (map): " + newElement);
+								logger.finest("Parent was null (map): " + newElement);
 							}
 						}
 						if (oldElement instanceof XMLParsableString) {
@@ -1067,7 +1067,7 @@ public class XMLDatabase
 		
 		OTID parentID = parent.getGlobalId();
 		OTID childID = child.getGlobalId();
-		logger.finer("Removing reference: " + parentID + " --> " + childID);	
+		logger.finest("Removing reference: " + parentID + " --> " + childID);	
 		
 		ArrayList<OTDataPropertyReference> parents = incomingReferences.get(childID);
 		ArrayList<OTDataPropertyReference> children = outgoingReferences.get(parentID);
