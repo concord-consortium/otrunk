@@ -35,7 +35,9 @@ package org.concord.otrunk.xml;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataMap;
+import org.concord.otrunk.datamodel.OTDataObject;
 
 
 /**
@@ -52,6 +54,7 @@ public class XMLDataMap
 {
 	HashMap<String, Object> hTable = new LinkedHashMap<String, Object>();
 	XMLDataObject dataObject;
+	XMLDatabase db;
 	
 	public XMLDataMap(XMLDataObject parent)
 	{
@@ -59,6 +62,7 @@ public class XMLDataMap
 	    if(dataObject == null) {
 	        throw new UnsupportedOperationException("passing null parent not allowed");
 	    }
+	    db = (XMLDatabase)dataObject.getDatabase();
 	}
 	
 	private void updateModifiedTime()
@@ -73,6 +77,10 @@ public class XMLDataMap
 	{
 		Object previousValue = hTable.put(key, resource);		
 		updateModifiedTime();
+		if (previousValue != null) {
+			removeReference(previousValue);
+		}
+		recordReference(resource);
 		return previousValue;
 	}
 
@@ -108,13 +116,37 @@ public class XMLDataMap
 	 */
 	public void removeAll()
 	{
+		for (String key : hTable.keySet()) {
+			Object obj = hTable.get(key);
+			removeReference(obj);
+		}
 		hTable.clear();		
 		updateModifiedTime();
 	}
 	
 	public void remove(String key)
 	{
+		Object obj = hTable.get(key);
+		removeReference(obj);
 		hTable.remove(key);
 		updateModifiedTime();
 	}
+	
+	private void recordReference(Object resource)
+    {
+	    if (resource instanceof OTDataObject) {
+			db.recordReference(dataObject, (OTDataObject) resource, "unknown");
+		} else if (resource instanceof OTID) {
+			db.recordReference(dataObject.getGlobalId(), (OTID) resource, "unknown");
+		}
+    }
+
+	private void removeReference(Object previousValue)
+    {
+	    if (previousValue instanceof OTDataObject) {
+	    	db.removeReference(dataObject, (OTDataObject) previousValue);
+	    } else if (previousValue instanceof OTID) {
+	    	db.removeReference(dataObject.getGlobalId(), (OTID) previousValue);
+	    }
+    }
 }

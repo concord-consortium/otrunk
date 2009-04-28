@@ -35,7 +35,9 @@ package org.concord.otrunk.xml;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.otrunk.datamodel.OTDataList;
+import org.concord.otrunk.datamodel.OTDataObject;
 
 
 /**
@@ -52,6 +54,7 @@ public class XMLDataList
 {
 	ArrayList<Object> list = new ArrayList<Object>();
 	XMLDataObject dataObject;
+	XMLDatabase db;
 	
 	HashMap<Integer, XMLReferenceInfo> referenceInfoMap = new HashMap<Integer, XMLReferenceInfo>();
 	
@@ -61,6 +64,7 @@ public class XMLDataList
 	    if(dataObject == null) {
 	        throw new UnsupportedOperationException("passing null parent not allowed");
 	    }
+	    db = (XMLDatabase)dataObject.getDatabase();
 	}
 		
 	private void updateModifiedTime()
@@ -84,6 +88,7 @@ public class XMLDataList
 		XMLDatabase.checkObject(object);
 		boolean added = list.add(object);
 		updateModifiedTime();
+		recordReference(object);
 		return added;
 	}
 
@@ -95,6 +100,7 @@ public class XMLDataList
 		XMLDatabase.checkObject(object);
 		list.add(index, object);
 		updateModifiedTime();
+		recordReference(object);
 	}
 
 	public Object set(int index, Object object)
@@ -118,6 +124,9 @@ public class XMLDataList
 	 */
 	public void removeAll()
 	{
+		for (Object obj : list) {
+			removeReference(obj);
+		}
 		list.clear();
 		updateModifiedTime();
 	}
@@ -127,8 +136,10 @@ public class XMLDataList
 	 */
 	public void remove(int index)
 	{
+		Object obj = list.get(index);
 		list.remove(index);
 		updateModifiedTime();
+		removeReference(obj);
 	}
 
 	/* (non-Javadoc)
@@ -139,6 +150,7 @@ public class XMLDataList
 		boolean removed = list.remove(obj);
 		if(removed){
 			updateModifiedTime();
+			removeReference(obj);
 		}
 		return removed;
 	}
@@ -158,5 +170,20 @@ public class XMLDataList
 		return list.contains(obj);
     }
 	
-
+	private void recordReference(Object object) {
+		if (object instanceof OTDataObject) {
+			db.recordReference(dataObject, (OTDataObject)object, "unknown");
+		} else if (object instanceof OTID) {
+			db.recordReference(dataObject.getGlobalId(), (OTID)object, "unknown");
+		}
+	}
+	
+	private void removeReference(Object obj)
+    {
+	    if (obj instanceof OTDataObject) {
+	    	db.removeReference(dataObject, (OTDataObject)obj);
+	    } else if (obj instanceof OTID) {
+	    	db.removeReference(dataObject.getGlobalId(), (OTID)obj);
+	    }
+    }
 }
