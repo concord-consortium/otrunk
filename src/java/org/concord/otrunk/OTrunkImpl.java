@@ -1072,13 +1072,13 @@ public class OTrunkImpl implements OTrunk
 	    return sailSavingDisabled;
     }
     
-    public ArrayList<OTObject> getAllObjects(Class<? extends Object> klass) {
+    public <T extends OTObject> ArrayList<T> getAllObjects(Class<T> klass) {
     	return getAllObjects(klass, getRootObjectService());
     }
     
-    public ArrayList<OTObject> getAllObjects(Class<? extends Object> klass, OTObjectService objService) {
+    public <T extends OTObject> ArrayList<T> getAllObjects(Class<T> klass, OTObjectService objService) {
     	logger.finest("Getting all objects for class: " + klass.getName());
-    	ArrayList<OTObject> allObjects = new ArrayList<OTObject>();
+    	ArrayList<T> allObjects = new ArrayList<T>();
     	logger.finest("Datases: " + databases.size());
     	for (OTDatabase db : databases) {
     		logger.finest("Searching db: " + db.getURI());
@@ -1092,7 +1092,7 @@ public class OTrunkImpl implements OTrunk
 	                    Class<?> objClass = Class.forName(dataObj.getType().getClassName());
             			if (klass.isAssignableFrom(objClass)) {
             				logger.finest("It's a match! Adding it.");
-            				allObjects.add(objService.getOTObject(id));
+            				allObjects.add((T) objService.getOTObject(id));
             			}
                     } catch (ClassNotFoundException e) {
                     	logger.log(Level.WARNING, "Couldn't instantiate class: " + dataObj.getType().getClassName(), e);
