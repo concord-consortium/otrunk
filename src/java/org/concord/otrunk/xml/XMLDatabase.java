@@ -1036,6 +1036,11 @@ public class XMLDatabase
 			return;
 		}
 		OTID childID = child.getGlobalId();
+
+		recordReference(parentID, childID, property);
+	}
+	
+	public void recordReference(OTID parentID, OTID childID, String property) {
 		logger.finer("Recording reference: " + parentID + " (" + property + ") --> " + childID);
 		
 		OTDataPropertyReference ref = new OTDataPropertyReference(parentID, childID, property);
@@ -1067,6 +1072,11 @@ public class XMLDatabase
 		
 		OTID parentID = parent.getGlobalId();
 		OTID childID = child.getGlobalId();
+
+		removeReference(parentID, childID);
+	}
+	
+	public void removeReference(OTID parentID, OTID childID) {
 		logger.finest("Removing reference: " + parentID + " --> " + childID);	
 		
 		ArrayList<OTDataPropertyReference> parents = incomingReferences.get(childID);
