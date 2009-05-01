@@ -187,7 +187,7 @@ public class Copier
     		CopyEntry entry = toBeCopied.get(currentIndex);
     		boolean onlyRecurse = recurseOnly.contains(entry);
     		OTDataObject original = entry.original; 
-    	//	logger.fine(original+" ; "+original.getType());
+    	//	logger.finer(original+" ; "+original.getType());
     		OTDataObject copy = entry.copy;
     		if(copy == null) {
     			copy = otDb.createDataObject(original.getType());
@@ -198,10 +198,10 @@ public class Copier
     		// This is used to handle a hack for strings which reference objects
     		ArrayList<String> secondPassKeys = new ArrayList<String>();
     		
-    		logger.fine("Processing object: " + original.getGlobalId());
+    		logger.finer("Processing object: " + original.getGlobalId());
     		
     		for(int i=0; i<keys.length; i++){
-    			logger.fine("Processing attribute: " + keys[i]);
+    			logger.finer("Processing attribute: " + keys[i]);
     			Object resource = original.getResource(keys[i]);
     			boolean keyModified = false;
     			if (onlyModifications) {
