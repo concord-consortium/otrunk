@@ -84,6 +84,9 @@ public class OTControllerServiceImpl implements OTControllerService
 		this.registry = registry;
 	}
 	
+	/**
+	 * @see OTControllerService.getRealObject
+	 */
 	public Object getRealObject(OTObject otObject) 
 	{
 		// Handle the trivial case.
@@ -97,6 +100,11 @@ public class OTControllerServiceImpl implements OTControllerService
 			return realObject;
 		}		
 
+		// if we are in the middle of disposing and we don't already have a real object just return null
+		if(disposing){			
+			return null;
+		}
+		
 		realObject = setupRealObject(otObject, null);
 			
 		return realObject;		
