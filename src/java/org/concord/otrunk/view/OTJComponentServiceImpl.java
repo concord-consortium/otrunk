@@ -4,6 +4,7 @@
 package org.concord.otrunk.view;
 
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -28,6 +29,9 @@ import org.concord.framework.otrunk.view.OTViewFactory;
  */
 public class OTJComponentServiceImpl implements OTJComponentService 
 {
+	private static final Logger logger =
+        Logger.getLogger(OTJComponentServiceImpl.class.getCanonicalName());
+	
 	OTViewFactory viewFactory;
 	
 	// For now we'll keep these in a regular hashtable we might need to do
@@ -109,20 +113,20 @@ public class OTJComponentServiceImpl implements OTJComponentService
         				(conversionService != null && 
         				!conversionService.canConvert(genericView, OTJComponentView.class))){
         			if(conversionService == null){
-        				System.err.println("No OTViewConversionService available");
+        				logger.warning("No OTViewConversionService available");
         			}
-        			System.err.println("No OTJComponentView or compatible view for the object");
-        			System.err.println("  obj: " + otObject);
-        			System.err.println("  mode: " + mode);
+        			logger.warning("No OTJComponentView or compatible view for the object\n" +
+        			               "  obj: " + otObject + "\n" +
+        			               "  mode: " + mode);
         		} 
         	}
     	}
 
     	if(genericView == null) {
-    		System.err.println("Cannot find view for object");
-    		System.err.println("  obj: " + otObject);
-    		System.err.println("  mode: " + mode);
-    		System.err.println("  viewEntry: " + viewEntry);
+    		logger.warning("Cannot find view for object\n" +
+    		               "  obj: " + otObject + "\n" +
+    		               "  mode: " + mode + "\n" + 
+    		               "  viewEntry: " + viewEntry);
     		return null;
     	}
 
@@ -136,7 +140,7 @@ public class OTJComponentServiceImpl implements OTJComponentService
     			viewContext2.getViewService(OTViewConversionService.class);
 
     		if(conversionService == null){
-    			System.err.println("No View Conversion service");
+				logger.warning("No OTViewConversionService available");
     		} else {    			
     			view = conversionService.convert(genericView, OTJComponentView.class,
     				viewFactory, viewEntry);
@@ -146,11 +150,11 @@ public class OTJComponentServiceImpl implements OTJComponentService
     	
     	if(view == null){
     		// We could not translate the genericView to a OTJComponentView
-    		System.err.println("Could not convert genericView to OTJComponentView");
-    		System.err.println("  obj: " + otObject);
-    		System.err.println("  genericView: " + genericView);
-    		System.err.println("  mode: " + mode);
-    		System.err.println("  viewEntry: " + viewEntry);
+    		logger.warning("Could not convert genericView to OTJComponentView\n" +
+    		               "  obj: " + otObject + "\n" +
+    		               "  genericView: " + genericView + "\n" +
+    		               "  mode: " + mode + "\n" +
+    		               "  viewEntry: " + viewEntry);
     		return null;
     	}
     	

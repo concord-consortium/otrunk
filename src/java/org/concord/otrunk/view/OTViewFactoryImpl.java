@@ -32,6 +32,7 @@ package org.concord.otrunk.view;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
@@ -56,6 +57,9 @@ import org.concord.otrunk.OTrunkUtil;
  */
 public class OTViewFactoryImpl implements OTViewFactory 
 {
+	private static final Logger logger =
+        Logger.getLogger(OTViewFactoryImpl.class.getCanonicalName());
+	
     OTViewFactoryImpl parent;
     ArrayList<InternalViewEntry> viewMap = new ArrayList<InternalViewEntry>();
     ArrayList<OTViewBundle> viewBundles = new ArrayList<OTViewBundle>();
@@ -234,9 +238,9 @@ public class OTViewFactoryImpl implements OTViewFactory
             initView(view, viewEntry);
         	return view;                       
         } catch (ClassNotFoundException e) {
-            System.err.println("Can't find view: " + viewClassStr + 
-                    " for object: " + objClassStr);
-            System.err.println("  error: " + e.toString());
+            logger.warning(
+            	"Can't find view: " + viewClassStr + " for object: " + objClassStr + "\n" +
+                "  error: " + e.toString());
         } catch (InstantiationException e) {
         	e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -300,9 +304,9 @@ public class OTViewFactoryImpl implements OTViewFactory
             internalEntry.otEntryID = entry.getGlobalId();
             return internalEntry;
         } catch (ClassNotFoundException e) {
-            System.err.println("Can't find view: " + viewClassStr + 
-                " for object: " + objClassStr);
-            System.err.println("  error: " + e.toString());
+            logger.warning(
+            	"Can't find view: " + viewClassStr + " for object: " + objClassStr + "\n" +
+                "  error: " + e.toString());
         }
         
         return null;
@@ -372,7 +376,7 @@ public class OTViewFactoryImpl implements OTViewFactory
     	}
 		
 		if(firstMode == null){
-			System.err.println("Cannot find view mode: \"" + modeStr + "\"");
+			logger.warning("Cannot find view mode: \"" + modeStr + "\"");
 			return null;
 		}
 		
