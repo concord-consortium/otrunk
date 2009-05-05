@@ -131,7 +131,7 @@ public class MemoryHogTest extends TestCase
 	{
 		URL resource = getClass().getResource("/memory-hog-test.otml");
 		
-		for(int i=0; i<1000; i++){
+		for(int i=0; i<10; i++){
 			OTViewerHelper viewerHelper = new OTViewerHelper();
 
 			OTDatabase mainDb = viewerHelper.loadOTDatabase(resource);
