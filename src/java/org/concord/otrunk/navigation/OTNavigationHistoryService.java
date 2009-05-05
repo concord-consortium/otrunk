@@ -16,8 +16,7 @@ import org.concord.otrunk.OTrunkImpl;
 
 public class OTNavigationHistoryService extends DefaultOTObject implements OTBundle
 {
-	private static final Logger logger =
-        Logger.getLogger(OTNavigationHistoryService.class.getCanonicalName());
+	private static final Logger logger = Logger.getLogger(OTNavigationHistoryService.class.getCanonicalName());
 	private OTrunkImpl otrunk;
 	private HashMap<OTUser, OTObjectSet> navigationHistories = new HashMap<OTUser, OTObjectSet>();
 		
@@ -64,15 +63,17 @@ public class OTNavigationHistoryService extends DefaultOTObject implements OTBun
 		return defaultUserNavigationHistory;
 	}
 	
-	public void logNavigationEvent(OTObject obj) throws Exception {
-		logNavigationEvent(obj, null);
+	public void logNavigationEvent(String type, OTObject obj) throws Exception {
+		logNavigationEvent(type, obj, null);
 	}
 	
-	public void logNavigationEvent(OTObject obj, OTUser user) throws Exception {
+	public void logNavigationEvent(String type, OTObject obj, OTUser user) throws Exception {
+		logger.fine((user == null ? "null user" : user.getName()) + " " + type + ": " + obj);
 		OTObjectSet history = getUserNavigationHistory(user);
 		OTNavigationEvent event = history.getOTObjectService().createObject(OTNavigationEvent.class);
 		event.setTimestamp(System.currentTimeMillis());
 		event.setObject(obj);
+		event.setType(type);
 		history.getObjects().add(event);
 	}
 	
