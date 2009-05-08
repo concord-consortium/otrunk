@@ -1134,6 +1134,10 @@ public class OTrunkImpl implements OTrunk
     	        if (parents != null) {
         	        logger.finest("Found " + parents.size() + " references");
         	        for (OTDataPropertyReference reference : parents) {
+        	        	/* FIXME by skipping objects we've seen already, it's possible that we're not including all of the possible paths to an object.
+        	        	 * For instance, if A indirectly references D through both B and C, only one of A -> B -> D or A -> C -> D will be returned.
+        	        	 * So while this code *will* find all the correct endpoints, it won't necessarily reflect all of the possible paths between those endpoints.
+        	        	 */
         	        	OTID pId;
         	        	if (incoming) {
         	        		pId= reference.getSource();
@@ -1156,8 +1160,9 @@ public class OTrunkImpl implements OTrunk
                 	        	allParents.add(pPath);
                 	        }
             	        	if (getIndirectReferences) {
-            	        		
+            	        		logger.finest("recursing");
             	        		allParents.addAll(getReferences(incoming, pId, filterClass, true, pPath, excludeIDs));
+            	        		logger.finest("unrecursing");
             	        	}
         	        	} else {
         	        		logger.finest("Already seen this id: " + pId);
@@ -1175,9 +1180,9 @@ public class OTrunkImpl implements OTrunk
     }
     
     public ArrayList<ArrayList<OTDataPropertyReference>> getIncomingReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences) {
-    	logger.finest("Finding references for: " + objectID + " with class: " + (filterClass == null ? "null" : filterClass.getName()) + " and recursion: " + getIndirectReferences);
+    	logger.finer("Finding references for: " + objectID + " with class: " + (filterClass == null ? "null" : filterClass.getName()) + " and recursion: " + getIndirectReferences);
     	ArrayList<ArrayList<OTDataPropertyReference>> parents = getIncomingReferences(objectID, filterClass, getIndirectReferences, null);
-    	logger.finest("found " + parents.size() + " matching parents");
+    	logger.finer("found " + parents.size() + " matching parents");
     	return parents;
     }
     
