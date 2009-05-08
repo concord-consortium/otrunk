@@ -116,6 +116,10 @@ public class OTViewFactoryImpl implements OTViewFactory
     	        otInit.invoke(null, getViewContext());
             } catch (NoSuchMethodException e) {
             	// this class doesn't have an otInit method
+            } catch (NoClassDefFoundError e){
+            	// this class can't be loaded because of a missing dependency
+            	logger.warning("Missing dependency : " + e.getMessage() + 
+            		" for view class: " + viewEntry.viewClass.getCanonicalName());
             } catch (Throwable t) {
             	t.printStackTrace();
             }

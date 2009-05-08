@@ -403,6 +403,8 @@ public class OTMLToXHTMLConverter
 		String url = embedComponent(comp, 1, 1, obj);
 		url = "<img src='" + url + "' />";
 
+		((OTJComponentView)view).viewClosed();
+		
 		return url;
 		// return null;
 	}
@@ -466,7 +468,8 @@ public class OTMLToXHTMLConverter
 				BufferedImage bim = ComponentScreenshot
 				        .makeComponentImageAlpha(comp, scaleX, scaleY);
 				ComponentScreenshot.saveImageAsFile(bim, newFile, "png");
-
+				bim.flush();
+				
 				text = folderPath + "/" + id + ".png";
 				return;
 
