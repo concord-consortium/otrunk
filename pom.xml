@@ -81,7 +81,7 @@
         <configuration>
           <excludes>
             <exclude>org/concord/otrunk/test/**</exclude>
-            <exclude>org/concord/otrunk/test2/MemoryHogTest</exclude>
+            <exclude>org/concord/otrunk/test2/MemoryHogTest.class</exclude>
           </excludes>
         </configuration>
       </plugin>
