@@ -11,10 +11,11 @@ public class HTTPRequestException extends IOException {
 		this.responseCode = responseCode;
 	}
 	
-	public HTTPRequestException(String msg, Throwable t, int responseCode) {
-		super(msg, t);
-		this.responseCode = responseCode;
-	}
+	// if we ever move to Java 1.6 we can enable this...
+//	public HTTPRequestException(String msg, Throwable t, int responseCode) {
+//		super(msg, t);
+//		this.responseCode = responseCode;
+//	}
 
 	/**
      * @return the responseCode
