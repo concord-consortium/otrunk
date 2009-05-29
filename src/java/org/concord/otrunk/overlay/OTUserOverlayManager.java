@@ -240,7 +240,7 @@ public class OTUserOverlayManager
 		}
 		
 		long serverTime = conn.getLastModified();
-		
+		logger.info("checking reload of: " + xmlDb.getSourceURL());
 		if (existingTime != 0 && serverTime != 0 && existingTime == serverTime) {
 			// no reload needed
 			logger.info("Not reloading overlay as modified time is the same as the currently loaded version");

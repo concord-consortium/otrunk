@@ -15,13 +15,13 @@ public class OTConfig
 	public final static String TRACE_PACKAGES_PROP = "otrunk.trace.packages";
 	public final static String AUTHOR_PROP = "otrunk.view.author";
 	public final static String REMOTE_URL_PROP = "otrunk.remote_url";
+	public final static String REMOTE_SAVE_DATA_PROP = "otrunk.remote_save_data";
 	public final static String REST_ENABLED_PROP = "otrunk.rest_enabled";
 	public final static String ROOT_OBJECT_PROP = "otrunk.root.localid";
 	public final static String VIEW_MODE_PROP = "otrunk.view.mode";
 	public final static String CODEBASE_PROP = "otrunk.codebase";
 	public final static String SHOW_STATUS_PROP = "otrunk.view.status";
 	public final static String USERDATA_URL_PROP = "otrunk.userdata_url";
-	public final static String REMOTE_SAVE_DATA_PROP = "otrunk.remote_save_data";
 	public final static String SHOW_DESTRUCTIVE_MENU_ITEMS_PROP = "otrunk.view.destructive_menu";	// "New" and "Open"
 	public final static String TRACE_DB_LOAD_TIME = "otrunk.db.trace.load";
 	public final static String USE_ASM = "otrunk.use.asm";

@@ -146,6 +146,7 @@ public class OTGroupListManager extends DefaultOTObject
     	lastReloadTime = now;
     	try {
     		if (groupUserObject != null) {
+    			logger.info("reloading group overlay");
     			overlayManager.reload(groupUserObject);
     		}
         } catch (Exception e) {
