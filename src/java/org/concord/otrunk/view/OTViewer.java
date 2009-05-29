@@ -62,6 +62,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -118,6 +120,7 @@ import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkServiceEntry;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.handlers.UrlStreamHandlerFactory;
+import org.concord.otrunk.net.HTTPRequestException;
 import org.concord.otrunk.overlay.OTOverlayGroup;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.ExporterJDOM;
@@ -149,6 +152,7 @@ public class OTViewer extends JFrame
      * first version of this class
      */
     private static final long serialVersionUID = 1L;
+    private static final Logger logger = Logger.getLogger(OTViewer.class.getCanonicalName());
 
     public final static String TITLE_PROP = "otrunk.view.frame_title";
     public final static String HIDE_TREE_PROP = "otrunk.view.hide_tree";
@@ -246,7 +250,7 @@ public class OTViewer extends JFrame
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            System.out.println("Error setting native LAF: " + e);
+            logger.warning("Error setting native LAF: " + e);
         }
 
         this.showTree = true;
@@ -324,7 +328,7 @@ public class OTViewer extends JFrame
                         && ((e.getModifiersEx() & java.awt.event.InputEvent.META_DOWN_MASK) != 0)
                         && (e.getKeyCode() == java.awt.event.KeyEvent.VK_B)) {
                     Object o = e.getSource();
-                    System.out.println(o.toString());
+                    logger.fine(o.toString());
                     return true;
                 }
                 
@@ -350,7 +354,7 @@ public class OTViewer extends JFrame
                 
                 if (mEvent.getID() == MouseEvent.MOUSE_CLICKED
                         && (mEvent.getModifiersEx() & MouseEvent.ALT_DOWN_MASK) != 0) {
-                    System.out.println(event.getSource().toString());                    
+                    logger.info(event.getSource().toString());                    
                 }
             }
         };
@@ -576,8 +580,7 @@ public class OTViewer extends JFrame
             e1.printStackTrace();
         } catch (Exception e) {
             // FIXME: this should popup a dialog
-            System.err.println("Can't load url");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Can't load url", e);
             return false;
         }
         
@@ -703,7 +706,7 @@ public class OTViewer extends JFrame
                 // overrides this)
                 if (baseFrameTitle == DEFAULT_BASE_FRAME_TITLE &&
                         mainFrame.getFrame().isResourceSet("title")){
-                    System.out.println("change");
+                    logger.fine("change");
                     baseFrameTitle = mainFrame.getFrame().getTitle();
                     setTitle(baseFrameTitle);
                 }
@@ -1143,8 +1146,7 @@ public class OTViewer extends JFrame
             }
         } catch (Exception e) {
             remoteURL = null;
-            System.err.println("Remote URL is invalid.");
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Remote URL is invalid.", e);
         }
     }
 
@@ -1288,13 +1290,13 @@ public class OTViewer extends JFrame
                     options, options[2]);
             switch (chosenOption) {
             case 0:
-                System.err.println("Not saving work");
+                logger.info("Not saving work");
                 break;
             case 1:
-                System.err.println("Canceling close");
+                logger.info("Canceling close");
                 return false;
             case 2:
-                System.err.println("Set needToSaveUserData true");
+                logger.info("Set needToSaveUserData true");
                 needToSaveUserData = true;
                 break;
             }            
@@ -1324,13 +1326,13 @@ public class OTViewer extends JFrame
                         options, options[2]);
                 switch (chosenOption) {
                 case 0:
-                    System.err.println("Not saving authored data");
+                    logger.info("Not saving authored data");
                     break;
                 case 1:
-                    System.err.println("Canceling close");
+                    logger.info("Canceling close");
                     return false;
                 case 2:
-                    System.err.println("Saving authored data");
+                    logger.info("Saving authored data");
                     saveAction.actionPerformed(null);
                     break;
                 }
@@ -1430,7 +1432,7 @@ public class OTViewer extends JFrame
             saveUserDataAction.actionPerformed(null);
 
         } else {
-            System.err.println("Not saving work before closing.");
+            logger.info("Not saving work before closing.");
         }
 
         // Reset these back to false, so if the user is switching to a new
@@ -1797,7 +1799,7 @@ public class OTViewer extends JFrame
                 }
 
                 if (file != null && file.exists()) {
-                    System.out.println("load file name: " + file);
+                    logger.info("load file name: " + file);
                     // if they open an authored file then they are overriding
                     // the remoteURL,
                     // at least for now. This makes the title bar update
@@ -1979,27 +1981,47 @@ public class OTViewer extends JFrame
                         );
 
                 if (returnVal == 0) {
-                    try {
-                        remoteURL = new URL(textField.getText());
-                        // WARNING this will cause a security exception if we
-                        // are running in a applet or jnlp which
-                        //  has a security sandbox.
+                	try {
+	                    remoteURL = new URL(textField.getText());
                         System.setProperty(OTConfig.REST_ENABLED_PROP,
-                                Boolean.toString(restCheckbox.isSelected()));
-                        otrunk.remoteSaveData(xmlDB, remoteURL, OTViewer.HTTP_POST);
-                        setTitle(remoteURL.toString());
-                        updateMenuBar();
-                    } catch (Exception e) {
-                        System.err.println("Bad URL. Not saving.");
-                        JOptionPane.showMessageDialog(
-                            SwingUtilities.getRoot(OTViewer.this),
-                                        "There was an error saving. Check your URL and try again.",
-                            "Error Saving", JOptionPane.ERROR_MESSAGE);
-                        e.printStackTrace();
+                            Boolean.toString(restCheckbox.isSelected()));
+                    	save(OTViewer.HTTP_POST);
+                    } catch (MalformedURLException e) {
+	                    // TODO Auto-generated catch block
+	                    e.printStackTrace();
                     }
                 } else {
                     // CANCELLED
                 }
+            }
+            
+            private void save(String method) {
+                try {
+                    // WARNING this will cause a security exception if we
+                    // are running in a applet or jnlp which
+                    //  has a security sandbox.
+                    otrunk.remoteSaveData(xmlDB, remoteURL, method);
+
+                    setTitle(remoteURL.toString());
+                    updateMenuBar();
+                } catch (HTTPRequestException e) {
+                    if (e.getResponseCode() == 405 && ! method.equals(OTViewer.HTTP_PUT)) {
+                    	// try again with a PUT since some REST servers don't allow you to POST to an already-created object
+                    	save(OTViewer.HTTP_PUT);
+                    } else {
+                    	badURL(e);
+                    }
+                } catch (Exception e) {
+                    badURL(e);
+                }
+            }
+            
+            private void badURL(Exception e) {
+            	logger.log(Level.INFO, "Bad URL. Not saving.", e);
+                JOptionPane.showMessageDialog(
+                    SwingUtilities.getRoot(OTViewer.this),
+                                "There was an error saving. Check your URL and try again.",
+                    "Error Saving", JOptionPane.ERROR_MESSAGE);
             }
         };
 

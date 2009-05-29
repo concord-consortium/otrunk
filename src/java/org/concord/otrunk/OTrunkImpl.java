@@ -71,6 +71,7 @@ import org.concord.otrunk.datamodel.OTDataPropertyReference;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTTransientMapID;
+import org.concord.otrunk.net.HTTPRequestException;
 import org.concord.otrunk.overlay.CompositeDataObject;
 import org.concord.otrunk.overlay.CompositeDatabase;
 import org.concord.otrunk.overlay.OTOverlay;
@@ -981,23 +982,23 @@ public class OTrunkImpl implements OTrunk
 		localSaveData(db, f);
 	}
 	
-	public void remoteSaveData(XMLDatabase xmldb, String method) throws Exception {
+	public void remoteSaveData(XMLDatabase xmldb, String method) throws HTTPRequestException,Exception {
 		remoteSaveData(xmldb, method, null);
 	}
 	
-	public void remoteSaveData(XMLDatabase xmldb, String method, Authenticator auth) throws Exception {
+	public void remoteSaveData(XMLDatabase xmldb, String method, Authenticator auth) throws HTTPRequestException,Exception {
 		if (xmldb.getSourceURL() == null) {
 			throw new MalformedURLException("Invalid source URL on XMLDatabase: " + xmldb.getDatabaseId().toString());
 		}
 		remoteSaveData(xmldb, xmldb.getSourceURL(), method, auth);
 	}
 	
-	public void remoteSaveData(OTDatabase db, URL remoteURL, String method) throws Exception {
+	public void remoteSaveData(OTDatabase db, URL remoteURL, String method) throws HTTPRequestException,Exception {
 		remoteSaveData(db, remoteURL, method, null);
 	}
 	
 	public void remoteSaveData(OTDatabase db, URL remoteURL, String method, Authenticator auth)
-    throws Exception
+    throws HTTPRequestException,Exception
     {
     	HttpURLConnection urlConn;
     	DataOutputStream urlDataOut;
@@ -1046,8 +1047,8 @@ public class OTrunkImpl implements OTrunk
     	// exception isn't thrown already) and capture the exceptions upstream
     	int code = urlConn.getResponseCode();
     	if (code >= 400) {
-    		throw new Exception("HTTP Response: " + urlConn.getResponseMessage() + "\n\n"
-    		        + response);
+    		throw new HTTPRequestException("HTTP Response: " + urlConn.getResponseMessage() + "\n\n"
+    		        + response, urlConn.getResponseCode());
     	}
     	urlConn.disconnect();
     	if (db instanceof XMLDatabase) {
