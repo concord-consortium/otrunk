@@ -18,6 +18,7 @@ import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.util.StandardPasswordAuthenticator;
+import org.concord.otrunk.view.OTConfig;
 import org.concord.otrunk.view.OTViewer;
 import org.concord.otrunk.xml.XMLDatabase;
 
@@ -252,7 +253,7 @@ public class OTUserOverlayManager
 	}
 
 	public void remoteSave(OTOverlay overlay) throws Exception {
-		if (otrunk.isSailSavingDisabled()) {
+		if (otrunk.isSailSavingDisabled() && ! OTConfig.isIgnoreSailViewMode()) {
 			logger.info("Not saving overlay because SAIL saving is disabled");
 		} else {
 			otrunk.remoteSaveData(getXMLDatabase(overlay), OTViewer.HTTP_PUT, authenticator);
