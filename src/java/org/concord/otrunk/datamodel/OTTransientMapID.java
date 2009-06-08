@@ -59,7 +59,7 @@ public class OTTransientMapID
 
     	OTTransientMapID other = (OTTransientMapID) obj;
     	
-    	if(mapToken != other.getMapToken()){
+    	if(! mapToken.equals(other.getMapToken())){
     		return false;
     	}
     	
