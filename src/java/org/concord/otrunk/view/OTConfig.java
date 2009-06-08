@@ -26,6 +26,7 @@ public class OTConfig
 	public final static String TRACE_DB_LOAD_TIME = "otrunk.db.trace.load";
 	public final static String USE_ASM = "otrunk.use.asm";
 	public final static String IGNORE_LOAD_ERRORS = "otrunk.db.ignore_errors";
+	public final static String IGNORE_SAIL_VIEW_MODE = "otrunk.debug.ignore_sail_view_mode";
 	
 	/**
      * This is yet another hack to support something like layers or mutliple files.
@@ -119,5 +120,10 @@ public class OTConfig
 	public static boolean isShowDestructiveMenuItems()
 	{
 		return getBooleanProp(SHOW_DESTRUCTIVE_MENU_ITEMS_PROP, false);
+	}
+	
+	public static boolean isIgnoreSailViewMode()
+	{
+		return getBooleanProp(IGNORE_SAIL_VIEW_MODE, false);
 	}
 }
