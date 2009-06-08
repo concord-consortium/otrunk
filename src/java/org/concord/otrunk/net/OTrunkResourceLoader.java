@@ -42,7 +42,6 @@ import java.util.zip.GZIPInputStream;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -66,6 +65,7 @@ public class OTrunkResourceLoader implements IResourceLoader{
 	private InputStream urlInputStream;
 	private int tryCount;
 	private int responseCode = -1;
+	private int contentLength = -1;
 	private static int ATTEMPTS_BEFORE_PROMPTING = 2;
 	
 	// FIXME this will fail in a secure environment that can't access system properties
@@ -309,5 +309,10 @@ public class OTrunkResourceLoader implements IResourceLoader{
 				writer.println("Exception getting error body (inputStream): " + e);
 			}
 		}
-	} 
+	}
+
+	public int getContentLength()
+    {
+	    return contentLength;
+    } 
 }
