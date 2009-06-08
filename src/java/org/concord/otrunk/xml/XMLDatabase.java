@@ -140,6 +140,7 @@ public class XMLDatabase
 	private boolean sourceVerified = false;
 	
 	private long urlLastModifiedTime = -1;
+	private int urlContentLength = -1;
 
 	private IResourceLoader resourceLoader;
 	
@@ -198,6 +199,7 @@ public class XMLDatabase
 			throw e;
 		}
 		urlLastModifiedTime = resourceLoader.getLastModified();
+		urlContentLength = resourceLoader.getContentLength();
 
 		urlOpenTime = System.currentTimeMillis() - openingStart;
 		
@@ -485,9 +487,13 @@ public class XMLDatabase
 		if(downloadTime >= 0){
 			downloadString = " downloaded in " + downloadTime + "ms";
 			parsedLabel = "parsed xml";
-		} 
+		}
+		String sizeString = " (unknown size)";
+		if (urlContentLength > -1) {
+			sizeString = " (" + urlContentLength + " bytes)";
+		}
 		logger.info("Loaded " + dataObjects.size() + " objects from: " + label
-	            + " opened url in " + urlOpenTime + "ms"
+	            + sizeString + " opened url in " + urlOpenTime + "ms"
 		        + downloadString 
 				+ " " + parsedLabel + " in " + parseTime + "ms" 
 				+ " loaded ot db in " + (endMillis - startMillis) + "ms" );
