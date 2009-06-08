@@ -47,18 +47,20 @@ public class OTNavigationHistoryService extends DefaultOTObject implements OTBun
 	
 	private OTObjectSet getUserNavigationHistory(OTUser user) throws Exception {
 		if (user == null) {
-			user = otrunk.getUsers().get(0);
+			user = otrunk.getUsers().size() > 0 ? otrunk.getUsers().get(0) : null;
 		}
 		
 		if (navigationHistories.containsKey(user)) {
 			return navigationHistories.get(user);
 		}
-		OTObjectSet set = resources.getNavigationHistory();
-		if (set == null) {
-			set = otrunk.createObject(OTObjectSet.class);
-			resources.setNavigationHistory(set);
+		OTObjectSet defaultUserNavigationHistory = resources.getNavigationHistory();
+		if (defaultUserNavigationHistory == null) {
+			defaultUserNavigationHistory = otrunk.createObject(OTObjectSet.class);
+			resources.setNavigationHistory(defaultUserNavigationHistory);
 		}
-		OTObjectSet defaultUserNavigationHistory = (OTObjectSet) otrunk.getUserRuntimeObject(set, user);
+		if (user != null) {
+			defaultUserNavigationHistory = (OTObjectSet) otrunk.getUserRuntimeObject(defaultUserNavigationHistory, user);
+		}
 		navigationHistories.put(user, defaultUserNavigationHistory);
 		return defaultUserNavigationHistory;
 	}
