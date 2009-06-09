@@ -420,4 +420,8 @@ public class CompositeDataObject
 		}
 		return false;
 	}
+	
+	public boolean isComposite() {
+		return composite;
+	}
 }

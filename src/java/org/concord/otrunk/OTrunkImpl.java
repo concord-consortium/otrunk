@@ -678,6 +678,17 @@ public class OTrunkImpl implements OTrunk
     	return false;
     }
     
+    public boolean isComposite(OTObject otObject)
+    {
+    	OTDataObject dataObject = OTObjectServiceImpl.getOTDataObject(otObject);
+    	
+        if(dataObject instanceof CompositeDataObject) {
+        	return ((CompositeDataObject)dataObject).isComposite();
+        } else {
+        	return false;
+        }    	
+    }
+    
     public boolean isModified(OTObject otObject, OTObjectService objService, boolean includingChildren) {
     	boolean isBaseModified = isModifiedInTopOverlay(otObject);
     	if (isBaseModified) {
