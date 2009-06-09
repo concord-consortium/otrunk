@@ -105,7 +105,10 @@ public class ListTypeHandler extends ResourceTypeHandler
 		    }
 			Object resValue = typeService.handleLiteralElement(child, childRelativePath);
 			if (parent != null) {
-    			if (resValue instanceof OTDataObject) {
+				if (resValue instanceof XMLDataObjectRef) {
+					logger.finest("Processed refid: " + ((XMLDataObjectRef)resValue).getRefId());
+					xmlDB.recordReference(parent, (XMLDataObjectRef)resValue, relativePath);
+				} else if (resValue instanceof OTDataObject) {
     				OTDataObject obj = (OTDataObject) resValue;
 					logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
 					// FIXME Not sure what the property string is here...
