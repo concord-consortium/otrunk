@@ -86,4 +86,17 @@ public class OTOverlaySyncView extends AbstractOTJComponentView
 		jViewContext = viewContext;	    
     }
 
+	@Override
+	public void viewClosed()
+	{
+	    super.viewClosed();
+	    
+	    for (ArrayList<OTObject> relatedList: externalIdToObject.values()){
+	    	for (OTObject related : relatedList) {
+				if(related instanceof OTChangeNotifying){
+					((OTChangeNotifying) related).removeOTChangeListener(changeListener);
+				}
+	    	}
+	    }
+	}
 }
