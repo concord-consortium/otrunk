@@ -46,6 +46,8 @@ public class OTGroupListManager extends DefaultOTObject
 
 	private long lastReloadTime = 0;
 	
+	private boolean skipStudentReload = false;
+	
 	public OTGroupListManager(ResourceSchema resources)
     {
 	    super(resources);
@@ -144,6 +146,38 @@ public class OTGroupListManager extends DefaultOTObject
     		return;
     	}
     	lastReloadTime = now;
+    	reloadGroupOverlay(false);
+    	processUserList(true);
+    }
+    
+    // Note: reloadGroupOverlay() is not called here unlike in reloadAll().
+    //       It is supposed to have already been called.
+    public void reloadSelectUsers(OTObjectList userList) {
+    	if (skipStudentReload) {
+    		return;
+    	}
+    	for(OTObject obj: userList){
+    		OTUserObject user = (OTUserObject) obj;
+    		try {
+    			overlayManager.reload(user);
+    		} catch (Exception e) {
+    			logger.log(Level.WARNING, "Couldn't load overlay for user: " + user.getName(), e);
+    		}
+    	}
+    }
+    
+    public void reloadGroupOverlay(boolean interval) {
+    	if (interval) {
+        	long now = System.currentTimeMillis();
+        	if (now - lastReloadTime < 10000) {
+        		logger.info("Not reloading. Only " + ((now - lastReloadTime)/1000) + " sec has passed since the last reload.");
+        		skipStudentReload = true; //flag for reloadSelectUsers()
+        		return;
+        	} else {
+        		skipStudentReload = false;
+        	}
+        	lastReloadTime = now;
+    	}
     	try {
     		if (groupUserObject != null) {
     			logger.info("reloading group overlay");
@@ -152,7 +186,6 @@ public class OTGroupListManager extends DefaultOTObject
         } catch (Exception e) {
         	logger.log(Level.WARNING, "Couldn't load overlay for group", e);
         }
-    	processUserList(true);
     }
     
     public boolean isGroupEnabled() {
@@ -164,7 +197,6 @@ public class OTGroupListManager extends DefaultOTObject
         try {
 	        newObject = overlayManager.getOTObject(user, otObject);
         } catch (Exception e) {
-	        // TODO Auto-generated catch block
 	        e.printStackTrace();
         }
     	
