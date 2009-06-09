@@ -687,6 +687,7 @@ public class XMLDatabase
 	protected XMLDataObject createDataObject(OTXMLElement element, OTID id)
 	    throws Exception
 	{
+		logger.finest("Creating data object for: " + (id == null ? "null" : id.toExternalForm()) );
 		if (id == null) {
 			// String path = TypeService.elementPath(element);
 			// id = new OTXMLPathID(path);
@@ -838,7 +839,7 @@ public class XMLDatabase
 						// update the references map
 						OTID parent = secondPassReferences.get(resourceValueObj);
 						if (parent != null) {
-							recordReference(getOTDataObject(null, parent), getOTDataObject(null, (OTID) newResourceValue), resourceKey);
+							recordReference(parent, (OTID) newResourceValue, resourceKey);
 							secondPassReferences.remove(resourceValueObj);
 						} else {
 							logger.finest("Parent was null (object): " + newResourceValue);
@@ -860,7 +861,7 @@ public class XMLDatabase
 							// update the references map
 							OTID parent = secondPassReferences.get(oldElement);
 							if (parent != null) {
-								recordReference(getOTDataObject(null, parent), getOTDataObject(null, newElement), resourceKey);
+								recordReference(parent, newElement, resourceKey);
 								secondPassReferences.remove(oldElement);
 							} else {
 								logger.finest("Parent was null (list): " + newElement);
@@ -903,7 +904,7 @@ public class XMLDatabase
 							// update the references map
 							OTID parent = secondPassReferences.get(oldElement);
 							if (parent != null) {
-								recordReference(getOTDataObject(null, parent), getOTDataObject(null, newElement), resourceKey);
+								recordReference(parent, newElement, resourceKey);
 								secondPassReferences.remove(oldElement);
 							} else {
 								logger.finest("Parent was null (map): " + newElement);
@@ -920,6 +921,8 @@ public class XMLDatabase
 					newResourceValue =
 					    ((XMLParsableString) resourceValue).parse(localIdMap);
 					xmlDObj.setResource(resourceKey, newResourceValue);
+				} else {
+					logger.finest("Not valid object type: " + resourceValue);
 				}
 			}
 
