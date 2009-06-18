@@ -450,10 +450,6 @@ public class OTViewer extends JFrame
             authorOTMLURL = OTViewer.class.getResource("no-arguments-page.otml");
         }
         
-        if ("file".equalsIgnoreCase(authorOTMLURL.getProtocol())) {
-            currentAuthoredFile = new File(authorOTMLURL.getPath());
-        }
-
         initWithWizard(authorOTMLURL);
     }
 
@@ -825,6 +821,10 @@ public class OTViewer extends JFrame
     public void loadURL(URL url)
         throws Exception
     {
+        if ("file".equalsIgnoreCase(url.getProtocol())) {
+            currentAuthoredFile = new File(url.getPath());
+        }
+    	
         XMLDatabase systemDB = null;
 
         try {
