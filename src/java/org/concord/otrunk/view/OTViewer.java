@@ -1166,7 +1166,9 @@ public class OTViewer extends JFrame
             fileMenu.removeAll();
         }
 
-        if (OTConfig.isAuthorMode()) {
+        // This is a hacky place to override the userMode, but it is currently 
+        // the best place.
+        if (OTConfig.isAuthorMode() || OTConfig.isNoUserMode()) {
             userMode = OTConfig.NO_USER_MODE;
         }
 
