@@ -1229,7 +1229,7 @@ public class OTViewer extends JFrame
 
         fileMenu.add(showConsoleAction);
 
-        if (OTConfig.isAuthorMode() || OTConfig.isDebug()) {
+        if (userMode == OTConfig.NO_USER_MODE || OTConfig.isDebug()) {
             fileMenu.add(reloadWindowAction);
         }
 
