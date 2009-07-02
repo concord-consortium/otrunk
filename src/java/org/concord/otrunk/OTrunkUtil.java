@@ -82,6 +82,9 @@ public class OTrunkUtil
 				
 				if(list instanceof OTObjectList){
 					OTObjectList objList = (OTObjectList) list;
+					if(index >= objList.size()){
+						return null;
+					}
 					return objList.get(index);
 				} else if(list instanceof OTResourceList){
 					OTResourceList resList = (OTResourceList) list;
@@ -129,7 +132,14 @@ public class OTrunkUtil
 				
 				if(list instanceof OTObjectList){
 					OTObjectList objList = (OTObjectList) list;
-					objList.set(index, (OTObject)value);
+					if(objList.size() <= index){
+					   while(objList.size() < index){
+						   objList.add((OTObject)null);
+					   }
+					   objList.add((OTObject)value);
+					} else {
+						objList.set(index, (OTObject)value);
+					}
 				} else if(list instanceof OTResourceList){
 					OTObjectList objList = (OTObjectList) list;
 					if(objList.size() >= (index+1)){
