@@ -118,6 +118,7 @@ import org.concord.otrunk.OTMLToXHTMLConverter;
 import org.concord.otrunk.OTSystem;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkServiceEntry;
+import org.concord.otrunk.PageXHTMLExporter;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.handlers.UrlStreamHandlerFactory;
 import org.concord.otrunk.net.HTTPRequestException;
@@ -243,6 +244,7 @@ public class OTViewer extends JFrame
     private AbstractAction exportImageAction;
     private AbstractAction exportHiResImageAction;
     private AbstractAction exportToHtmlAction;
+    private AbstractAction exportCurrentToHtmlAction;
 
     public OTViewer() {
         super();
@@ -1227,7 +1229,12 @@ public class OTViewer extends JFrame
             fileMenu.add(exportHiResImageAction);
         }
 
-        fileMenu.add(exportToHtmlAction);
+        if (OTConfig.isUseAlternativeExport()) {
+        	exportCurrentToHtmlAction.putValue(Action.NAME, exportToHtmlAction.getValue(Action.NAME));
+        	fileMenu.add(exportCurrentToHtmlAction);
+        } else {
+        	fileMenu.add(exportToHtmlAction);
+        }
 
         fileMenu.add(showConsoleAction);
 
@@ -1729,6 +1736,29 @@ public class OTViewer extends JFrame
         };
         // Isn't it enabled by default?
         exportToHtmlAction.setEnabled(true);
+        
+        exportCurrentToHtmlAction = new AbstractAction("Export current to html...") {
+            /**
+             * nothing to serialize here
+             */
+            private static final long serialVersionUID = 1L;
+
+            public void actionPerformed(ActionEvent arg0)
+            {
+            	try {
+                File fileToSave = getReportFile();
+                PageXHTMLExporter otxc =
+                    new PageXHTMLExporter(bodyPanel);
+                otxc.setXHTMLParams(fileToSave);
+
+                (new Thread(otxc)).start();
+            	} catch (Exception e) {
+            		logger.log(Level.SEVERE, "Couldn't get the root object from otrunk", e);
+            	}
+            }
+        };
+        // Isn't it enabled by default?
+        exportCurrentToHtmlAction.setEnabled(true);
 
         saveUserDataAction = new AbstractAction("Save") {
 

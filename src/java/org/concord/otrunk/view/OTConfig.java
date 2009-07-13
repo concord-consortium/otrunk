@@ -27,6 +27,7 @@ public class OTConfig
 	public final static String USE_ASM = "otrunk.use.asm";
 	public final static String IGNORE_LOAD_ERRORS = "otrunk.db.ignore_errors";
 	public final static String IGNORE_SAIL_VIEW_MODE = "otrunk.debug.ignore_sail_view_mode";
+	public final static String USE_ALTERNATIVE_EXPORT = "otrunk.export.use_alternative";
 	
 	/**
      * This is yet another hack to support something like layers or mutliple files.
@@ -130,5 +131,10 @@ public class OTConfig
 	public static boolean isIgnoreSailViewMode()
 	{
 		return getBooleanProp(IGNORE_SAIL_VIEW_MODE, false);
+	}
+	
+	public static boolean isUseAlternativeExport()
+	{
+		return getBooleanProp(USE_ALTERNATIVE_EXPORT, false);
 	}
 }
