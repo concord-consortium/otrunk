@@ -24,7 +24,6 @@
 package org.concord.otrunk;
 
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -54,7 +53,7 @@ import org.concord.framework.otrunk.view.OTViewEntry;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTXHTMLHelper;
 import org.concord.framework.otrunk.view.OTXHTMLView;
-import org.concord.swing.util.ComponentScreenshot;
+import org.concord.otrunk.util.ComponentImageSaver;
 
 public class OTMLToXHTMLConverter
     implements Runnable, OTXHTMLHelper
@@ -320,8 +319,8 @@ public class OTMLToXHTMLConverter
 		if (!folder.isDirectory())
 			return null;
 
-		ImageSaver saver = new ImageSaver(comp, folder, folder.getName(),
-		        otObject, scaleX, scaleY);
+		ComponentImageSaver saver = new ComponentImageSaver(comp, folder, folder.getName(),
+		        otObject, scaleX, scaleY, false);
 
 		try {
 			SwingUtilities.invokeAndWait(saver);
@@ -407,82 +406,6 @@ public class OTMLToXHTMLConverter
 		
 		return url;
 		// return null;
-	}
-
-	class ImageSaver
-	    implements Runnable
-	{
-		JComponent comp;
-
-		File folder;
-
-		OTObject otObject;
-
-		String text = null;
-
-		float scaleX = 1;
-
-		float scaleY = 1;
-
-		private String folderPath;
-
-		ImageSaver(JComponent comp, File folder, String folderPath,
-		        OTObject otObject, float scaleX, float scaleY)
-		{
-			this.comp = comp;
-			this.folder = folder;
-			this.otObject = otObject;
-			this.scaleX = scaleX;
-			this.scaleY = scaleY;
-			this.folderPath = folderPath;
-		}
-
-		public void run()
-		{
-			// TODO Auto-generated method stub
-			try {
-				String id = otObject.otExternalId();
-				id = id.replaceAll("/", "_");
-				id = id.replaceAll("'", "");
-				id = id.replaceAll("!", "");
-				
-				if (!folder.isDirectory()) {
-					text = null;
-					return;
-				}
-
-				File newFile = new File(folder, id + ".png");
-				String originalId = id;
-				
-				// This is a hack so when multiple students objects are shown at the same time
-				// the file names don't overlap because all of them will return the same thing from
-				// otExternalId().  This approach isn't perfect though because the same object 
-				// might be referenced twice so in that case the same image should be used.
-				int i=1;
-				while(newFile.exists()){
-					id = originalId + "_" + i;
-					i++;
-					newFile = new File(folder, id + ".png");
-				}				
-				
-				BufferedImage bim = ComponentScreenshot
-				        .makeComponentImageAlpha(comp, scaleX, scaleY);
-				ComponentScreenshot.saveImageAsFile(bim, newFile, "png");
-				bim.flush();
-				
-				text = folderPath + "/" + id + ".png";
-				return;
-
-			} catch (Throwable t) {
-				t.printStackTrace();
-			}
-			text = null;
-		}
-
-		String getText()
-		{
-			return text;
-		}
 	}	
 	
 	public OTObject getRuntimeObject(OTObject object, String userStr) {

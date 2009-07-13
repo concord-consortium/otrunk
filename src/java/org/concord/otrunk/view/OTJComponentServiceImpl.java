@@ -192,7 +192,7 @@ public class OTJComponentServiceImpl implements OTJComponentService
 			return objToComponent.get(obj);
         }
 
-		public OTView getViewByObject(OTObject obj)
+		public OTJComponentView getViewByObject(OTObject obj)
         {
 			return objToView.get(obj);
         }
