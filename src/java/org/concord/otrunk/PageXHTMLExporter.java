@@ -1,7 +1,9 @@
 package org.concord.otrunk;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.LayoutManager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -10,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.concord.framework.otrunk.OTID;
@@ -34,16 +37,30 @@ public class PageXHTMLExporter implements Runnable
 //	private OTViewFactory viewFactory;
 	private OTViewContainer viewContainer;
 	private OTJComponentView rootObjectView;
+	private Component rootObjectComponent;
 	private File outputFile;
 	
 	public PageXHTMLExporter(OTViewContainerPanel viewPanel) {
 		this.rootObject = viewPanel.getCurrentObject();
 		this.rootObjectView = viewPanel.getView();
+		this.rootObjectComponent = getRootObjectComponent(viewPanel);
 		if (rootObjectView instanceof AbstractOTJComponentContainerView) {
 			this.jComponentService = ((AbstractOTJComponentContainerView)rootObjectView).getJComponentService();
 		}
 
 		this.viewContainer = viewPanel.getViewContainer();
+	}
+	
+	private Component getRootObjectComponent(OTViewContainerPanel viewPanel) {
+		LayoutManager layout = viewPanel.getLayout();
+		if (! (layout instanceof BorderLayout)) {
+			return viewPanel;
+		}
+		Component comp = ((BorderLayout)layout).getLayoutComponent(BorderLayout.CENTER);
+		if (comp instanceof JScrollPane) {
+			comp = ((JScrollPane)comp).getViewport().getView();
+		}
+		return comp;
 	}
 	
 	public void run()
@@ -63,7 +80,7 @@ public class PageXHTMLExporter implements Runnable
 				xhtmlView = (OTXHTMLView) objView;
 				bodyText = xhtmlView.getXHTMLText(rootObject);
 
-				Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"([^>]*)>");
+				Pattern p = Pattern.compile("<object(?:[^>]*)refid=\"([^\"]*)\"(?:[^>]*)>");
 				Matcher m = p.matcher(bodyText);
 				StringBuffer parsed = new StringBuffer();
 				OTObjectService objectService = rootObject.getOTObjectService();
@@ -79,7 +96,7 @@ public class PageXHTMLExporter implements Runnable
 					} 
 
 					Pattern userPat = Pattern.compile("user=\"([^\"]*)\"");
-					Matcher userMatcher = userPat.matcher(m.group(2));
+					Matcher userMatcher = userPat.matcher(m.group(0));
 					if(userMatcher.find()){
 						String userId = userMatcher.group(1);
 						referencedObject = getRuntimeObject(referencedObject, userId);
@@ -101,7 +118,7 @@ public class PageXHTMLExporter implements Runnable
 				m.appendTail(parsed);
 				text = "<div>" + parsed.toString() + "</div><hr/>";
 			} else {
-				text = embedOTObject(rootObject);
+				text = "<img src='" + embedComponent(rootObjectComponent, 1, 1, rootObject) + "' />";
 			}
 
 			allTexts = allTexts + text;
@@ -128,7 +145,10 @@ public class PageXHTMLExporter implements Runnable
 	
 	/// this was simplified...
 	private OTJComponentView getOTJComponentView(OTObject obj, String mode) {
-		OTJComponentView view = jComponentService.getJComponentViewContext().getViewByObject(obj);
+		OTJComponentView view = null;
+		if (jComponentService.getJComponentViewContext() != null) {
+			view = jComponentService.getJComponentViewContext().getViewByObject(obj);
+		}
 		if (view != null) {
 			return view;
 		}
