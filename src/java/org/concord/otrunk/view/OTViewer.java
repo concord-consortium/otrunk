@@ -122,6 +122,7 @@ import org.concord.otrunk.PageXHTMLExporter;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.handlers.UrlStreamHandlerFactory;
 import org.concord.otrunk.net.HTTPRequestException;
+import org.concord.otrunk.net.InstallationResponseCache;
 import org.concord.otrunk.overlay.OTOverlayGroup;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.ExporterJDOM;
@@ -248,6 +249,8 @@ public class OTViewer extends JFrame
 
     public OTViewer() {
         super();
+        
+        InstallationResponseCache.installResponseCache();
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
