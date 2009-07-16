@@ -17,12 +17,13 @@ public class InstallationResponseCache extends ResponseCache
 	private static final Logger logger =
         Logger.getLogger(InstallationResponseCache.class.getCanonicalName());
 	private static File CACHE_DIR;
+	private static boolean TEMP_DIR = true;
 	static {
 		try {
 			CACHE_DIR = File.createTempFile("otrunk_cache_", "");
 			CACHE_DIR.delete();
 			CACHE_DIR.mkdir();
-//			CACHE_DIR.deleteOnExit();
+			CACHE_DIR.deleteOnExit();
 			if(!CACHE_DIR.isDirectory()){
 				System.err.println("Can't create cache dir");
 				CACHE_DIR = null;
@@ -37,6 +38,7 @@ public class InstallationResponseCache extends ResponseCache
 	
 	public static void installResponseCache(File cacheDir) {
 		CACHE_DIR = cacheDir;
+		TEMP_DIR = false;
 		installResponseCache();
 	}
 	
@@ -102,7 +104,9 @@ public class InstallationResponseCache extends ResponseCache
 		int code = remoteUri.hashCode();
 		String fileName = Integer.toString(code >= 0 ? code : -code);
 		File localFile = new File(CACHE_DIR, fileName);
-		// localFile.deleteOnExit();
+		if (TEMP_DIR) {
+			localFile.deleteOnExit();
+		}
 		return localFile;
 	}
 	
