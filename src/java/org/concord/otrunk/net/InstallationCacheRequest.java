@@ -125,7 +125,7 @@ public class InstallationCacheRequest extends CacheRequest
 			
 			@Override
 			public void write(int bit) {
-				super.write(bit);
+				write(new byte[] {(byte) bit});
 			}
 			
 			private byte[] getFirstBytes() {
