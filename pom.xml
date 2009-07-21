@@ -100,7 +100,7 @@
             <configuration>
               <tasks>
                 <property name="maven-jar" value="${project.build.directory}/${project.build.finalName}.jar"/>
-                <!--  this is a hack because I couldn't find another way to get the path to a dependcy jar
+                <!--  this is a hack because I couldn't find another way to get the path to a dependency jar
                     the dependency plugin can be used to copy a jar but why copy it when we just 
                     need to reference it -->
                 <property name="asm-jar" value="${settings.localRepository}/asm/asm/3.1/asm-3.1.jar"/>
