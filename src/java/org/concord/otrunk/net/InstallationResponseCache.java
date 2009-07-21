@@ -1,6 +1,7 @@
 package org.concord.otrunk.net;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.CacheRequest;
 import java.net.CacheResponse;
@@ -8,8 +9,13 @@ import java.net.HttpURLConnection;
 import java.net.ResponseCache;
 import java.net.URI;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class InstallationResponseCache extends ResponseCache
@@ -18,6 +24,7 @@ public class InstallationResponseCache extends ResponseCache
         Logger.getLogger(InstallationResponseCache.class.getCanonicalName());
 	private static File CACHE_DIR;
 	private static boolean TEMP_DIR = true;
+	private static HashMap<String, String> LOOKUP_MAP;
 	static {
 		try {
 			CACHE_DIR = File.createTempFile("otrunk_cache_", "");
@@ -36,14 +43,28 @@ public class InstallationResponseCache extends ResponseCache
 		}
 	}
 	
+	public static void registerLookupMap() {
+		try {
+			File lookupFile = new File(CACHE_DIR.toString() + File.pathSeparator + "url_map.xml");
+			if (lookupFile.exists()) {
+				LOOKUP_MAP = readLookupMap(lookupFile);
+			}
+		} catch (IOException e) {
+			logger.log(Level.WARNING, "Can't open url map file!", e);
+			LOOKUP_MAP = null;
+		}
+	}
+	
 	public static void installResponseCache(File cacheDir) {
 		CACHE_DIR = cacheDir;
 		TEMP_DIR = false;
-		installResponseCache();
+		registerLookupMap();
+		ResponseCache.setDefault(new InstallationResponseCache());
 	}
 	
 	public static void installResponseCache() {
 		if (CACHE_DIR != null) {
+			registerLookupMap();
 			ResponseCache.setDefault(new InstallationResponseCache());
 		}
 	}
@@ -101,13 +122,39 @@ public class InstallationResponseCache extends ResponseCache
 	 * Returns the local File corresponding to the given remote URI.
 	 */
 	public static File getLocalFile(URI remoteUri) {
-		int code = remoteUri.hashCode();
-		String fileName = Integer.toString(code >= 0 ? code : -code);
-		File localFile = new File(CACHE_DIR, fileName);
+		File localFile = null;
+		if (LOOKUP_MAP != null) {
+			String fileName = LOOKUP_MAP.get(remoteUri.toString());
+			if (fileName != null) {
+				localFile = new File(CACHE_DIR, fileName);
+			}
+		}
+		if (localFile == null) {
+			int code = remoteUri.hashCode();
+			String fileName = Integer.toString(code >= 0 ? code : -code);
+			localFile = new File(CACHE_DIR, fileName);
+		}
 		if (TEMP_DIR) {
 			localFile.deleteOnExit();
 		}
 		return localFile;
+	}
+	
+	private static 	HashMap<String, String> readLookupMap(File mapFile) throws IOException
+	{
+		Properties properties = new Properties();
+		properties.loadFromXML(new FileInputStream(mapFile));
+
+		HashMap<String, String> map = new HashMap<String, String>();
+		
+		Set<Entry<Object,Object>> entrySet = properties.entrySet();
+		for (Entry<Object, Object> entry : entrySet) {
+			String key = (String) entry.getKey();
+			String value = (String) entry.getValue();
+			map.put(key, value);
+		}
+
+		return map;
 	}
 	
 	private boolean isURICachable(URI uri) {
