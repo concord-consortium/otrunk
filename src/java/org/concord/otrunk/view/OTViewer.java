@@ -250,7 +250,9 @@ public class OTViewer extends JFrame
     public OTViewer() {
         super();
         
-        InstallationResponseCache.installResponseCache();
+        if (! OTConfig.isAuthorMode()) {
+        	InstallationResponseCache.installResponseCache();
+        }
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
