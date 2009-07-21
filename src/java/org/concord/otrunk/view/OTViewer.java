@@ -122,7 +122,6 @@ import org.concord.otrunk.PageXHTMLExporter;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.handlers.UrlStreamHandlerFactory;
 import org.concord.otrunk.net.HTTPRequestException;
-import org.concord.otrunk.net.InstallationResponseCache;
 import org.concord.otrunk.overlay.OTOverlayGroup;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.ExporterJDOM;
@@ -135,6 +134,7 @@ import org.concord.swing.MostRecentFileDialog;
 import org.concord.swing.StreamRecord;
 import org.concord.swing.StreamRecordView;
 import org.concord.swing.util.Util;
+import org.concord.utilities.InstallationResponseCache;
 import org.concord.view.SimpleTreeModel;
 import org.concord.view.SwingUserMessageHandler;
 
