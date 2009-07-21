@@ -58,6 +58,7 @@
     <dependency>
       <groupId>org.concord.utilities</groupId>
       <artifactId>response-cache</artifactId>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 
