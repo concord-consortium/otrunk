@@ -103,6 +103,11 @@ public class OTConfig
 		return getBooleanProp(NO_USER_PROP, false);
 	}
 	
+	public static boolean isSingleUserMode()
+	{
+		return getBooleanProp(SINGLE_USER_PROP, false);
+	}
+	
 	public static boolean isRestEnabled()
     {
     	return getBooleanProp(REST_ENABLED_PROP, true);

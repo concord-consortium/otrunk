@@ -250,7 +250,7 @@ public class OTViewer extends JFrame
     public OTViewer() {
         super();
         
-        if (! OTConfig.isAuthorMode()) {
+        if (OTConfig.isSingleUserMode()) {
         	InstallationResponseCache.installResponseCache();
         }
 
