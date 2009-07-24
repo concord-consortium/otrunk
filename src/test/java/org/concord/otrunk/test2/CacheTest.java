@@ -8,17 +8,18 @@ import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.swing.ImageIcon;
 
 import junit.framework.TestCase;
 
-import org.concord.otrunk.net.InstallationResponseCache;
+import org.concord.utilities.InstallationResponseCache;
 
 
 public class CacheTest extends TestCase {
 	private class Cacher {
     	Object object;
     
-    	public void fetchImage(String url) throws IOException {
+    	public void fetchImageReader(String url) throws IOException {
     		Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("png");
     		ImageReader reader = readers.next();
     		
@@ -45,6 +46,21 @@ public class CacheTest extends TestCase {
     		object = bytes;
     	}
     	
+    	public void fetchImageIcon(String url) throws Exception {
+    		ImageIcon icon = new ImageIcon(new URL(url));
+//    		while (icon.getImageLoadStatus() == MediaTracker.LOADING) {
+//    			Thread.sleep(100);
+//    		}
+//    		JFrame frame = new JFrame();
+//    		JButton button = new JButton(icon);
+//    		frame.getContentPane().add(button);
+//    		frame.pack();
+//    		frame.setVisible(true);
+//    		Thread.sleep(2000);
+    		object = new ImageIcon(url).getImage();
+//    		frame.dispose();
+    	}
+    	
     	public Object getObject() {
     		return object;
     	}
@@ -54,10 +70,14 @@ public class CacheTest extends TestCase {
 		InstallationResponseCache.installResponseCache();
 		InstallationResponseCache.clearCache();
 		
+		System.err.flush();
+		System.out.println("Running Image Reader Test");
+		System.out.flush();
+		
 		Cacher test1 = new Cacher();
-		test1.fetchImage("http://udl.concord.org/share/models/netlogo/aspenleaftrans.png");
+		test1.fetchImageReader("http://udl.concord.org/share/models/netlogo/aspenleaftrans.png");
 		Cacher test2 = new Cacher();
-		test2.fetchImage("http://udl.concord.org/share/models/netlogo/aspenleaftrans.png");
+		test2.fetchImageReader("http://udl.concord.org/share/models/netlogo/aspenleaftrans.png");
 		
 		// XXX These should equal each other, but apparently BufferedImage doesn't implement the equal() method well...
 		assertEquals(false, test1.getObject().equals(test2.getObject()));
@@ -67,10 +87,29 @@ public class CacheTest extends TestCase {
 		InstallationResponseCache.installResponseCache();
 		InstallationResponseCache.clearCache();
 		
+		System.err.flush();
+		System.out.println("Running Direct Download Test");
+		System.out.flush();
+		
 		Cacher test1 = new Cacher();
 		test1.fetchUrl("http://udl.concord.org/share/models/netlogo/aspenleaftrans.png");
 		Cacher test2 = new Cacher();
 		test2.fetchUrl("http://udl.concord.org/share/models/netlogo/aspenleaftrans.png");
+		
+		assertEquals(true, test1.getObject().equals(test2.getObject()));
+	}
+	
+	public void testUrlImageIconEqual() throws Exception {
+		InstallationResponseCache.installResponseCache();
+		InstallationResponseCache.clearCache();
+		System.err.flush();
+		System.out.println("Running Image Icon Test");
+		System.out.flush();
+		
+		Cacher test1 = new Cacher();
+		test1.fetchImageIcon("http://udl.concord.org/share/models/netlogo/aspenleaftrans.png");
+		Cacher test2 = new Cacher();
+		test2.fetchImageIcon("http://udl.concord.org/share/models/netlogo/aspenleaftrans.png");
 		
 		assertEquals(true, test1.getObject().equals(test2.getObject()));
 	}
