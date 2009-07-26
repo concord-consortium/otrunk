@@ -46,7 +46,7 @@ public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler
 		this.primitiveClass = primitiveClass;
 	}
 	
-	abstract public Object handleElement(String value)
+	abstract protected Object handleElement(String value)
 		throws HandlerException;
 	
 	/**

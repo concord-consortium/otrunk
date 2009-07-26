@@ -51,6 +51,11 @@ public class PreserveFormatingTest extends TestCase
 		formatingHelper("map-key-id-test.otml");
 	}
 
+	public void testEnumFormating() throws Exception
+	{
+		formatingHelper("enum-test.otml");
+	}
+
 	public void formatingHelper(String fileName) throws Exception
 	{
 		URL otmlUrl = 
