@@ -138,6 +138,15 @@ public class ExporterJDOM
 		writeDocument(doc, outputStream);
 	}
 
+	public static void exportWithUnixSep(Writer writer, OTDataObject rootObject, OTDatabase db)
+	throws Exception
+	{		
+		ExporterJDOM exporter = new ExporterJDOM();
+		Document doc = exporter.buildDocument(rootObject, db);
+		
+		writeDocument(doc, writer, "\n");
+	}
+
 	/**
 	 * Calling this method is a unsafe when the writer is writing to a File.  
 	 * As soon as the writer is created, the file gets erased.  So if there is an 
@@ -171,7 +180,16 @@ public class ExporterJDOM
 	public static void writeDocument(Document doc, Writer writer)
 	throws Exception
 	{
+		writeDocument(doc, writer, null);
+	}
+	
+	public static void writeDocument(Document doc, Writer writer, String lineSep)
+	throws Exception
+	{
 		Format format = Format.getPrettyFormat();
+		if(lineSep != null){
+			format.setLineSeparator(lineSep);
+		}
 		XMLOutputter outputter = new XMLOutputter(format);
 
 		outputter.output(doc, writer);
@@ -627,7 +645,8 @@ public class ExporterJDOM
 							content.add(new Comment(info.comment));
 						}
 					}
-					Element collectionEl = exportCollectionItem(dataObj, listElement, resourceName);
+					Element collectionEl = exportCollectionItem(dataObj, listElement, 
+						resourceName + "[" + j + "]");
 					if(collectionEl != null){
 						content.add(collectionEl);
 					}
@@ -662,7 +681,8 @@ public class ExporterJDOM
 			    	entryEl.setAttribute("key", exportedKey);
 			    	
 			        Object mapValue = map.get(mapKeys[j]);
-			        Element collectionEl = exportCollectionItem(dataObj, mapValue, resourceName);
+			        Element collectionEl = exportCollectionItem(dataObj, mapValue, 
+			        	resourceName + "['" + exportedKey + "']");
 			        entryEl.addContent(collectionEl);
 			    }
 			    writeResourceElement(dataObj, objectEl, resourceName, content);
@@ -824,41 +844,20 @@ public class ExporterJDOM
 		if(parent == container && 
 						parentResourceName.equals(containerResourceName)){
 			// our parent is the container and our parent property is the same as the container property
+			// so the actual object should be written here
 			return false;
 		}
 
 		// this isn't the parent, or it isn't the right resource in the parent
-		Object containedValue = container.getResource(containerResourceName);
+		Object containedValue = container.getResourceWithSuffix(containerResourceName);
 		if(containedValue.equals(id)){
 			// the container still contains the correct value						
 			// so just write a reference here
 			return true;
 		}
-					
-		if(containedValue instanceof OTDataList){
-			OTDataList dataListContainer = ((OTDataList)containedValue);
-			for(int i=0; i<dataListContainer.size(); i++){
-				if(id.equals(dataListContainer.get(i))){
-					// our container list still references us
-					return true;
-				}
-			}						
-			// our container list doesn't reference us anymore
-			return false;
-		}
-					
-		if(containedValue instanceof OTDataMap){
-			OTDataMap dataMapContainer = (OTDataMap) containedValue;
-			String [] keys = dataMapContainer.getKeys();
-			for(int i=0; i<keys.length; i++){
-				if(id.equals(dataMapContainer.get(keys[i]))){
-					// our previous container map still references us
-					return true;
-				}
-			}
-			return false;
-		}
-		
+
+		// The container doesn't reference this object anymore, or at least not in the 
+		// same spot as before, so the full object needs to be written
 		return false;
     }
     

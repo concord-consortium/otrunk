@@ -130,9 +130,6 @@ public class XMLDatabase
 	private HashMap<OTID, ArrayList<OTDataPropertyReference>> outgoingReferences = 
 		new HashMap<OTID, ArrayList<OTDataPropertyReference>>();
 	
-	private HashMap<XMLDataObjectRef, OTID> secondPassReferences = 
-		new HashMap<XMLDataObjectRef, OTID>();
-
 	private long urlOpenTime;
 	private long downloadTime = -1;
 	private long parseTime;
@@ -470,7 +467,7 @@ public class XMLDatabase
 			relativePath = databaseId.toExternalForm() + "/";
 		}
 		XMLDataObject rootDataObject =
-		    (XMLDataObject) typeService.handleLiteralElement(rootObjectNode, relativePath);
+		    (XMLDataObject) typeService.handleLiteralElement(rootObjectNode, relativePath, null, null);
 
 		// Need to handle local_id this will be stored as XMLDataObjectRef with in the
 		// tree. this is what the objectReferences vector is for
@@ -827,45 +824,22 @@ public class XMLDatabase
 				String resourceKey = resourceEntry.getKey();
 				if (resourceValue instanceof XMLDataObject) {
 					XMLDataObject resourceValueObj = (XMLDataObject) resourceValue;
-					if (!(resourceValueObj instanceof XMLDataObjectRef)) {
-						resourceValueObj.setContainer(xmlDObj);
-						resourceValueObj.setContainerResourceKey(resourceKey);
-					}
 					newResourceValue = getOTID(resourceValueObj);
 					if (newResourceValue == null) {
 						removedKeys.add(resourceKey);
-					} else {
-						xmlDObj.setResource(resourceKey, newResourceValue);
-						// update the references map
-						OTID parent = secondPassReferences.get(resourceValueObj);
-						if (parent != null) {
-							recordReference(parent, (OTID) newResourceValue, resourceKey);
-							secondPassReferences.remove(resourceValueObj);
-						} else {
-							logger.finest("Parent was null (object): " + newResourceValue);
-						}
-					}
+					} else {					
+						xmlDObj.setResource(resourceKey, newResourceValue, false);
+						recordSecondPassReference(resourceValueObj);
+					}					
 				} else if (resourceValue instanceof XMLDataList) {
 					XMLDataList list = (XMLDataList) resourceValue;
 					for (int j = 0; j < list.size(); j++) {
 						Object oldElement = list.get(j);
 						if (oldElement instanceof XMLDataObject) {
 							XMLDataObject oldElementObj = (XMLDataObject) oldElement;
-							if (!(oldElementObj instanceof XMLDataObjectRef)) {
-								oldElementObj.setContainer(xmlDObj);
-								oldElementObj.setContainerResourceKey(resourceKey);
-							}
-
 							OTID newElement = getOTID((XMLDataObject) oldElement);
 							list.set(j, newElement);
-							// update the references map
-							OTID parent = secondPassReferences.get(oldElement);
-							if (parent != null) {
-								recordReference(parent, newElement, resourceKey);
-								secondPassReferences.remove(oldElement);
-							} else {
-								logger.finest("Parent was null (list): " + newElement);
-							}
+							recordSecondPassReference(oldElementObj);
 						}
 						if (oldElement instanceof XMLParsableString) {
 							newResourceValue =
@@ -894,22 +868,13 @@ public class XMLDatabase
 
 						if (oldElement instanceof XMLDataObject) {
 							XMLDataObject oldElementObj = (XMLDataObject) oldElement;
-							if (!(oldElementObj instanceof XMLDataObjectRef)) {
-								oldElementObj.setContainer(xmlDObj);
-								oldElementObj.setContainerResourceKey(resourceKey);
-							}
-
 							OTID newElement = getOTID((XMLDataObject) oldElement);
 							map.put(keys[j], newElement);
+							
 							// update the references map
-							OTID parent = secondPassReferences.get(oldElement);
-							if (parent != null) {
-								recordReference(parent, newElement, resourceKey);
-								secondPassReferences.remove(oldElement);
-							} else {
-								logger.finest("Parent was null (map): " + newElement);
-							}
+							recordSecondPassReference(oldElementObj);							
 						}
+						
 						if (oldElement instanceof XMLParsableString) {
 							newResourceValue =
 							    ((XMLParsableString) oldElement).parse(localIdMap);
@@ -935,6 +900,20 @@ public class XMLDatabase
 			}
 		}
 	}
+
+	private void recordSecondPassReference(XMLDataObject dataObject)
+    {
+	    if(dataObject instanceof XMLDataObjectRef){
+	    	OTID otid = getOTID(dataObject);
+	    	XMLDataObjectRef ref = (XMLDataObjectRef) dataObject;
+	    	if(ref.parent == null){
+	    		// scytacki: I'm not sure this will ever happen
+	    		logger.finest("Parent was null (object): " + otid);								
+	    	} else {
+	    		recordReference(ref.parent.getGlobalId(), otid, ref.property);
+	    	}
+	    }
+    }
 
 	private OTID getGlobalId(String idStr)
 	{
@@ -1037,13 +1016,13 @@ public class XMLDatabase
 			// can't reference "null"
 			return;
 		}
-		
-		OTID parentID = parent.getGlobalId();
+
 		if (child instanceof XMLDataObjectRef) {
-			// save these and process them in the second pass so that we can correctly resolve the references
-			secondPassReferences.put((XMLDataObjectRef) child, parentID);
+			// this will be handled in the second pass
 			return;
 		}
+		
+		OTID parentID = parent.getGlobalId();
 		OTID childID = child.getGlobalId();
 
 		recordReference(parentID, childID, property);
