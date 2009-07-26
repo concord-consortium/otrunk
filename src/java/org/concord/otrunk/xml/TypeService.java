@@ -44,6 +44,7 @@ import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTXMLString;
 import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.framework.otrunk.otcore.OTEnum;
 import org.concord.framework.otrunk.otcore.OTType;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataList;
@@ -73,6 +74,7 @@ public class TypeService
     public final static String BLOB = "blob";
     public final static String LIST = "list";
     public final static String MAP = "map";
+    public final static String ENUM = "enum";
     public final static String OBJECT = "object";
 
     /**
@@ -247,7 +249,12 @@ public class TypeService
 	public ResourceTypeHandler getElementHandler(OTType otType)
 	{
 		ResourceTypeHandler handler = (ResourceTypeHandler) handlerByOTTypeMap.get(otType);
-
+		
+		if(handler == null && otType instanceof OTEnum) {
+			handler = new EnumTypeHandler((OTEnum) otType);
+			handlerByOTTypeMap.put(otType, handler);
+		}
+		
 		return handler;
 	}
 	

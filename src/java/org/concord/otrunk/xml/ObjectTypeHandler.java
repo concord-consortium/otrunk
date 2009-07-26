@@ -45,6 +45,7 @@ import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTUUID;
+import org.concord.otrunk.xml.XMLReferenceInfo.XmlType;
 
 /**
  * ObjectTypeHandler
@@ -187,7 +188,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			try {
 			    
 				Object resValue = handleChildResource(element, attribName, 
-				        attrib.getValue(), objRelativePath, obj, XMLReferenceInfo.ATTRIBUTE,
+				        attrib.getValue(), objRelativePath, obj, XmlType.ATTRIBUTE,
 				        null);
 				obj.setResource(attribName, resValue);
 				
@@ -197,7 +198,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 						info = new XMLReferenceInfo();
 						obj.setResourceInfo(attribName, info);
 					}
-					info.type = XMLReferenceInfo.ATTRIBUTE;				
+					info.xmlType = XmlType.ATTRIBUTE;				
 				}
 			} catch (HandlerException e) {
 				logger.warning(e.getMessage() + " in attribute: " +
@@ -221,7 +222,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		    OTXMLElement child = (OTXMLElement) childContent;
 			try {
 				Object resValue = handleChildResource(element, child.getName(), 
-				        child, objRelativePath, obj, XMLReferenceInfo.ELEMENT, previousComment);
+				        child, objRelativePath, obj, XmlType.ELEMENT, previousComment);
 				if(resValue == null) {
                     // this should be an option debug or log message
 					// System.out.println("null resource: " + TypeService.elementPath(child));
@@ -234,7 +235,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 						info = new XMLReferenceInfo();
 						obj.setResourceInfo(childName, info);
 					}
-					info.type = XMLReferenceInfo.ELEMENT;									
+					info.xmlType = XmlType.ELEMENT;									
 				}
 			} catch (HandlerException e) {
 				logger.log(Level.WARNING, "error in element: " +
@@ -274,7 +275,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	 */
 	public Object handleChildResource(OTXMLElement parentElement, String childName, 
 	        Object childObj, String relativeParentPath, XMLDataObject parent, 
-	        int xmlType, String comment)
+	        XmlType xmlType, String comment)
 		throws HandlerException
 	{
 		OTClassProperty otProperty = otClass.getProperty(childName);
@@ -292,7 +293,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				resInfo = new XMLReferenceInfo();
 				parent.setResourceInfo(childName, resInfo);
 			}
-			resInfo.type = xmlType;
+			resInfo.xmlType = xmlType;
 			
 			resInfo.comment = comment;
 		}

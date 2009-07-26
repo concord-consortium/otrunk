@@ -60,6 +60,8 @@ import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
+import org.concord.otrunk.xml.XMLReferenceInfo.EnumType;
+import org.concord.otrunk.xml.XMLReferenceInfo.XmlType;
 import org.jdom.Comment;
 import org.jdom.Content;
 import org.jdom.Document;
@@ -690,7 +692,7 @@ public class ExporterJDOM
 				BlobResource blob = (BlobResource) resource;
 				URL blobUrl = blob.getBlobURL();
 				String blobString = null;
-				int defaultType = XMLReferenceInfo.ELEMENT;
+				XmlType defaultType = XmlType.ELEMENT;
 				if(blobUrl != null){
 					if(contextURL != null){
 						blobString = URLUtil.getRelativeURL(contextURL, blobUrl);
@@ -698,7 +700,7 @@ public class ExporterJDOM
 						blobString = blobUrl.toString();
 					}
 					
-					defaultType = XMLReferenceInfo.ATTRIBUTE;
+					defaultType = XmlType.ATTRIBUTE;
 				} else {
 					blobString = BlobTypeHandler.base64(blob.getBytes());
 				}
@@ -720,7 +722,7 @@ public class ExporterJDOM
 
 				String primitiveString = resource.toString();
 				writeResource(dataObj, objectEl, resourceName, primitiveString, 
-						XMLReferenceInfo.ATTRIBUTE);				
+						XmlType.ATTRIBUTE);				
 			} else if(resource instanceof OTXMLString) {
 				// The xml string is wrapped with a fake root element
 				// and loaded as a JDOM document
@@ -766,18 +768,41 @@ public class ExporterJDOM
 	            	if (!saveAnyway){
 	            		throw new Exception("JDOMParseException caught. User will edit invalid XML");
 	            	} else {
-						writeResource(dataObj, objectEl, resourceName, XMLStringTypeHandler.INVALID_PREFIX + originalString, XMLReferenceInfo.ELEMENT);
+						writeResource(dataObj, objectEl, resourceName, 
+							XMLStringTypeHandler.INVALID_PREFIX + originalString, XmlType.ELEMENT);
 	            	}
 					e.printStackTrace();					
 				}
 			} else if(resource instanceof String) {
 				writeResource(dataObj, objectEl, resourceName, (String) resource, 
-						XMLReferenceInfo.ATTRIBUTE);								
+						XmlType.ATTRIBUTE);								
+			} else if(resource instanceof Enum) {
+				EnumType enumType = EnumType.STRING;
+				if(dataObj instanceof XMLDataObject){
+					XMLDataObject xmlObj = (XMLDataObject)dataObj;
+					XMLReferenceInfo resInfo = xmlObj.getReferenceInfo(resourceName);
+					if(resInfo != null){
+						enumType = resInfo.enumType;
+					}
+				} 
+
+				String str = null;
+				switch(enumType){
+				case INT:
+					str = Integer.toString(((Enum)resource).ordinal());
+					break;
+				case STRING:
+					str = ((Enum)resource).name();
+					break;
+				}
+				
+				writeResource(dataObj, objectEl, resourceName, str, 
+					XmlType.ATTRIBUTE);								
 			} else {
 				String primitiveString = resource.toString();
 
 				writeResource(dataObj, objectEl, resourceName, primitiveString, 
-						XMLReferenceInfo.ATTRIBUTE);				
+						XmlType.ATTRIBUTE);				
 			}
 		}
 		
@@ -898,7 +923,7 @@ public class ExporterJDOM
 	
 	public static void writeResource(OTDataObject dataObj, Element objectEl, 
 		String resourceName, String resourceValue, 
-			int defaultType)
+			XmlType defaultType)
 	{
 		XMLReferenceInfo resInfo = null;
 		if(dataObj instanceof XMLDataObject){
@@ -906,10 +931,10 @@ public class ExporterJDOM
 			resInfo = xmlObj.getReferenceInfo(resourceName);
 		}
 		
-		boolean writeElement = defaultType == XMLReferenceInfo.ELEMENT;
+		boolean writeElement = defaultType == XmlType.ELEMENT;
 
 		if(resInfo != null){
-			writeElement = resInfo.type == XMLReferenceInfo.ELEMENT;
+			writeElement = resInfo.xmlType == XmlType.ELEMENT;
 			if(resInfo.comment != null){
 				Comment comment = new Comment(resInfo.comment);
 				objectEl.addContent(comment);
