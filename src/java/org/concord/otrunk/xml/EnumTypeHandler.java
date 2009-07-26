@@ -1,7 +1,6 @@
 package org.concord.otrunk.xml;
 
 import org.concord.framework.otrunk.otcore.OTEnum;
-import org.concord.otrunk.datamodel.EnumResource;
 import org.concord.otrunk.xml.XMLReferenceInfo.EnumType;
 
 public class EnumTypeHandler extends PrimitiveResourceTypeHandler
