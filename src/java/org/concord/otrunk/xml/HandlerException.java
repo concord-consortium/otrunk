@@ -35,14 +35,14 @@ package org.concord.otrunk.xml;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class HandleElementException extends Exception 
+public class HandlerException extends Exception 
 {
 	/**
 	 * Not intended to be serialized, just added remove compile warning
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public HandleElementException(String message)
+	public HandlerException(String message)
 	{
 		super(message);
 	}

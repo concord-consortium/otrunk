@@ -55,12 +55,12 @@ public class DoubleTypeHandler extends PrimitiveResourceTypeHandler
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
 	public Object handleElement(String value)
-		throws HandleElementException
+		throws HandlerException
 	{
 		try {
 			return Double.valueOf(value);
 		} catch (Throwable e) {
-			throw new HandleElementException("malformed double");
+			throw new HandlerException("malformed double");
 		}
 	}
 
