@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="bb369df9-7a29-11de-9aa2-57046e13c363">
+  <imports>
+    <import class="org.concord.otrunk.test.OTEnumTestObject" />
+  </imports>
+  <objects>
+    <OTEnumTestObject enumProp1="CONST3" enumProp2="0" />
+  </objects>
+</otrunk>
+

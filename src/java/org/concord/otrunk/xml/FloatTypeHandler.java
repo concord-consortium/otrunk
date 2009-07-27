@@ -55,12 +55,12 @@ public class FloatTypeHandler extends PrimitiveResourceTypeHandler
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
 	public Object handleElement(String value)
-		throws HandleElementException
+		throws HandlerException
 	{
 		try {
 			return Float.valueOf(value);
 		} catch (Throwable e) {
-			throw new HandleElementException("malformed float");
+			throw new HandlerException("malformed float");
 		}
 	}
 

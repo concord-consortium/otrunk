@@ -66,8 +66,9 @@ public class MapTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.xml.ResourceTypeHandler#handleElement(org.jdom.Element, java.util.Properties)
 	 */
+	@Override
 	public Object handleElement(OTXMLElement element, String relativePath,
-	        XMLDataObject parent)
+	        XMLDataObject parent, String propertyName)
 	{
 		XMLDataMap map = new XMLDataMap(parent);
 		
@@ -93,24 +94,25 @@ public class MapTypeHandler extends ResourceTypeHandler
 			}
 			
 		    String childRelativePath = null;
+		    String keyString = "['" + key + "']";
 		    if(relativePath != null) {
-		        childRelativePath = relativePath + "['" + key + "']";		        
+		        childRelativePath = relativePath + keyString;		        
 		    }
 
 		    OTXMLElement valueElement = (OTXMLElement)entryChildren.get(0);
-		    value = typeService.handleLiteralElement(valueElement, childRelativePath);
-		    if (parent != null) {
-		    	if (value instanceof OTDataObject) {
-					OTDataObject obj = (OTDataObject) value;
-					logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
-					// FIXME Not sure what the property string is here...
-					xmlDB.recordReference(parent, obj, relativePath);
-				}
-			}
+		    value = typeService.handleLiteralElement(valueElement, childRelativePath, parent, propertyName + keyString);
 		    map.put(key, value);
 		}
 
 		return map;
 	}
 
+	@Override
+    public Object handleAttribute(String value, String name, XMLDataObject parent)
+        throws HandlerException
+    {
+		throw new HandlerException(
+			"Maps cannot be attributes. path: " + 
+			TypeService.elementPath(parent.getElement()) + "/" + name);
+    }
 }

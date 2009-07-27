@@ -183,6 +183,33 @@ public class XMLDataObject
 		return resources.get(key);
 	}
 
+	Object getResourceWithSuffix(String key)
+	{
+		int suffixStartIndex = key.indexOf('[');
+		if(suffixStartIndex == -1){
+			return getResource(key);
+		}
+		
+		int suffixEndIndex = key.indexOf(']');
+		if(suffixEndIndex == -1){
+			throw new IllegalStateException("invalid key format: " + key);
+		}
+		
+		String property = key.substring(0, suffixStartIndex);
+		Object resource = getResource(property);
+		if(resource instanceof XMLDataList){
+			XMLDataList list = (XMLDataList) resource;
+			String indexStr = key.substring(suffixStartIndex+1, suffixEndIndex);
+			return list.get(Integer.parseInt(indexStr));
+		} else if(resource instanceof XMLDataMap){
+			XMLDataMap map = (XMLDataMap) resource;
+			String mapKey = key.substring(suffixStartIndex+2, suffixEndIndex-1);
+			return map.get(mapKey);
+		} else {
+			throw new IllegalStateException("unknown resource type for key: " + key);
+		}		
+	}
+	
 	public void setResourceInfo(String key, XMLReferenceInfo info)
 	{
 		referenceInfoMap.put(key, info);
