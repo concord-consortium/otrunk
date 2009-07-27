@@ -60,8 +60,6 @@ import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
-import org.concord.otrunk.xml.XMLReferenceInfo.EnumType;
-import org.concord.otrunk.xml.XMLReferenceInfo.XmlType;
 import org.jdom.Comment;
 import org.jdom.Content;
 import org.jdom.Document;
@@ -140,15 +138,6 @@ public class ExporterJDOM
 		writeDocument(doc, outputStream);
 	}
 
-	public static void exportWithUnixSep(Writer writer, OTDataObject rootObject, OTDatabase db)
-	throws Exception
-	{		
-		ExporterJDOM exporter = new ExporterJDOM();
-		Document doc = exporter.buildDocument(rootObject, db);
-		
-		writeDocument(doc, writer, "\n");
-	}
-
 	/**
 	 * Calling this method is a unsafe when the writer is writing to a File.  
 	 * As soon as the writer is created, the file gets erased.  So if there is an 
@@ -182,16 +171,7 @@ public class ExporterJDOM
 	public static void writeDocument(Document doc, Writer writer)
 	throws Exception
 	{
-		writeDocument(doc, writer, null);
-	}
-	
-	public static void writeDocument(Document doc, Writer writer, String lineSep)
-	throws Exception
-	{
 		Format format = Format.getPrettyFormat();
-		if(lineSep != null){
-			format.setLineSeparator(lineSep);
-		}
 		XMLOutputter outputter = new XMLOutputter(format);
 
 		outputter.output(doc, writer);
@@ -647,8 +627,7 @@ public class ExporterJDOM
 							content.add(new Comment(info.comment));
 						}
 					}
-					Element collectionEl = exportCollectionItem(dataObj, listElement, 
-						resourceName + "[" + j + "]");
+					Element collectionEl = exportCollectionItem(dataObj, listElement, resourceName);
 					if(collectionEl != null){
 						content.add(collectionEl);
 					}
@@ -683,8 +662,7 @@ public class ExporterJDOM
 			    	entryEl.setAttribute("key", exportedKey);
 			    	
 			        Object mapValue = map.get(mapKeys[j]);
-			        Element collectionEl = exportCollectionItem(dataObj, mapValue, 
-			        	resourceName + "['" + exportedKey + "']");
+			        Element collectionEl = exportCollectionItem(dataObj, mapValue, resourceName);
 			        entryEl.addContent(collectionEl);
 			    }
 			    writeResourceElement(dataObj, objectEl, resourceName, content);
@@ -692,7 +670,7 @@ public class ExporterJDOM
 				BlobResource blob = (BlobResource) resource;
 				URL blobUrl = blob.getBlobURL();
 				String blobString = null;
-				XmlType defaultType = XmlType.ELEMENT;
+				int defaultType = XMLReferenceInfo.ELEMENT;
 				if(blobUrl != null){
 					if(contextURL != null){
 						blobString = URLUtil.getRelativeURL(contextURL, blobUrl);
@@ -700,7 +678,7 @@ public class ExporterJDOM
 						blobString = blobUrl.toString();
 					}
 					
-					defaultType = XmlType.ATTRIBUTE;
+					defaultType = XMLReferenceInfo.ATTRIBUTE;
 				} else {
 					blobString = BlobTypeHandler.base64(blob.getBytes());
 				}
@@ -722,7 +700,7 @@ public class ExporterJDOM
 
 				String primitiveString = resource.toString();
 				writeResource(dataObj, objectEl, resourceName, primitiveString, 
-						XmlType.ATTRIBUTE);				
+						XMLReferenceInfo.ATTRIBUTE);				
 			} else if(resource instanceof OTXMLString) {
 				// The xml string is wrapped with a fake root element
 				// and loaded as a JDOM document
@@ -768,41 +746,18 @@ public class ExporterJDOM
 	            	if (!saveAnyway){
 	            		throw new Exception("JDOMParseException caught. User will edit invalid XML");
 	            	} else {
-						writeResource(dataObj, objectEl, resourceName, 
-							XMLStringTypeHandler.INVALID_PREFIX + originalString, XmlType.ELEMENT);
+						writeResource(dataObj, objectEl, resourceName, XMLStringTypeHandler.INVALID_PREFIX + originalString, XMLReferenceInfo.ELEMENT);
 	            	}
 					e.printStackTrace();					
 				}
 			} else if(resource instanceof String) {
 				writeResource(dataObj, objectEl, resourceName, (String) resource, 
-						XmlType.ATTRIBUTE);								
-			} else if(resource instanceof Enum) {
-				EnumType enumType = EnumType.STRING;
-				if(dataObj instanceof XMLDataObject){
-					XMLDataObject xmlObj = (XMLDataObject)dataObj;
-					XMLReferenceInfo resInfo = xmlObj.getReferenceInfo(resourceName);
-					if(resInfo != null){
-						enumType = resInfo.enumType;
-					}
-				} 
-
-				String str = null;
-				switch(enumType){
-				case INT:
-					str = Integer.toString(((Enum)resource).ordinal());
-					break;
-				case STRING:
-					str = ((Enum)resource).name();
-					break;
-				}
-				
-				writeResource(dataObj, objectEl, resourceName, str, 
-					XmlType.ATTRIBUTE);								
+						XMLReferenceInfo.ATTRIBUTE);								
 			} else {
 				String primitiveString = resource.toString();
 
 				writeResource(dataObj, objectEl, resourceName, primitiveString, 
-						XmlType.ATTRIBUTE);				
+						XMLReferenceInfo.ATTRIBUTE);				
 			}
 		}
 		
@@ -869,20 +824,41 @@ public class ExporterJDOM
 		if(parent == container && 
 						parentResourceName.equals(containerResourceName)){
 			// our parent is the container and our parent property is the same as the container property
-			// so the actual object should be written here
 			return false;
 		}
 
 		// this isn't the parent, or it isn't the right resource in the parent
-		Object containedValue = container.getResourceWithSuffix(containerResourceName);
+		Object containedValue = container.getResource(containerResourceName);
 		if(containedValue.equals(id)){
 			// the container still contains the correct value						
 			// so just write a reference here
 			return true;
 		}
-
-		// The container doesn't reference this object anymore, or at least not in the 
-		// same spot as before, so the full object needs to be written
+					
+		if(containedValue instanceof OTDataList){
+			OTDataList dataListContainer = ((OTDataList)containedValue);
+			for(int i=0; i<dataListContainer.size(); i++){
+				if(id.equals(dataListContainer.get(i))){
+					// our container list still references us
+					return true;
+				}
+			}						
+			// our container list doesn't reference us anymore
+			return false;
+		}
+					
+		if(containedValue instanceof OTDataMap){
+			OTDataMap dataMapContainer = (OTDataMap) containedValue;
+			String [] keys = dataMapContainer.getKeys();
+			for(int i=0; i<keys.length; i++){
+				if(id.equals(dataMapContainer.get(keys[i]))){
+					// our previous container map still references us
+					return true;
+				}
+			}
+			return false;
+		}
+		
 		return false;
     }
     
@@ -923,7 +899,7 @@ public class ExporterJDOM
 	
 	public static void writeResource(OTDataObject dataObj, Element objectEl, 
 		String resourceName, String resourceValue, 
-			XmlType defaultType)
+			int defaultType)
 	{
 		XMLReferenceInfo resInfo = null;
 		if(dataObj instanceof XMLDataObject){
@@ -931,10 +907,10 @@ public class ExporterJDOM
 			resInfo = xmlObj.getReferenceInfo(resourceName);
 		}
 		
-		boolean writeElement = defaultType == XmlType.ELEMENT;
+		boolean writeElement = defaultType == XMLReferenceInfo.ELEMENT;
 
 		if(resInfo != null){
-			writeElement = resInfo.xmlType == XmlType.ELEMENT;
+			writeElement = resInfo.type == XMLReferenceInfo.ELEMENT;
 			if(resInfo.comment != null){
 				Comment comment = new Comment(resInfo.comment);
 				objectEl.addContent(comment);

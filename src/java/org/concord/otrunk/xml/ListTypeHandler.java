@@ -62,9 +62,8 @@ public class ListTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
-	@Override
 	public Object handleElement(OTXMLElement element, String relativePath,
-	        XMLDataObject parent, String propertyName)
+	        XMLDataObject parent)
 	{
 		XMLDataList list = new XMLDataList(parent);
 		
@@ -101,11 +100,21 @@ public class ListTypeHandler extends ResourceTypeHandler
 			}
 
 			String childRelativePath = null;
-			String indexString = "[" + index + "]";
 		    if(relativePath != null) {
-		        childRelativePath = relativePath + indexString;		        
+		        childRelativePath = relativePath + "[" + index + "]";		        
 		    }
-			Object resValue = typeService.handleLiteralElement(child, childRelativePath, parent, propertyName + indexString);
+			Object resValue = typeService.handleLiteralElement(child, childRelativePath);
+			if (parent != null) {
+				if (resValue instanceof XMLDataObjectRef) {
+					logger.finest("Processed refid: " + ((XMLDataObjectRef)resValue).getRefId());
+					xmlDB.recordReference(parent, (XMLDataObjectRef)resValue, relativePath);
+				} else if (resValue instanceof OTDataObject) {
+    				OTDataObject obj = (OTDataObject) resValue;
+					logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
+					// FIXME Not sure what the property string is here...
+					xmlDB.recordReference(parent, obj, relativePath);
+				}
+			}
 			list.add(resValue);
 			index++;
 			
@@ -114,13 +123,4 @@ public class ListTypeHandler extends ResourceTypeHandler
 
 		return list;
 	}
-
-	@Override
-    public Object handleAttribute(String value, String name, XMLDataObject parent)
-        throws HandlerException
-    {
-		throw new HandlerException(
-			"Lists cannot be attributes. path: " + 
-			TypeService.elementPath(parent.getElement()) + "/" + name);
-    }
 }

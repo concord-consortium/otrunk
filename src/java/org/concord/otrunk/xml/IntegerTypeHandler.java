@@ -53,12 +53,12 @@ public class IntegerTypeHandler extends PrimitiveResourceTypeHandler
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
 	public Object handleElement(String value)
-		throws HandlerException
+		throws HandleElementException
 	{
 		try {
 			return Integer.decode(value);
 		} catch (Throwable e) {
-			throw new HandlerException("malformed integer");
+			throw new HandleElementException("malformed integer");
 		}
 	}
 

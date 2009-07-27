@@ -46,8 +46,8 @@ public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler
 		this.primitiveClass = primitiveClass;
 	}
 	
-	abstract protected Object handleElement(String value)
-		throws HandlerException;
+	abstract public Object handleElement(String value)
+		throws HandleElementException;
 	
 	/**
 	 * You must override this method if this resource needs more than a string
@@ -57,18 +57,12 @@ public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler
 	 * @return
 	 */
 	public Object handleElement(OTXMLElement element, String relativePath, 
-	        XMLDataObject parent, String propertyName)
-	throws HandlerException
+	        XMLDataObject parent)
+	throws HandleElementException
 	{
 		return handleElement(element.getTextTrim());
 	}
 	
-	public Object handleAttribute(String value, String name, XMLDataObject parent)
-	throws HandlerException
-	{
-		return handleElement(value);
-	}
-
 	public Class<?> getPrimitiveClass()
 	{
 		return primitiveClass;

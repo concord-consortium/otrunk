@@ -46,9 +46,6 @@ package org.concord.otrunk.xml;
 public class XMLDataObjectRef extends XMLDataObject
 {
 	String refId = null;
-	XMLDataObject parent;
-	String property;
-	
 	
 	/**
 	 * @return Returns the refId.
@@ -65,13 +62,28 @@ public class XMLDataObjectRef extends XMLDataObject
 		this.refId = refId;
 	}
 	
-	public XMLDataObjectRef(String id, OTXMLElement element, XMLDataObject parent, 
-		String property)
+	public XMLDataObjectRef(String id, OTXMLElement element)
 	{
 		super(element, null, null);
 		
-		setRefId(id);
-		this.parent = parent;
-		this.property = property;
-	}	
+		setRefId(id);		
+	}
+	/**
+	 * @param obj
+	 * @param name
+	 */
+	public void setReferenceSource(XMLDataObject obj, String name)
+	{
+		// TODO Auto-generated method stub		
+	}
+	
+	public void setReferenceSource(XMLDataList list, int index)
+	{
+		// TODO
+	}
+	
+	public void setReferenceSource(XMLDataMap map, String key)
+	{
+		// TODO
+	}
 }

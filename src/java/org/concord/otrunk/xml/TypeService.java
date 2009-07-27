@@ -44,7 +44,6 @@ import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.framework.otrunk.OTXMLString;
 import org.concord.framework.otrunk.otcore.OTClass;
-import org.concord.framework.otrunk.otcore.OTEnum;
 import org.concord.framework.otrunk.otcore.OTType;
 import org.concord.otrunk.datamodel.BlobResource;
 import org.concord.otrunk.datamodel.OTDataList;
@@ -74,7 +73,6 @@ public class TypeService
     public final static String BLOB = "blob";
     public final static String LIST = "list";
     public final static String MAP = "map";
-    public final static String ENUM = "enum";
     public final static String OBJECT = "object";
 
     /**
@@ -175,7 +173,7 @@ public class TypeService
 	
 	HashMap<String, ResourceTypeHandler> handlerMap = new HashMap<String, ResourceTypeHandler>();
 	private HashMap<String, OTClass> shortcutMap = new HashMap<String, OTClass>();
-	private HashMap<OTType, ResourceTypeHandler> handlerByOTTypeMap = 
+	private HashMap<OTType, ResourceTypeHandler> handlerByOTClassMap = 
 		new HashMap<OTType, ResourceTypeHandler>();
 
 	public TypeService(URL contextURL)
@@ -199,18 +197,18 @@ public class TypeService
 			handlerMap.put(handlers[i].getPrimitiveName(), handlers[i]);
 		}
 		
-		handlerByOTTypeMap.put(OTCorePackage.BOOLEAN_TYPE,       handlers[0]);
-		handlerByOTTypeMap.put(OTCorePackage.INTEGER_TYPE,       handlers[1]);
-		handlerByOTTypeMap.put(OTCorePackage.LONG_TYPE,          handlers[2]);
-		handlerByOTTypeMap.put(OTCorePackage.FLOAT_TYPE,         handlers[3]);
-		handlerByOTTypeMap.put(OTCorePackage.DOUBLE_TYPE,        handlers[4]);
-		handlerByOTTypeMap.put(OTCorePackage.STRING_TYPE,        handlers[5]);
-		handlerByOTTypeMap.put(OTCorePackage.XML_STRING_TYPE,    handlers[6]);
-		handlerByOTTypeMap.put(OTCorePackage.BLOB_TYPE,          handlers[7]);
-		handlerByOTTypeMap.put(OTCorePackage.OBJECT_LIST_TYPE,   handlers[8]);
-		handlerByOTTypeMap.put(OTCorePackage.RESOURCE_LIST_TYPE, handlers[8]);
-		handlerByOTTypeMap.put(OTCorePackage.OBJECT_MAP_TYPE,    handlers[9]);
-		handlerByOTTypeMap.put(OTCorePackage.RESOURCE_MAP_TYPE,  handlers[9]);
+		handlerByOTClassMap.put(OTCorePackage.BOOLEAN_TYPE,       handlers[0]);
+		handlerByOTClassMap.put(OTCorePackage.INTEGER_TYPE,       handlers[1]);
+		handlerByOTClassMap.put(OTCorePackage.LONG_TYPE,          handlers[2]);
+		handlerByOTClassMap.put(OTCorePackage.FLOAT_TYPE,         handlers[3]);
+		handlerByOTClassMap.put(OTCorePackage.DOUBLE_TYPE,        handlers[4]);
+		handlerByOTClassMap.put(OTCorePackage.STRING_TYPE,        handlers[5]);
+		handlerByOTClassMap.put(OTCorePackage.XML_STRING_TYPE,    handlers[6]);
+		handlerByOTClassMap.put(OTCorePackage.BLOB_TYPE,          handlers[7]);
+		handlerByOTClassMap.put(OTCorePackage.OBJECT_LIST_TYPE,   handlers[8]);
+		handlerByOTClassMap.put(OTCorePackage.RESOURCE_LIST_TYPE, handlers[8]);
+		handlerByOTClassMap.put(OTCorePackage.OBJECT_MAP_TYPE,    handlers[9]);
+		handlerByOTClassMap.put(OTCorePackage.RESOURCE_MAP_TYPE,  handlers[9]);
 	}
 	
 	public void registerUserType(String name, ResourceTypeHandler handler)
@@ -220,7 +218,7 @@ public class TypeService
 	
 	public void registerUserType(OTClass otClass, ResourceTypeHandler handler)
 	{
-		handlerByOTTypeMap.put(otClass, handler);
+		handlerByOTClassMap.put(otClass, handler);
 	}	
 	
 	public void registerShortcutName(String name, OTClass otClass)
@@ -248,12 +246,7 @@ public class TypeService
 
 	public ResourceTypeHandler getElementHandler(OTType otType)
 	{
-		ResourceTypeHandler handler = (ResourceTypeHandler) handlerByOTTypeMap.get(otType);
-		
-		if(handler == null && otType instanceof OTEnum) {
-			handler = new EnumTypeHandler((OTEnum) otType);
-			handlerByOTTypeMap.put(otType, handler);
-		}
+		ResourceTypeHandler handler = (ResourceTypeHandler) handlerByOTClassMap.get(otType);
 		
 		return handler;
 	}
@@ -293,7 +286,7 @@ public class TypeService
 	 * @param child
 	 * @return
 	 */
-	public Object handleLiteralElement(OTXMLElement child, String relativePath, XMLDataObject parent, String propertyName)
+	public Object handleLiteralElement(OTXMLElement child, String relativePath)
 	{
 		String childName = child.getName();
 
@@ -312,8 +305,8 @@ public class TypeService
 		}
 		
 		try {
-			return handler.handleElement(child, relativePath, parent, propertyName);
-		} catch (HandlerException e) {
+			return handler.handleElement(child, relativePath, null);
+		} catch (HandleElementException e) {
 			logger.warning("Error reading element: " + TypeService.elementPath(child));
 			return null;
 		}
