@@ -59,12 +59,9 @@ public abstract class ResourceTypeHandler
 	 * @return
 	 */
 	public abstract Object handleElement(OTXMLElement element, 
-	        String relativePath, XMLDataObject parent, String propertyName)
-		throws HandlerException;
+	        String relativePath, XMLDataObject parent)
+		throws HandleElementException;
 
-	public abstract Object handleAttribute(String value, String name, XMLDataObject parent)
-		throws HandlerException;
-	
 	public String getPrimitiveName()
 	{
 		return primitiveName;

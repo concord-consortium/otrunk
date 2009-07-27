@@ -46,7 +46,6 @@ public class ReflectiveOTClassFactory
     public final static String BLOB = "blob";
     public final static String LIST = "list";
     public final static String MAP = "map";
-    public final static String ENUM = "enum";
     public final static String OBJECT = "object";
 
     public static ReflectiveOTClassFactory singleton = new ReflectiveOTClassFactory(); 
@@ -325,9 +324,7 @@ public class ReflectiveOTClassFactory
 		} else if(OTResourceMap.class.isAssignableFrom(klass) ||
 				OTObjectMap.class.isAssignableFrom(klass)) {
 			return MAP;
-		} else if(Enum.class.isAssignableFrom(klass)){
-			return ENUM;
-		}
+		} 
 		
 		return null;
 	}
@@ -398,9 +395,7 @@ public class ReflectiveOTClassFactory
 			} else if(resourceTypeClass.equals(OTObjectMap.class)){
 				otType = OTCorePackage.OBJECT_MAP_TYPE;
 			}
-		} else if(TypeService.ENUM.equals(resourceType)){
-			otType = new OTEnumImpl(resourceTypeClass);
-		}
+		} 
 
 		return otType;
 	}

@@ -60,7 +60,7 @@ public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 	 * @see org.concord.otrunk.xml.ResourceTypeHandler#handleElement(org.jdom.Element, java.util.Properties)
 	 */	
 	public Object handleElement(String urlStr)
-		throws HandlerException
+		throws HandleElementException
 	{		
 		try {
 			// check if the urlStr is a gzipped base64.
@@ -79,7 +79,7 @@ public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 		} catch(Exception e) {
 		//	e.printStackTrace();
 			System.err.println("Could not load "+urlStr);
-			throw new HandlerException("malformed url for blob");
+			throw new HandleElementException("malformed url for blob");
 		} 		
 	}
 

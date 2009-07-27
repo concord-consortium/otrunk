@@ -91,9 +91,6 @@ public class ReferenceTest extends TestCase
 		OTObject obj = getObject("object_list_sibling", false);
 		ArrayList<ArrayList<OTDataPropertyReference>> references = otrunk.getIncomingReferences(obj.getGlobalId(), false);
 		makeSureArraysMatch(extractReferences(references), expectedReferences);
-		
-		// check if the propertyName of the reference is what it should be
-		assertEquals("objectList[0]", references.get(1).get(0).getProperty());
 	}
 	
 	private void makeSureArraysMatch(ArrayList<OTID> results, ArrayList<OTID> expected) throws Exception {

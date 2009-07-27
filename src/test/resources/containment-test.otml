@@ -1,37 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <otrunk id="33754150-b594-11d9-9669-0800200c9a66">
-  <imports>
-    <import class="org.concord.otrunk.OTSystem" />
-    <import class="org.concord.otrunk.test.OTBasicTestObject" />
-    <import class="org.concord.otrunk.test.OTListTestObject" />
-    <import class="org.concord.otrunk.view.OTViewService" />
-  </imports>
-  <objects>
-    <OTSystem>
-      <services>
-        <OTViewService />
-      </services>
-      <root>
-        <OTListTestObject name="root list">
-          <!--  These is a test to see if the serializer preserves comments on 
+	<imports>
+		<import class="org.concord.otrunk.OTSystem" />
+		<import class="org.concord.otrunk.view.OTFolderObject" />
+		<import class="org.concord.otrunk.view.document.OTCompoundDoc"/>
+		<import class="org.concord.otrunk.view.OTViewEntry" />
+		<import class="org.concord.otrunk.view.OTViewService" />
+	</imports>
+	<objects>
+		<OTSystem>
+			<services>
+				<OTViewService />
+			</services>
+			<root>
+				<OTCompoundDoc name="root folder">
+				    <!--  These is a test to see if the serializer preserves comments on 
 				    	list references.  -->
-          <objectList>
-            <OTBasicTestObject>
-              <!--  this tests to see if serializer preserves the type of resource -->
-              <name>local obj</name>
-            </OTBasicTestObject>
-            <!--  this is a test to see if the serializer preserves comments on
+					<children>
+						<OTFolderObject>
+						  <!--  this tests to see if serializer preserves the type of resource -->
+						  <name>local folder</name>
+						</OTFolderObject>
+						<!--  this is a test to see if the serializer preserves comments on
 						   list elements -->
-            <object refid="${same_list_obj}" />
-            <object refid="${library_obj}" />
-            <OTBasicTestObject local_id="same_list_obj" name="same list obj" />
-          </objectList>
-        </OTListTestObject>
-      </root>
-      <library>
-        <OTBasicTestObject local_id="library_obj" name="library obj" />
-      </library>
-    </OTSystem>
-  </objects>
+						<object refid="${doc_refs_folder}"/>
+						<object refid="${library_folder}"/>
+					</children>
+					<documentRefs>
+						<OTFolderObject local_id="doc_refs_folder"
+							name="doc refs folder" />
+					</documentRefs>
+				</OTCompoundDoc>
+			</root>
+			<library>
+				<OTFolderObject local_id="library_folder" name="library folder"/>
+			</library>
+		</OTSystem>
+	</objects>
 </otrunk>
-

@@ -142,6 +142,7 @@ public class OTObjectInternal implements OTObjectInterface
     	changeEvent.setPreviousValue(previousValue);
     	
     	try {
+
     		for(int i=0;i<changeListeners.size(); i++){
     			WeakReference<OTChangeListener> ref = changeListeners.get(i);
     			OTChangeListener listener = ref.get();

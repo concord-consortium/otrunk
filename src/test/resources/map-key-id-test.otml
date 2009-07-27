@@ -1,38 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<otrunk id="33754150-b594-11d9-9669-0800200c9a66">
+<otrunk id="33754150-b594-11d9-9669-0800200c9a66" >
   <imports>
-    <import class="org.concord.otrunk.OTSystem" />
-    <import class="org.concord.otrunk.view.OTViewEntry" />
-    <import class="org.concord.otrunk.view.OTViewService" />
-    <import class="org.concord.otrunk.test.OTMapTestObject" />
-    <import class="org.concord.otrunk.test.OTBasicTestObject" />
+    <import class="org.concord.otrunk.OTSystem"/>
+    <import class="org.concord.otrunk.view.OTViewEntry"/>
+    <import class="org.concord.otrunk.view.OTViewService"/>
+    <import class="org.concord.otrunk.test.OTMapTestObject"/>
+    <import class="org.concord.otrunk.test.OTBasicTestObject"/>
   </imports>
   <objects>
     <OTSystem>
       <services>
-        <OTViewService />
+        <OTViewService/>
       </services>
       <root>
         <OTMapTestObject name="Map Test">
           <resourceMap>
-            <entry key="${basic1}">
-              <string>value1</string>
-            </entry>
-            <entry key="${basic2}">
-              <null />
-            </entry>
-            <entry key="${basic3}">
-              <string>value3</string>
-            </entry>
+            <entry key="${basic1}"><string>value1</string></entry>
+            <entry key="${basic2}"><null/></entry>
+            <entry key="${basic3}"><string>value3</string></entry>
           </resourceMap>
         </OTMapTestObject>
       </root>
       <library>
-        <OTBasicTestObject local_id="basic1" />
-        <OTBasicTestObject local_id="basic2" />
-        <OTBasicTestObject local_id="basic3" />
+        <OTBasicTestObject local_id="basic1"/>
+        <OTBasicTestObject local_id="basic2"/>
+        <OTBasicTestObject local_id="basic3"/>        
       </library>
     </OTSystem>
   </objects>
 </otrunk>
-
