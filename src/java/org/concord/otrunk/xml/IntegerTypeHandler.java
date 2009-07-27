@@ -52,6 +52,7 @@ public class IntegerTypeHandler extends PrimitiveResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
+	@Override
 	public Object handleElement(String value)
 		throws HandlerException
 	{

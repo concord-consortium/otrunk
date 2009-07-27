@@ -822,6 +822,7 @@ public class XMLDatabase
 				Object resourceValue = resourceEntry.getValue();
 				Object newResourceValue = null;
 				String resourceKey = resourceEntry.getKey();
+				logger.finest("Processing key: " + resourceKey + ", with value: " + resourceValue);
 				if (resourceValue instanceof XMLDataObject) {
 					XMLDataObject resourceValueObj = (XMLDataObject) resourceValue;
 					newResourceValue = getOTID(resourceValueObj);
@@ -887,7 +888,7 @@ public class XMLDatabase
 					    ((XMLParsableString) resourceValue).parse(localIdMap);
 					xmlDObj.setResource(resourceKey, newResourceValue);
 				} else {
-					logger.finest("Not valid object type: " + resourceValue);
+					logger.finest("Not valid object type: " + resourceValue.getClass().getName());
 				}
 			}
 

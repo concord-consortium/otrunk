@@ -61,8 +61,9 @@ public class XMLStringTypeHandler extends PrimitiveResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
+	@Override
 	public Object handleElement(OTXMLElement element, String relativePath,
-	        XMLDataObject parent)
+	        XMLDataObject parent, String propertyName)
 	{	    
 	    String contentStr = element.getContentAsXMLText();
 	    if(contentStr.startsWith(INVALID_PREFIX)){

@@ -56,6 +56,7 @@ public abstract class PrimitiveResourceTypeHandler extends ResourceTypeHandler
 	 * @param element
 	 * @return
 	 */
+	@Override
 	public Object handleElement(OTXMLElement element, String relativePath, 
 	        XMLDataObject parent, String propertyName)
 	throws HandlerException
