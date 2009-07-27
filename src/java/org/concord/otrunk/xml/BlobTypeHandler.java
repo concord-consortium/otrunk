@@ -59,6 +59,7 @@ public class BlobTypeHandler extends PrimitiveResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.otrunk.xml.ResourceTypeHandler#handleElement(org.jdom.Element, java.util.Properties)
 	 */	
+	@Override
 	public Object handleElement(String urlStr)
 		throws HandlerException
 	{		
