@@ -142,7 +142,6 @@ public class OTObjectInternal implements OTObjectInterface
     	changeEvent.setPreviousValue(previousValue);
     	
     	try {
-
     		for(int i=0;i<changeListeners.size(); i++){
     			WeakReference<OTChangeListener> ref = changeListeners.get(i);
     			OTChangeListener listener = ref.get();
@@ -484,11 +483,9 @@ public class OTObjectInternal implements OTObjectInterface
 	    				returnType == Boolean.class || returnType == Short.class ||
 	    				returnType == Character.class || returnType == Integer.class ||
 	    				returnType == Float.class || returnType == Double.class ||
-	    				returnType == Long.class || Enum.class.isAssignableFrom(returnType))) {
+	    				returnType == Long.class)) {
 	    	Object defaultValue = property.getDefault();
-	    	if(defaultValue == null && 
-	    			returnType != String.class && 
-	    			!Enum.class.isAssignableFrom(returnType)){
+	    	if(defaultValue == null && returnType != String.class){
 	    		throw new RuntimeException("No default value set for \"" + resourceName + "\" " +
 	    				"in class: " + otClass.getName());	        		
 	    	}
