@@ -888,7 +888,7 @@ public class XMLDatabase
 					    ((XMLParsableString) resourceValue).parse(localIdMap);
 					xmlDObj.setResource(resourceKey, newResourceValue);
 				} else {
-					logger.finest("Not valid object type: " + resourceValue.getClass().getName());
+					logger.finest("Not valid object type: " + resourceValue);
 				}
 			}
 
