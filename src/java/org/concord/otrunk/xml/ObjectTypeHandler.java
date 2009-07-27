@@ -45,6 +45,7 @@ import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDataObjectType;
 import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTUUID;
+import org.concord.otrunk.xml.XMLReferenceInfo.XmlType;
 
 /**
  * ObjectTypeHandler
@@ -106,20 +107,13 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	/* (non-Javadoc)
 	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
 	 */
+	@Override
 	public Object handleElement(OTXMLElement element, String relativePath,
-	        XMLDataObject parent)
+	        XMLDataObject parent, String propertyName)
 	{
 		if(isObjectReferenceHandler()){
 			String refid = element.getAttributeValue("refid");
-			if(refid != null && refid.length() > 0){
-				XMLDataObjectRef ref = new XMLDataObjectRef(refid, element);
-				if (parent != null) {
-    				logger.finest("Processed refid: " + refid + " of parent: " + parent.getGlobalId());
-    				// FIXME Not sure what the property string is here...
-    				xmlDB.recordReference(parent, ref, relativePath);
-				}
-				return ref;
-			}
+			return handleRefid(refid, parent, element, propertyName);
 		}
 		
 		String idStr = element.getAttributeValue("id");
@@ -149,6 +143,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		        	obj.setPreserveUUID(true);
 		        }
 		    }
+		    obj.setContainer(parent);
+		    obj.setContainerResourceKey(propertyName);
 		} catch (Exception e) {
 			logger.log(Level.WARNING, "Failed to created data object", e);
 			return null;
@@ -192,7 +188,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			try {
 			    
 				Object resValue = handleChildResource(element, attribName, 
-				        attrib.getValue(), objRelativePath, obj, XMLReferenceInfo.ATTRIBUTE,
+				        attrib.getValue(), objRelativePath, obj, XmlType.ATTRIBUTE,
 				        null);
 				obj.setResource(attribName, resValue);
 				
@@ -202,9 +198,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 						info = new XMLReferenceInfo();
 						obj.setResourceInfo(attribName, info);
 					}
-					info.type = XMLReferenceInfo.ATTRIBUTE;				
+					info.xmlType = XmlType.ATTRIBUTE;				
 				}
-			} catch (HandleElementException e) {
+			} catch (HandlerException e) {
 				logger.warning(e.getMessage() + " in attribute: " +
 						TypeService.attributePath(attrib));
 			}
@@ -226,7 +222,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		    OTXMLElement child = (OTXMLElement) childContent;
 			try {
 				Object resValue = handleChildResource(element, child.getName(), 
-				        child, objRelativePath, obj, XMLReferenceInfo.ELEMENT, previousComment);
+				        child, objRelativePath, obj, XmlType.ELEMENT, previousComment);
 				if(resValue == null) {
                     // this should be an option debug or log message
 					// System.out.println("null resource: " + TypeService.elementPath(child));
@@ -239,9 +235,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 						info = new XMLReferenceInfo();
 						obj.setResourceInfo(childName, info);
 					}
-					info.type = XMLReferenceInfo.ELEMENT;									
+					info.xmlType = XmlType.ELEMENT;									
 				}
-			} catch (HandleElementException e) {
+			} catch (HandlerException e) {
 				logger.log(Level.WARNING, "error in element: " +
 						TypeService.elementPath(child), e);
 			}
@@ -279,8 +275,8 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 	 */
 	public Object handleChildResource(OTXMLElement parentElement, String childName, 
 	        Object childObj, String relativeParentPath, XMLDataObject parent, 
-	        int xmlType, String comment)
-		throws HandleElementException
+	        XmlType xmlType, String comment)
+		throws HandlerException
 	{
 		OTClassProperty otProperty = otClass.getProperty(childName);
 		if(otProperty == null) {
@@ -297,25 +293,20 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 				resInfo = new XMLReferenceInfo();
 				parent.setResourceInfo(childName, resInfo);
 			}
-			resInfo.type = xmlType;
+			resInfo.xmlType = xmlType;
 			
 			resInfo.comment = comment;
 		}
 
+		// This should be refactored so this case is handled by the handleAttribute method
+		// of this class
 		if(otType instanceof OTClass &&
 				childObj instanceof String){
 		    
 		    // this is an object reference
 			String refid = (String)childObj;
-			if(refid != null && refid.length() > 0){
-				XMLDataObjectRef ref = new XMLDataObjectRef(refid, parentElement);
-				if (parent != null) {
-    				logger.finest("Processed refid: " + refid + " of parent: " + parent.getGlobalId());
-    				// FIXME Not sure what the property string is here...
-    				xmlDB.recordReference(parent, ref, childName);
-				}
-				return ref;
-			}		    
+			
+			return handleRefid(refid, parent, parentElement, childName);
 		}
 		
 		if(otType instanceof OTClass) {
@@ -327,6 +318,9 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 
 			// This allows users to put refid on the attribute element:
 			// like: <OTGraph><xAxis refid="id_of_some_other_object"/></OTGraph>
+			// FIXME this used to work but I don't see how it could work now.
+			// If it hasn't worked for a whiel it should be removed because it is 
+			// really unnecessary.
 			String childRefId = child.getAttributeValue("refid");
 			
 			// If this element doesn't have a reference id then 
@@ -373,8 +367,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 					" on class: " + otClass.getName()); 
 		}
 		
-		ResourceTypeHandler resHandler = typeService.getElementHandler(otType);
-		
+		ResourceTypeHandler resHandler = typeService.getElementHandler(otType);		
 		if(resHandler == null){
 			logger.warning("Can't find type handler for: " +
 					otType.getName());
@@ -382,16 +375,11 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		}
 		
 		if(childObj instanceof String) {
-			if(resHandler instanceof PrimitiveResourceTypeHandler){
-				return ((PrimitiveResourceTypeHandler)resHandler).
-					handleElement((String)childObj);
-			} else {
-				throw new HandleElementException("Can't use an attribute for a non-primitive type");
-			}
+			return resHandler.handleAttribute((String)childObj, childName, parent);
 		} else {
 		    String childRelativePath = relativeParentPath + "/" + childName;
 			return resHandler.handleElement((OTXMLElement)childObj, childRelativePath,
-			        parent);
+			        parent, childName);
 		}		
 	}
 	
@@ -408,6 +396,30 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 			return parentType;
 		}
 		return null;		
+	}
+
+	/**
+	 * FIXME this method isn't used yet, but using it should simplify the 
+	 * handleChildResource method.
+	 * 
+	 */
+	@Override
+    public Object handleAttribute(String value, String name, XMLDataObject parent)
+        throws HandlerException
+    {
+		return handleRefid(value, parent, parent.getElement(), name);
+    }
+	
+	private Object handleRefid(String refid, XMLDataObject referringObject, 
+		OTXMLElement element, String property)
+	{
+		if(refid != null && refid.length() > 0){
+			logger.finest("Handling refid: " + refid + " of parent: " + referringObject.getGlobalId());
+			return new XMLDataObjectRef(refid, element, referringObject, property);
+		}
+
+		logger.warning("id cannot be an empty string or null");
+		return null;
 	}
 	
 }

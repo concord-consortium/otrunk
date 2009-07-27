@@ -484,9 +484,11 @@ public class OTObjectInternal implements OTObjectInterface
 	    				returnType == Boolean.class || returnType == Short.class ||
 	    				returnType == Character.class || returnType == Integer.class ||
 	    				returnType == Float.class || returnType == Double.class ||
-	    				returnType == Long.class)) {
+	    				returnType == Long.class || Enum.class.isAssignableFrom(returnType))) {
 	    	Object defaultValue = property.getDefault();
-	    	if(defaultValue == null && returnType != String.class){
+	    	if(defaultValue == null && 
+	    			returnType != String.class && 
+	    			!Enum.class.isAssignableFrom(returnType)){
 	    		throw new RuntimeException("No default value set for \"" + resourceName + "\" " +
 	    				"in class: " + otClass.getName());	        		
 	    	}
