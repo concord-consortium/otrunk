@@ -1,66 +1,12 @@
 package org.concord.otrunk.test2;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-
-import org.concord.framework.otrunk.OTObject;
-import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.OTrunk;
-import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.OTrunkUtil;
-import org.concord.otrunk.datamodel.OTDatabase;
-import org.concord.otrunk.test.OTBasicTestObject;
 import org.concord.otrunk.test.OTEnumTestObject;
 import org.concord.otrunk.test.OTListTestObject;
+import org.concord.otrunk.test.RoundTrip;
 import org.concord.otrunk.test.OTEnumTestObject.TestEnum;
-import org.concord.otrunk.view.OTFolder;
-import org.concord.otrunk.view.OTViewerHelper;
-import org.concord.otrunk.xml.XMLDatabase;
 
-import junit.framework.TestCase;
-
-public class EnumTest extends TestCase
-{
-	OTViewerHelper viewerHelper;
-	XMLDatabase db;
-	OTrunk otrunk;
-	
-	public void initOTrunk() throws Exception
-	{
-		viewerHelper = new OTViewerHelper();
-
-		// create  an empty database
-		db = new XMLDatabase();
-
-        viewerHelper.loadOTrunk2(null, db);
-
-        otrunk = viewerHelper.getOtrunk();		
-	}
-
-	public void reload() throws Exception
-	{
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		viewerHelper.saveOTDatabase(db, output);
-		output.close();
-		
-		InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(output.toByteArray()));
-		BufferedReader bufReader = new BufferedReader(reader);
-		String line;
-		while((line = bufReader.readLine()) != null){
-			System.out.println(line);
-		}
-		
-		viewerHelper = new OTViewerHelper();
-		
-		db = (XMLDatabase) viewerHelper.loadOTDatabase(new ByteArrayInputStream(output.toByteArray()), 
-			null);
-		
-		viewerHelper.loadOTrunk2(null, db);		
-	}
-	
+public class EnumTest extends RoundTrip
+{	
 	public void testBasicRoundTrip() throws Exception
 	{
 		initOTrunk();
