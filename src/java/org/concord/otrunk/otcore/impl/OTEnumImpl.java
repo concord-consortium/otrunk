@@ -13,32 +13,6 @@ public class OTEnumImpl extends OTTypeImpl
 	    	throw new IllegalStateException("The instance class of an OTEnumImpl must be an Enum");
 	    }
     }
-
-	public boolean validInt(int testInt)
-    {
-		Class<Enum> instanceClass2 = (Class<Enum>) getInstanceClass();
-	
-		for(Enum constant: instanceClass2.getEnumConstants()){
-			if(constant.ordinal() == testInt){
-				return true;
-			}
-		}
-		
-		return false;
-    }
-
-	public boolean validName(int testName)
-    {
-		Class<Enum> instanceClass2 = (Class<Enum>) getInstanceClass();
-	
-		for(Enum constant: instanceClass2.getEnumConstants()){
-			if(constant.name().equals(testName)){
-				return true;
-			}
-		}
-		
-		return false;
-    }
 	
 	public Object getValue(int valueOrdinal)
 	{
