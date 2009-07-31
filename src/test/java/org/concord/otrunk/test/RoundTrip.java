@@ -1,15 +1,8 @@
 package org.concord.otrunk.test;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-
 import junit.framework.TestCase;
 
-import org.concord.framework.otrunk.OTrunk;
-import org.concord.otrunk.view.OTViewerHelper;
-import org.concord.otrunk.xml.XMLDatabase;
+import org.concord.framework.otrunk.OTObject;
 
 /**
  * This is intended to be extended so test round tripping various OTrunk
@@ -20,40 +13,25 @@ import org.concord.otrunk.xml.XMLDatabase;
  */
 public class RoundTrip extends TestCase
 {
-	protected OTViewerHelper viewerHelper;
-	XMLDatabase db;
-	protected OTrunk otrunk;
+	private RoundTripHelper helper;
 	
-	public void initOTrunk() throws Exception
+	public void initOTrunk(Class<? extends OTObject> otClass) throws Exception
 	{
-		viewerHelper = new OTViewerHelper();
-
-		// create  an empty database
-		db = new XMLDatabase();
-
-        viewerHelper.loadOTrunk2(null, db);
-
-        otrunk = viewerHelper.getOtrunk();		
+		helper.initOTrunk(otClass);
 	}
 
 	public void reload() throws Exception
 	{
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		viewerHelper.saveOTDatabase(db, output);
-		output.close();
-		
-		InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(output.toByteArray()));
-		BufferedReader bufReader = new BufferedReader(reader);
-		String line;
-		while((line = bufReader.readLine()) != null){
-			System.out.println(line);
-		}
-		
-		viewerHelper = new OTViewerHelper();
-		
-		db = (XMLDatabase) viewerHelper.loadOTDatabase(new ByteArrayInputStream(output.toByteArray()), 
-			null);
-		
-		viewerHelper.loadOTrunk2(null, db);		
+		helper.reload();
 	}	
+	
+	public OTObject getRootObject() throws Exception
+	{
+		return helper.getRootObject();
+	}
+	
+	public void setHelper(RoundTripHelper helper)
+    {
+	    this.helper = helper;
+    }
 }
