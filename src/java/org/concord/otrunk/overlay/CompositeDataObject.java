@@ -86,6 +86,9 @@ public class CompositeDataObject
 		database = db;
 		this.middleDeltas = middleDeltas;
 		this.composite = composite;
+		if(composite){
+			activeDeltaObject = database.getActiveDeltaObject(baseObject);
+		}
 	}
 	
 	public OTDatabase getDatabase()
@@ -100,14 +103,7 @@ public class CompositeDataObject
 
 	public OTDataObject getActiveDeltaObject()
 	{
-	    if(activeDeltaObject != null) {
-	        return activeDeltaObject;
-	    } else {
-            // I don't know if I should do this but it should speed things
-            // up
-            activeDeltaObject = database.getActiveDeltaObject(baseObject);
-	        return activeDeltaObject;
-	    }
+		return activeDeltaObject;
 	}
 			
 	/* (non-Javadoc)
@@ -224,14 +220,12 @@ public class CompositeDataObject
 
 	public OTDataObject getOrCreateActiveDeltaObject()
 	{
-	    OTDataObject localActiveDelta = getActiveDeltaObject();
-		
-		if(localActiveDelta == null) {
-			localActiveDelta = database.createActiveDeltaObject(baseObject);			
-			logger.fine("created delta object: " + localActiveDelta.getGlobalId().toExternalForm());			
+		if(activeDeltaObject == null) {
+			activeDeltaObject = database.createActiveDeltaObject(baseObject);			
+			logger.fine("created delta object: " + activeDeltaObject.getGlobalId().toExternalForm());			
 		}
 		
-		return localActiveDelta;
+		return activeDeltaObject;
 	}
 	
 	/* (non-Javadoc)
