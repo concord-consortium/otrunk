@@ -34,4 +34,10 @@ public class RoundTrip extends TestCase
     {
 	    this.helper = helper;
     }
+	
+	public <T extends OTObject> T createObject(Class<T> klass) 
+		throws Exception
+	{
+		return helper.createObject(klass);
+	}
 }

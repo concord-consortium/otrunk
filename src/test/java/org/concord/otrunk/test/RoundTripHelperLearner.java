@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.view.OTMLUserSession;
 import org.concord.otrunk.view.OTViewerHelper;
@@ -25,6 +26,7 @@ public class RoundTripHelperLearner implements RoundTripHelper
 	private XMLDatabase learnerDb;
 	private OTrunk otrunk;
 	private OTMLUserSession userSession;
+	private OTObjectService otObjectService;
 	
 	public void initOTrunk(Class<? extends OTObject> otClass) throws Exception
 	{
@@ -70,10 +72,18 @@ public class RoundTripHelperLearner implements RoundTripHelper
 			null);
         
         viewerHelper.loadUserData(learnerDb, null);
+        
+        otObjectService = viewerHelper.getRootObject().getOTObjectService();
 	}	
 	
 	public OTObject getRootObject() throws Exception
 	{
 		return viewerHelper.getRootObject();
 	}
+	
+	public <T extends OTObject> T createObject(Class<T> klass) throws Exception
+	{
+        return otObjectService.createObject(klass);
+	}
+
 }
