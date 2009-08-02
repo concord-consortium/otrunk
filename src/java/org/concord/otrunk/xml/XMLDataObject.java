@@ -200,7 +200,11 @@ public class XMLDataObject
 		if(resource instanceof XMLDataList){
 			XMLDataList list = (XMLDataList) resource;
 			String indexStr = key.substring(suffixStartIndex+1, suffixEndIndex);
-			return list.get(Integer.parseInt(indexStr));
+			int index = Integer.parseInt(indexStr);
+			if(index < 0 || index >= list.size()){
+				return null;
+			}
+			return list.get(index);
 		} else if(resource instanceof XMLDataMap){
 			XMLDataMap map = (XMLDataMap) resource;
 			String mapKey = key.substring(suffixStartIndex+2, suffixEndIndex-1);

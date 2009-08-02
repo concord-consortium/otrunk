@@ -875,12 +875,14 @@ public class ExporterJDOM
 
 		// this isn't the parent, or it isn't the right resource in the parent
 		Object containedValue = container.getResourceWithSuffix(containerResourceName);
-		if(containedValue.equals(id)){
+
+		// the containedValue can be null if it doesn't exist any more
+		if(id.equals(containedValue)){
 			// the container still contains the correct value						
 			// so just write a reference here
 			return true;
 		}
-
+		
 		// The container doesn't reference this object anymore, or at least not in the 
 		// same spot as before, so the full object needs to be written
 		return false;
