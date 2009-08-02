@@ -72,4 +72,10 @@ public class RoundTripHelperAuthoring implements RoundTripHelper
 	{
 		return viewerHelper.getRootObject();
 	}
+	
+	public <T extends OTObject> T createObject(Class<T> klass) throws Exception
+	{
+        return otrunk.createObject(klass);
+	}
+
 }

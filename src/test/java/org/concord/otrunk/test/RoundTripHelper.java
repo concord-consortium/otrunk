@@ -14,4 +14,6 @@ public interface RoundTripHelper
 	public abstract OTObject getRootObject()
 	    throws Exception;
 
+	public <T extends OTObject> T createObject(Class<T> klass) 
+		throws Exception;
 }
