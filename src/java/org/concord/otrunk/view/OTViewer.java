@@ -56,6 +56,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -113,6 +115,7 @@ import org.concord.framework.otrunk.view.OTViewContainerListener;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.text.UserMessageHandler;
+import org.concord.framework.text.UserMessageHandlerExt1;
 import org.concord.framework.util.SimpleTreeNode;
 import org.concord.otrunk.OTMLToXHTMLConverter;
 import org.concord.otrunk.OTSystem;
@@ -1348,7 +1351,9 @@ public class OTViewer extends JFrame
                 case 2:
                     logger.info("Saving authored data");
                     saveAction.actionPerformed(null);
-                    break;
+                    // check again if the save was successful
+                    // it is possible there was an error and the save was unsuccessful.
+                    return checkForUnsavedAuthorData();                	
                 }
             }
         }
@@ -1902,7 +1907,7 @@ public class OTViewer extends JFrame
                                 xmlDB);
                             xmlDB.setDirty(false);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                        	handleSavingException(e);
                         }
                     }
                 } // end if (remoteUrl == null)
@@ -1956,7 +1961,7 @@ public class OTViewer extends JFrame
                             currentURL = file.toURL();
                             xmlDB.setDirty(false);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            handleSavingException(e);
                         }
                     }
 
@@ -1966,6 +1971,7 @@ public class OTViewer extends JFrame
 
                 }
             }
+
         };
 
         saveRemoteAsAction = new AbstractAction("Save Remotely As...") {
@@ -2197,6 +2203,29 @@ public class OTViewer extends JFrame
             // If this suceeds then the VM will exit so
             // the window will get disposed
             exit();
+        }
+    }
+
+    private void handleSavingException(Exception e)
+    {
+        e.printStackTrace();
+        UserMessageHandler service = otrunk.getService(UserMessageHandler.class);
+        String title = "Saving Error!";
+        String message = "There was an error saving!\n";
+        message += "Please click on the details button and send the text to the developers.\n";
+        message += "If you were overwritting an existing file, that file should be not have changed.\n";
+        message += "Any changes made since the last save will be lost when you quit, so if possible\n";
+        message += "copy and paste your changes into a text editor.\n";
+        message += "Then restart the application and reload your last saved file.\n";
+        message += "When quiting the application you'll need to click the 'don't save' button.";
+        if(service instanceof UserMessageHandlerExt1){
+        	StringWriter sw = new StringWriter();
+        	PrintWriter printStream = new PrintWriter(sw);
+        	e.printStackTrace(printStream);
+        	printStream.close();
+        	((UserMessageHandlerExt1) service).showMessage(message, title, sw.toString());
+        } else if(service != null){
+        	service.showMessage(message, title);
         }
     }
 } // @jve:decl-index=0:visual-constraint="10,10"
