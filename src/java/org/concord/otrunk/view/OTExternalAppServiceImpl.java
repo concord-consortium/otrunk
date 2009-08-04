@@ -1,6 +1,7 @@
 package org.concord.otrunk.view;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 
@@ -63,7 +64,11 @@ public class OTExternalAppServiceImpl
 		} catch (ClassNotFoundException e){
 			// the jnlp classes can't be found so 
 			return false;
-		}catch (Exception exp) {
+		} catch (InvocationTargetException e){
+			// the jnlp classes are found but they throw an exception when called
+			// probably because the classes are on the classpath but we aren't running in webstart
+			return false;
+		} catch (Exception exp) {
 			// Some other exception occurred.
 			System.err.println("Can't open external link.");
 			exp.printStackTrace();
