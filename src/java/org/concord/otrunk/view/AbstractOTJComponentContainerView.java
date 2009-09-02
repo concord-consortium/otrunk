@@ -53,16 +53,23 @@ public abstract class AbstractOTJComponentContainerView extends AbstractOTJCompo
 	public JComponent createSubViewComponent(OTObject otObject, boolean useScrollPane, 
 		OTViewEntry viewEntry)
 	{
-		OTViewContainerPanel otObjectPanel = createViewContainerPanel();
-		otObjectPanel.setUseScrollPane(useScrollPane);
-		
-		// The OTViewContainerPanel automatically handles the OTViewChild object
-		otObjectPanel.setCurrentObject(otObject, viewEntry);
-		
-		// set parent of new viewcontainer to this viewcontainer
-		otObjectPanel.setParentContainer(viewContainer);
-		return otObjectPanel;
+		return createSubViewComponent(otObject, useScrollPane, viewEntry, false);
 	}
+	
+	public JComponent createSubViewComponent(OTObject otObject, boolean useScrollPane, 
+			OTViewEntry viewEntry, boolean isTopLevelContainer)
+		{
+			OTViewContainerPanel otObjectPanel = createViewContainerPanel();
+			otObjectPanel.setUseScrollPane(useScrollPane);
+			otObjectPanel.setTopLevelContainer(isTopLevelContainer);
+			
+			// The OTViewContainerPanel automatically handles the OTViewChild object
+			otObjectPanel.setCurrentObject(otObject, viewEntry);
+			
+			// set parent of new viewcontainer to this viewcontainer
+			otObjectPanel.setParentContainer(viewContainer);
+			return otObjectPanel;
+		}
 	
 	protected void removeAllSubViews()
     {
