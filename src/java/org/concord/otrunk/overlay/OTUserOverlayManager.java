@@ -32,6 +32,8 @@ public class OTUserOverlayManager
 	OTrunkImpl otrunk;
 	ArrayList<OverlayImpl> globalOverlays = new ArrayList<OverlayImpl>();
 	private final StandardPasswordAuthenticator authenticator = new StandardPasswordAuthenticator();
+	private HashMap<OTUserObject, ArrayList<OverlayUpdateListener>> listenerMap = new HashMap<OTUserObject, ArrayList<OverlayUpdateListener>>();
+	private ArrayList<OverlayUpdateListener> globalListeners = new ArrayList<OverlayUpdateListener>();
 
 	public OTUserOverlayManager(OTrunkImpl otrunk) {
 		this.otrunk = otrunk;
@@ -249,6 +251,56 @@ public class OTUserOverlayManager
 			logger.info("Modified times indicated reload needed. current: " + existingTime + ", server: " + serverTime);
 			remove(userObject);
 			add(xmlDb.getSourceURL(), userObject, false);
+			notifyListeners(userObject);
+		}
+	}
+	
+	private void notifyListeners(OTUserObject user) {
+		for (OverlayUpdateListener l : globalListeners) {
+			l.updated(user);
+		}
+		ArrayList<OverlayUpdateListener> listeners = listenerMap.get(user);
+		if (listeners != null) {
+			for (OverlayUpdateListener l : listeners) {
+				l.updated(user);
+			}
+		}
+	}
+	
+	/**
+	 * register a listener which will get notified when any user's overlay gets reloaded
+	 * @param listener
+	 */
+	public void addOverlayUpdateListener(OverlayUpdateListener listener) {
+		if (! globalListeners.contains(listener)) {
+			globalListeners.add(listener);
+		}
+	}
+	
+	/**
+	 * register a listener which will get notified when the specified user's overlay gets reloaded
+	 * @param listener
+	 * @param user
+	 */
+	public void addOverlayUpdateListener(OverlayUpdateListener listener, OTUserObject user) {
+		ArrayList<OverlayUpdateListener> currentListeners = listenerMap.get(user);
+		if (currentListeners == null) {
+			currentListeners = new ArrayList<OverlayUpdateListener>();
+		}
+		if (! currentListeners.contains(listener)) {
+			currentListeners.add(listener);
+		}
+		listenerMap.put(user, currentListeners);
+	}
+	
+	/**
+	 * remove a listener
+	 * @param listener
+	 */
+	public void removeOverlayUpdateListener(OverlayUpdateListener listener) {
+		globalListeners.remove(listener);
+		for (ArrayList<OverlayUpdateListener> listeners : listenerMap.values()) {
+			listeners.remove(listener);
 		}
 	}
 
