@@ -34,6 +34,12 @@ public class OTUserOverlayManager
 	private final StandardPasswordAuthenticator authenticator = new StandardPasswordAuthenticator();
 	private HashMap<OTUserObject, ArrayList<OverlayUpdateListener>> listenerMap = new HashMap<OTUserObject, ArrayList<OverlayUpdateListener>>();
 	private ArrayList<OverlayUpdateListener> globalListeners = new ArrayList<OverlayUpdateListener>();
+	
+	private static boolean doHeadBeforeGet = true;
+	
+	public static void setHeadBeforeGet(boolean doHead) {
+		doHeadBeforeGet = doHead;
+	}
 
 	public OTUserOverlayManager(OTrunkImpl otrunk) {
 		this.otrunk = otrunk;
@@ -170,7 +176,7 @@ public class OTUserOverlayManager
 	}
 	
 	public OTObject getOTObject(OTUserObject userObject, OTObject object) throws Exception {
-		userObject = getAuthoredObject(userObject);
+		// userObject = getAuthoredObject(userObject);
 		object = getAuthoredObject(object);
 		return getOTObject(userObject, object.getGlobalId());
 	}
@@ -235,20 +241,27 @@ public class OTUserOverlayManager
 		userObject = getAuthoredObject(userObject);
 		// check the last modified of the URL and the existing db, if they're different, remove and add the db again
 		XMLDatabase xmlDb = getXMLDatabase(getOverlay(userObject));
-		long existingTime = xmlDb.getUrlLastModifiedTime();
-		
-		URLConnection conn = xmlDb.getSourceURL().openConnection();
-		if (conn instanceof HttpURLConnection) {
-			((HttpURLConnection) conn).setRequestMethod(OTViewer.HTTP_HEAD);
+		if (doHeadBeforeGet) {
+    		long existingTime = xmlDb.getUrlLastModifiedTime();
+    		
+    		URLConnection conn = xmlDb.getSourceURL().openConnection();
+    		if (conn instanceof HttpURLConnection) {
+    			((HttpURLConnection) conn).setRequestMethod(OTViewer.HTTP_HEAD);
+    		}
+    		
+    		long serverTime = conn.getLastModified();
+    		logger.info("checking reload of: " + xmlDb.getSourceURL());
+    		if (existingTime != 0 && serverTime != 0 && existingTime == serverTime) {
+    			// no reload needed
+    			logger.info("Not reloading overlay as modified time is the same as the currently loaded version");
+    		} else {
+    			logger.info("Modified times indicated reload needed. current: " + existingTime + ", server: " + serverTime);
+    			remove(userObject);
+    			add(xmlDb.getSourceURL(), userObject, false);
+    			notifyListeners(userObject);
+    		}
 		}
-		
-		long serverTime = conn.getLastModified();
-		logger.info("checking reload of: " + xmlDb.getSourceURL());
-		if (existingTime != 0 && serverTime != 0 && existingTime == serverTime) {
-			// no reload needed
-			logger.info("Not reloading overlay as modified time is the same as the currently loaded version");
-		} else {
-			logger.info("Modified times indicated reload needed. current: " + existingTime + ", server: " + serverTime);
+		else {
 			remove(userObject);
 			add(xmlDb.getSourceURL(), userObject, false);
 			notifyListeners(userObject);
