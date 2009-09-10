@@ -699,7 +699,10 @@ public class OTViewer extends JFrame
 
         useScrollPane = true;
         if (mainFrame.getFrame() != null) {
-            if (mainFrame.getFrame().isResourceSet("width")
+        	if (mainFrame.getFrame().isResourceSet("openMaximized")
+        			&& mainFrame.getFrame().getOpenMaximized()){
+        		setExtendedState(Frame.MAXIMIZED_BOTH);
+        	} else if (mainFrame.getFrame().isResourceSet("width")
                     && mainFrame.getFrame().isResourceSet("height")) {
                 int cornerX = mainFrame.getFrame().getPositionX();
                 int cornerY = mainFrame.getFrame().getPositionY();
