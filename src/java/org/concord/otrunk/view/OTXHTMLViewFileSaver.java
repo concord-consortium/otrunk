@@ -63,7 +63,8 @@ public class OTXHTMLViewFileSaver
 			}
 			File outputFolder = new File(outputFolderStr);
 			outputFolder.mkdirs();
-			File fileToSave = new File(outputFolder, "index.html");
+			String fileName = System.getProperty("otrunk.html_output.file_name", "index.html");			
+			File fileToSave = new File(outputFolder, fileName);
 			
 			conv.setXHTMLParams(fileToSave, 800, 600);
 

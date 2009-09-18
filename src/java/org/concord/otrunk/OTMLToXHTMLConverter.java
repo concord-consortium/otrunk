@@ -54,11 +54,13 @@ import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.otrunk.view.OTXHTMLHelper;
 import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.otrunk.util.ComponentImageSaver;
+import org.concord.otrunk.view.OTConfig;
 
 public class OTMLToXHTMLConverter
     implements Runnable, OTXHTMLHelper
 {
-
+	public final static String XHTML_EXPORT_WRAP_PROP = "otrunk.xhtml_export_wrap";
+	
 	private OTObject[] topLevelOTObjects;
 	private OTViewEntry [] topLevelViewEntries;
 	
@@ -154,6 +156,8 @@ public class OTMLToXHTMLConverter
 
 	public void run()
 	{
+		boolean xhtmlOutput = OTConfig.getBooleanProp(XHTML_EXPORT_WRAP_PROP, true);
+		
 		if (outputFile == null) {
 			return;
 		}
@@ -264,7 +268,11 @@ public class OTMLToXHTMLConverter
 					}
 				}
 				m.appendTail(parsed);
-				text = "<div>" + parsed.toString() + "</div><hr/>";
+				if(xhtmlOutput){
+					text = "<div>" + parsed.toString() + "</div><hr/>";
+				} else {
+					text = parsed.toString();
+				}
 			} else {
 				text = embedOTObject(topLevelOTObjects[i], topLevelViewEntries[i]);
 			}
@@ -274,7 +282,11 @@ public class OTMLToXHTMLConverter
 
 		try {
 			FileWriter fos = new FileWriter(outputFile);
-			fos.write("<html><body>" + allTexts + "</body></html>");
+			if(xhtmlOutput){
+				fos.write("<html><body>" + allTexts + "</body></html>");
+			} else {
+				fos.write(allTexts);
+			}
 			fos.close();
 		} catch (FileNotFoundException exp) {
 			exp.printStackTrace();
