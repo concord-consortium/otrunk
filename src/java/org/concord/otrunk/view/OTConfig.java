@@ -53,7 +53,12 @@ public class OTConfig
     	}
     
     	try {
-    		return Boolean.getBoolean(property);
+        	String value = System.getProperty(property, null);
+        	if(value == null){
+        		return defaultValue;
+        	} else {
+        		return Boolean.parseBoolean(value);
+        	}
     	} catch (AccessControlException e){			
     		OTConfig.handlePropertyReadException(e);
     		return defaultValue;
