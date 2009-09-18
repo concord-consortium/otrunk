@@ -52,6 +52,7 @@ import org.concord.framework.text.UserMessageHandler;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkServiceEntry;
 import org.concord.otrunk.datamodel.OTDatabase;
+import org.concord.otrunk.handlers.UrlStreamHandlerFactory;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.ExporterJDOM;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -569,4 +570,15 @@ public class OTViewerHelper
 		OTrunkServiceEntry<T> entry = new OTrunkServiceEntry<T>(service, serviceInterface);
 		services.add(entry);
 	}
+	
+    static 
+    {
+    	try {
+    		UrlStreamHandlerFactory.registerHandlerClass(org.concord.otrunk.handlers.jres.Handler.class);
+    	} catch (Exception e){
+    		// don't do anything here. If SailStreamHandlerFactory has already been
+    		// created, SailOTViewer should have already added the handlers
+    	}
+    }
+
 }
