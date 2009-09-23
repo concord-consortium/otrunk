@@ -249,7 +249,7 @@ public class ObjectTypeHandler extends ResourceTypeHandler
 		if (parent != null) {
 			logger.finest("Processed child: " + obj.getGlobalId() + " of parent: " + parent.getGlobalId());
 			// FIXME Not sure what the property string is here...
-			xmlDB.recordReference(parent, obj, relativePath);
+			xmlDB.recordReference(parent, obj, propertyName);
 		}
 		
 		return obj;
