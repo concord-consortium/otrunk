@@ -126,7 +126,7 @@ public class OTLabbookManagerImpl
 	
 	private OTLabbookEntry createEntry(OTObject object, String type){
 		try {
-	        OTLabbookEntry entry = (OTLabbookEntry) resources.getOTObjectService().createObject(OTLabbookEntry.class);
+	        OTLabbookEntry entry = resources.getOTObjectService().createObject(OTLabbookEntry.class);
 	        entry.setOTObject(object);
 	        
 	        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d 'at' K:mm");
@@ -186,7 +186,7 @@ public class OTLabbookManagerImpl
 		labbookChangeEvent.setShowLabbook(tempShowLabbook);
 		
 		for (int i = 0; i < listeners.size(); i++) {
-	       ((OTChangeListener)listeners.get(i)).stateChanged(labbookChangeEvent); 
+	       (listeners.get(i)).stateChanged(labbookChangeEvent); 
         }
 	}
 
@@ -225,4 +225,9 @@ public class OTLabbookManagerImpl
 			return showLabbook;
 		}
 	}
+
+	public boolean getEmbedInDrawTool()
+    {
+	    return resources.getEmbedInDrawTool();
+    }
 }
