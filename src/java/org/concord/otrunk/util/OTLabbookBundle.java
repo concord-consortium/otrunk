@@ -20,6 +20,13 @@ public class OTLabbookBundle extends DefaultOTObject
 		 * the other categories
 		 */
         public OTObjectList getEntries();
+        
+        /**
+         * Whether the labbook should embed snapshots in a draw tool or not
+         * @return
+         */
+        public boolean getEmbedInDrawTool();
+        public static boolean DEFAULT_embedInDrawTool = true;
     }
 	
 	ResourceSchema resources;
@@ -34,7 +41,7 @@ public class OTLabbookBundle extends DefaultOTObject
 	public void initializeBundle(OTServiceContext serviceContext)
 	{
 		OTViewFactory viewFactory = 
-    		(OTViewFactory) serviceContext.getService(OTViewFactory.class);
+    		serviceContext.getService(OTViewFactory.class);
     	
     	OTViewContext factoryContext = viewFactory.getViewContext();    	
     	factoryContext.addViewService(OTLabbookManagerProvider.class, labbookManagerProvider);
