@@ -187,7 +187,7 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
         }
 	}
 
-	public boolean getEmbedXHTMLView()
+	public boolean getEmbedXHTMLView(OTObject otObject)
     {
 	    return true;
     }

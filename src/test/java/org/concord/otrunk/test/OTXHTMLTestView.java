@@ -17,7 +17,7 @@ public class OTXHTMLTestView
 	    return text;
     }
 
-	public boolean getEmbedXHTMLView()
+	public boolean getEmbedXHTMLView(OTObject otObject)
     {
 	    return true;
     }
