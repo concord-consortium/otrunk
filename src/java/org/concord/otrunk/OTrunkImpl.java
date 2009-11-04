@@ -672,7 +672,7 @@ public class OTrunkImpl implements OTrunk
             OTDataObject overlayModifications = ((CompositeDataObject)dataObject).getActiveDeltaObject();
             return overlayModifications != null;
         } else {
-        	logger.warning("This object isn't from an Overlay");
+        	logger.finest("This object isn't from an Overlay");
         }
     	
     	return false;
