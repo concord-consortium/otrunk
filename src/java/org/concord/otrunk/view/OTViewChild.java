@@ -14,7 +14,7 @@ public interface OTViewChild extends OTObjectInterface {
 	
 	public static boolean DEFAULT_useScrollPane = false;	
 	public boolean getUseScrollPane();
-	
+	public void setUseScrollPane(boolean useScrollPane);
 	
 	public static boolean DEFAULT_useHorizontalScrollPane = true;
 	/**
@@ -22,8 +22,10 @@ public interface OTViewChild extends OTObjectInterface {
 	 * @return
 	 */
 	public boolean getUseHorizontalScrollPane();
+	public void setUseHorizontalScrollPane(boolean useHorizontal);
 	
 	public static boolean DEFAULT_scrollPanelHasBorder = true;
 	public boolean getScrollPanelHasBorder();
+	public void setScrollPanelHasBorder(boolean hasBorder);
 	
 }
