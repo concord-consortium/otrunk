@@ -144,7 +144,17 @@ public class OTObjectInternal implements OTObjectInterface
     	try {
 
     		for(int i=0;i<changeListeners.size(); i++){
-    			WeakReference<OTChangeListener> ref = changeListeners.get(i);
+    			WeakReference<OTChangeListener> ref = null;
+    			try {
+    				ref = changeListeners.get(i);
+    			} catch (java.lang.IndexOutOfBoundsException e){
+					// listener was removed since entering this loop
+    				return;
+				}
+    			if (ref == null){
+    				return;
+    			}
+    			
     			OTChangeListener listener = ref.get();
     			if(traceListeners && !(listener instanceof InternalListener)){
     				System.out.println("sending stateChanged " + changeEvent.getDescription() +
@@ -183,9 +193,9 @@ public class OTObjectInternal implements OTObjectInterface
     			changeListeners.remove(toBeRemoved.get(i));
     		}
     	}
-		if(changeListeners.size() == 0){
-			changeListeners = null;
-		}
+//		if(changeListeners.size() == 0){
+//			changeListeners = null;
+//		}
     }
 
 	/* (non-Javadoc)
@@ -254,9 +264,9 @@ public class OTObjectInternal implements OTObjectInterface
 	            break;
 	        }
 	    }
-	    if(changeListeners.size() == 0) {
-	    	changeListeners = null;
-	    }
+//	    if(changeListeners.size() == 0) {
+//	    	changeListeners = null;
+//	    }
 	}
 
     public OTObject getOTObject(OTID childID) throws Exception
