@@ -1,6 +1,7 @@
 package org.concord.otrunk.view;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -218,6 +219,15 @@ public class OTGroupListManager extends DefaultOTObject
     		}
     	}
     	return null;
+    }
+    
+    public ArrayList<OTGroupMember> getMembers(OTObjectList users) {
+    	// OTObjectList list = resources.getOTObjectService().createObject(OTObjectList.class);
+    	ArrayList<OTGroupMember> list = new ArrayList<OTGroupMember>();
+    	for (OTObject user : users) {
+    		list.add(getMember((OTUserObject) user));
+    	}
+    	return list;
     }
 
 	/**
