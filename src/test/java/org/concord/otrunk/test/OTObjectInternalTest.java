@@ -21,7 +21,7 @@ public class OTObjectInternalTest extends TestCase
 	boolean noExceptionThrown;
 	
 	// run test for 500 ms
-    final long endTime = System.currentTimeMillis() + 1000;
+    final long endTime = System.currentTimeMillis() + 500;
 	
     /**
      * If OTObjectInternal believes it has listeners when an otObject is
@@ -81,6 +81,9 @@ public class OTObjectInternalTest extends TestCase
 	        		}
 	        	}
 	        };
+	        
+	        changeListenersThread.setPriority(Thread.MAX_PRIORITY);
+	        changeObjectThread.setPriority(Thread.MIN_PRIORITY);
 	        
 	        changeObjectThread.start();
 	        changeListenersThread.start();
