@@ -268,6 +268,13 @@ public class OTUserOverlayManager
 		}
 	}
 	
+	public long getLastModified(OTUserObject userObject) {
+		userObject = getAuthoredObject(userObject);
+		XMLDatabase xmlDb = getXMLDatabase(getOverlay(userObject));
+    	long existingTime = xmlDb.getUrlLastModifiedTime();
+    	return existingTime;
+	}
+	
 	private void notifyListeners(OTUserObject user) {
 		for (OverlayUpdateListener l : globalListeners) {
 			l.updated(user);

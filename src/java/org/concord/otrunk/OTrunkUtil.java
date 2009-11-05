@@ -318,13 +318,20 @@ public class OTrunkUtil
 	 * false in some cases when the objects are the same.  So use with caution.
 	 * @param obj1
 	 * @param obj2
-	 * @return
+	 * @return true if the same, false if different
 	 */
 	public static boolean compareObjects(OTObject obj1, OTObject obj2)
 	{	
 		return compareObjects(obj1, obj2, false);
 	}
 	
+	/**
+	 * Compare the content of the 2 objects.  This isn't complete, it will probably return
+	 * false in some cases when the objects are the same.  So use with caution.
+	 * @param obj1
+	 * @param obj2
+	 * @return true if the same, false if different
+	 */
 	public static boolean compareObjects(OTObject obj1, OTObject obj2, boolean compareXMLStrings)
 	{
 		OTClass otClass = obj1.otClass();
