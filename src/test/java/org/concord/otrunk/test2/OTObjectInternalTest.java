@@ -1,4 +1,4 @@
-package org.concord.otrunk.test;
+package org.concord.otrunk.test2;
 
 import java.util.Random;
 
