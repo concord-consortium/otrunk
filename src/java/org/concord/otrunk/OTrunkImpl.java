@@ -1074,6 +1074,7 @@ public class OTrunkImpl implements OTrunk
     public void setSailSavingDisabled(boolean sailSavingDisabled)
     {
 	    this.sailSavingDisabled = sailSavingDisabled;
+	    System.setProperty("sail.data.saving", Boolean.toString(! sailSavingDisabled));
     }
 
 	/**
