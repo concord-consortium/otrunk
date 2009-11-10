@@ -8,6 +8,7 @@ import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.view.OTLabbookManagerProvider;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
+import org.concord.otrunk.util.OTLabbookBundle.ResourceSchema.ImageFiletype;
 
 public class OTLabbookBundle extends DefaultOTObject
     implements OTBundle
@@ -27,6 +28,12 @@ public class OTLabbookBundle extends DefaultOTObject
          */
         public boolean getEmbedInDrawTool();
         public static boolean DEFAULT_embedInDrawTool = true;
+        
+
+        public enum ImageFiletype {PNG, JPG};
+        public ImageFiletype getSnapshotFiletype();
+        public void setSnapshotFiletype(ImageFiletype imageFiletype);
+        public ImageFiletype DEFAULT_snapshotFiletype = ImageFiletype.PNG;
     }
 	
 	ResourceSchema resources;
@@ -56,11 +63,20 @@ public class OTLabbookBundle extends DefaultOTObject
 	public ResourceSchema getResources(){
 		return resources;
 	}
+	
 	/**
-	 * @return Snapshots taken of models or other objects that don't fit into
-	 * the other categories
+	 * @return All lab book entries
 	 */
     public OTObjectList getEntries(){
     	return resources.getEntries();
     }
+    
+    public ImageFiletype getSnapshotFiletype(){
+    	return resources.getSnapshotFiletype();
+    }
+    
+    public void setSnapshotFiletype(ImageFiletype imageFiletype){
+    	resources.setSnapshotFiletype(imageFiletype);
+    }
+    
 }
