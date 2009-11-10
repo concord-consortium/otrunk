@@ -178,7 +178,15 @@ public class OTResourceListImpl extends OTResourceCollectionImpl
 
 	public boolean addAll(Collection<?> c)
 	{
-		throw new UnsupportedOperationException();
+		boolean added = true;
+		for (Object object : c) {
+			Object toBeStored = translateExternalToStored(object);
+			boolean a = list.add(toBeStored);
+			if (!a) added = false;
+        }
+
+		notifyOTChange(OTChangeEvent.OP_ADD, c, null);
+		return added;
 	}
 	
 	public boolean removeAll(Collection<?> c)
