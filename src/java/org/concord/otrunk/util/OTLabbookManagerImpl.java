@@ -9,6 +9,7 @@ import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.view.OTLabbookManager;
+import org.concord.otrunk.util.OTLabbookBundle.ResourceSchema.ImageFiletype;
 
 public class OTLabbookManagerImpl
     implements OTLabbookManager, OTChangeListener
@@ -230,4 +231,8 @@ public class OTLabbookManagerImpl
     {
 	    return resources.getEmbedInDrawTool();
     }
+	
+//	public ImageFiletype getSnapshotFiletype(){
+//		
+//	}
 }
