@@ -40,12 +40,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
@@ -63,19 +66,24 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -87,10 +95,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.JWindow;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -249,6 +259,7 @@ public class OTViewer extends JFrame
     private AbstractAction exportHiResImageAction;
     private AbstractAction exportToHtmlAction;
     private AbstractAction exportCurrentToHtmlAction;
+	private boolean settingUp;
 
     public OTViewer() {
         super();
@@ -633,6 +644,43 @@ public class OTViewer extends JFrame
                                 saveStateLabel.setText("Unsaved changes");
                             } else {
                                 saveStateLabel.setText("File saved");
+                                
+                                if (!settingUp){
+                                	// show save confirmation dialog
+                                    final JWindow savedWindow = new JWindow(OTViewer.this);
+                                    JLabel savedLabel = new JLabel("File saved");
+                                    savedLabel.setFont(saveStateLabel.getFont().deriveFont(Font.BOLD));
+                                    String fileName = currentAuthoredFile.getAbsolutePath();
+                                    if (fileName.length() > 35){
+                                    	fileName = "... "+fileName.substring(fileName.length()-35);
+                                    }
+    								JLabel locationLabel = new JLabel(fileName);
+    								locationLabel.setBorder(BorderFactory.createCompoundBorder(
+    								    BorderFactory.createLineBorder(Color.BLACK),
+    								    BorderFactory.createEmptyBorder(2, 2, 2, 2)));
+    								JPanel savedPanel = new JPanel(new GridBagLayout());
+    								GridBagConstraints gbc = new GridBagConstraints();
+    								gbc.insets = new Insets(5, 5, 5, 5);
+                        	        gbc.gridwidth = GridBagConstraints.REMAINDER;
+                                    savedPanel.add(savedLabel, gbc);
+                                    savedPanel.add(locationLabel, gbc);
+                                    savedPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                                    savedWindow.getContentPane().add(savedPanel);
+                                    savedWindow.pack();
+                                    Point labelLoc = saveStateLabel.getLocationOnScreen();
+                                    savedWindow.setLocation(new Point(labelLoc.x-30, labelLoc.y-30));
+                                    savedWindow.setVisible(true);
+                                    TimerTask closeTask = new TimerTask() {
+    									
+    									@Override
+    									public void run()
+    									{
+    										savedWindow.setVisible(false);
+    									}
+    								};
+    								Timer timer = new Timer();
+    								timer.schedule(closeTask, 2500);
+                                }
                             }
                             statusPanel.repaint();
                         }
@@ -923,10 +971,13 @@ public class OTViewer extends JFrame
 
         // set the viewFactory of the frame manager
         frameManager.setViewFactory(otViewFactory);
-
+        
+        settingUp = true;
         xmlDB.setDirty(false);
 
         reloadWindow();
+
+        settingUp = false;
     }
 
     public OTObject getAuthoredRoot()
