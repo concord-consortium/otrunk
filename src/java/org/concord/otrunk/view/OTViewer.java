@@ -89,6 +89,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -647,7 +648,8 @@ public class OTViewer extends JFrame
                                 
                                 if (!settingUp){
                                 	// show save confirmation dialog
-                                    final JWindow savedWindow = new JWindow(OTViewer.this);
+                                    final JPopupMenu savedWindow = new JPopupMenu();
+                                    savedWindow.setLightWeightPopupEnabled(true);
                                     JLabel savedLabel = new JLabel("File saved");
                                     savedLabel.setFont(saveStateLabel.getFont().deriveFont(Font.BOLD));
                                     String fileName = currentAuthoredFile.getAbsolutePath();
@@ -657,19 +659,20 @@ public class OTViewer extends JFrame
     								JLabel locationLabel = new JLabel(fileName);
     								locationLabel.setBorder(BorderFactory.createCompoundBorder(
     								    BorderFactory.createLineBorder(Color.BLACK),
-    								    BorderFactory.createEmptyBorder(2, 2, 2, 2)));
+    								    BorderFactory.createEmptyBorder(3, 3, 3, 3)));
     								JPanel savedPanel = new JPanel(new GridBagLayout());
     								GridBagConstraints gbc = new GridBagConstraints();
-    								gbc.insets = new Insets(5, 5, 5, 5);
+    								gbc.insets = new Insets(8, 8, 8, 8);
                         	        gbc.gridwidth = GridBagConstraints.REMAINDER;
                                     savedPanel.add(savedLabel, gbc);
                                     savedPanel.add(locationLabel, gbc);
                                     savedPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-                                    savedWindow.getContentPane().add(savedPanel);
+                                    savedWindow.add(savedPanel);
                                     savedWindow.pack();
-                                    Point labelLoc = saveStateLabel.getLocationOnScreen();
-                                    savedWindow.setLocation(new Point(labelLoc.x-30, labelLoc.y-30));
-                                    savedWindow.setVisible(true);
+									savedWindow.show(OTViewer.this, OTViewer.this.getWidth()
+									        - savedWindow.getPreferredSize().width,
+									    OTViewer.this.getHeight()
+									            - savedWindow.getPreferredSize().height);
                                     TimerTask closeTask = new TimerTask() {
     									
     									@Override
