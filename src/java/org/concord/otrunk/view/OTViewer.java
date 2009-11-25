@@ -615,6 +615,9 @@ public class OTViewer extends JFrame
     private boolean noClassAssignedForStudent() {
         return getUserMode() == OTConfig.SINGLE_USER_MODE && ! isSailSaveEnabled();
     }
+    
+
+    private Point bottomCorner;
 
     private void initStatusBar() {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 1));
@@ -637,6 +640,7 @@ public class OTViewer extends JFrame
                         } catch (Exception e) {
                         }
                     }
+                    
                     xmlDB.addXMLDatabaseChangeListener(new XMLDatabaseChangeListener() {
 
                         public void stateChanged(XMLDatabaseChangeEvent e)
@@ -648,8 +652,7 @@ public class OTViewer extends JFrame
                                 
                                 if (!settingUp){
                                 	// show save confirmation dialog
-                                    final JPopupMenu savedWindow = new JPopupMenu();
-                                    savedWindow.setLightWeightPopupEnabled(true);
+                                    final JWindow savedWindow = new JWindow();
                                     JLabel savedLabel = new JLabel("File saved");
                                     savedLabel.setFont(saveStateLabel.getFont().deriveFont(Font.BOLD));
                                     String fileName = currentAuthoredFile.getAbsolutePath();
@@ -660,7 +663,7 @@ public class OTViewer extends JFrame
     								locationLabel.setBorder(BorderFactory.createCompoundBorder(
     								    BorderFactory.createLineBorder(Color.BLACK),
     								    BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-    								JPanel savedPanel = new JPanel(new GridBagLayout());
+    								final JPanel savedPanel = new JPanel(new GridBagLayout());
     								GridBagConstraints gbc = new GridBagConstraints();
     								gbc.insets = new Insets(8, 8, 8, 8);
                         	        gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -669,20 +672,62 @@ public class OTViewer extends JFrame
                                     savedPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
                                     savedWindow.add(savedPanel);
                                     savedWindow.pack();
-									savedWindow.show(OTViewer.this, OTViewer.this.getWidth()
-									        - savedWindow.getPreferredSize().width,
-									    OTViewer.this.getHeight()
-									            - savedWindow.getPreferredSize().height);
-                                    TimerTask closeTask = new TimerTask() {
-    									
-    									@Override
-    									public void run()
-    									{
-    										savedWindow.setVisible(false);
-    									}
-    								};
-    								Timer timer = new Timer();
-    								timer.schedule(closeTask, 2500);
+                                    
+                                    final int desiredHeight = savedWindow.getHeight();
+                                    savedWindow.getContentPane().setLayout(null);
+                                    savedWindow.setSize(savedWindow.getWidth(), 0);
+                                    
+                                    bottomCorner = new Point(OTViewer.this.getLocationOnScreen().x + OTViewer.this.getWidth(),
+                                    	OTViewer.this.getLocationOnScreen().y + OTViewer.this.getHeight());
+                                    savedWindow.setLocation(bottomCorner.x - savedWindow.getWidth(), bottomCorner.y);
+                                    
+                                    savedWindow.setVisible(true);
+                                    
+                                    javax.swing.Timer timer = new javax.swing.Timer(0, new ActionListener() {
+                                        public void actionPerformed(ActionEvent e) {
+                                            int newHeight = Math.min(savedWindow.getHeight()+6, desiredHeight);
+                             
+                                            savedWindow.setSize(savedWindow.getWidth(),newHeight);
+                                            savedWindow.setLocation(bottomCorner.x - savedWindow.getWidth(), bottomCorner.y-savedWindow.getHeight());
+                                            savedPanel.repaint();
+                             
+                                            if(newHeight >= desiredHeight) {
+                                                ((javax.swing.Timer) e.getSource()).stop();
+                                                //restore original layout
+                                                savedWindow.getContentPane().setLayout(new BorderLayout());
+                                                savedWindow.validate();
+                                            }
+                                        }
+                                    });
+                                    timer.start();
+                                    
+                                    javax.swing.Timer timer2 = new javax.swing.Timer(0, new ActionListener() {
+                                        public void actionPerformed(ActionEvent e) {
+                                            int newHeight = Math.max(savedWindow.getHeight()-6, 0);
+                             
+                                            savedWindow.setSize(savedWindow.getWidth(),newHeight);
+                                            savedWindow.setLocation(bottomCorner.x - savedWindow.getWidth(), bottomCorner.y-savedWindow.getHeight());
+                                            savedPanel.repaint();
+                             
+                                            if(newHeight <= 0) {
+                                                ((javax.swing.Timer) e.getSource()).stop();
+                                                savedWindow.dispose();
+                                            }
+                                        }
+                                    });
+                                    timer2.setInitialDelay(2500);
+                                    timer2.start();
+                                    
+//                                    TimerTask closeTask = new TimerTask() {
+//    									
+//    									@Override
+//    									public void run()
+//    									{
+//    										savedWindow.setVisible(false);
+//    									}
+//    								};
+//    								Timer timer2 = new Timer();
+//    								timer2.schedule(closeTask, 2500);
                                 }
                             }
                             statusPanel.repaint();
