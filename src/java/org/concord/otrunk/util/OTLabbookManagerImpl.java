@@ -232,7 +232,7 @@ public class OTLabbookManagerImpl
 	    return resources.getEmbedInDrawTool();
     }
 	
-//	public ImageFiletype getSnapshotFiletype(){
-//		
-//	}
+	public ImageFiletype getSnapshotFiletype(){
+		return resources.getSnapshotFiletype();
+	}
 }
