@@ -17,7 +17,13 @@ public class OTLabbookManagerImpl
 	private OTLabbookBundle.ResourceSchema resources;
 	private ArrayList<OTChangeListener> listeners;
 	private boolean tempShowLabbook;
+	
+	private static final String NEAR_LIMIT_MESSAGE = "Be careful, you have now taken _CURRENT_ENTRIES_ snapshots of this _TYPE_.\nYou can only take one more snapshot of this!";
+	private static final String AT_LIMIT_MESSAGE = "You have now taken _CURRENT_ENTRIES_ snapshots of this _TYPE_. That's the limit!\nIf you want to take more snapshots of this _TYPE_, you will need to delete some in your lab book.";
+	private static final String OVER_LIMIT_MESSAGE = "Oops, you already took _MAX_ENTRIES_ snapshots of this _TYPE_. That was the limit!\nIf you want to take more snapshots of this _TYPE_, you will need to delete some in your lab book.";
 
+	
+	
 	public OTLabbookManagerImpl(OTLabbookBundle.ResourceSchema resources)
     {
 	    this.resources = resources;
@@ -41,6 +47,11 @@ public class OTLabbookManagerImpl
 	
 	public void add(OTObject otObject, OTObject container, OTObject originalObject, boolean showLabbook)
 	{
+		if (resources.getLimitEntries() && (totalNumberOfEntriesForObject(originalObject) >= resources.getLimit())){
+			showOverLimitMessage(originalObject);
+			return;
+		}
+		
 		OTLabbookEntry entry = createEntry(otObject);
 		if (container != null){
 			entry.setContainer(container);
@@ -153,6 +164,33 @@ public class OTLabbookManagerImpl
 		
 	}
 	
+	private int totalNumberOfEntriesForObject(OTObject object){
+		int totalNumberOfEntriesForObject = 0;
+		for (OTObject entry : resources.getEntries()) {
+	        if (((OTLabbookEntry)entry).getOriginalObject().equals(object))
+	        	totalNumberOfEntriesForObject++;
+        }
+		return totalNumberOfEntriesForObject;
+	}
+	
+	private void showOverLimitMessage(OTObject originalObject){
+		OTLabbookChangeEvent e = new OTLabbookChangeEvent(originalObject);
+		String message = OVER_LIMIT_MESSAGE.replaceAll("_TYPE_", getType(originalObject));
+		message = message.replaceAll("_MAX_ENTRIES_", ""+resources.getLimit());
+		e.setMessage(message);
+		notifyListeners(e);
+	}
+	
+	private String getType(OTObject otObj){
+		String className = otObj.otClass().getName();
+		String type = "model";
+		if (className.indexOf("Drawing") > -1)
+			type = "drawing";
+		else if (className.indexOf("Collector") > -1 || className.indexOf("Graph") > -1)
+			type = "graph";
+		return type;
+	}
+	
 	/**
 	 * Change events on the bundle will get passed straight through to listeners
 	 */
@@ -186,8 +224,28 @@ public class OTLabbookManagerImpl
 		labbookChangeEvent.setValue(e.getValue());
 		labbookChangeEvent.setShowLabbook(tempShowLabbook);
 		
+		if (resources.getLimitEntries() && e.getOperation() == OTChangeEvent.OP_ADD){
+			int total = totalNumberOfEntriesForObject(((OTLabbookEntry)e.getValue()).getOriginalObject());
+			String message = null;
+			if (total == resources.getLimit()){
+				message = AT_LIMIT_MESSAGE;
+			} else if (total == resources.getLimit() - 1){
+				message = NEAR_LIMIT_MESSAGE;
+			}
+			
+			if (message != null){
+				message = message.replaceAll("_TYPE_", getType((OTObject) e.getValue()));
+				message = message.replaceAll("_CURRENT_ENTRIES_", ""+total);
+				labbookChangeEvent.setMessage(message);
+			}
+		}
+		
+		notifyListeners(labbookChangeEvent);
+	}
+	
+	private void notifyListeners(OTLabbookChangeEvent e){
 		for (int i = 0; i < listeners.size(); i++) {
-	       (listeners.get(i)).stateChanged(labbookChangeEvent); 
+	       (listeners.get(i)).stateChanged(e); 
         }
 	}
 
@@ -208,7 +266,10 @@ public class OTLabbookManagerImpl
 	public class OTLabbookChangeEvent extends OTChangeEvent
 	{
 
+        private static final long serialVersionUID = 1L;
+        
 		private boolean showLabbook = true;
+		private String message;
 
 		public OTLabbookChangeEvent(OTObject source)
         {
@@ -224,6 +285,14 @@ public class OTLabbookManagerImpl
 		 */
 		public boolean getShowLabbook(){
 			return showLabbook;
+		}
+		
+		public void setMessage(String message){
+			this.message = message;
+		}
+		
+		public String getMessage(){
+			return message;
 		}
 	}
 
