@@ -17,8 +17,7 @@ public class OTLabbookBundle extends DefaultOTObject
 	public static interface ResourceSchema extends OTResourceSchema {
 		
 		/**
-		 * @return Snapshots taken of models or other objects that don't fit into
-		 * the other categories
+		 * @return Snapshots taken of models or entries on drawings or graphs
 		 */
         public OTObjectList getEntries();
         
@@ -34,6 +33,14 @@ public class OTLabbookBundle extends DefaultOTObject
         public ImageFiletype getSnapshotFiletype();
         public void setSnapshotFiletype(ImageFiletype imageFiletype);
         public ImageFiletype DEFAULT_snapshotFiletype = ImageFiletype.PNG;
+        
+        public boolean getLimitEntries();
+        public void setLimitEntries(boolean limitEntries);
+        public static boolean DEFAULT_limitEntries = false;
+        
+        public int getLimit();
+        public void setLimit(int limit);
+        public static int DEFAULT_limit = 10;
     }
 	
 	ResourceSchema resources;
