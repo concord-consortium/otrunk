@@ -303,7 +303,7 @@ public class OTMLToXHTMLConverter
 	 * on it.
 	 * 
 	 */
-	public String embedComponent(JComponent comp, float scaleX, float scaleY,
+	public ComponentImageSaver saveComponentAsImage(JComponent comp, float scaleX, float scaleY,
 	    OTObject otObject)
 	{
 		Dimension compSize = comp.getSize();
@@ -337,9 +337,16 @@ public class OTMLToXHTMLConverter
 			e.printStackTrace();
 		}
 
-		return saver.getText();
+		return saver;
 	}
 
+	public String embedComponent(JComponent comp, float scaleX, float scaleY,
+	    OTObject otObject)
+	{
+		ComponentImageSaver saver = saveComponentAsImage(comp, scaleX, scaleY, otObject);
+		return saver.getText();
+	}	
+	
 	protected OTJComponentView getOTJComponentView(OTObject obj, OTViewEntry viewEntry)
 	{
 		return getOTJComponentView(obj, null, viewEntry);
@@ -404,14 +411,24 @@ public class OTMLToXHTMLConverter
 			comp.setSize(dim2);
 		}
 
-		String url = embedComponent(comp, 1, 1, obj);
-		url = "<img src='" + url + "' />";
+		String url = getImgTagForComponent(obj, comp);
 
 		((OTJComponentView)view).viewClosed();
 		
 		return url;
 		// return null;
-	}	
+	}
+
+	private String getImgTagForComponent(OTObject obj, JComponent comp)
+    {
+		ComponentImageSaver saver = saveComponentAsImage(comp, 1, 1, obj);
+
+		String tag = "<img src='" + saver.getText() + "' " +
+		   "width='" + saver.getWidth() + "' " +
+		   "height='" + saver.getHeight() + "' " +
+		   "/>";
+	    return tag;
+    }	
 	
 	public OTObject getRuntimeObject(OTObject object, String userStr) {
 		try {
