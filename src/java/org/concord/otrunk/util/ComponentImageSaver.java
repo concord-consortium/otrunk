@@ -21,7 +21,9 @@ import org.concord.swing.util.ComponentScreenshot;
 		OTObject otObject;
 
 		String text = null;
-
+		int width = -1;
+		int height = -1;
+				
 		float scaleX = 1;
 
 		float scaleY = 1;
@@ -83,6 +85,9 @@ import org.concord.swing.util.ComponentScreenshot;
 					bim = ComponentScreenshot.makeComponentImageAlpha(comp, scaleX, scaleY);
 				}
 				
+				width = bim.getWidth();
+				height = bim.getHeight();
+				
 				ComponentScreenshot.saveImageAsFile(bim, newFile, "png");
 				bim.flush();
 				
@@ -98,5 +103,15 @@ import org.concord.swing.util.ComponentScreenshot;
 		public String getText()
 		{
 			return text;
+		}
+		
+		public int getWidth()
+		{
+			return width;
+		}
+		
+		public int getHeight()
+		{
+			return height;
 		}
 	}
