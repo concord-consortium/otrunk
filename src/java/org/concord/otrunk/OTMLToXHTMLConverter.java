@@ -203,80 +203,9 @@ public class OTMLToXHTMLConverter
 				continue;
 			}
 			
-			String text = null;
-
-			OTJComponentView objView = getOTJComponentView(topLevelOTObjects[i], null, topLevelViewEntries[i]);
-
-			OTXHTMLView xhtmlView = null;
-			String bodyText = "";
-			if (objView instanceof OTXHTMLView) {
-				xhtmlView = (OTXHTMLView) objView;
-				bodyText = xhtmlView.getXHTMLText(topLevelOTObjects[i]);
-
-				Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"([^>]*)>");
-				Matcher m = p.matcher(bodyText);
-				StringBuffer parsed = new StringBuffer();
-				OTObjectService objectService = topLevelOTObjects[i].getOTObjectService();
-				while (m.find()) {
-					String id = m.group(1);
-					OTID otid = objectService.getOTID(id);
-					OTObject referencedObject = null;
-					try {
-						referencedObject = objectService.getOTObject(otid);
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} 
-
-					Pattern userPat = Pattern.compile("user=\"([^\"]*)\"");
-					Matcher userMatcher = userPat.matcher(m.group(2));
-					if(userMatcher.find()){
-						String userId = userMatcher.group(1);
-						referencedObject = getRuntimeObject(referencedObject, userId);
-					}
-					
-		        	OTViewEntry viewEntry = null;
-					Pattern viewPat = Pattern.compile("viewid=\"([^\"]*)\"");
-					Matcher viewMatcher = viewPat.matcher(m.group(2));
-					if(viewMatcher.find()){
-						String viewId = viewMatcher.group(1);
-			        	if(viewId != null && viewId.length() > 0) {
-							OTID viewOTid = objectService.getOTID(viewId);
-			        		try {
-	                            viewEntry = (OTViewEntry)
-	                            	objectService.getOTObject(viewOTid);
-                            } catch (Exception e) {
-	                            e.printStackTrace();
-                            }
-			        	}
-					}
-
-					// System.out.println(referencedObject.getClass());
-					String url = Matcher.quoteReplacement(embedOTObject(referencedObject, viewEntry));
-					// String url = objView.getXHTMLText(folder,
-					// containerDisplayWidth, containerDisplayHeight);
-					if (url != null) {
-						try {
-							m.appendReplacement(parsed, url);
-						} catch (IllegalArgumentException e) {
-							System.err.println("bad replacement: " + url);
-							e.printStackTrace();
-						} catch (IndexOutOfBoundsException e) {
-							System.err.println("bad replacement (non-matching group reference): " + url);
-							e.printStackTrace();
-						}
-					}
-				}
-				m.appendTail(parsed);
-				if(xhtmlOutput){
-					text = "<div>" + parsed.toString() + "</div><hr/>";
-				} else {
-					text = parsed.toString();
-				}
-			} else {
-				text = embedOTObject(topLevelOTObjects[i], topLevelViewEntries[i]);
-			}
-
+			
+			String text = embedOTObject(topLevelOTObjects[i], topLevelViewEntries[i], xhtmlOutput);
+			
 			allTexts = allTexts + text;
 		}
 
@@ -295,6 +224,72 @@ public class OTMLToXHTMLConverter
 		}
 	}
 
+	public String embedOTXHTMLView(OTObject topOTObject, OTViewEntry topViewEntry, OTXHTMLView xhtmlView, boolean xhtmlOutput)
+	{
+		String bodyText = xhtmlView.getXHTMLText(topOTObject);
+
+		Pattern p = Pattern.compile("<object refid=\"([^\"]*)\"([^>]*)>");
+		Matcher m = p.matcher(bodyText);
+		StringBuffer parsed = new StringBuffer();
+		OTObjectService objectService = topOTObject.getOTObjectService();
+		while (m.find()) {
+			String id = m.group(1);
+			OTID otid = objectService.getOTID(id);
+			OTObject referencedObject = null;
+			try {
+				referencedObject = objectService.getOTObject(otid);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} 
+
+			Pattern userPat = Pattern.compile("user=\"([^\"]*)\"");
+			Matcher userMatcher = userPat.matcher(m.group(2));
+			if(userMatcher.find()){
+				String userId = userMatcher.group(1);
+				referencedObject = getRuntimeObject(referencedObject, userId);
+			}
+
+			OTViewEntry viewEntry = null;
+			Pattern viewPat = Pattern.compile("viewid=\"([^\"]*)\"");
+			Matcher viewMatcher = viewPat.matcher(m.group(2));
+			if(viewMatcher.find()){
+				String viewId = viewMatcher.group(1);
+				if(viewId != null && viewId.length() > 0) {
+					OTID viewOTid = objectService.getOTID(viewId);
+					try {
+						viewEntry = (OTViewEntry)
+						objectService.getOTObject(viewOTid);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			// System.out.println(referencedObject.getClass());
+			String url = Matcher.quoteReplacement(embedOTObject(referencedObject, viewEntry, xhtmlOutput));
+			// String url = objView.getXHTMLText(folder,
+			// containerDisplayWidth, containerDisplayHeight);
+			if (url != null) {
+				try {
+					m.appendReplacement(parsed, url);
+				} catch (IllegalArgumentException e) {
+					System.err.println("bad replacement: " + url);
+					e.printStackTrace();
+				} catch (IndexOutOfBoundsException e) {
+					System.err.println("bad replacement (non-matching group reference): " + url);
+					e.printStackTrace();
+				}
+			}
+		}
+		m.appendTail(parsed);
+		if(xhtmlOutput){
+			return "<div>" + parsed.toString() + "</div><hr/>";
+		} else {
+			return parsed.toString();
+		}
+	}
+	
 	/**
 	 * This code attempts to save an image of the component. It does 3 things
 	 * that are a bit odd but seem to make things work. 1. It calls addNotify on
@@ -373,7 +368,7 @@ public class OTMLToXHTMLConverter
 		return comp;
 	}
 
-	public String embedOTObject(OTObject obj, OTViewEntry viewEntry)
+	public String embedOTObject(OTObject obj, OTViewEntry viewEntry, boolean xhtmlOutput)
 	{
 		OTView view = viewFactory.getView(obj, OTPrintDimension.class);
 		if (view == null) {
@@ -381,14 +376,12 @@ public class OTMLToXHTMLConverter
 		}
 		
 		if (view instanceof OTXHTMLView) {
-			String objectText = ((OTXHTMLView) view).getXHTMLText(obj);
-			return objectText;
+			return embedOTXHTMLView(obj, viewEntry, (OTXHTMLView)view, xhtmlOutput);
 		}
 
 		view = getOTJComponentView(obj, null, viewEntry);
 		if (view instanceof OTXHTMLView) {
-			String objectText = ((OTXHTMLView) view).getXHTMLText(obj);
-			return objectText;
+			return embedOTXHTMLView(obj, viewEntry, (OTXHTMLView)view, xhtmlOutput);
 		}
 		
 		JComponent comp = ((OTJComponentView)view).getComponent(obj);
@@ -433,6 +426,11 @@ public class OTMLToXHTMLConverter
 			return null;
 		}
 	}
+
+	public String embedOTObject(OTObject obj, OTViewEntry viewEntry)
+    {
+		return embedOTObject(obj, viewEntry, false);
+    }
     
 
 }
