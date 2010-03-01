@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="9d4f759c-3166-4c54-a6ab-416e546d9f62">
+  <imports>
+    <import class="org.concord.otrunk.OTSystem" />
+    <import class="org.concord.otrunk.view.OTFolderObject" />
+    <import class="org.concord.otrunk.test.OTBasicTestObject" />
+    <import class="org.concord.otrunk.test.OTPrimitivesTestObject" />
+    <import class="org.concord.otrunk.test.OTMapTestObject" />
+    <import class="org.concord.otrunk.test.OTObjectMapTestObject" />
+    <import class="org.concord.otrunk.test.OTResourceListTestObject" />
+    <import class="org.concord.otrunk.test.OTObjectListTestObject" />
+    <import class="org.concord.otrunk.test.OTDocumentTestObject" />
+    <import class="org.concord.otrunk.test.OTBasicTestObject" />
+    <import class="org.concord.framework.otrunk.wrapper.OTBlob" />
+  </imports>
+  <objects>
+    <OTObjectListTestObject local_id="object_list_some_change">
+      <objectList>
+        <OTPrimitivesTestObject local_id="primitive_no_changes" float="4.243" int="45" string="this is a string" />
+        <OTPrimitivesTestObject local_id="primitive_all_changes" float="943.234" int="98" string="some good stuff" />
+      </objectList>
+    </OTObjectListTestObject>
+  </objects>
+</otrunk>
+

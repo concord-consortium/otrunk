@@ -86,6 +86,7 @@ public class ExporterJDOM
 {
 	public static boolean useFullClassNames = false;
 	public static boolean preserveImports = true;
+	public static boolean skipOTrunkWrapping = false;
 	
 	private static Pattern refidPattern = Pattern.compile("(refid=\")([^\"]*)(\")");
 
@@ -243,6 +244,11 @@ public class ExporterJDOM
 		} catch (Exception e){
 			// break and pass exception on up
 			throw e;
+		}
+		
+		if (skipOTrunkWrapping) {
+			Document simpleDoc = new Document(rootObjectElement);
+			return simpleDoc;
 		}
 
 		Element otrunkEl = new Element("otrunk");
