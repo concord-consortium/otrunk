@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OTObjectListTestObject local_id="object_list_some_change">
+  <objectList>
+    <OTPrimitivesTestObject local_id="primitive_no_changes" float="4.243" int="45" string="this is a string" />
+    <OTPrimitivesTestObject local_id="primitive_all_changes" float="943.234" int="98" string="some good stuff" />
+  </objectList>
+</OTObjectListTestObject>
+
