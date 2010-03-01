@@ -11,6 +11,7 @@ import junit.framework.Assert;
 
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.xml.ExporterJDOM;
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -22,6 +23,12 @@ public class ExporterJDOMTest
 	private static final URL learnerContent = ExporterJDOMTest.class.getResource("/overlay-copy-test-learner.otml");
 	private static final String documentUUID = "9d4f759c-3166-4c54-a6ab-416e546d9f62";
 	private final OTrunkHelper otHelper = new OTrunkHelper();
+	
+	@After
+	public void afterTest() {
+		// have to reset this or it can mess up other tests when run in Continuum
+		ExporterJDOM.skipOTrunkWrapping = false;
+	}
 	
 	@Test
 	public void testNormalXMLExport() throws Exception {
