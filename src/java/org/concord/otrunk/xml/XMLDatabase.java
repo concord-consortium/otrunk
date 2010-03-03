@@ -499,6 +499,11 @@ public class XMLDatabase
 		        + downloadString 
 				+ " " + parsedLabel + " in " + parseTime + "ms" 
 				+ " loaded ot db in " + (endMillis - startMillis) + "ms" );
+		
+		// release the resources associated with the XML DOM elements
+		for (XMLDataObject obj : dataObjects.values()) {
+			obj.nullifyElement();
+		}
 	}
 
 	public static abstract class PackageNotFound implements OTPackage

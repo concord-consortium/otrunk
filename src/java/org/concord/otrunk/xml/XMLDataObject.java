@@ -346,4 +346,8 @@ public class XMLDataObject
 	{
 		return saveNulls;
 	}
+	
+	public void nullifyElement() {
+		this.element = null;
+	}
 }
