@@ -394,7 +394,12 @@ public class XMLDatabase
 	{
 		long startMillis = System.currentTimeMillis();
 
+		if (document == null) {
+			throw new RuntimeException("Database was not initialized!");
+		}
 		OTXMLElement rootElement = document.getRootElement();
+		// don't keep the document around. it tends to use a lot of memory and isn't used once the objects are loaded.
+		document = null;
 
 		TypeService typeService = new TypeService(contextURL);
 		ObjectTypeHandler objectTypeHandler = new ObjectTypeHandler(typeService, this);
