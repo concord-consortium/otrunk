@@ -53,11 +53,14 @@ public class OTNavigationHistoryService extends DefaultOTObject implements OTBun
 		if (navigationHistories.containsKey(user)) {
 			return navigationHistories.get(user);
 		}
+		
+		// this is ok if the user's histories are based on the current navigation history service's document...
 		OTObjectSet defaultUserNavigationHistory = resources.getNavigationHistory();
 		if (defaultUserNavigationHistory == null) {
 			defaultUserNavigationHistory = otrunk.createObject(OTObjectSet.class);
 			resources.setNavigationHistory(defaultUserNavigationHistory);
 		}
+		
 		if (user != null) {
 			defaultUserNavigationHistory = (OTObjectSet) otrunk.getUserRuntimeObject(defaultUserNavigationHistory, user);
 		}
