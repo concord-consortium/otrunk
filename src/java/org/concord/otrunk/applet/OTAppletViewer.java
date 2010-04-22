@@ -89,7 +89,7 @@ public class OTAppletViewer extends JApplet
 	{
 		super.start();
 
-		System.out.println("" + getAppletName() + " started start");
+		System.out.println("applet.start called on " + getAppletName());
 
 		if(isMaster()){
 			loadState();
@@ -140,9 +140,25 @@ public class OTAppletViewer extends JApplet
 		}
 	}	
 
-	public void stop() 
+	/**
+	 * There is also the stop method, but I believe that might be called if 
+	 */
+	public void destroy() 
 	{
-		super.stop();
+		System.out.println("applet.destroy called on " + getAppletName());
+		
+		if(otContainer != null){
+			otContainer.setCurrentObject(null);
+		}
+
+		super.destroy();
+	}
+
+	public void stop()
+	{
+		System.out.println("applet.stop called on " + getAppletName());
+		
+		super.stop();		
 	}
 	
 	protected URL getDatabaseURL()
