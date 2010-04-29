@@ -55,7 +55,7 @@ import org.concord.otrunk.OTrunkUtil;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class OTViewFactoryImpl implements OTViewFactory 
+public class OTViewFactoryImpl implements OTViewFactory, OTLifecycleNotifying
 {
 	private static final Logger logger =
         Logger.getLogger(OTViewFactoryImpl.class.getCanonicalName());
@@ -65,6 +65,7 @@ public class OTViewFactoryImpl implements OTViewFactory
     ArrayList<OTViewBundle> viewBundles = new ArrayList<OTViewBundle>();
     OTViewContextImpl viewContext;
 	private String mode;
+	ArrayList<OTLifecycleListener> lifecycleListeners = new ArrayList<OTLifecycleListener>();
     
     public OTViewFactoryImpl(OTViewBundle viewBundle)
     {
@@ -124,6 +125,7 @@ public class OTViewFactoryImpl implements OTViewFactory
             	t.printStackTrace();
             }
     	}
+    	notifyLifecycleListeners(OTLifecycleEvent.INITIALIZATION_COMPLETE);
     }
     
     class InternalViewEntry {
@@ -362,7 +364,7 @@ public class OTViewFactoryImpl implements OTViewFactory
 		
 		List<OTViewBundle> allViewBundles = getViewBundles();
     	for(int j=0; j<allViewBundles.size() && modeViewEntry == null; j++){
-    		OTViewBundle viewBundle = (OTViewBundle) allViewBundles.get(j);
+    		OTViewBundle viewBundle = allViewBundles.get(j);
     		OTObjectList modes = viewBundle.getModes();
     		for(int i=0; i<modes.size(); i++){
     			OTViewMode curMode = (OTViewMode)modes.get(i);
@@ -528,6 +530,25 @@ public class OTViewFactoryImpl implements OTViewFactory
 		}
 
 		viewBundles.add(0, viewBundle);			
+    }
+	
+	private void notifyLifecycleListeners(int type) {
+		OTLifecycleEvent event = new OTLifecycleEvent(type, this);
+		for (OTLifecycleListener listener : lifecycleListeners) {
+			listener.lifecycleEventOccurred(event);
+		}
+	}
+
+	public void addLifecycleListener(OTLifecycleListener listener)
+    {
+		if (! this.lifecycleListeners.contains(listener)) {
+			this.lifecycleListeners.add(listener);
+		}
+    }
+
+	public void removeLifecycleListener(OTLifecycleListener listener)
+    {
+	    this.lifecycleListeners.remove(listener);
     }
 	
 }
