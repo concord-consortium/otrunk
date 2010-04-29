@@ -44,16 +44,25 @@ public class OTJComponentContainerHelper
 	
 	public OTViewContainerPanel createViewContainerPanel()
 	{
-		OTViewContainerPanel viewContainerPanel = 
-        	new OTViewContainerPanel(frameManager);
+		OTViewContainerPanel viewContainerPanel =
+		    createViewContainerPanel(frameManager, jComponentService, autoRequestFocus,
+		        useScrollPane, viewMode, this.parentContainer);
+		viewContainerPanels.add(viewContainerPanel);
+		return viewContainerPanel;
+	}
+
+	public static OTViewContainerPanel createViewContainerPanel(OTFrameManager frameManager,
+	    OTJComponentService jComponentService, boolean autoRequestFocus, boolean useScrollPane,
+	    String viewMode, OTViewContainer parentContainer)
+	{
+		OTViewContainerPanel viewContainerPanel = new OTViewContainerPanel(frameManager);
 		viewContainerPanel.setOTJComponentService(jComponentService);
-        viewContainerPanel.setAutoRequestFocus(autoRequestFocus);
-        viewContainerPanel.setUseScrollPane(useScrollPane);
-        viewContainerPanel.setOpaque(false);
-        viewContainerPanel.setViewMode(viewMode);
-        viewContainerPanel.setParentContainer(this.parentContainer); 
-        viewContainerPanels.add(viewContainerPanel);
-        return viewContainerPanel;
+		viewContainerPanel.setAutoRequestFocus(autoRequestFocus);
+		viewContainerPanel.setUseScrollPane(useScrollPane);
+		viewContainerPanel.setOpaque(false);
+		viewContainerPanel.setViewMode(viewMode);
+		viewContainerPanel.setParentContainer(parentContainer);
+		return viewContainerPanel;
 	}
 
 
