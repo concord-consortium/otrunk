@@ -144,7 +144,7 @@ public class OTGroupListManager extends DefaultOTObject
     public void reloadAll() {
     	long now = System.currentTimeMillis();
     	if ((now - lastReloadTime) < reloadDelay) {
-    		logger.info("Not reloading. Only " + ((now - lastReloadTime)/1000) + " sec has passed since the last reload.");
+    		logger.finer("Not reloading. Only " + ((now - lastReloadTime)/1000) + " sec has passed since the last reload.");
     		return;
     	}
     	lastReloadTime = now;
@@ -172,7 +172,7 @@ public class OTGroupListManager extends DefaultOTObject
     	if (interval) {
         	long now = System.currentTimeMillis();
         	if ((now - lastReloadTime) < reloadDelay) {
-        		logger.info("Not reloading. Only " + ((now - lastReloadTime)/1000) + " sec has passed since the last reload.");
+        		logger.finer("Not reloading. Only " + ((now - lastReloadTime)/1000) + " sec has passed since the last reload.");
         		skipStudentReload = true; //flag for reloadSelectUsers()
         		return;
         	} else {
@@ -182,7 +182,7 @@ public class OTGroupListManager extends DefaultOTObject
     	}
     	try {
     		if (groupUserObject != null) {
-    			logger.info("reloading group overlay");
+    			logger.finer("reloading group overlay");
     			overlayManager.reload(groupUserObject);
     		}
         } catch (Exception e) {
