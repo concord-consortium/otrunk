@@ -334,6 +334,13 @@ public class OTrunkUtil
 	 */
 	public static boolean compareObjects(OTObject obj1, OTObject obj2, boolean compareXMLStrings)
 	{
+		// if only one is null, return false. If both are null, return true
+		if (obj1 == null && obj2 == null){
+			return true;
+		} else if (obj1 == null || obj2 == null){
+			return false;
+		}
+		
 		OTClass otClass = obj1.otClass();
 		if(!otClass.equals(obj2.otClass())){
 			logger.fine("Object classes don't match: " + otClass + " != " + obj2.otClass());
