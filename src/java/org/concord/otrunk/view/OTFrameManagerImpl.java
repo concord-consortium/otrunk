@@ -24,6 +24,7 @@ public class OTFrameManagerImpl implements OTFrameManager
 	private JFrame jFrame;
 	private int oldX = 0;
 	private int oldY = 0;
+	private JFrame mainJFrame;
 	
 	public class FrameContainer
 	{
@@ -73,7 +74,7 @@ public class OTFrameManagerImpl implements OTFrameManager
 	{
 		// look up view container with the frame.
 		FrameContainer frameContainer = 
-			(FrameContainer)frameContainers.get(otFrame.getGlobalId());
+			frameContainers.get(otFrame.getGlobalId());
 		
 		if(frameContainer == null || oldX != positionX || oldY != positionY) {
 			jFrame = new JFrame(otFrame.getTitle());
@@ -124,6 +125,14 @@ public class OTFrameManagerImpl implements OTFrameManager
 			frameContainer.container.setCurrentObject(otObject, viewEntry);
 		}
 		frameContainer.frame.setVisible(true);
+	}
+	
+	public JFrame getMainFrame() {
+		return this.mainJFrame;
+	}
+	
+	public void setMainFrame(JFrame frame) {
+		this.mainJFrame = frame;
 	}
 	
 	public void destroyFrame(){
