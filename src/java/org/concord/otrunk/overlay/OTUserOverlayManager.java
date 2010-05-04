@@ -271,7 +271,10 @@ public class OTUserOverlayManager
 	public long getLastModified(OTUserObject userObject) {
 		userObject = getAuthoredObject(userObject);
 		XMLDatabase xmlDb = getXMLDatabase(getOverlay(userObject));
-    	long existingTime = xmlDb.getUrlLastModifiedTime();
+		long existingTime = 0;
+		if (xmlDb != null) {
+			existingTime = xmlDb.getUrlLastModifiedTime();
+		}
     	return existingTime;
 	}
 	
