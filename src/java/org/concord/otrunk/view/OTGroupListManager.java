@@ -142,13 +142,19 @@ public class OTGroupListManager extends DefaultOTObject
     }
     
     public void reloadAll() {
+    	reloadAll(true);
+    }
+    
+    public void reloadAll(boolean reloadGroup) {
     	long now = System.currentTimeMillis();
     	if ((now - lastReloadTime) < reloadDelay) {
     		logger.finer("Not reloading. Only " + ((now - lastReloadTime)/1000) + " sec has passed since the last reload.");
     		return;
     	}
     	lastReloadTime = now;
-    	reloadGroupOverlay(false);
+    	if (reloadGroup) {
+    		reloadGroupOverlay(false);
+    	}
     	processUserList(true);
     }
     
