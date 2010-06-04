@@ -613,6 +613,22 @@ public class OTViewer extends JFrame
     
 
     private Point bottomCorner;
+    
+    public void setStatusPanelVisible(boolean visible) {
+    	if (visible) {
+    		if (statusPanel == null) {
+    			// wants to be visible, but hasn't been set up yet
+    			initStatusBar();
+    		}
+    	}
+		if (statusPanel != null) {
+			statusPanel.setVisible(visible);
+		}
+    }
+    
+    public JPanel getStatusPanel() {
+    	return this.statusPanel;
+    }
 
     private void initStatusBar() {
         statusPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 1));
@@ -974,6 +990,7 @@ public class OTViewer extends JFrame
         }
 
         addService(UserMessageHandler.class, new SwingUserMessageHandler(this));        
+        addService(OTViewer.class, this);
         
         otrunk = new OTrunkImpl(systemDB, xmlDB, services);
 
