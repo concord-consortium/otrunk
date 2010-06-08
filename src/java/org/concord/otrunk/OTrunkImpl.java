@@ -1165,18 +1165,22 @@ public class OTrunkImpl implements OTrunk
         	        		pPath.add(reference);
         	        		
                 	        OTDataObject parentObj = db.getOTDataObject(null, pId);
-                	        if (filterClass != null) {
-                	        	logger.finest("Filter class: " + filterClass.getSimpleName() + ", parent class: " + parentObj.getType().getClassName());
+                	        if (parentObj != null) {
+                    	        if (filterClass != null) {
+                    	        	logger.finest("Filter class: " + filterClass.getSimpleName() + ", parent class: " + parentObj.getType().getClassName());
+                    	        }
+                    	        if (filterClass == null || filterClass.isAssignableFrom(Class.forName(parentObj.getType().getClassName()))) {
+                    	        	logger.finest("Found a matching parent: " + parentObj.getGlobalId());
+                    	        	allParents.add(pPath);
+                    	        }
+                	        	if (getIndirectReferences) {
+                	        		logger.finest("recursing");
+                	        		allParents.addAll(getReferences(incoming, pId, filterClass, true, pPath, excludeIDs));
+                	        		logger.finest("unrecursing");
+                	        	}
+                	        } else {
+                	        	logger.warning("Had parent id but no real object!: " + pId);
                 	        }
-                	        if (filterClass == null || filterClass.isAssignableFrom(Class.forName(parentObj.getType().getClassName()))) {
-                	        	logger.finest("Found a matching parent: " + parentObj.getGlobalId());
-                	        	allParents.add(pPath);
-                	        }
-            	        	if (getIndirectReferences) {
-            	        		logger.finest("recursing");
-            	        		allParents.addAll(getReferences(incoming, pId, filterClass, true, pPath, excludeIDs));
-            	        		logger.finest("unrecursing");
-            	        	}
         	        	} else {
         	        		logger.finest("Already seen this id: " + pId);
         	        	}
