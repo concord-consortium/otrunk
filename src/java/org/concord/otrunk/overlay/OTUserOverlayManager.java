@@ -4,7 +4,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -32,8 +35,8 @@ public class OTUserOverlayManager
 	OTrunkImpl otrunk;
 	ArrayList<OverlayImpl> globalOverlays = new ArrayList<OverlayImpl>();
 	private final StandardPasswordAuthenticator authenticator = new StandardPasswordAuthenticator();
-	private HashMap<OTUserObject, ArrayList<OverlayUpdateListener>> listenerMap = new HashMap<OTUserObject, ArrayList<OverlayUpdateListener>>();
-	private ArrayList<OverlayUpdateListener> globalListeners = new ArrayList<OverlayUpdateListener>();
+	private Map<OTUserObject, ArrayList<OverlayUpdateListener>> listenerMap = Collections.synchronizedMap(new HashMap<OTUserObject, ArrayList<OverlayUpdateListener>>());
+	private List<OverlayUpdateListener> globalListeners = Collections.synchronizedList(new ArrayList<OverlayUpdateListener>());
 	
 	private static boolean doHeadBeforeGet = true;
 	
@@ -279,14 +282,18 @@ public class OTUserOverlayManager
 	}
 	
 	private void notifyListeners(OTUserObject user) {
-		for (OverlayUpdateListener l : globalListeners) {
-			l.updated(user);
+		synchronized(globalListeners) {
+    		for (OverlayUpdateListener l : globalListeners) {
+    			l.updated(user);
+    		}
 		}
-		ArrayList<OverlayUpdateListener> listeners = listenerMap.get(user);
-		if (listeners != null) {
-			for (OverlayUpdateListener l : listeners) {
-				l.updated(user);
-			}
+		synchronized (listenerMap) {
+    		ArrayList<OverlayUpdateListener> listeners = listenerMap.get(user);
+    		if (listeners != null) {
+    			for (OverlayUpdateListener l : listeners) {
+    				l.updated(user);
+    			}
+    		}
 		}
 	}
 	
@@ -295,8 +302,10 @@ public class OTUserOverlayManager
 	 * @param listener
 	 */
 	public void addOverlayUpdateListener(OverlayUpdateListener listener) {
-		if (! globalListeners.contains(listener)) {
-			globalListeners.add(listener);
+		synchronized(globalListeners) {
+    		if (! globalListeners.contains(listener)) {
+    			globalListeners.add(listener);
+    		}
 		}
 	}
 	
@@ -306,14 +315,16 @@ public class OTUserOverlayManager
 	 * @param user
 	 */
 	public void addOverlayUpdateListener(OverlayUpdateListener listener, OTUserObject user) {
-		ArrayList<OverlayUpdateListener> currentListeners = listenerMap.get(user);
-		if (currentListeners == null) {
-			currentListeners = new ArrayList<OverlayUpdateListener>();
+		synchronized (listenerMap) {
+    		ArrayList<OverlayUpdateListener> currentListeners = listenerMap.get(user);
+    		if (currentListeners == null) {
+    			currentListeners = new ArrayList<OverlayUpdateListener>();
+    		}
+    		if (! currentListeners.contains(listener)) {
+    			currentListeners.add(listener);
+    		}
+    		listenerMap.put(user, currentListeners);
 		}
-		if (! currentListeners.contains(listener)) {
-			currentListeners.add(listener);
-		}
-		listenerMap.put(user, currentListeners);
 	}
 	
 	/**
@@ -322,8 +333,10 @@ public class OTUserOverlayManager
 	 */
 	public void removeOverlayUpdateListener(OverlayUpdateListener listener) {
 		globalListeners.remove(listener);
-		for (ArrayList<OverlayUpdateListener> listeners : listenerMap.values()) {
-			listeners.remove(listener);
+		synchronized (listenerMap) {
+    		for (ArrayList<OverlayUpdateListener> listeners : listenerMap.values()) {
+    			listeners.remove(listener);
+    		}
 		}
 	}
 
