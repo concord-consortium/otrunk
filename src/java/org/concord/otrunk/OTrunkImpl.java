@@ -44,8 +44,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -110,7 +112,8 @@ public class OTrunkImpl implements OTrunk
 	
     protected OTObjectServiceImpl rootObjectService;
     
-	ArrayList<OTDatabase> databases = new ArrayList<OTDatabase>();
+    // synchronized since multiple threads might be modifying the list of databases (esp. the otrunk-intrasession code)
+	List<OTDatabase> databases = Collections.synchronizedList(new ArrayList<OTDatabase>());
 	Vector<OTUser> users = new Vector<OTUser>();
 	
     ArrayList<OTObjectServiceImpl> objectServices = new ArrayList<OTObjectServiceImpl>();
@@ -320,10 +323,12 @@ public class OTrunkImpl implements OTrunk
 	        return null;
 	    }
 	    
-	    for (OTDatabase db : databases) {	     	   
-	        if(db.contains(id)) {
-	            return db;
-	        }
+	    synchronized(databases) {
+    	    for (OTDatabase db : databases) {	     	   
+    	        if(db.contains(id)) {
+    	            return db;
+    	        }
+    	    }
 	    }
 	    return null;
 	}
@@ -455,27 +460,33 @@ public class OTrunkImpl implements OTrunk
     	throws Exception
     {    	
     	// first see if we have a database with the same context url
-    	for (OTDatabase db : databases) {
-    		if(!(db instanceof XMLDatabase)) continue;
-    		
-    		XMLDatabase xmlDatabase = (XMLDatabase) db;
-    		URL contextURL = xmlDatabase.getContextURL();
-    		if (contextURL == null) {
-    			logger.info("Database without a context url! " + xmlDatabase.getDatabaseId());
-    		}
-    		else if (contextURL.equals(url)){
-    			if (reload) {
-    				// remove the current database, so we can reload it below
-    				logger.info("Removing database so we can reload it.");
-    				databases.remove(xmlDatabase);
-    				removeObjectService(getExistingObjectService(xmlDatabase));
-    				break;
-    			} else {
-    				return getExistingObjectService(xmlDatabase);
-    			}
-    		}
+    	synchronized(databases) {
+    		XMLDatabase dbToRemove = null;
+        	for (OTDatabase db : databases) {
+        		if(!(db instanceof XMLDatabase)) continue;
+        		
+        		XMLDatabase xmlDatabase = (XMLDatabase) db;
+        		URL contextURL = xmlDatabase.getContextURL();
+        		if (contextURL == null) {
+        			logger.info("Database without a context url! " + xmlDatabase.getDatabaseId());
+        		}
+        		else if (contextURL.equals(url)){
+        			if (reload) {
+        				// remove the current database, so we can reload it below
+        				logger.info("Removing database so we can reload it.");
+        				dbToRemove = xmlDatabase;
+        				break;
+        			} else {
+        				return getExistingObjectService(xmlDatabase);
+        			}
+        		}
+        	}
+        	if (dbToRemove != null) {
+    			databases.remove(dbToRemove);
+    			removeObjectService(getExistingObjectService(dbToRemove));
+        	}
     	}
-    	
+
 		XMLDatabase includeDb = new XMLDatabase(url);
 
 		// load the data base		
@@ -1093,26 +1104,28 @@ public class OTrunkImpl implements OTrunk
     	logger.finest("Getting all objects for class: " + klass.getName());
     	ArrayList<T> allObjects = new ArrayList<T>();
     	logger.finest("Datases: " + databases.size());
-    	for (OTDatabase db : databases) {
-    		logger.finest("Searching db: " + db.getURI());
-    		HashMap<OTID, ? extends OTDataObject> map = db.getDataObjects();
-    		logger.finest("db has " + map.size() + " objects");
-    		for (Entry<OTID, ? extends OTDataObject> entry : map.entrySet()) {
-    			OTDataObject dataObj = entry.getValue();
-    			OTID id = entry.getKey();
-    			logger.finest("Data object class is: " + dataObj.getType().getClassName());
-                    try {
-	                    Class<?> objClass = Class.forName(dataObj.getType().getClassName());
-            			if (klass.isAssignableFrom(objClass)) {
-            				logger.finest("It's a match! Adding it.");
-            				allObjects.add((T) objService.getOTObject(id));
-            			}
-                    } catch (ClassNotFoundException e) {
-                    	logger.log(Level.WARNING, "Couldn't instantiate class: " + dataObj.getType().getClassName(), e);
-                    } catch (Exception e) {
-     					logger.log(Level.WARNING, "Couldn't get OTObject for object: " + id.toExternalForm(), e);
-     				}
-    		}
+    	synchronized(databases) {
+        	for (OTDatabase db : databases) {
+        		logger.finest("Searching db: " + db.getURI());
+        		HashMap<OTID, ? extends OTDataObject> map = db.getDataObjects();
+        		logger.finest("db has " + map.size() + " objects");
+        		for (Entry<OTID, ? extends OTDataObject> entry : map.entrySet()) {
+        			OTDataObject dataObj = entry.getValue();
+        			OTID id = entry.getKey();
+        			logger.finest("Data object class is: " + dataObj.getType().getClassName());
+                        try {
+    	                    Class<?> objClass = Class.forName(dataObj.getType().getClassName());
+                			if (klass.isAssignableFrom(objClass)) {
+                				logger.finest("It's a match! Adding it.");
+                				allObjects.add((T) objService.getOTObject(id));
+                			}
+                        } catch (ClassNotFoundException e) {
+                        	logger.log(Level.WARNING, "Couldn't instantiate class: " + dataObj.getType().getClassName(), e);
+                        } catch (Exception e) {
+         					logger.log(Level.WARNING, "Couldn't get OTObject for object: " + id.toExternalForm(), e);
+         				}
+        		}
+        	}
     	}
     	return allObjects;
     }
@@ -1136,62 +1149,64 @@ public class OTrunkImpl implements OTrunk
     		excludeIDs = new ArrayList<OTID>();
     	}
     	// XXX Should we be searching all databases?
-    	for (OTDatabase db : databases) {
-        	try {
-    	        ArrayList<OTDataPropertyReference> parents = null;
-    	        if (incoming) {
-    	        	parents = db.getIncomingReferences(objectID);
-    	        } else {
-    	        	parents = db.getOutgoingReferences(objectID);
-    	        }
-    	        if (parents != null) {
-        	        logger.finest("Found " + parents.size() + " references");
-        	        for (OTDataPropertyReference reference : parents) {
-        	        	/* FIXME by skipping objects we've seen already, it's possible that we're not including all of the possible paths to an object.
-        	        	 * For instance, if A indirectly references D through both B and C, only one of A -> B -> D or A -> C -> D will be returned.
-        	        	 * So while this code *will* find all the correct endpoints, it won't necessarily reflect all of the possible paths between those endpoints.
-        	        	 */
-        	        	OTID pId;
-        	        	if (incoming) {
-        	        		pId= reference.getSource();
-        	        	} else {
-        	        		pId = reference.getDest();
-        	        	}
-        	        	if (! excludeIDs.contains(pId)) {
-        	        		logger.finest("Found reference id: " + pId);
-        	        		excludeIDs.add(pId);
-        	        		
-        	        		ArrayList<OTDataPropertyReference> pPath = (ArrayList<OTDataPropertyReference>) currentPath.clone();
-        	        		pPath.add(reference);
-        	        		
-                	        OTDataObject parentObj = db.getOTDataObject(null, pId);
-                	        if (parentObj != null) {
-                    	        if (filterClass != null) {
-                    	        	logger.finest("Filter class: " + filterClass.getSimpleName() + ", parent class: " + parentObj.getType().getClassName());
-                    	        }
-                    	        if (filterClass == null || filterClass.isAssignableFrom(Class.forName(parentObj.getType().getClassName()))) {
-                    	        	logger.finest("Found a matching parent: " + parentObj.getGlobalId());
-                    	        	allParents.add(pPath);
-                    	        }
-                	        	if (getIndirectReferences) {
-                	        		logger.finest("recursing");
-                	        		allParents.addAll(getReferences(incoming, pId, filterClass, true, pPath, excludeIDs));
-                	        		logger.finest("unrecursing");
-                	        	}
-                	        } else {
-                	        	logger.warning("Had parent id but no real object!: " + pId);
-                	        }
-        	        	} else {
-        	        		logger.finest("Already seen this id: " + pId);
-        	        	}
+    	synchronized(databases) {
+        	for (OTDatabase db : databases) {
+            	try {
+        	        ArrayList<OTDataPropertyReference> parents = null;
+        	        if (incoming) {
+        	        	parents = db.getIncomingReferences(objectID);
+        	        } else {
+        	        	parents = db.getOutgoingReferences(objectID);
         	        }
-    	        } else {
-    	        	logger.finest("null parents");
-    	        }
-            } catch (Exception e) {
-    	        // TODO Auto-generated catch block
-            	logger.log(Level.WARNING, "Error finding parents", e);
-            }
+        	        if (parents != null) {
+            	        logger.finest("Found " + parents.size() + " references");
+            	        for (OTDataPropertyReference reference : parents) {
+            	        	/* FIXME by skipping objects we've seen already, it's possible that we're not including all of the possible paths to an object.
+            	        	 * For instance, if A indirectly references D through both B and C, only one of A -> B -> D or A -> C -> D will be returned.
+            	        	 * So while this code *will* find all the correct endpoints, it won't necessarily reflect all of the possible paths between those endpoints.
+            	        	 */
+            	        	OTID pId;
+            	        	if (incoming) {
+            	        		pId= reference.getSource();
+            	        	} else {
+            	        		pId = reference.getDest();
+            	        	}
+            	        	if (! excludeIDs.contains(pId)) {
+            	        		logger.finest("Found reference id: " + pId);
+            	        		excludeIDs.add(pId);
+            	        		
+            	        		ArrayList<OTDataPropertyReference> pPath = (ArrayList<OTDataPropertyReference>) currentPath.clone();
+            	        		pPath.add(reference);
+            	        		
+                    	        OTDataObject parentObj = db.getOTDataObject(null, pId);
+                    	        if (parentObj != null) {
+                        	        if (filterClass != null) {
+                        	        	logger.finest("Filter class: " + filterClass.getSimpleName() + ", parent class: " + parentObj.getType().getClassName());
+                        	        }
+                        	        if (filterClass == null || filterClass.isAssignableFrom(Class.forName(parentObj.getType().getClassName()))) {
+                        	        	logger.finest("Found a matching parent: " + parentObj.getGlobalId());
+                        	        	allParents.add(pPath);
+                        	        }
+                    	        	if (getIndirectReferences) {
+                    	        		logger.finest("recursing");
+                    	        		allParents.addAll(getReferences(incoming, pId, filterClass, true, pPath, excludeIDs));
+                    	        		logger.finest("unrecursing");
+                    	        	}
+                    	        } else {
+                    	        	logger.warning("Had parent id but no real object!: " + pId);
+                    	        }
+            	        	} else {
+            	        		logger.finest("Already seen this id: " + pId);
+            	        	}
+            	        }
+        	        } else {
+        	        	logger.finest("null parents");
+        	        }
+                } catch (Exception e) {
+        	        // TODO Auto-generated catch block
+                	logger.log(Level.WARNING, "Error finding parents", e);
+                }
+        	}
     	}
     	return allParents;
     }
