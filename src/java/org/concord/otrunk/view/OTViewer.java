@@ -1135,11 +1135,14 @@ public class OTViewer extends JFrame
 
         switch (userMode) {
         case OTConfig.NO_USER_MODE:
-            if (remoteURL != null) {
-                frame.setTitle(baseFrameTitle + ": " + remoteURL.toString());
-            } else {
-                frame.setTitle(baseFrameTitle + ": " + currentURL.toString());
-            }
+        	if (frame.getTitle().equals(baseFrameTitle) && baseFrameTitle.equals(DEFAULT_BASE_FRAME_TITLE)) {
+        		// update the frame title to reflect the document location, but only if the frame title isn't custom
+                if (remoteURL != null) {
+                    frame.setTitle(baseFrameTitle + ": " + remoteURL.toString());
+                } else {
+                    frame.setTitle(baseFrameTitle + ": " + currentURL.toString());
+                }
+        	}
             break;
         case OTConfig.SINGLE_USER_MODE:
             String userSessionLabel = null;            
