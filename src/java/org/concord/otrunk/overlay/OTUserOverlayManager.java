@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -214,6 +214,13 @@ public class OTUserOverlayManager
     	}
     	return null;
     }
+	
+	public void pruneDatabase(OTOverlay overlay) {
+		OTDatabase db = getDatabase(overlay);
+    	if (db instanceof CompositeDatabase) {
+    		((CompositeDatabase) db).pruneNonDeltaObjects();
+    	}
+	}
 
 	public void remove(OTOverlay overlay) {
 		OTUserObject userObject = getUserObject(overlay);
@@ -344,6 +351,7 @@ public class OTUserOverlayManager
 		if (otrunk.isSailSavingDisabled() && ! OTConfig.isIgnoreSailViewMode()) {
 			logger.info("Not saving overlay because SAIL saving is disabled");
 		} else {
+			pruneDatabase(overlay);
 			otrunk.remoteSaveData(getXMLDatabase(overlay), OTViewer.HTTP_PUT, authenticator);
 		}
 	}
