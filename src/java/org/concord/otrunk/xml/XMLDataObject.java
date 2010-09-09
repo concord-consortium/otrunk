@@ -36,8 +36,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
@@ -143,18 +143,22 @@ public class XMLDataObject
 	    	oldObject = resources.remove(key);
 	    	if (oldObject instanceof OTDataObject) {
 	    		database.removeReference(this, (OTDataObject) oldObject);
+	    	} else if (oldObject instanceof OTID) {
+	    		database.removeReference(this.globalId, (OTID) oldObject);
 	    	}
 	    } else {
 	    	oldObject = resources.put(key, resource);
 	    	if (oldObject instanceof OTDataObject) {
 	    		database.removeReference(this, (OTDataObject) oldObject);
+	    	} else if (oldObject instanceof OTID) {
+	    		database.removeReference(this.globalId, (OTID) oldObject);
 	    	}
+	    	
 	    	if (resource instanceof OTDataObject) {
 	    		database.recordReference(this, (OTDataObject) resource, key);
-	    	}
-	    	if (resource instanceof OTID) {
+	    	} else if (resource instanceof OTID) {
 	    		try {
-	    			database.recordReference(this, database.getOTDataObject(this, (OTID) resource), key);
+	    			database.recordReference(this.globalId, (OTID) resource, key);
 	    		} catch (Exception e) {
 	    			// TODO do we care?
 	    		}
