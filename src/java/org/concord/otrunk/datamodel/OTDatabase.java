@@ -132,4 +132,12 @@ public interface OTDatabase
 	 * @return
 	 */
 	public ArrayList<OTDataPropertyReference> getOutgoingReferences(OTID otid);
+
+	public void recordReference(OTID parentID, OTID childID, String property);
+	public void recordReference(OTDataObject parent, OTDataObject child, String property);
+
+	public void removeReference(OTDataObject parent, OTDataObject child);
+	public void removeReference(OTID parentID, OTID childID);
+	
+	
 }

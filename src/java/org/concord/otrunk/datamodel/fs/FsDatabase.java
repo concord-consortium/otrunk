@@ -359,4 +359,24 @@ public class FsDatabase implements OTDatabase
     {
 		throw new UnsupportedOperationException("not implemented yet");
     }
+
+	public void recordReference(OTID parentID, OTID childID, String property)
+    {
+		throw new UnsupportedOperationException("not implemented yet");
+    }
+
+	public void recordReference(OTDataObject parent, OTDataObject child, String property)
+    {
+		throw new UnsupportedOperationException("not implemented yet");
+    }
+
+	public void removeReference(OTDataObject parent, OTDataObject child)
+    {
+		throw new UnsupportedOperationException("not implemented yet");
+    }
+
+	public void removeReference(OTID parentID, OTID childID)
+    {
+		throw new UnsupportedOperationException("not implemented yet");
+    }
 }
