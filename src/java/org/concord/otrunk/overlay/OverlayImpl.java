@@ -7,6 +7,7 @@ import org.concord.framework.otrunk.OTResourceList;
 import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.datamodel.OTDataObject;
+import org.concord.otrunk.datamodel.OTDataPropertyReference;
 import org.concord.otrunk.datamodel.OTDatabase;
 
 public class OverlayImpl
@@ -109,7 +110,7 @@ public class OverlayImpl
 		for(int i=0; i<nonDeltaObjects.size(); i++){
 			OTID nonDeltaId = (OTID)nonDeltaObjects.get(i);
 			if(nonDeltaId.equals(id)){
-				// This objec is already registered.
+				// This object is already registered.
 				return;
 			}
 		}
@@ -126,5 +127,37 @@ public class OverlayImpl
     {
 		listeners.remove(listener);	    
     }
+	
+	public void pruneNonDeltaObjects() {
+		// we need to do this process repeatedly, since pruning one object may end up freeing up another object to be pruned in a later loop
+		boolean objectsWerePruned = false;
+		do {
+			ArrayList<OTID> objectsToPrune = new ArrayList<OTID>();
+    		OTResourceList nonDeltaObjects = otOverlay.getNonDeltaObjects();
+    		
+    		for (int i = 0; i < nonDeltaObjects.size(); i++) {
+    			OTID nonDeltaId = (OTID)nonDeltaObjects.get(i);
+    			ArrayList<OTDataPropertyReference> incomingReferences = overlayDb.getIncomingReferences(nonDeltaId);
+    			if (incomingReferences.size() == 1) {
+    				System.out.println("Object " + nonDeltaId + " was only referenced in one place: " + incomingReferences.get(0).getSource() + ":" + incomingReferences.get(0).getProperty());
+    				objectsToPrune.add(nonDeltaId);
+    			}
+    		}
+    		objectsWerePruned = (objectsToPrune.size() > 0);
+    		for (OTID id : objectsToPrune) {
+    			nonDeltaObjects.remove(id);
+    			ArrayList<OTDataPropertyReference> outgoingReferences = overlayDb.getOutgoingReferences(id);
+    			if (outgoingReferences != null) {
+        			ArrayList<OTID> refsToRemove = new ArrayList<OTID>();
+        			for (OTDataPropertyReference ref : outgoingReferences) {
+        				refsToRemove.add(ref.getDest());
+        			}
+        			for (OTID child : refsToRemove) {
+        				overlayDb.removeReference(id, child);
+        			}
+    			}
+    		}
+		} while(objectsWerePruned);
+	}
 
 }

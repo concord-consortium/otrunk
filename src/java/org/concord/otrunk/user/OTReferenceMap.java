@@ -194,5 +194,10 @@ public class OTReferenceMap extends DefaultOTObject
 		throw new UnsupportedOperationException("reference map doesn't generate events");
     }
 
+	public void pruneNonDeltaObjects()
+    {
+		// we don't want to support pruning objects from the user level overlays
+    }
+
 
 }

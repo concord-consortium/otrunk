@@ -57,4 +57,6 @@ public interface Overlay
 	
 	public void addOverlayListener(OverlayListener listener);
 	public void removeOverlayListener(OverlayListener listener);
+
+	public void pruneNonDeltaObjects();
 }
