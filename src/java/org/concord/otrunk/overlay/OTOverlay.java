@@ -9,5 +9,6 @@ public interface OTOverlay
 {
 	public OTResourceMap getDeltaObjectMap();
 	
+	public static String NON_DELTA_OBJECTS_ATTRIBUTE = "nonDeltaObjects";
 	public OTResourceList getNonDeltaObjects();
 }

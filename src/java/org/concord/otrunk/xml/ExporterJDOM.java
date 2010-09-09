@@ -60,6 +60,7 @@ import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.datamodel.OTPathID;
 import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
+import org.concord.otrunk.overlay.OTOverlay;
 import org.concord.otrunk.xml.XMLReferenceInfo.EnumType;
 import org.concord.otrunk.xml.XMLReferenceInfo.XmlType;
 import org.jdom.Comment;
@@ -574,6 +575,11 @@ public class ExporterJDOM
 
 		// Check if we should write out a reference
 		if(shouldWriteReference(dataObj, parent, parentResourceName)) {
+			// never write an object reference 
+			if (parentResourceName.startsWith(OTOverlay.NON_DELTA_OBJECTS_ATTRIBUTE + "[")) {
+				// System.out.println("skipping writing object reference");
+				return null;
+			}
 			return exportObjectReference(id);			
 		}
 		
@@ -582,7 +588,7 @@ public class ExporterJDOM
 		// and if it has a valid container then we are inside of that container
 		writtenIds.add(id);
 		
-		// System.err.println("writting object: " + id);		
+		// System.err.println("writing object: " + id);		
 		
 		String objectFullClassName = OTrunkImpl.getClassName(dataObj);
 		String objectElementName =  getObjectElementName(objectFullClassName);
