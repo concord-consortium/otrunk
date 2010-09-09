@@ -375,5 +375,29 @@ public class CompositeDatabase
     {
 		return activeOverlayDb.getIncomingReferences(otid);
     }
+	
+	public void pruneNonDeltaObjects() {
+		activeOverlay.pruneNonDeltaObjects();
+	}
+
+	public void recordReference(OTID parentID, OTID childID, String property)
+    {
+	    activeOverlayDb.recordReference(parentID, childID, property);
+    }
+
+	public void recordReference(OTDataObject parent, OTDataObject child, String property)
+    {
+	    activeOverlayDb.recordReference(parent, child, property);
+    }
+
+	public void removeReference(OTDataObject parent, OTDataObject child)
+    {
+	    activeOverlayDb.removeReference(parent, child);
+    }
+
+	public void removeReference(OTID parentID, OTID childID)
+    {
+	    activeOverlayDb.removeReference(parentID, childID);
+    }
 
 }
