@@ -326,7 +326,8 @@ public class XMLDatabase
 	 * @param label
 	 * @param statusStream
 	 */
-	protected void initialize(URL contextURL, String label, PrintStream statusStream)
+	@Deprecated
+    protected void initialize(URL contextURL, String label, PrintStream statusStream)
 	{
 		initialize(contextURL, label);
 	}
@@ -1039,7 +1040,17 @@ public class XMLDatabase
 		recordReference(parentID, childID, property);
 	}
 	
+	private OTID unmapID(OTID id) {
+		if (id instanceof OTTransientMapID) {
+			return ((OTTransientMapID)id).getMappedId();
+		}
+		return id;
+	}
+	
 	public void recordReference(OTID parentID, OTID childID, String property) {
+		parentID = unmapID(parentID);
+		childID  = unmapID(childID);
+		
 		logger.finer("Recording reference: " + parentID + " (" + property + ") --> " + childID);
 		
 		OTDataPropertyReference ref = new OTDataPropertyReference(parentID, childID, property);
@@ -1076,7 +1087,10 @@ public class XMLDatabase
 	}
 	
 	public void removeReference(OTID parentID, OTID childID) {
-		logger.finest("Removing reference: " + parentID + " --> " + childID);	
+		parentID = unmapID(parentID);
+		childID  = unmapID(childID);
+		
+		logger.finer("Removing reference: " + parentID + " --> " + childID);	
 		
 		ArrayList<OTDataPropertyReference> parents = incomingReferences.get(childID);
 		ArrayList<OTDataPropertyReference> children = outgoingReferences.get(parentID);
