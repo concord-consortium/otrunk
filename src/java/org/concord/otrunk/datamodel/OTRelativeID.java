@@ -127,4 +127,9 @@ public class OTRelativeID
     {
 		return toStringInternal();
     }
+
+	public OTID getMappedId()
+    {
+	    return this;
+    }
 }

@@ -141,4 +141,9 @@ public class OTUUID extends UUID
     {
 		return super.toString();
     }
+
+	public OTID getMappedId()
+    {
+	    return this;
+    }
 }
