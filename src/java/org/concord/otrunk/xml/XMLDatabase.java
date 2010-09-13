@@ -1041,6 +1041,10 @@ public class XMLDatabase
 	}
 	
 	public void recordReference(OTID parentID, OTID childID, String property) {
+		if (parentID == null || childID == null) {
+			// can't reference null
+			return;
+		}
 		parentID = parentID.getMappedId();
 		childID  = childID.getMappedId();
 		
@@ -1080,6 +1084,11 @@ public class XMLDatabase
 	}
 	
 	public void removeReference(OTID parentID, OTID childID) {
+		if (parentID == null || childID == null) {
+			// can't reference null
+			return;
+		}
+		
 		parentID = parentID.getMappedId();
 		childID  = childID.getMappedId();
 		
