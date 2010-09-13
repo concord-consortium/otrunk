@@ -48,8 +48,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -706,10 +706,7 @@ public class OTrunkImpl implements OTrunk
     		return true;
     	}
     	if (includingChildren) {
-    		OTID objId = otObject.getGlobalId();
-    		if (objId instanceof OTTransientMapID) {
-    			objId = ((OTTransientMapID) objId).getMappedId();
-    		}
+    		OTID objId = otObject.getGlobalId().getMappedId();
     		
     		ArrayList<ArrayList<OTDataPropertyReference>> references = getOutgoingReferences(objId, true);
     		for (ArrayList<OTDataPropertyReference> path : references) {
