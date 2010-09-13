@@ -83,4 +83,9 @@ public class OTPathID
     {
 		return path;
     }
+
+	public OTID getMappedId()
+    {
+	    return this;
+    }
 }
