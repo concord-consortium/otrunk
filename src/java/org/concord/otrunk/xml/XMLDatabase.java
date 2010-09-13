@@ -1040,16 +1040,9 @@ public class XMLDatabase
 		recordReference(parentID, childID, property);
 	}
 	
-	private OTID unmapID(OTID id) {
-		if (id instanceof OTTransientMapID) {
-			return ((OTTransientMapID)id).getMappedId();
-		}
-		return id;
-	}
-	
 	public void recordReference(OTID parentID, OTID childID, String property) {
-		parentID = unmapID(parentID);
-		childID  = unmapID(childID);
+		parentID = parentID.getMappedId();
+		childID  = childID.getMappedId();
 		
 		logger.finer("Recording reference: " + parentID + " (" + property + ") --> " + childID);
 		
@@ -1087,8 +1080,8 @@ public class XMLDatabase
 	}
 	
 	public void removeReference(OTID parentID, OTID childID) {
-		parentID = unmapID(parentID);
-		childID  = unmapID(childID);
+		parentID = parentID.getMappedId();
+		childID  = childID.getMappedId();
 		
 		logger.finer("Removing reference: " + parentID + " --> " + childID);	
 		

@@ -116,10 +116,7 @@ public class Copier
 				}
 				
 				if (onlyModifications) {
-    				OTID itemID = itemObj.getGlobalId();
-    				if (itemID instanceof OTTransientMapID) {
-    					itemID = ((OTTransientMapID)itemID).getMappedId();
-    				}
+    				OTID itemID = itemObj.getGlobalId().getMappedId();
     				
     				if (itemObj instanceof CompositeDataObject) {
     					CompositeDataObject compositeObj = (CompositeDataObject) itemObj;
