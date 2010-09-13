@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="fabc17f5-09a8-11de-aebf-37f53627f26a">
+  <imports>
+    <import class="org.concord.otrunk.OTStateRoot" />
+    <import class="org.concord.otrunk.user.OTUserObject" />
+    <import class="org.concord.otrunk.user.OTReferenceMap" />
+  </imports>
+  <objects>
+    <OTStateRoot formatVersionString="1.0">
+      <userMap>
+        <entry key="c4eceaa0-09a8-11de-aebf-37f53627f26a">
+          <OTReferenceMap>
+            <user>
+              <OTUserObject id="c4eceaa0-09a8-11de-aebf-37f53627f26a" name="anon_single_user" />
+            </user>
+            <map />
+          </OTReferenceMap>
+        </entry>
+      </userMap>
+    </OTStateRoot>
+  </objects>
+</otrunk>

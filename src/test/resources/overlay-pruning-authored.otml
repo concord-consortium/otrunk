@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="9d4f759c-3166-4c54-a6ab-416e546d9f62">
+  <imports>
+    <import class="org.concord.otrunk.OTSystem" />
+    <import class="org.concord.otrunk.test.OTBasicTestObject" />
+  </imports>
+  <objects>
+    <OTSystem>
+      <root>
+        <OTBasicTestObject local_id="basic_root_object" />
+      </root>
+    </OTSystem>
+  </objects>
+</otrunk>
