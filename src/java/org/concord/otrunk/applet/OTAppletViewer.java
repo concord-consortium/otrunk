@@ -38,14 +38,12 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.view.OTViewContainerPanel;
 import org.concord.otrunk.view.OTViewerHelper;
-import org.concord.otrunk.xml.XMLDatabase;
 
 public class OTAppletViewer extends JApplet
 {
@@ -71,7 +69,8 @@ public class OTAppletViewer extends JApplet
 		return getParameter("name");
 	}
 
-	public void init() 
+	@Override
+    public void init() 
 	{
 		super.init();
 
@@ -85,7 +84,8 @@ public class OTAppletViewer extends JApplet
 		}
 	}	
 	
-	public void start() 
+	@Override
+    public void start() 
 	{
 		super.start();
 
@@ -104,7 +104,8 @@ public class OTAppletViewer extends JApplet
 			// so we sleep for a bit before looking for them.
 			// if there was some way to know when they had fully loaded. that should be used instead.			
 			Thread delayer = new Thread(){
-				public void run()
+				@Override
+                public void run()
 				{
 					try {
 	                    Thread.sleep(1000);
@@ -143,7 +144,8 @@ public class OTAppletViewer extends JApplet
 	/**
 	 * There is also the stop method, but I believe that might be called if 
 	 */
-	public void destroy() 
+	@Override
+    public void destroy() 
 	{
 		System.out.println("applet.destroy called on " + getAppletName());
 		
@@ -154,7 +156,8 @@ public class OTAppletViewer extends JApplet
 		super.destroy();
 	}
 
-	public void stop()
+	@Override
+    public void stop()
 	{
 		System.out.println("applet.stop called on " + getAppletName());
 		
@@ -232,7 +235,7 @@ public class OTAppletViewer extends JApplet
 	
 			// call setCurrentObject on that view container with a null
 			// frame
-			OTObject appletObject = getOTObject();
+			OTObject appletObject = getRootOTObject();
 
 			otContainer.setCurrentObject(appletObject);
 			
@@ -264,7 +267,7 @@ public class OTAppletViewer extends JApplet
 		}		
 	}
 
-	public OTObject getOTObject()
+	public OTObject getRootOTObject()
 		throws Exception
 	{
 		// call setCurrentObject on that view container with a null
@@ -274,12 +277,15 @@ public class OTAppletViewer extends JApplet
 		String refid = getParameter("refid");
 		OTObject appletObject = root;
 		if(refid != null && refid.length() > 0){
-			OTID id = getID(refid);
-	
-			appletObject = ((DefaultOTObject)root).getReferencedObject(id);
+			appletObject = getOTObject(refid);
 		}
 	
 		return appletObject;
+	}
+	
+	public OTObject getOTObject(String otid) throws Exception {
+		OTID id = getID(otid);
+		return getOTrunk().getOTObject(id);
 	}
 
 	/**
@@ -411,7 +417,7 @@ public class OTAppletViewer extends JApplet
 	public OTID getID(String id)
 	{
 		if(isMaster()){
-			return ((XMLDatabase)viewerHelper.getOtDB()).getOTIDFromLocalID(id);
+			return getOTrunk().getOTID(id);
 		}
 
 		OTAppletViewer localMaster = getMaster();
