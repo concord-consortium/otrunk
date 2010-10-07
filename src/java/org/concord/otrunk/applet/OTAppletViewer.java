@@ -44,6 +44,7 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.view.OTViewContainerPanel;
 import org.concord.otrunk.view.OTViewerHelper;
+import org.concord.otrunk.xml.XMLDatabase;
 
 public class OTAppletViewer extends JApplet
 {
@@ -417,7 +418,15 @@ public class OTAppletViewer extends JApplet
 	public OTID getID(String id)
 	{
 		if(isMaster()){
-			return getOTrunk().getOTID(id);
+			if (id.startsWith("${")) {
+				// local id
+				id = id.substring(2, id.length()-1);
+				// FIXME it's not guaranteed that the db in viewerHelper is the db that contains this local id
+				return ((XMLDatabase)viewerHelper.getOtDB()).getOTIDFromLocalID(id);
+			} else {
+				// assume its a uuid or path id
+				return getOTrunk().getOTID(id);
+			}
 		}
 
 		OTAppletViewer localMaster = getMaster();
