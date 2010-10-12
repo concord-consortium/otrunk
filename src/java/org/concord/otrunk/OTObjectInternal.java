@@ -538,21 +538,21 @@ public class OTObjectInternal implements OTObjectInterface
 	
 	public OTResourceMap getResourceMap(String resourceName)
     {
-        OTDataMap map = (OTDataMap)dataObject.getResourceCollection(
+        OTDataMap map = dataObject.getResourceCollection(
                 resourceName, OTDataMap.class);
         return new OTResourceMapImpl(resourceName, map, this);
     }
 
 	public OTObjectMap getObjectMap(String resourceName)
     {
-    	OTDataMap map = (OTDataMap)dataObject.getResourceCollection(
+    	OTDataMap map = dataObject.getResourceCollection(
     			resourceName, OTDataMap.class);
     	return new OTObjectMapImpl(resourceName, map, this);
     }
 
 	public OTResourceList getResourceList(String resourceName)
     {
-        OTDataList list = (OTDataList)dataObject.getResourceCollection(
+        OTDataList list = dataObject.getResourceCollection(
                 resourceName, OTDataList.class);
         return new OTResourceListImpl(resourceName, list, this);
     }
@@ -560,7 +560,7 @@ public class OTObjectInternal implements OTObjectInterface
 	public OTObjectList getObjectList(String resourceName, Object overriddenValue)
     {		
     	OTDataList list = 
-    		(OTDataList) getResourceCollection(resourceName, OTDataList.class, overriddenValue);
+    		getResourceCollection(resourceName, OTDataList.class, overriddenValue);
         return new OTObjectListImpl(resourceName, list, this);
     }
 
@@ -613,7 +613,8 @@ public class OTObjectInternal implements OTObjectInterface
 		referencedObjects.put(key, value);
 	}
 	
-	protected void finalize()
+	@Override
+    protected void finalize()
 	throws Throwable
 	{
 		if(OTConfig.isTrace()){
@@ -733,4 +734,8 @@ public class OTObjectInternal implements OTObjectInterface
     {
 	    return changeListeners;
     }
+	
+	public OTObjectMap getAnnotations() {
+		return getObjectMap("annotations");
+	}
 }
