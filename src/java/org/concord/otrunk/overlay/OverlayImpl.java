@@ -128,7 +128,7 @@ public class OverlayImpl
 		listeners.remove(listener);	    
     }
 	
-	public void pruneNonDeltaObjects() {
+	public synchronized void pruneNonDeltaObjects() {
 		// FIXME There's still a problem where objects can be orphaned but not pruned when the overlay is saved, the current session is ended, and then overlay is loaded in a new session and saved
 		// we need to do this process repeatedly, since pruning one object may end up freeing up another object to be pruned in a later loop
 		boolean objectsWerePruned = false;

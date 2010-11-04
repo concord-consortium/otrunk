@@ -36,6 +36,7 @@ import org.concord.framework.otrunk.view.OTXHTMLView;
 import org.concord.otrunk.OTIncludeRootObject;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
+import org.concord.otrunk.overlay.OTUserOverlayManagerFactory;
 import org.concord.otrunk.user.OTUserObject;
 
 
@@ -53,10 +54,9 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 	    otrunk = (OTrunkImpl) getViewService(OTrunk.class);
 	    
 		if (firstRun) { //why is this method called twice?
-			overlayManager = new OTUserOverlayManager(otrunk);
-			viewContext.addViewService(OTUserOverlayManager.class, overlayManager);
 			loadGlobalOverlay(root);
 			loadUserDatabases(root);
+			viewContext.addViewService(OTUserOverlayManager.class, overlayManager);
 			firstRun = false;
 		}
 	    reportTemplate = root.getReportTemplate();
@@ -141,8 +141,11 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 					if (overlayURL != null && userObject != null) {
 						try {
 		    			  	synchronized (this){
+		    			  		if (overlayManager == null) {
+									overlayManager = OTUserOverlayManagerFactory.getUserOverlayManager(overlayURL, otrunk);
+								}
 		        				// map the object service/overlay to the user
-		    			  		overlayManager.add(overlayURL, userObject, false);
+		    			  		overlayManager.addReadOnly(overlayURL, userObject, false);
 		    			  	}
 						} catch (Exception e) {
 							logger.log(Level.SEVERE, "Couldn't initialize user overlay", e);
@@ -177,9 +180,9 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 			if(root.getGroupOverlayURL() == null){
 				return;
 			}
-
+			overlayManager = OTUserOverlayManagerFactory.getUserOverlayManager(root.getGroupOverlayURL(), otrunk);
 			long start = System.currentTimeMillis();
-			overlayManager.add(root.getGroupOverlayURL(), null, true);
+			overlayManager.addReadOnly(root.getGroupOverlayURL(), null, true);
 	        System.out.println("group overlay load time: " + 
 	        	(System.currentTimeMillis() - start) + "ms");
 		} catch (Exception e) {
