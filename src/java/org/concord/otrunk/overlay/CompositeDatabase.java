@@ -376,7 +376,7 @@ public class CompositeDatabase
 		return activeOverlayDb.getIncomingReferences(otid);
     }
 	
-	public void pruneNonDeltaObjects() {
+	public synchronized void pruneNonDeltaObjects() {
 		activeOverlay.pruneNonDeltaObjects();
 	}
 

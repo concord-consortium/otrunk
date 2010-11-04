@@ -2,6 +2,7 @@ package org.concord.otrunk.view;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +16,7 @@ import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
+import org.concord.otrunk.overlay.OTUserOverlayManagerFactory;
 import org.concord.otrunk.user.OTUserObject;
 
 public class OTGroupListManager extends DefaultOTObject
@@ -44,11 +46,6 @@ public class OTGroupListManager extends DefaultOTObject
 	private OTGroupMember currentGroupMember;
 
 	private OTUserOverlayManager overlayManager;
-
-	private long lastReloadTime = 0;
-	private long reloadDelay = 10000;
-	
-	private boolean skipStudentReload = false;
 	
 	public OTGroupListManager(ResourceSchema resources)
     {
@@ -60,15 +57,25 @@ public class OTGroupListManager extends DefaultOTObject
 	public void initializeBundle(OTServiceContext serviceContext)
 	{
 		userList = resources.getUserList();
-		groupDataURL = resources.getGroupDataURL();
 		groupListURL = resources.getUserListURL();
 		if (groupListURL != null) {
 			initializeUserListFromURL();
 		}
+		
+		groupDataURL = resources.getGroupDataURL();
+		overlayManager = serviceContext.getService(OTUserOverlayManager.class);
+		if (overlayManager == null) {
+			initOverlayManager();
+			serviceContext.addService(OTUserOverlayManager.class, overlayManager);
+		}
 		if (groupDataURL != null) {
 			try {
 	            groupUserObject = resources.getOTObjectService().createObject(OTUserObject.class);
-	            overlayManager.add(groupDataURL, groupUserObject, false);
+	            if (isCurrentMemberSet()) {
+	            	overlayManager.addReadOnly(groupDataURL, groupUserObject, false);
+	            } else {
+	            	overlayManager.addWriteable(groupDataURL, groupUserObject, false);
+	            }
             } catch (Exception e) {
 	            logger.log(Level.WARNING, "Couldn't set up group datastore.", e);
 	            groupUserObject = null;
@@ -80,19 +87,43 @@ public class OTGroupListManager extends DefaultOTObject
 	public void registerServices(OTServiceContext serviceContext)
 	{
 		serviceContext.addService(OTGroupListManager.class, this);
-		overlayManager = serviceContext.getService(OTUserOverlayManager.class);
-		if (overlayManager == null) {
-			overlayManager = new OTUserOverlayManager(otrunk);
-			serviceContext.addService(OTUserOverlayManager.class, overlayManager);
-			// logger.info("Overlay manager registered as service");
-		}
 	}
 	
+	private boolean isCurrentMemberSet() {
+		for (OTObject obj : userList) {
+			OTGroupMember mem = (OTGroupMember) obj;
+			if (mem.getIsCurrentUser()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private void initOverlayManager()
+    {
+		URL autodetectURL = null;
+		if (groupDataURL != null) {
+			autodetectURL = groupDataURL;
+		} else {
+			Iterator<OTObject> iterator = userList.iterator();
+			while (autodetectURL == null && iterator.hasNext()) {
+				OTGroupMember mem = (OTGroupMember) iterator.next();
+				autodetectURL = mem.getDataURL();
+			}
+		}
+		overlayManager = OTUserOverlayManagerFactory.getUserOverlayManager(autodetectURL, otrunk);
+    }
+
 	private void initializeUserListFromURL() {
 		try {
 	        OTObjectSet set = (OTObjectSet) otrunk.getExternalObject(groupListURL, resources.getOTObjectService());
 	        
-	        userList.addAll(set.getObjects());
+	        // add non-duplicated objects
+	        for (OTObject obj : set.getObjects()) {
+	        	if (! userList.contains(obj)) {
+	        		userList.add(obj);
+	        	}
+	        }
         } catch (Exception e) {
 	        logger.log(Level.SEVERE, "Couldn't initialize class list from URL: " + groupListURL, e);
         }
@@ -128,7 +159,11 @@ public class OTGroupListManager extends DefaultOTObject
     					// to avoid problems where the overlayManager still references different versions of the overlay, we'll remove the old ones first
     					overlayManager.reload(groupMember.getUserObject());
     				} else {
-    					overlayManager.add(groupMember.getDataURL(), groupMember.getUserObject(), false);
+    					if (groupMember.getIsCurrentUser()) {
+    						overlayManager.addWriteable(groupMember.getDataURL(), groupMember.getUserObject(), false);
+    					} else {
+    						overlayManager.addReadOnly(groupMember.getDataURL(), groupMember.getUserObject(), false);
+    					}
     				}
     			} catch (Exception e) {
     				logger.log(Level.WARNING, "Couldn't load overlay for user: " + groupMember.getName(), e);
@@ -141,74 +176,8 @@ public class OTGroupListManager extends DefaultOTObject
     	return this.currentGroupMember;
     }
     
-    public void reloadAll() {
-    	reloadAll(true);
-    }
-    
-    public void reloadAll(boolean reloadGroup) {
-    	long now = System.currentTimeMillis();
-    	if ((now - lastReloadTime) < reloadDelay) {
-    		logger.finer("Not reloading. Only " + ((now - lastReloadTime)/1000) + " sec has passed since the last reload.");
-    		return;
-    	}
-    	lastReloadTime = now;
-    	if (reloadGroup) {
-    		reloadGroupOverlay(false);
-    	}
-    	processUserList(true);
-    }
-    
-    // Note: reloadGroupOverlay() is not called here unlike in reloadAll().
-    //       It is supposed to have already been called.
-    public void reloadSelectUsers(OTObjectList userList) {
-    	if (skipStudentReload) {
-    		return;
-    	}
-    	for(OTObject obj: userList){
-    		OTUserObject user = (OTUserObject) obj;
-    		try {
-    			overlayManager.reload(user);
-    		} catch (Exception e) {
-    			logger.log(Level.WARNING, "Couldn't load overlay for user: " + user.getName(), e);
-    		}
-    	}
-    }
-    
-    public void reloadGroupOverlay(boolean interval) {
-    	if (interval) {
-        	long now = System.currentTimeMillis();
-        	if ((now - lastReloadTime) < reloadDelay) {
-        		logger.finer("Not reloading. Only " + ((now - lastReloadTime)/1000) + " sec has passed since the last reload.");
-        		skipStudentReload = true; //flag for reloadSelectUsers()
-        		return;
-        	} else {
-        		skipStudentReload = false;
-        	}
-        	lastReloadTime = now;
-    	}
-    	try {
-    		if (groupUserObject != null) {
-    			logger.finer("reloading group overlay");
-    			overlayManager.reload(groupUserObject);
-    		}
-        } catch (Exception e) {
-        	logger.log(Level.WARNING, "Couldn't load overlay for group", e);
-        }
-    }
-    
     public boolean isGroupEnabled() {
     	return groupUserObject == null;
-    }
-    
-    public OTObject getObjectForUser(OTObject otObject, OTUserObject user) {
-    	OTObject newObject = otObject;
-        try {
-	        newObject = overlayManager.getOTObject(user, otObject);
-        } catch (Exception e) {
-	        e.printStackTrace();
-        }
-    	
-    	return newObject;
     }
     
     public OTGroupMember getMember(OTUserObject user) {
@@ -234,22 +203,6 @@ public class OTGroupListManager extends DefaultOTObject
     		list.add(getMember((OTUserObject) user));
     	}
     	return list;
-    }
-
-	/**
-     * @param reloadDelay the reloadDelay to set
-     */
-    public void setReloadDelay(long ms)
-    {
-	    this.reloadDelay = ms;
-    }
-
-	/**
-     * @return the reloadDelay
-     */
-    public long getReloadDelay()
-    {
-	    return reloadDelay;
     }
 
 }
