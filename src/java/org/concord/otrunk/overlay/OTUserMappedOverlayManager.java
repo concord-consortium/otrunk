@@ -293,7 +293,9 @@ public class OTUserMappedOverlayManager
     	    URL url = null;
     	    try {
     	    	// create as URI first so that it can do any escaping of invalid url chars when it converts to a URL
-    	        url = new URI(userToOverlayMap.get(user).toExternalForm().replaceFirst("\\.otml", suffix)).toURL();
+    	        URL mapUrl = userToOverlayMap.get(user);
+    	        URI referenceUri = new URI(mapUrl.toExternalForm().replaceFirst("\\.otml", suffix));
+				url = referenceUri.toURL();
             } catch (Exception e) {
     	        e.printStackTrace();
     	        return null;
