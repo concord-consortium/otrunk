@@ -28,6 +28,7 @@ public class OTConfig
 	public final static String IGNORE_LOAD_ERRORS = "otrunk.db.ignore_errors";
 	public final static String IGNORE_SAIL_VIEW_MODE = "otrunk.debug.ignore_sail_view_mode";
 	public final static String USE_ALTERNATIVE_EXPORT = "otrunk.export.use_alternative";
+	public final static String SILENT_DB = "otrunk.db.silent";
 	
 	/**
      * This is yet another hack to support something like layers or mutliple files.

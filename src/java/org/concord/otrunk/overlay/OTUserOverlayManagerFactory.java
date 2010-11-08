@@ -25,7 +25,7 @@ public class OTUserOverlayManagerFactory
     	        }
             } catch (Exception e) {
     	        // TODO Auto-generated catch block
-    	        e.printStackTrace();
+    	        // e.printStackTrace();
             }
 		}
 		if (Boolean.getBoolean("otrunk.intrassession.use_single_overlay")) {
