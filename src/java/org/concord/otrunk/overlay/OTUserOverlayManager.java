@@ -133,6 +133,7 @@ public abstract class OTUserOverlayManager
 	
 	public OTUserOverlayManager(OTrunkImpl otrunk) {
 		this.otrunk = otrunk;
+		XMLDatabase.SILENT_DB = true;
 	}
 	
 	protected <T extends OTObject> T getAuthoredObject(T object) {
@@ -166,7 +167,7 @@ public abstract class OTUserOverlayManager
     		if (remoteObject == null) {
     			// create a blank one
     			try {
-    				logger.info("Creating empty overlay database on the fly...");
+    				logger.info("Creating empty database on the fly (root: " + klass.getSimpleName() + ")...");
         			XMLDatabase xmldb = new XMLDatabase();
         			OTObjectService objService = otrunk.createObjectService(xmldb);
         			remoteObject = objService.createObject(klass);

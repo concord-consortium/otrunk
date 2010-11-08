@@ -90,6 +90,8 @@ public class XMLDatabase
 	private static final Logger logger = Logger.getLogger(XMLDatabase.class.getName());
 	public static boolean TRACE_PACKAGES =
 	    OTConfig.getBooleanProp(OTConfig.TRACE_PACKAGES_PROP, false);
+	
+	public static boolean SILENT_DB = OTConfig.getBooleanProp(OTConfig.SILENT_DB, false);
 
 	OTID rootId = null;
 
@@ -164,7 +166,7 @@ public class XMLDatabase
 
 	public XMLDatabase(URL xmlURL) throws Exception
 	{
-		this(xmlURL, System.out);
+		this(xmlURL, SILENT_DB ? null : System.out);
 	}
 
 	public XMLDatabase(URL xmlURL, PrintStream statusStream) throws Exception
@@ -226,10 +228,12 @@ public class XMLDatabase
 
 	public void printErrorDetails()
     {
-	    IndentingPrintWriter writer = new IndentingPrintWriter(System.err);
-	    writer.printFirstln("Error Loading XMLDatabase: ");
-	    resourceLoader.writeResourceErrorDetails(writer, true);
-	    writer.flush();
+		if (! SILENT_DB) {
+    	    IndentingPrintWriter writer = new IndentingPrintWriter(System.err);
+    	    writer.printFirstln("Error Loading XMLDatabase: ");
+    	    resourceLoader.writeResourceErrorDetails(writer, true);
+    	    writer.flush();
+		}
     }
 	
 	public XMLDatabase(InputStream xmlStream, URL contextURL, PrintStream statusStream)
