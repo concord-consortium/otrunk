@@ -137,6 +137,10 @@ public class ExporterJDOM
 	throws Exception
 	{		
 		ExporterJDOM exporter = new ExporterJDOM();
+		
+		if (db instanceof XMLDatabase && ((XMLDatabase)db).getContextURL() != null)
+		exporter.setContextURL(((XMLDatabase)db).getContextURL());
+		
 		Document doc = exporter.buildDocument(rootObject, db);
 		
 		writeDocument(doc, outputStream);
