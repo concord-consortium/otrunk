@@ -219,6 +219,7 @@ public class OTUserMappedOverlayManager
     		if (! writeableUsers.contains(user)) {
     			return;
     		}
+    		incrementSubmitCount(object);
     		OTOverlayReference ref = spawnOverlay(user, object);
     		addReferenceToMap(user, object, ref);
 		} finally {

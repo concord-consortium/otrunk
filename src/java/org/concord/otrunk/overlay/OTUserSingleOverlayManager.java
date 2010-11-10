@@ -109,6 +109,7 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
 		} finally {
 			readUnlock();
 		}
+		incrementSubmitCount(object);
 		user = getAuthoredObject(user);
 		OTObjectService overlayObjectService = getObjectService(user, object);
 		if (object != null) {

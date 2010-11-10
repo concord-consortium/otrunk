@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
+import org.concord.framework.otrunk.wrapper.OTInt;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkUtil;
@@ -51,6 +52,10 @@ public abstract class OTUserOverlayManager
 	
 	private Map<OTUserObject, ArrayList<OverlayUpdateListener>> listenerMap = Collections.synchronizedMap(new HashMap<OTUserObject, ArrayList<OverlayUpdateListener>>());
 	private List<OverlayUpdateListener> globalListeners = Collections.synchronizedList(new ArrayList<OverlayUpdateListener>());
+	/**
+     * String used as the key in the annotations object map to record number of times a student "submits" an object
+     */
+    public static final String SUBMIT_ANNOTATION = "intrasession-submits";
 	
 	public static void setHeadBeforeGet(boolean doHead) {
 		doHeadBeforeGet = doHead;
@@ -439,18 +444,18 @@ public abstract class OTUserOverlayManager
 	}
 	
 	public boolean isSubmitted(OTUserObject user, OTObject obj, boolean includeChildren) {
-		OTObject authoredObj = getAuthoredObject(obj);
-		OTObjectService objService = getObjectService(user, authoredObj);
-		if (objService == null) {
-			return false;
-		}
 		try {
-	        authoredObj = objService.getOTObject(authoredObj.getGlobalId());
+	        OTObject usersVersion = getOTObject(user, obj);
+	        OTObject annotation = usersVersion.getAnnotations().getObject(SUBMIT_ANNOTATION);
+	        if (annotation != null && annotation instanceof OTInt) {
+	        	if (((OTInt)annotation).getValue() > 0) {
+	        		return true;
+	        	}
+	        }
         } catch (Exception e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
+        	logger.log(Level.SEVERE, "Couldn't get object for user", e);
         }
-		return otrunk.isModified(authoredObj, objService, includeChildren);
+        return false;
 	}
 	
 	public void reloadAll() throws Exception {
@@ -538,6 +543,21 @@ public abstract class OTUserOverlayManager
 			writeUnlock();
 		}
 	}
+	
+	protected void incrementSubmitCount(OTObject object) {
+        OTInt submitCount = (OTInt) object.getAnnotations().getObject(OTUserOverlayManager.SUBMIT_ANNOTATION);
+        if (submitCount == null) {
+            try {
+                submitCount = object.getOTObjectService().createObject(OTInt.class);
+                submitCount.setValue(0);
+                object.getAnnotations().putObject(OTUserOverlayManager.SUBMIT_ANNOTATION, submitCount);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Couldn't create OTInt object!", e);
+                return;
+            }
+        }
+        submitCount.setValue(submitCount.getValue() + 1);
+    }
 	
 	protected void writeLock() {
 		readWriteLock.writeLock().lock();
