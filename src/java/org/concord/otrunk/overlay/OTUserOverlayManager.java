@@ -451,11 +451,22 @@ public abstract class OTUserOverlayManager
 	        	if (((OTInt)annotation).getValue() > 0) {
 	        		return true;
 	        	}
+	        } else {
+	        	// try old method
+	        	return oldIsSubmitted(user, obj, includeChildren);
 	        }
         } catch (Exception e) {
         	logger.log(Level.SEVERE, "Couldn't get object for user", e);
         }
         return false;
+	}
+	
+	private boolean oldIsSubmitted(OTUserObject user, OTObject obj, boolean includeChildren) {
+		OTObjectService objService = getObjectService(user, obj);
+		if (objService == null) {
+			return false;
+		}
+		return otrunk.isModified(obj, objService, includeChildren);
 	}
 	
 	public void reloadAll() throws Exception {
