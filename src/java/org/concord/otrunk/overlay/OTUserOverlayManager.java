@@ -438,12 +438,19 @@ public abstract class OTUserOverlayManager
 		}
 	}
 	
-	public boolean isModified(OTUserObject user, OTObject obj, boolean includeChildren) {
-		OTObjectService objService = getObjectService(user, obj);
+	public boolean isSubmitted(OTUserObject user, OTObject obj, boolean includeChildren) {
+		OTObject authoredObj = getAuthoredObject(obj);
+		OTObjectService objService = getObjectService(user, authoredObj);
 		if (objService == null) {
 			return false;
 		}
-		return otrunk.isModified(obj, objService, includeChildren);
+		try {
+	        authoredObj = objService.getOTObject(authoredObj.getGlobalId());
+        } catch (Exception e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+		return otrunk.isModified(authoredObj, objService, includeChildren);
 	}
 	
 	public void reloadAll() throws Exception {

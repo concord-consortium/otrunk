@@ -14,7 +14,6 @@ import org.concord.framework.otrunk.wrapper.OTObjectSet;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDatabase;
-import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.net.HTTPRequestException;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -148,10 +147,8 @@ public class OTUserMappedOverlayManager
 	@Override
 	protected OTObjectService getObjectService(OTUserObject userObject, OTObject object)
 	{
-		if (object.getGlobalId() instanceof OTTransientMapID) {
-			return object.getOTObjectService();
-		}
-	    return getOTObject(userObject, object, null).getOTObjectService();
+		OTObject authoredObject = getAuthoredObject(object);
+	    return getOTObject(userObject, authoredObject, null).getOTObjectService();
 	}
 	
 	@Override
