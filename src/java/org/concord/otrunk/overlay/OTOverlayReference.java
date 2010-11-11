@@ -13,8 +13,4 @@ public interface OTOverlayReference
 	public static int DEFAULT_number = 1;
 	public int getNumber();
 	public void setNumber(int num);
-	
-	public static boolean DEFAULT_canReload = false;
-	public boolean getCanReload();
-	public void setCanReload(boolean canReload);
 }

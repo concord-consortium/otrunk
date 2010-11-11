@@ -2,7 +2,9 @@ package org.concord.otrunk.overlay;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,7 +37,7 @@ public class OTUserMappedOverlayManager
 	    tempObjService = otrunk.createObjectService(db);
     }
 
-	private HashMap<OTUserObject, OTObjectToOverlayReferenceMap> userToOverlayReferenceMaps = new HashMap<OTUserObject, OTObjectToOverlayReferenceMap>();
+	private Map<OTUserObject, OTObjectToOverlayReferenceMap> userToOverlayReferenceMaps = Collections.synchronizedMap(new HashMap<OTUserObject, OTObjectToOverlayReferenceMap>());
 	private OTObjectService tempObjService;
 	
 	/**
@@ -57,17 +59,7 @@ public class OTUserMappedOverlayManager
     		
     		if (reference != null) {
     			URL overlayURL = reference.getOverlayURL();
-    			if (reference.getCanReload() && overlayToObjectServiceMap.containsKey(overlayURL)) {
-    				try {
-	                    if (doesUrlNeedReloaded(overlayURL)) {
-	                    	removeReference(overlayURL);
-	                    }
-                    } catch (Exception e) {
-	                    // TODO Auto-generated catch block
-	                    e.printStackTrace();
-	                    removeReference(overlayURL);
-                    }
-    			}
+
     			if (! overlayToObjectServiceMap.containsKey(overlayURL)) {
     				loadOverlay(overlayURL, false);
     			}
@@ -100,7 +92,8 @@ public class OTUserMappedOverlayManager
     			if (set == null || set.getObjects().size() < 1) {
     				return null;
     			}
-    			return (OTOverlayReference) set.getObjects().get(set.getObjects().size()-1);
+    			OTOverlayReference ref = (OTOverlayReference) set.getObjects().get(set.getObjects().size()-1);
+    			return ref;
     		}
     		return null;
 		} finally {
@@ -117,6 +110,9 @@ public class OTUserMappedOverlayManager
     		OTObjectToOverlayReferenceMap referenceMap = loadRemoteObject(referenceMapURL, OTObjectToOverlayReferenceMap.class);
     		userToOverlayReferenceMaps.put(userObject, referenceMap);
     		userToOverlayMap.put(userObject, referenceMapURL);
+    		
+    		// ensure this user is only readable
+    		writeableUsers.remove(userObject);
     		readOnlyUsers.add(userObject);
 		} finally {
 			writeUnlock();
@@ -132,6 +128,9 @@ public class OTUserMappedOverlayManager
     		OTObjectToOverlayReferenceMap referenceMap = loadRemoteObject(referenceMapURL, OTObjectToOverlayReferenceMap.class);
     		userToOverlayReferenceMaps.put(userObject, referenceMap);
     		userToOverlayMap.put(userObject, referenceMapURL);
+    		
+    		// ensure this user is only writeable
+    		readOnlyUsers.remove(userObject);
     		writeableUsers.add(userObject);
 		} finally {
 			writeUnlock();
@@ -189,25 +188,31 @@ public class OTUserMappedOverlayManager
 	@Override
     public void reload(OTUserObject userObject) throws Exception
 	{
-		writeLock();
+		OTObjectToOverlayReferenceMap otObjectToOverlayReferenceMap;
+		readLock();
 		try {
     		if (! readOnlyUsers.contains(userObject)) {
     			return;
     		}
-    		OTObjectToOverlayReferenceMap otObjectToOverlayReferenceMap = userToOverlayReferenceMaps.get(userObject);
+    		otObjectToOverlayReferenceMap = userToOverlayReferenceMaps.get(userObject);
     		if (otObjectToOverlayReferenceMap == null) {
     			return;
     		}
-    		XMLDatabase xmlDb = getXMLDatabase(otObjectToOverlayReferenceMap.getOTObjectService());
-    		if (doesDbNeedReloaded(xmlDb)) {
-    			logger.info("Reloading database: " + xmlDb.getSourceURL());
+		} finally {
+			readUnlock();
+		}
+		
+		XMLDatabase xmlDb = getXMLDatabase(otObjectToOverlayReferenceMap.getOTObjectService());
+		if (doesDbNeedReloaded(xmlDb)) {
+			writeLock();
+			try {
     			remove(userObject);
     			addReadOnly(xmlDb.getSourceURL(), userObject, false);
-    			// TODO we could potentially also figure out which object changed and include that in our notification
-    			notifyListeners(userObject);
-    		}
-		} finally {
-			writeUnlock();
+			} finally {
+				writeUnlock();
+			}
+			// TODO we could potentially also figure out which object changed and include that in our notification
+			notifyListeners(userObject);
 		}
 	}
 

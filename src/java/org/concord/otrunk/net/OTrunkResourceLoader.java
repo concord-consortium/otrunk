@@ -60,6 +60,7 @@ public class OTrunkResourceLoader implements IResourceLoader{
 
 	private URL url;
 	private long lastModified = 0;
+	private String eTag;
 	private boolean promptRetryQuit;
 	private URLConnection connection;
 	private InputStream urlInputStream;
@@ -163,6 +164,7 @@ public class OTrunkResourceLoader implements IResourceLoader{
 			}
 
 			lastModified = connection.getLastModified();
+			eTag = connection.getHeaderField("ETag");
 
 			logger.fine("RequiredResourceLoader - Done.");
 			return urlInputStream;
@@ -315,4 +317,8 @@ public class OTrunkResourceLoader implements IResourceLoader{
     {
 	    return contentLength;
     } 
+	
+	public String getETag() {
+		return eTag;
+	}
 }

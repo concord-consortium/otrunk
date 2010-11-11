@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
@@ -138,6 +139,7 @@ public class XMLDatabase
 
 	private boolean sourceVerified = false;
 	
+	private String eTag;
 	private long urlLastModifiedTime = -1;
 	private int urlContentLength = -1;
 
@@ -197,8 +199,9 @@ public class XMLDatabase
 			printErrorDetails();
 			throw e;
 		}
-		urlLastModifiedTime = resourceLoader.getLastModified();
+		setUrlLastModifiedTime(resourceLoader.getLastModified());
 		urlContentLength = resourceLoader.getContentLength();
+		setETag(resourceLoader.getETag());
 
 		urlOpenTime = System.currentTimeMillis() - openingStart;
 		
@@ -1176,7 +1179,7 @@ public class XMLDatabase
 	 * Sets the time that the document located at the sourceURL was last modified, or 0 if unknown
      * @param urlLastModifiedTime the urlLastModifiedTime to set
      */
-    public void setUrlLastModifiedTime(long urlLastModifiedTime)
+    private void setUrlLastModifiedTime(long urlLastModifiedTime)
     {
 	    this.urlLastModifiedTime = urlLastModifiedTime;
     }
@@ -1233,5 +1236,15 @@ public class XMLDatabase
 	public ArrayList<OTDataPropertyReference> getOutgoingReferences(OTID otid)
     {
 	    return outgoingReferences.get(otid);
+    }
+
+	private void setETag(String eTag)
+    {
+	    this.eTag = eTag;
+    }
+
+	public String getETag()
+    {
+	    return eTag;
     }
 }

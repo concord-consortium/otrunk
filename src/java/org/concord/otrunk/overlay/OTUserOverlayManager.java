@@ -1,6 +1,5 @@
 package org.concord.otrunk.overlay;
 
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
@@ -39,16 +38,16 @@ public abstract class OTUserOverlayManager
 	protected static StandardPasswordAuthenticator authenticator = new StandardPasswordAuthenticator();
 
 	protected OTrunkImpl otrunk;
-	protected ArrayList<OverlayImpl> globalOverlays = new ArrayList<OverlayImpl>();
-	protected HashMap<URL, OTObjectService> overlayToObjectServiceMap = new HashMap<URL, OTObjectService>();
-	protected HashMap<OTUserObject, URL> userToOverlayMap = new HashMap<OTUserObject, URL>();
-	protected ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
+	protected List<OverlayImpl> globalOverlays = Collections.synchronizedList(new ArrayList<OverlayImpl>());
+	protected Map<URL, OTObjectService> overlayToObjectServiceMap = Collections.synchronizedMap(new HashMap<URL, OTObjectService>());
+	protected Map<OTUserObject, URL> userToOverlayMap = Collections.synchronizedMap(new HashMap<OTUserObject, URL>());
+	protected static final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
 
-	protected ArrayList<OTUserObject> readOnlyUsers = new ArrayList<OTUserObject>();
-	protected ArrayList<OTUserObject> writeableUsers = new ArrayList<OTUserObject>();
+	protected List<OTUserObject> readOnlyUsers = Collections.synchronizedList(new ArrayList<OTUserObject>());
+	protected List<OTUserObject> writeableUsers = Collections.synchronizedList(new ArrayList<OTUserObject>());
 	
-	protected HashMap<OTID, Integer> nonRecurseObjects = new HashMap<OTID, Integer>();
+	protected Map<OTID, Integer> nonRecurseObjects = Collections.synchronizedMap(new HashMap<OTID, Integer>());
 	
 	private Map<OTUserObject, ArrayList<OverlayUpdateListener>> listenerMap = Collections.synchronizedMap(new HashMap<OTUserObject, ArrayList<OverlayUpdateListener>>());
 	private List<OverlayUpdateListener> globalListeners = Collections.synchronizedList(new ArrayList<OverlayUpdateListener>());
@@ -359,23 +358,19 @@ public abstract class OTUserOverlayManager
     }
 	
 	protected void notifyListeners(final OTUserObject user) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				synchronized(globalListeners) {
-		    		for (OverlayUpdateListener l : globalListeners) {
-		    			l.updated(user);
-		    		}
-				}
-				synchronized (listenerMap) {
-		    		ArrayList<OverlayUpdateListener> listeners = listenerMap.get(user);
-		    		if (listeners != null) {
-		    			for (OverlayUpdateListener l : listeners) {
-		    				l.updated(user);
-		    			}
-		    		}
-				}
-			}
-		});
+    	synchronized(globalListeners) {
+    		for (OverlayUpdateListener l : globalListeners) {
+    			l.updated(user);
+    		}
+    	}
+    	synchronized (listenerMap) {
+    		ArrayList<OverlayUpdateListener> listeners = listenerMap.get(user);
+    		if (listeners != null) {
+    			for (OverlayUpdateListener l : listeners) {
+    				l.updated(user);
+    			}
+    		}
+    	}
 	}
 	
 	/**
@@ -470,16 +465,17 @@ public abstract class OTUserOverlayManager
 	}
 	
 	public void reloadAll() throws Exception {
-		writeLock();
+		Object[] allUsers;
+		readLock();
 		try {
     		// use an array of the set, so that the set can be manipulated in the reload method, and we won't
     		// have concurrent modification problems
-    		Object[] allUsers = readOnlyUsers.toArray();
-    		for (Object user: allUsers) {
-    			reload((OTUserObject)user);
-    		}
+    		allUsers = readOnlyUsers.toArray();
 		} finally {
-			writeUnlock();
+			readUnlock();
+		}
+		for (Object user: allUsers) {
+			reload((OTUserObject)user);
 		}
 	}
 	
@@ -492,12 +488,17 @@ public abstract class OTUserOverlayManager
 	}
 	
 	protected boolean doesUrlNeedReloaded(URL url) throws ProtocolException, IOException {
-		OTObjectService otObjectService = overlayToObjectServiceMap.get(url);
-		if (otObjectService == null) {
-			return true;
+		readLock();
+		try {
+    		OTObjectService otObjectService = overlayToObjectServiceMap.get(url);
+    		if (otObjectService == null) {
+    			return true;
+    		}
+    		XMLDatabase db = getXMLDatabase(otObjectService);
+    		return doesDbNeedReloaded(db);
+		} finally {
+			readUnlock();
 		}
-		XMLDatabase db = getXMLDatabase(otObjectService);
-		return doesDbNeedReloaded(db);
 	}
 	
 	protected boolean doesDbNeedReloaded(XMLDatabase xmlDb) throws IOException, ProtocolException {
@@ -506,6 +507,7 @@ public abstract class OTUserOverlayManager
 		}
 		if (doHeadBeforeGet) {
     		long existingTime = xmlDb.getUrlLastModifiedTime();
+    		String existingETag = xmlDb.getETag();
     		
     		URLConnection conn = xmlDb.getSourceURL().openConnection();
     		if (conn instanceof HttpURLConnection) {
@@ -513,7 +515,14 @@ public abstract class OTUserOverlayManager
     		}
     		
     		long serverTime = conn.getLastModified();
+    		String serverETag = conn.getHeaderField("ETag");
     		logger.finer("checking reload of: " + xmlDb.getSourceURL());
+    		if (existingETag != null) {
+    			if (! existingETag.equals(serverETag)) {
+    				logger.finer("ETag indicated reload needed. current: " + existingETag + ", server: " + serverETag);
+    				return true;
+    			}
+    		}
     		if (existingTime != 0 && serverTime != 0 && existingTime == serverTime) {
     			// no reload needed
     			logger.finer("Not reloading overlay as modified time is the same as the currently loaded version");
@@ -528,7 +537,12 @@ public abstract class OTUserOverlayManager
 	
 	public void addNonRecurseObject(OTObject obj, int depth) {
 		OTID authoredId = getAuthoredId(obj);
-		nonRecurseObjects.put(authoredId, depth);
+		writeLock();
+		try {
+			nonRecurseObjects.put(authoredId, depth);
+		} finally {
+			writeUnlock();
+		}
 	}
 	
 	public void setReadOnly(OTUserObject user) {
@@ -571,19 +585,34 @@ public abstract class OTUserOverlayManager
     }
 	
 	protected void writeLock() {
+//		if (! readWriteLock.writeLock().isHeldByCurrentThread()) {
+//			logger.info("asking for WRITE lock: " + Thread.currentThread().getName());
+//		}
 		readWriteLock.writeLock().lock();
+//		if (readWriteLock.writeLock().getHoldCount() == 1) {
+//			logger.info("got WRITE lock: " + Thread.currentThread().getName());
+//		}
 	}
 	
 	protected void writeUnlock() {
 		readWriteLock.writeLock().unlock();
+//		if (readWriteLock.writeLock().getHoldCount() == 0) {
+//			logger.info("released WRITE lock: " + Thread.currentThread().getName());
+//		}
 	}
 	
 	protected void readLock() {
 		readWriteLock.readLock().lock();
+//		if (! readWriteLock.writeLock().isHeldByCurrentThread()) {
+//			logger.info("got READ lock: " + Thread.currentThread().getName());
+//		}
 	}
 	
 	protected void readUnlock() {
 		readWriteLock.readLock().unlock();
+//		if (! readWriteLock.writeLock().isHeldByCurrentThread()) {
+//			logger.info("released READ lock: " + Thread.currentThread().getName());
+//		}
 	}
 
 }
