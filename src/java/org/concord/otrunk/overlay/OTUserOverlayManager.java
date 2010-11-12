@@ -1,5 +1,6 @@
 package org.concord.otrunk.overlay;
 
+import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
@@ -362,19 +363,24 @@ public abstract class OTUserOverlayManager
     }
 	
 	protected void notifyListeners(final OTUserObject user) {
-    	synchronized(globalListeners) {
-    		for (OverlayUpdateListener l : globalListeners) {
-    			l.updated(user);
-    		}
-    	}
-    	synchronized (listenerMap) {
-    		ArrayList<OverlayUpdateListener> listeners = listenerMap.get(user);
-    		if (listeners != null) {
-    			for (OverlayUpdateListener l : listeners) {
-    				l.updated(user);
-    			}
-    		}
-    	}
+		EventQueue.invokeLater(new Runnable() {
+			public void run()
+            {
+		    	synchronized(globalListeners) {
+		    		for (OverlayUpdateListener l : globalListeners) {
+		    			l.updated(user);
+		    		}
+		    	}
+		    	synchronized (listenerMap) {
+		    		ArrayList<OverlayUpdateListener> listeners = listenerMap.get(user);
+		    		if (listeners != null) {
+		    			for (OverlayUpdateListener l : listeners) {
+		    				l.updated(user);
+		    			}
+		    		}
+		    	}
+            }
+		});
 	}
 	
 	/**
