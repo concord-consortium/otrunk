@@ -2,9 +2,7 @@ package org.concord.otrunk.overlay;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +35,7 @@ public class OTUserMappedOverlayManager
 	    tempObjService = otrunk.createObjectService(db);
     }
 
-	private Map<OTUserObject, OTObjectToOverlayReferenceMap> userToOverlayReferenceMaps = Collections.synchronizedMap(new HashMap<OTUserObject, OTObjectToOverlayReferenceMap>());
+	private HashMap<OTUserObject, OTObjectToOverlayReferenceMap> userToOverlayReferenceMaps = new HashMap<OTUserObject, OTObjectToOverlayReferenceMap>();
 	private OTObjectService tempObjService;
 	
 	/**
@@ -88,8 +86,10 @@ public class OTUserMappedOverlayManager
     		if (userToOverlayReferenceMaps.containsKey(user)) {
     			OTID authoredId = getAuthoredId(object);
     			OTObjectToOverlayReferenceMap referenceMap = userToOverlayReferenceMaps.get(user);
+    			
     			OTObjectSet set = (OTObjectSet) referenceMap.getObjectToOverlayMap().getObject(authoredId.toExternalForm());
-    			if (set == null || set.getObjects().size() < 1) {
+    			int size = (set == null) ? 0 : set.getObjects().size();
+    			if (size < 1) {
     				return null;
     			}
     			OTOverlayReference ref = (OTOverlayReference) set.getObjects().get(set.getObjects().size()-1);

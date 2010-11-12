@@ -69,6 +69,8 @@ public class OTObjectServiceImpl
 	public final static Logger logger = 
 		Logger.getLogger(OTObjectServiceImpl.class.getCanonicalName());
 	
+	public static volatile boolean DEBUG = false;
+	
     protected OTrunkImpl otrunk;
     protected OTDatabase creationDb;
     protected OTDatabase mainDb;
@@ -158,6 +160,9 @@ public class OTObjectServiceImpl
         	// So if we can't find this object then we go out to OTrunk to see if it can find
         	// the object.  The way that this happens needs to be more clear so the ramifcations
         	// are clear.
+        	if (DEBUG) {
+        		logger.info("Object is an orphan");
+        	}
         	return otrunk.getOrphanOTObject(childID, this, reload);
         }
 
@@ -165,6 +170,10 @@ public class OTObjectServiceImpl
         // it might be better to have each object service maintain its own list of loaded objects
         OTObject otObject = otrunk.getLoadedObject(childDataObject.getGlobalId(), reload);
         if(otObject != null) {
+        	if (DEBUG) {
+        		logger.info("loaded from cache. reload: " + reload);
+        		try { throw new Exception("st"); } catch (Exception e) { logger.log(Level.INFO, "stacktrace", e); }
+        	}
             return otObject;
         }
 
@@ -178,6 +187,9 @@ public class OTObjectServiceImpl
     	OTObjectInternal otObjectInternal = 
     		new OTObjectInternal(childDataObject, this, OTrunkImpl.getOTClass(otObjectClassStr));
     
+    	if (DEBUG) {
+    		logger.info("loaded from db. reload: " + reload);
+    	}
         return loadOTObject(otObjectInternal, otObjectClass);        
     }
 

@@ -38,16 +38,16 @@ public abstract class OTUserOverlayManager
 	protected static StandardPasswordAuthenticator authenticator = new StandardPasswordAuthenticator();
 
 	protected OTrunkImpl otrunk;
-	protected List<OverlayImpl> globalOverlays = Collections.synchronizedList(new ArrayList<OverlayImpl>());
-	protected Map<URL, OTObjectService> overlayToObjectServiceMap = Collections.synchronizedMap(new HashMap<URL, OTObjectService>());
-	protected Map<OTUserObject, URL> userToOverlayMap = Collections.synchronizedMap(new HashMap<OTUserObject, URL>());
+	protected ArrayList<OverlayImpl> globalOverlays = new ArrayList<OverlayImpl>();
+	protected HashMap<URL, OTObjectService> overlayToObjectServiceMap = new HashMap<URL, OTObjectService>();
+	protected HashMap<OTUserObject, URL> userToOverlayMap = new HashMap<OTUserObject, URL>();
 	protected static final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
 
-	protected List<OTUserObject> readOnlyUsers = Collections.synchronizedList(new ArrayList<OTUserObject>());
-	protected List<OTUserObject> writeableUsers = Collections.synchronizedList(new ArrayList<OTUserObject>());
+	protected ArrayList<OTUserObject> readOnlyUsers = new ArrayList<OTUserObject>();
+	protected ArrayList<OTUserObject> writeableUsers = new ArrayList<OTUserObject>();
 	
-	protected Map<OTID, Integer> nonRecurseObjects = Collections.synchronizedMap(new HashMap<OTID, Integer>());
+	protected HashMap<OTID, Integer> nonRecurseObjects = new HashMap<OTID, Integer>();
 	
 	private Map<OTUserObject, ArrayList<OverlayUpdateListener>> listenerMap = Collections.synchronizedMap(new HashMap<OTUserObject, ArrayList<OverlayUpdateListener>>());
 	private List<OverlayUpdateListener> globalListeners = Collections.synchronizedList(new ArrayList<OverlayUpdateListener>());
@@ -82,8 +82,10 @@ public abstract class OTUserOverlayManager
     		URL otOverlay = userToOverlayMap.get(userObject);
     		OTObjectService objService = overlayToObjectServiceMap.get(otOverlay);
     
-    		otrunk.removeObjectService((OTObjectServiceImpl) objService);
-    		overlayToObjectServiceMap.remove(otOverlay);
+    		if (objService != null) {
+        		otrunk.removeObjectService((OTObjectServiceImpl) objService);
+        		overlayToObjectServiceMap.remove(otOverlay);
+    		}
     		
     		readOnlyUsers.remove(userObject);
     		writeableUsers.remove(userObject);
@@ -156,6 +158,7 @@ public abstract class OTUserOverlayManager
     protected synchronized <T extends OTObject> T loadRemoteObject(URL url, Class<T> klass) {
     	writeLock();
     	try {
+    		// OTObjectServiceImpl.DEBUG = true;
     		T remoteObject = null;
     		try {
     			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true);
@@ -173,13 +176,13 @@ public abstract class OTUserOverlayManager
     			try {
     				logger.info("Creating empty database on the fly (root: " + klass.getSimpleName() + ")...");
         			XMLDatabase xmldb = new XMLDatabase();
-        			OTObjectService objService = otrunk.createObjectService(xmldb);
+        			OTObjectServiceImpl objService = otrunk.createObjectService(xmldb);
         			remoteObject = objService.createObject(klass);
     
         			xmldb.setRoot(remoteObject.getGlobalId());
         			otrunk.remoteSaveData(xmldb, url, OTViewer.HTTP_PUT, authenticator);
     
-        			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService());
+        			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true);
     			} catch (Exception e) {
     				// still an error. skip the overlay for this user/url
     				logger.warning("Couldn't create a default overlay for user\n" + url + "\n" + e.getMessage());
@@ -187,6 +190,7 @@ public abstract class OTUserOverlayManager
     		}
     		return remoteObject;
         } finally {
+        	// OTObjectServiceImpl.DEBUG = false;
     		writeUnlock();
         }
 	}

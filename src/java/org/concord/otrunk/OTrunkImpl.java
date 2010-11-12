@@ -116,7 +116,7 @@ public class OTrunkImpl implements OTrunk
 	List<OTDatabase> databases = Collections.synchronizedList(new ArrayList<OTDatabase>());
 	Vector<OTUser> users = new Vector<OTUser>();
 	
-    ArrayList<OTObjectServiceImpl> objectServices = new ArrayList<OTObjectServiceImpl>();
+    List<OTObjectServiceImpl> objectServices = Collections.synchronizedList(new ArrayList<OTObjectServiceImpl>());
 
 	private ArrayList<Class<? extends OTPackage>> registeredPackageClasses = 
 		new ArrayList<Class<? extends OTPackage>>();
@@ -428,9 +428,11 @@ public class OTrunkImpl implements OTrunk
     		loadDatabase(url, reload);
 		
     	// get the root object either the real root or the system root
-    	OTObject root = getRoot(externalObjectService);
+    	OTObject root = getRoot(externalObjectService, reload);
     	
-    	return parentObjectService.getOTObject(root.getGlobalId(), reload);
+    	OTObject newRoot = parentObjectService.getOTObject(root.getGlobalId(), reload);
+    	
+    	return newRoot;
     }
 
     protected OTObjectServiceImpl getExistingObjectService(XMLDatabase includeDb)
@@ -483,7 +485,9 @@ public class OTrunkImpl implements OTrunk
         	}
         	if (dbToRemove != null) {
     			databases.remove(dbToRemove);
-    			removeObjectService(getExistingObjectService(dbToRemove));
+    			OTObjectServiceImpl existingObjectService = getExistingObjectService(dbToRemove);
+				removeObjectService(existingObjectService);
+				removeLoadedObjects(dbToRemove);
         	}
     	}
 
@@ -505,14 +509,14 @@ public class OTrunkImpl implements OTrunk
 		return initObjectService(includeDb, url.toExternalForm());
     }
     
-    protected OTObject getRoot(OTObjectServiceImpl objectService) 
+    protected OTObject getRoot(OTObjectServiceImpl objectService, boolean reload) 
     	throws Exception
     {
     	OTDatabase db = objectService.getMainDb();
 
     	OTDataObject rootDO = db.getRoot();
 
-    	OTObject root = objectService.getOTObject(rootDO.getGlobalId());
+    	OTObject root = objectService.getOTObject(rootDO.getGlobalId(), reload);
     	
 		if(root instanceof OTSystem) {
 			return ((OTSystem)root).getRoot();
@@ -551,7 +555,7 @@ public class OTrunkImpl implements OTrunk
 			return;
 		}
 		OTID rootID = rootDO.getGlobalId();
-		OTObject otRoot = objectService.getOTObject(rootID);
+		OTObject otRoot = objectService.getOTObject(rootID, true);
 		if(!(otRoot instanceof OTSystem)){
 			return;
 		}
@@ -897,29 +901,41 @@ public class OTrunkImpl implements OTrunk
 
     void putLoadedObject(OTObject otObject, OTID otId)
     {
-    	WeakReference<OTObject> objRef = new WeakReference<OTObject>(otObject);
-    	loadedObjects.put(otId, objRef);    		
+    	synchronized(loadedObjects) {
+        	WeakReference<OTObject> objRef = new WeakReference<OTObject>(otObject);
+        	loadedObjects.put(otId, objRef);
+    	}
     }
     
     OTObject getLoadedObject(OTID otId, boolean reload)
     {
-    	if (reload) {
-    		loadedObjects.remove(otId);
-    		return null;
+    	synchronized(loadedObjects) {
+        	if (reload) {
+        		loadedObjects.remove(otId);
+        		return null;
+        	}
+        	
+        	OTObject otObject = null;
+        	Reference<OTObject> otObjectRef = loadedObjects.get(otId);
+        	if(otObjectRef != null) {
+        		otObject = otObjectRef.get();
+        	}
+    
+        	if(otObject != null) {
+        		return otObject;
+        	}
+    
+        	loadedObjects.remove(otId);
+        	return null;
     	}
-    	
-    	OTObject otObject = null;
-    	Reference<OTObject> otObjectRef = loadedObjects.get(otId);
-    	if(otObjectRef != null) {
-    		otObject = otObjectRef.get();
+    }
+    
+    private void removeLoadedObjects(XMLDatabase db) {
+    	synchronized(loadedObjects) {
+    		for (OTID objectId : db.getDataObjects().keySet()) {
+    			loadedObjects.remove(objectId);
+    		}
     	}
-
-    	if(otObject != null) {
-    		return otObject;
-    	}
-
-    	loadedObjects.remove(otId);
-    	return null;
     }
     
     /**
