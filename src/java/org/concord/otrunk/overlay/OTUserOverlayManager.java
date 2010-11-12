@@ -426,6 +426,7 @@ public abstract class OTUserOverlayManager
      * @param object
      * @throws Exception
      */
+    @Deprecated
 	public void remoteSaveAll(OTObject object) throws Exception
 	{
 		writeLock();
@@ -462,6 +463,13 @@ public abstract class OTUserOverlayManager
 			return false;
 		}
 		return otrunk.isModified(obj, objService, includeChildren);
+	}
+	
+	protected boolean isObjectModified(OTUserObject user, OTObject currentObj) throws Exception {
+		OTObject authoredObj = getAuthoredObject(currentObj);
+        OTObject mostRecentSubmission = getOTObject(user, authoredObj);
+        boolean areSame = OTrunkUtil.compareObjects(mostRecentSubmission, currentObj, true);
+        return !areSame;
 	}
 	
 	public void reloadAll() throws Exception {

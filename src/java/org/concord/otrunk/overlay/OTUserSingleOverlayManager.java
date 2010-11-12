@@ -109,13 +109,15 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
 		} finally {
 			readUnlock();
 		}
-		incrementSubmitCount(object);
-		user = getAuthoredObject(user);
-		OTObjectService overlayObjectService = getObjectService(user, object);
-		if (object != null) {
-    		copyObjectIntoOverlay(user,  object, null);
-		
-    		actualRemoteSave(overlayObjectService);
+		if (isObjectModified(user, object)) {
+    		incrementSubmitCount(object);
+    		user = getAuthoredObject(user);
+    		OTObjectService overlayObjectService = getObjectService(user, object);
+    		if (object != null) {
+        		copyObjectIntoOverlay(user,  object, null);
+    		
+        		actualRemoteSave(overlayObjectService);
+    		}
 		}
 	}
 	
