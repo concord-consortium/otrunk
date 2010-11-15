@@ -100,7 +100,12 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
 	}
 	
 	@Override
-    public void remoteSave(OTUserObject user, OTObject object) throws Exception {
+	public void remoteSave(OTUserObject user, OTObject object) throws Exception {
+		remoteSave(user, object, false);
+	}
+	
+    @Override
+    public void remoteSave(OTUserObject user, OTObject object, boolean forceSave) throws Exception {
 		readLock();
 		try {
     		if (! writeableUsers.contains(user)) {
@@ -109,7 +114,7 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
 		} finally {
 			readUnlock();
 		}
-		if (isObjectModified(user, object)) {
+		if (forceSave || isObjectModified(user, object)) {
     		incrementSubmitCount(object);
     		user = getAuthoredObject(user);
     		OTObjectService overlayObjectService = getObjectService(user, object);

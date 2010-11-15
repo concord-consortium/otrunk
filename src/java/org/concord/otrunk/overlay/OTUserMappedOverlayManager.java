@@ -217,14 +217,20 @@ public class OTUserMappedOverlayManager
 	}
 
 	@Override
-    public void remoteSave(OTUserObject user, OTObject object) throws Exception
+	public void remoteSave(OTUserObject user, OTObject object) throws Exception
+	{
+		remoteSave(user, object, false);
+	}
+	
+    @Override
+    public void remoteSave(OTUserObject user, OTObject object, boolean forceSave) throws Exception
 	{
 		writeLock();
 		try {
     		if (! writeableUsers.contains(user)) {
     			return;
     		}
-    		if (isObjectModified(user, object)) {
+    		if (forceSave || isObjectModified(user, object)) {
         		incrementSubmitCount(object);
         		OTOverlayReference ref = spawnOverlay(user, object);
         		addReferenceToMap(user, object, ref);

@@ -118,6 +118,7 @@ public abstract class OTUserOverlayManager
 	 * @throws Exception
 	 */
 	public abstract void remoteSave(OTUserObject user, OTObject object) throws Exception;
+	public abstract void remoteSave(OTUserObject user, OTObject object, boolean forceSave) throws Exception;
 	
 //	/**
 //	 * Copies an object into an overlay and returns the object accessed through that overlay.
