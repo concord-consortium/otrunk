@@ -369,14 +369,22 @@ public abstract class OTUserOverlayManager
             {
 		    	synchronized(globalListeners) {
 		    		for (OverlayUpdateListener l : globalListeners) {
-		    			l.updated(user);
+		    			try {
+		    				l.updated(user);
+		    			} catch (Exception e) {
+		    				logger.log(Level.SEVERE, "Couldn't notify listener!", e);
+		    			}
 		    		}
 		    	}
 		    	synchronized (listenerMap) {
 		    		ArrayList<OverlayUpdateListener> listeners = listenerMap.get(user);
 		    		if (listeners != null) {
 		    			for (OverlayUpdateListener l : listeners) {
-		    				l.updated(user);
+		    				try {
+			    				l.updated(user);
+			    			} catch (Exception e) {
+			    				logger.log(Level.SEVERE, "Couldn't notify listener!", e);
+			    			}
 		    			}
 		    		}
 		    	}
