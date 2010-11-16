@@ -188,6 +188,7 @@ public class OTUserMappedOverlayManager
 	@Override
     public void reload(OTUserObject userObject) throws Exception
 	{
+		userObject = getAuthoredObject(userObject);
 		OTObjectToOverlayReferenceMap otObjectToOverlayReferenceMap;
 		readLock();
 		try {

@@ -81,6 +81,7 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
 	
 	@Override
     public synchronized void reload(OTUserObject userObject) throws Exception {
+		userObject = getAuthoredObject(userObject);
 		readLock();
 		try {
     		if (! readOnlyUsers.contains(userObject)) {
