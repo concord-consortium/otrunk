@@ -461,6 +461,9 @@ public abstract class OTUserOverlayManager
 	public boolean isSubmitted(OTUserObject user, OTObject obj, boolean includeChildren) {
 		try {
 	        OTObject usersVersion = getOTObject(user, obj);
+	        if (usersVersion == null) {
+	        	return false;
+	        }
 	        OTObject annotation = usersVersion.getAnnotations().getObject(SUBMIT_ANNOTATION);
 	        if (annotation != null && annotation instanceof OTInt) {
 	        	if (((OTInt)annotation).getValue() > 0) {
