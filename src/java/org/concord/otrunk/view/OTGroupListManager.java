@@ -205,4 +205,16 @@ public class OTGroupListManager extends DefaultOTObject
     	return list;
     }
 
+	public OTUserObject findUserById(String studentId)
+    {
+		for( OTObject obj: userList){
+    		OTGroupMember groupMember = (OTGroupMember) obj;
+    		OTUserObject user = groupMember.getUserObject();
+    		if (user.getGlobalId().toExternalForm().equals(studentId)) {
+    			return user;
+    		}
+	    }
+	    return null;
+    }
+
 }
