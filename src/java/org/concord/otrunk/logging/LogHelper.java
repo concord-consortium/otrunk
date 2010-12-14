@@ -7,11 +7,21 @@ import org.concord.framework.otrunk.OTObjectList;
 import org.concord.otrunk.logging.OTModelEvent.EventType;
 
 public class LogHelper {
-	
+	/**
+	 * Add a new event of the passed in type
+	 * @param model
+	 * @param type
+	 */
 	public static void add(OTModelLogging model, EventType type) {
 		add(model, type, null);
 	}
 	
+	/**
+	 * Add a new event of the passed in type, with extra details attached
+	 * @param model
+	 * @param type
+	 * @param details
+	 */
 	public static void add(OTModelLogging model, EventType type, HashMap<String, String> details) {
 		try {
 			OTModelEvent item = model.getOTObjectService().createObject(OTModelEvent.class);
