@@ -15,7 +15,9 @@ public interface OTModelEvent extends OTObjectInterface {
         // types of events Netlogo logs
         NL_GLOBAL, NL_GREEN, NL_CODE, NL_WIDGET, NL_BUTTON, NL_SPEED_SLIDER, NL_TURTLE, NL_LINK,
         // some default types for startable models
-        START, STOP, RESET
+        START, STOP, RESET,
+        // for playback
+        PLAYBACK_START, PLAYBACK_STOP, PLAYBACK_RESET
         
     }
     
