@@ -13,7 +13,6 @@ import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
-import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.net.HTTPRequestException;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -25,14 +24,7 @@ public class OTUserMappedOverlayManager
 	public OTUserMappedOverlayManager(OTrunkImpl otrunk)
     {
 	    super(otrunk);
-	    OTDatabase db;
-	    try {
-    	    OTOverlay overlay = otrunk.createObject(OTOverlay.class);
-    	    db = new CompositeDatabase(otrunk.getDataObjectFinder(), new OverlayImpl(overlay));
-	    } catch (Exception e) {
-	    	db = new XMLDatabase();
-	    }
-	    tempObjService = otrunk.createObjectService(db);
+	    tempObjService = otrunk.createTemporaryObjectService();
     }
 
 	private HashMap<OTUserObject, OTObjectToOverlayReferenceMap> userToOverlayReferenceMaps = new HashMap<OTUserObject, OTObjectToOverlayReferenceMap>();
