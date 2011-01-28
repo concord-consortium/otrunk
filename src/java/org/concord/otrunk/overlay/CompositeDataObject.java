@@ -69,7 +69,6 @@ public class CompositeDataObject
 	private OTDataObject [] middleDeltas;
 	private CompositeDatabase database;
 	
-	
     // The object can represent two types of data objects
     // it is either a bridge between an authored object (template object)
     // and the user modifications to that object object
@@ -78,6 +77,9 @@ public class CompositeDataObject
 	
 	private HashMap<String, OTDataCollection> resourceCollections = 
 		new HashMap<String, OTDataCollection>();
+	
+	private OTDataObject container;
+	private String containerResourceKey;
 	
 	public CompositeDataObject(OTDataObject baseObject, 
 	        CompositeDatabase db, OTDataObject[] middleDeltas, boolean composite)
@@ -222,7 +224,8 @@ public class CompositeDataObject
 	{
 		if(activeDeltaObject == null) {
 			activeDeltaObject = database.createActiveDeltaObject(baseObject);			
-			logger.fine("created delta object: " + activeDeltaObject.getGlobalId().toExternalForm());			
+			activeDeltaObject.setContainer(this.container);
+			activeDeltaObject.setContainerResourceKey(this.containerResourceKey);
 		}
 		
 		return activeDeltaObject;
@@ -418,4 +421,62 @@ public class CompositeDataObject
 	public boolean isComposite() {
 		return composite;
 	}
+	
+	public OTDataObject getContainer()
+    {
+		if (composite) {
+			if (activeDeltaObject != null) {
+				return activeDeltaObject.getContainer();
+			}
+			return this.container;
+		}
+		return baseObject.getContainer();
+    }
+
+	public void setContainer(OTDataObject container)
+    {
+		OTDataObject parentDO = getParentDO(container);
+		if (composite) {
+			if (activeDeltaObject != null) {
+				activeDeltaObject.setContainer(parentDO);
+			}
+		} else {
+			baseObject.setContainer(parentDO);
+		}
+		this.container = parentDO;
+    }
+	
+	private OTDataObject getParentDO(OTDataObject container) {
+		if (container instanceof CompositeDataObject) {
+			CompositeDataObject compDO = (CompositeDataObject) container;
+			if (compDO.isComposite()) {
+				return compDO.getActiveDeltaObject();
+			}
+			return compDO.getBaseObject();
+		}
+		return container;
+	}
+
+	public String getContainerResourceKey()
+    {
+		if (composite) {
+			if (activeDeltaObject != null) {
+				return activeDeltaObject.getContainerResourceKey();
+			}
+			return this.containerResourceKey;
+		}
+		return baseObject.getContainerResourceKey();
+    }
+
+	public void setContainerResourceKey(String containerResourceKey)
+    {
+		if (composite) {
+			if (activeDeltaObject != null) {
+				activeDeltaObject.setContainerResourceKey(containerResourceKey);
+			}
+		} else {
+			baseObject.setContainerResourceKey(containerResourceKey);
+		}
+		this.containerResourceKey = containerResourceKey;
+    }
 }

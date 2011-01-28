@@ -69,6 +69,9 @@ public class FsDataObject
 	FsDatabase database = null;
 
 	protected OTDataObjectType type;
+
+	private FsDataObject container;
+	private String containerResourceKey;
 	
 	public final static String CURRENT_REVISION = "currentRevision";
 	
@@ -201,5 +204,29 @@ public class FsDataObject
 	public boolean containsKey(String key)
     {
 		return resources.containsKey(key);
+    }
+
+	public OTDataObject getContainer()
+    {
+	    return container;
+    }
+
+	public void setContainer(OTDataObject container)
+    {
+		if (container == null || container instanceof FsDataObject) {
+			this.container = (FsDataObject) container;
+		} else {
+			throw new RuntimeException("FsDataObject can only have another FsDataObject as a container.");
+		}
+    }
+
+	public String getContainerResourceKey()
+    {
+	    return containerResourceKey;
+    }
+
+	public void setContainerResourceKey(String containerResourceKey)
+    {
+	    this.containerResourceKey = containerResourceKey;
     }
 }

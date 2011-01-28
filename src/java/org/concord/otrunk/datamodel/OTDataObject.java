@@ -104,4 +104,10 @@ public interface OTDataObject
 	 * @return
 	 */
 	public URL getCodebase();
+	
+	public OTDataObject getContainer();
+	public void setContainer(OTDataObject container);
+
+	public String getContainerResourceKey();
+	public void setContainerResourceKey(String containerResourceKey);
 }

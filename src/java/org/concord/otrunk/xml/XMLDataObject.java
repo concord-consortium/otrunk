@@ -201,6 +201,11 @@ public class XMLDataObject
 		
 		String property = key.substring(0, suffixStartIndex);
 		Object resource = getResource(property);
+		if (resource == null) {
+			// this data object doesn't have that property
+			logger.warning(String.format("This data object (%s) doesn't have a value for property '%s'", getGlobalId().toString(), property));
+			return null;
+		}
 		if(resource instanceof XMLDataList){
 			XMLDataList list = (XMLDataList) resource;
 			String indexStr = key.substring(suffixStartIndex+1, suffixEndIndex);
@@ -214,7 +219,7 @@ public class XMLDataObject
 			String mapKey = key.substring(suffixStartIndex+2, suffixEndIndex-1);
 			return map.get(mapKey);
 		} else {
-			throw new IllegalStateException("unknown resource type for key: " + key);
+			throw new IllegalStateException("unknown resource type for key: " + key + ", resource: " + resource);
 		}		
 	}
 	
@@ -306,9 +311,13 @@ public class XMLDataObject
     	return container;
     }
 
-	public void setContainer(XMLDataObject container)
+	public void setContainer(OTDataObject container)
     {
-    	this.container = container;
+		if (container == null || container instanceof XMLDataObject) {
+			this.container = (XMLDataObject) container;
+		} else {
+			throw new RuntimeException("XMLDataObject can only have another XMLDataObject as a container. Instead got: " + container.getClass().getName());
+		}
     }
 
 	public String getContainerResourceKey()
