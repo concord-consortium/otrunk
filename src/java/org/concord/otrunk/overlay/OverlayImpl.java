@@ -49,11 +49,14 @@ public class OverlayImpl
 		// Because we don't have explicit containment yet, (maybe now is the time)
 		// we need to make a list in the OTObject to track non delta objects.
 		
-		// TODO Auto-generated method stub
+		// NOTE: This relies on ExporterJDOM to export a flat representation of the nonDeltaObjects list.
+		// eg if an object (A) is a nonDeltaObject AND it's a child of another nonDeltaObject (B),
+		// B should be exported with a reference to A, and A should be exported as a full object in the
+		// nonDeltaObject list.
 		OTResourceList nonDeltaObjects = otOverlay.getNonDeltaObjects();
 		for(int i=0; i<nonDeltaObjects.size(); i++){
 			OTID nonDeltaId = (OTID)nonDeltaObjects.get(i);
-			if(nonDeltaId.equals(id)){
+			if(nonDeltaId != null && nonDeltaId.equals(id)){
 				return true;
 			}
 		}
@@ -109,7 +112,7 @@ public class OverlayImpl
 		OTResourceList nonDeltaObjects = otOverlay.getNonDeltaObjects();
 		for(int i=0; i<nonDeltaObjects.size(); i++){
 			OTID nonDeltaId = (OTID)nonDeltaObjects.get(i);
-			if(nonDeltaId.equals(id)){
+			if(nonDeltaId != null && nonDeltaId.equals(id)){
 				// This object is already registered.
 				return;
 			}
