@@ -1249,4 +1249,15 @@ public class OTrunkImpl implements OTrunk
     	logger.finest("found " + parents.size() + " matching parents");
     	return parents;
     }
+    
+    public OTObjectService createTemporaryObjectService() {
+    	OTDatabase db;
+	    try {
+    	    OTOverlay overlay = this.createObject(OTOverlay.class);
+    	    db = new CompositeDatabase(this.getDataObjectFinder(), new OverlayImpl(overlay));
+	    } catch (Exception e) {
+	    	db = new XMLDatabase();
+	    }
+	    return this.createObjectService(db);
+    }
 }
