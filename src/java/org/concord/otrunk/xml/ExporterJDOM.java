@@ -42,6 +42,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,6 +106,7 @@ public class ExporterJDOM
 	private HashMap<OTID, ArrayList<OTDataObject>> incomingReferenceMap;
 	
 	private URL contextURL;
+	private OTDataObject currentOverlayDO;
 	
 	public static void export(File outputFile, OTDataObject rootObject, OTDatabase db)
 	throws Exception
@@ -634,6 +636,10 @@ public class ExporterJDOM
 		    // FIXME: we are ignoring special keys there should way
 		    // to identify special keys.
 			String resourceName = resourceKeys[i];
+			
+			if (objectElementName.equals("OTOverlay") && resourceName.equals(OTOverlay.NON_DELTA_OBJECTS_ATTRIBUTE)) {
+				this.currentOverlayDO = dataObj;
+			}
 
 			if(		resourceName.equals("currentRevision") ||
 					resourceName.equals("localId")) {
@@ -820,6 +826,10 @@ public class ExporterJDOM
 				writeResource(dataObj, objectEl, resourceName, primitiveString, 
 						XmlType.ATTRIBUTE);				
 			}
+			
+			if (objectElementName.equals("OTOverlay") && resourceName.equals(OTOverlay.NON_DELTA_OBJECTS_ATTRIBUTE)) {
+				this.currentOverlayDO = null;
+			}
 		}
 		
 		if(nullResources.size() > 0){
@@ -886,6 +896,16 @@ public class ExporterJDOM
 						parentResourceName.equals(containerResourceName)){
 			// our parent is the container and our parent property is the same as the container property
 			// so the actual object should be written here
+			switch (shouldWriteReferenceBecauseOfNonDeltaObjectsFlattening(id, container, containerResourceName, parent)) {
+			case FULL:
+				return false;
+			case REFERENCE:
+				return true;
+			case CONTINUE:
+			default:
+				break;
+			}
+			
 			return false;
 		}
 
@@ -895,13 +915,53 @@ public class ExporterJDOM
 		// the containedValue can be null if it doesn't exist any more
 		if(id.equals(containedValue)){
 			// the container still contains the correct value						
-			// so just write a reference here
+			// so just write a reference here unless the parent is the current overlay, and we need to flatten
+			
+			switch (shouldWriteReferenceBecauseOfNonDeltaObjectsFlattening(id, container, containerResourceName, parent)) {
+			case FULL:
+				return false;
+			case REFERENCE:
+				return true;
+			case CONTINUE:
+			default:
+				break;
+			}
+			
 			return true;
 		}
 		
 		// The container doesn't reference this object anymore, or at least not in the 
 		// same spot as before, so the full object needs to be written
 		return false;
+    }
+    
+    private enum NonDeltaAction { FULL, REFERENCE, CONTINUE }
+    
+    public NonDeltaAction shouldWriteReferenceBecauseOfNonDeltaObjectsFlattening(OTID id, OTDataObject container, String containerResourceName, OTDataObject parent) {
+		if (currentOverlayDO != null) {
+			// if we're a child of an OTOverlay, and
+			// if this object has multiple parents, and one of them is the nonDeltaObjects list of an Overlay, then
+			// only write the object if the current container is the Overlay. This will output the nonDeltaObjects list
+			// in a flat manner, which is necessary for OverlayImpl.contains() to work correctly (as written 2011-01-27).
+			
+			ArrayList<OTDataObject> arrayList = incomingReferenceMap.get(id);
+			if (arrayList.size() > 1) {
+				// more than one reference. is one of those the OTOverlay?
+				for (OTDataObject parentDO : arrayList) {
+					if (parentDO.equals(currentOverlayDO)) {
+						// one of them is
+						if (parent.equals(parentDO)) {
+							// write out the full element, because we're the direct child of the overlay
+							return NonDeltaAction.FULL;
+						} else {
+							// we're not currently the direct child of the overlay. just write a reference.
+							return NonDeltaAction.REFERENCE;
+						}
+					}
+				}
+			}
+		}
+		return NonDeltaAction.CONTINUE;
     }
     
 	public static String getClassName(String fullClassName)
