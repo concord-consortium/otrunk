@@ -459,6 +459,7 @@ public class OTObjectServiceImpl
 		}
 		
 		// OTDataObject copyDataObject = DataObjectUtil.copy(originalDataObject, creationDb, orphanDataList, maxDepth, this, otrunk.getDataObjectFinder());
+		// FIXME Why are we collecting idProviders and not using them?
 		ArrayList<OTObjectService> idProviders = new ArrayList<OTObjectService>();
 		idProviders.add(source.getOTObjectService());
 		idProviders.add(destination.getOTObjectService());
