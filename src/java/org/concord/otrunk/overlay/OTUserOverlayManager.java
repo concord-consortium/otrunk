@@ -48,8 +48,6 @@ public abstract class OTUserOverlayManager
 	protected ArrayList<OTUserObject> readOnlyUsers = new ArrayList<OTUserObject>();
 	protected ArrayList<OTUserObject> writeableUsers = new ArrayList<OTUserObject>();
 	
-	protected HashMap<OTID, Integer> nonRecurseObjects = new HashMap<OTID, Integer>();
-	
 	private Map<OTUserObject, ArrayList<OverlayUpdateListener>> listenerMap = Collections.synchronizedMap(new HashMap<OTUserObject, ArrayList<OverlayUpdateListener>>());
 	private List<OverlayUpdateListener> globalListeners = Collections.synchronizedList(new ArrayList<OverlayUpdateListener>());
 	/**
@@ -319,10 +317,6 @@ public abstract class OTUserOverlayManager
             if (newWrappedObject != null) {
             	int depth = -1;
             	boolean onlyChanges = true;
-            	if (nonRecurseObjects.containsKey(getAuthoredId(object))) {
-            		depth = nonRecurseObjects.get(getAuthoredId(object));
-            		onlyChanges = false;
-            	}
     	        ((OTObjectServiceImpl) object.getOTObjectService()).copyInto(object, newWrappedObject, depth, onlyChanges);
     	        return true;
             }
@@ -563,16 +557,6 @@ public abstract class OTUserOverlayManager
     		}
 		}
 		return true;
-	}
-	
-	public void addNonRecurseObject(OTObject obj, int depth) {
-		OTID authoredId = getAuthoredId(obj);
-		writeLock();
-		try {
-			nonRecurseObjects.put(authoredId, depth);
-		} finally {
-			writeUnlock();
-		}
 	}
 	
 	public void setReadOnly(OTUserObject user) {
