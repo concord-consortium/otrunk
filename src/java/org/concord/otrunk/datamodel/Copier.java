@@ -90,7 +90,7 @@ public class Copier
     	return null;
     }
     
-     private Object handleChild(Object child, int maxDepth) 
+     private Object handleChild(Object child, int maxDepth, OTDataObject copyParentDO, String resourceName) 
     throws Exception
     {
 		// check if the value is an OTID
@@ -137,19 +137,22 @@ public class Copier
     						// the object is newly created *or* we're forcing a full copy
     						itemCopy = destinationDb.createDataObject(itemObj.getType());
     					}
+    					setContainerInfo(itemCopy, copyParentDO, resourceName);
     					itemCopyEntry = new CopyEntry(itemObj, copyMaxDepth, itemCopy);
         				toBeCopied.add(itemCopyEntry);
         				if (onlyRecurse) {
         					recurseOnly.add(itemCopyEntry);
         				}
     				} else {
-    					OTDataObject itemCopy =  destinationDb.createDataObject(itemObj.getType()); 
+    					OTDataObject itemCopy =  destinationDb.createDataObject(itemObj.getType());
+    					setContainerInfo(itemCopy, copyParentDO, resourceName);
     					itemCopyEntry = new CopyEntry(itemObj, copyMaxDepth, itemCopy); 
     					toBeCopied.add(itemCopyEntry); 
     				}
     				
 				} else {
-					OTDataObject itemCopy =  destinationDb.createDataObject(itemObj.getType()); 
+					OTDataObject itemCopy =  destinationDb.createDataObject(itemObj.getType());
+					setContainerInfo(itemCopy, copyParentDO, resourceName);
 					itemCopyEntry = new CopyEntry(itemObj, copyMaxDepth, itemCopy); 
 					toBeCopied.add(itemCopyEntry); 
 				}
@@ -162,6 +165,13 @@ public class Copier
 		}
 		
 		return child;
+    }
+     
+    private void setContainerInfo(OTDataObject dataObj, OTDataObject containerDO, String resourceKey) {
+    	if (dataObj.getClass().equals(containerDO.getClass())) {
+			dataObj.setContainer(containerDO);
+			dataObj.setContainerResourceKey(resourceKey);
+    	}
     }
     
     public static void copyInto(OTDataObject source, OTDataObject dest,
@@ -214,7 +224,7 @@ public class Copier
     					ArrayList<Object> tempList = new ArrayList<Object>();
     					for(int j=0; j<list.size(); j++){
         					Object listItem = list.get(j);
-        					listItem = handleChild(listItem, entry.maxDepth);
+        					listItem = handleChild(listItem, entry.maxDepth, copy, keys[i] + "[" + j + "]");
         					tempList.add(listItem);
         					if (listItem instanceof CompositeDataObject && ((CompositeDataObject) listItem).isModified()) {
         						modifiedList = true;
@@ -241,7 +251,7 @@ public class Copier
         				for(int j=0; j<list.size(); j++){
         					Object listItem = list.get(j);
         					
-        					listItem = handleChild(listItem, entry.maxDepth);
+        					listItem = handleChild(listItem, entry.maxDepth, copy, keys[i] + "[" + j + "]");
         					copyList.add(listItem);
         				}
     				}
@@ -254,7 +264,7 @@ public class Copier
     					HashMap<String, Object> tempMap = new HashMap<String, Object>();
     					for(int j=0; j<mapKeys.length; j++){
         					Object item = map.get(mapKeys[j]);
-        					item = handleChild(item, entry.maxDepth);
+        					item = handleChild(item, entry.maxDepth, copy, keys[i] + "['" + mapKeys[j] + "']");
         					tempMap.put(mapKeys[j], item);
         					if (item instanceof CompositeDataObject && ((CompositeDataObject) item).isModified()) {
         						modifiedMap = true;
@@ -280,7 +290,7 @@ public class Copier
         				
         				for(int j=0; j<mapKeys.length; j++){
         					Object item = map.get(mapKeys[j]);
-        					item = handleChild(item, entry.maxDepth);
+        					item = handleChild(item, entry.maxDepth, copy, keys[i] + "['" + mapKeys[j] + "']");
         					copyMap.put(mapKeys[j], item);
         				}
     				}
@@ -288,7 +298,7 @@ public class Copier
 					// the xhtml needs parsing so that object references can be resolved
 					secondPassKeys.add(keys[i]);
     			} else {
-    				resource = handleChild(resource, entry.maxDepth);
+    				resource = handleChild(resource, entry.maxDepth, copy, keys[i]);
     				if (! onlyRecurse) {
     					copy.setResource(keys[i], resource);
     				}
@@ -411,7 +421,7 @@ public class Copier
 					// Just use the original id
 					copiedId = otid;							
 				} else {
-					copiedId = (OTID)handleChild(otid, entry.maxDepth);
+					copiedId = (OTID)handleChild(otid, entry.maxDepth, entry.copy, attributeName);
 					if (onlyModifications && (copiedId instanceof OTTransientMapID)) {
 						// ignore it
 					} else {
