@@ -141,6 +141,15 @@ public class OTGroupListManager extends DefaultOTObject
     	return groupUserObject;
     }
     
+    public ArrayList<OTUserObject> getUsers() {
+    	ArrayList<OTUserObject> users = new ArrayList<OTUserObject>();
+    	for (OTObject obj : userList) {
+    		OTUserObject user = ((OTGroupMember) obj).getUserObject();
+    		users.add(user);
+    	}
+    	return users;
+    }
+    
     private void processUserList(boolean reload) {
     	// logger.info("processing users...");
     	// for each user

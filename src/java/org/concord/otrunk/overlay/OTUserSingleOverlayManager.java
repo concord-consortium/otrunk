@@ -78,6 +78,13 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
 		}
 		return (T) objService.getOTObject(object.getGlobalId());
 	}
+
+	@Override
+    public <T extends OTObject> T getOTObject(UserSubmission submission, T object)
+        throws Exception
+    {
+	    return getOTObject(submission.getUser(), object);
+    }
 	
 	@Override
     public synchronized void reload(OTUserObject userObject) throws Exception {
@@ -137,4 +144,11 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
 			readUnlock();
 		}
 	}
+
+	@Override
+    public int getSubmissionNumber(OTUserObject user, OTObject object)
+        throws Exception
+    {
+	    return UserSubmission.MOST_RECENT_SUBMISSION;
+    }
 }

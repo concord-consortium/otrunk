@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
 import org.concord.otrunk.OTObjectServiceImpl;
@@ -73,6 +74,10 @@ public class OTUserMappedOverlayManager
 	}
 	
 	private OTOverlayReference findLastReference(OTUserObject user, OTObject object) {
+		return findReference(user, object, UserSubmission.MOST_RECENT_SUBMISSION);
+	}
+	
+	private OTOverlayReference findReference(OTUserObject user, OTObject object, int submissionNumber) {
 		readLock();
 		try {
     		if (userToOverlayReferenceMaps.containsKey(user)) {
@@ -81,11 +86,19 @@ public class OTUserMappedOverlayManager
     			
     			OTObjectSet set = (OTObjectSet) referenceMap.getObjectToOverlayMap().getObject(authoredId.toExternalForm());
     			int size = (set == null) ? 0 : set.getObjects().size();
-    			if (size < 1) {
-    				return null;
+    			if (size > 0) {
+        			OTObjectList referenceList = set.getObjects();
+        			if (submissionNumber == UserSubmission.MOST_RECENT_SUBMISSION) {
+        				OTOverlayReference ref = (OTOverlayReference) referenceList.get(referenceList.size()-1);
+        				return ref;
+        			}
+        			for (OTObject refObj : referenceList) {
+        				OTOverlayReference ref = (OTOverlayReference) refObj;
+        				if (ref.getNumber() == submissionNumber) {
+        					return ref;
+        				}
+        			}
     			}
-    			OTOverlayReference ref = (OTOverlayReference) set.getObjects().get(set.getObjects().size()-1);
-    			return ref;
     		}
     		return null;
 		} finally {
@@ -133,6 +146,16 @@ public class OTUserMappedOverlayManager
     public <T extends OTObject> T getOTObject(OTUserObject userObject, T object) throws Exception
 	{
 		return getOTObject(userObject, object, null);
+	}
+	
+	@Override
+    public <T extends OTObject> T getOTObject(UserSubmission submission, T object) throws Exception
+	{
+		if (submission.getSubmissionNumber() == 0) {
+			return null;
+		}
+		OTOverlayReference reference = findReference(submission.getUser(), object, submission.getSubmissionNumber());
+		return getOTObject(submission.getUser(), object, reference);
 	}
 	
 	@Override
@@ -309,5 +332,16 @@ public class OTUserMappedOverlayManager
 		} finally {
 			readUnlock();
 		}
+    }
+
+	@Override
+    public int getSubmissionNumber(OTUserObject user, OTObject object)
+        throws Exception
+    {
+		OTOverlayReference ref = findReference(user, object, UserSubmission.MOST_RECENT_SUBMISSION);
+		if (ref == null) {
+			return 0;
+		}
+	    return ref.getNumber();
     }
 }

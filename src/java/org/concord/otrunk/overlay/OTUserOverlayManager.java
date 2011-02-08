@@ -71,8 +71,11 @@ public abstract class OTUserOverlayManager
 	public abstract void addWriteable(URL overlayURL, OTUserObject userObject, boolean isGlobal) throws Exception;
 
 	public abstract <T extends OTObject> T getOTObject(OTUserObject userObject, T object) throws Exception;
+	public abstract <T extends OTObject> T getOTObject(UserSubmission submission, T object) throws Exception;
 	
 	protected abstract OTObjectService getObjectService(OTUserObject userObject, OTObject object);
+
+	public abstract int getSubmissionNumber(OTUserObject user, OTObject object) throws Exception;
 
 	public void remove(OTUserObject userObject) {
 		writeLock();
