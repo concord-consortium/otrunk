@@ -13,6 +13,7 @@ public interface OTUserSubmission extends OTObjectInterface, UserSubmission {
     public OTUserObject getUser();
     public void setUser(OTUserObject user);
 
+    public static final int DEFAULT_submissionNumber = -1;
     public int getSubmissionNumber();
     public void setSubmissionNumber(int number);
 }
