@@ -2,6 +2,9 @@ package org.concord.otrunk.overlay;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
@@ -78,9 +81,27 @@ public class OTUserMappedOverlayManager
 	}
 	
 	private OTOverlayReference findReference(OTUserObject user, OTObject object, int submissionNumber) {
+		ArrayList<OTOverlayReference> allReferences = findAllReferences(user, object);
+
+		if (allReferences.size() > 0) {
+    		if (submissionNumber == UserSubmission.MOST_RECENT_SUBMISSION) {
+    			OTOverlayReference ref = allReferences.get(allReferences.size()-1);
+    			return ref;
+    		}
+    		for (OTOverlayReference ref : allReferences) {
+    			if (ref.getNumber() == submissionNumber) {
+    				return ref;
+    			}
+    		}
+		}
+		return null;
+	}
+	
+	private ArrayList<OTOverlayReference> findAllReferences(OTUserObject user, OTObject object) {
+		ArrayList<OTOverlayReference> references = new ArrayList<OTOverlayReference>();
 		readLock();
 		try {
-    		if (userToOverlayReferenceMaps.containsKey(user)) {
+			if (userToOverlayReferenceMaps.containsKey(user)) {
     			OTID authoredId = getAuthoredId(object);
     			OTObjectToOverlayReferenceMap referenceMap = userToOverlayReferenceMaps.get(user);
     			
@@ -88,22 +109,24 @@ public class OTUserMappedOverlayManager
     			int size = (set == null) ? 0 : set.getObjects().size();
     			if (size > 0) {
         			OTObjectList referenceList = set.getObjects();
-        			if (submissionNumber == UserSubmission.MOST_RECENT_SUBMISSION) {
-        				OTOverlayReference ref = (OTOverlayReference) referenceList.get(referenceList.size()-1);
-        				return ref;
-        			}
         			for (OTObject refObj : referenceList) {
         				OTOverlayReference ref = (OTOverlayReference) refObj;
-        				if (ref.getNumber() == submissionNumber) {
-        					return ref;
-        				}
+        				references.add(ref);
         			}
     			}
     		}
-    		return null;
 		} finally {
 			readUnlock();
 		}
+
+		// make sure they are sorted from oldest to newest
+		Collections.sort(references, new Comparator<OTOverlayReference>() {
+			public int compare(OTOverlayReference a, OTOverlayReference b)
+            {
+	            return Integer.valueOf(a.getNumber()).compareTo(Integer.valueOf(b.getNumber()));
+            }
+		});
+		return references;
 	}
 
 	@Override
@@ -157,6 +180,18 @@ public class OTUserMappedOverlayManager
 		OTOverlayReference reference = findReference(submission.getUser(), object, submission.getSubmissionNumber());
 		return getOTObject(submission.getUser(), object, reference);
 	}
+	
+	@Override
+	public <T extends OTObject> ArrayList<T> getAllOTObjects(OTUserObject userObject, T object) throws Exception {
+		ArrayList<T> list = new ArrayList<T>();
+		ArrayList<OTOverlayReference> allReferences = findAllReferences(userObject, object);
+		
+		for (OTOverlayReference ref : allReferences) {
+			T newObject = getOTObject(userObject, object, ref);
+			list.add(newObject);
+		}
+		return list;
+	};
 	
 	@Override
 	protected OTObjectService getObjectService(OTUserObject userObject, OTObject object)
@@ -248,6 +283,7 @@ public class OTUserMappedOverlayManager
     		}
     		if (forceSave || isObjectModified(user, object)) {
         		incrementSubmitCount(object);
+        		setSubmitTimestamp(object);
         		OTOverlayReference ref = spawnOverlay(user, object);
         		addReferenceToMap(user, object, ref);
     		}

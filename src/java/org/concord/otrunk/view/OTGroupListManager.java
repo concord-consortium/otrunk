@@ -12,6 +12,7 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
 import org.concord.framework.otrunk.OTServiceContext;
+import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
 import org.concord.otrunk.OTrunkImpl;
@@ -225,5 +226,36 @@ public class OTGroupListManager extends DefaultOTObject
 	    }
 	    return null;
     }
+	
+	public OTUser getOTrunkUser(OTUserObject intrasessionUser) {
+		OTGroupMember member = getMember(intrasessionUser);
+		if (member != null) {
+			for (OTUser user : otrunk.getUsers()) {
+				// Try matching on name... that's the best we can do right now
+				if (user.getName().equals(member.getName())) {
+					return user;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public OTUser getIntrasessionUser(OTUser otrunkUser) {
+		OTGroupMember member = getMember(otrunkUser.getName());
+		if (member != null) {
+			return member.getUserObject();
+		}
+		return null;
+	}
+	
+	public OTGroupMember getMember(String name) {
+		for (OTObject mem : userList) {
+    		OTGroupMember member = (OTGroupMember) mem;
+    		if (member.getName().equals(name)) {
+    			return member;
+    		}
+    	}
+    	return null;
+	}
 
 }

@@ -20,6 +20,7 @@ import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.wrapper.OTInt;
+import org.concord.framework.otrunk.wrapper.OTLong;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkUtil;
@@ -54,6 +55,7 @@ public abstract class OTUserOverlayManager
      * String used as the key in the annotations object map to record number of times a student "submits" an object
      */
     public static final String SUBMIT_ANNOTATION = "intrasession-submits";
+    public static final String SUBMIT_TIMESTAMP_ANNOTATION = "intrasession-submit-timestamp";
 	
 	public static void setHeadBeforeGet(boolean doHead) {
 		doHeadBeforeGet = doHead;
@@ -72,6 +74,8 @@ public abstract class OTUserOverlayManager
 
 	public abstract <T extends OTObject> T getOTObject(OTUserObject userObject, T object) throws Exception;
 	public abstract <T extends OTObject> T getOTObject(UserSubmission submission, T object) throws Exception;
+	
+	public abstract <T extends OTObject> ArrayList<T> getAllOTObjects(OTUserObject userObject, T object) throws Exception;
 	
 	protected abstract OTObjectService getObjectService(OTUserObject userObject, OTObject object);
 
@@ -600,6 +604,17 @@ public abstract class OTUserOverlayManager
         }
         submitCount.setValue(submitCount.getValue() + 1);
     }
+	
+	protected void setSubmitTimestamp(OTObject object) {
+		try {
+            OTLong timestamp = object.getOTObjectService().createObject(OTLong.class);
+            timestamp.setValue(System.currentTimeMillis());
+            object.getAnnotations().putObject(OTUserOverlayManager.SUBMIT_TIMESTAMP_ANNOTATION, timestamp);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Couldn't create OTLong object!", e);
+            return;
+        }
+	}
 	
 	protected void writeLock() {
 //		if (! readWriteLock.writeLock().isHeldByCurrentThread()) {

@@ -1,6 +1,7 @@
 package org.concord.otrunk.overlay;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -85,6 +86,13 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
     {
 	    return getOTObject(submission.getUser(), object);
     }
+	
+	@Override
+	public <T extends OTObject> java.util.ArrayList<T> getAllOTObjects(OTUserObject userObject, T object) throws Exception {
+		ArrayList<T> list = new ArrayList<T>();
+		list.add(getOTObject(userObject, object));
+		return list;
+	};
 	
 	@Override
     public synchronized void reload(OTUserObject userObject) throws Exception {
