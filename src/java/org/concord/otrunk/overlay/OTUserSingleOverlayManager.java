@@ -132,6 +132,7 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
 		}
 		if (forceSave || isObjectModified(user, object)) {
     		incrementSubmitCount(object);
+    		setSubmitTimestamp(object);
     		user = getAuthoredObject(user);
     		OTObjectService overlayObjectService = getObjectService(user, object);
     		if (object != null) {
