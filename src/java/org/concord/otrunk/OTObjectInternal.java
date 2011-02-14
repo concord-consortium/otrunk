@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTChangeEvent;
 import org.concord.framework.otrunk.OTChangeListener;
@@ -30,6 +32,7 @@ import org.concord.otrunk.view.OTConfig;
 
 public class OTObjectInternal implements OTObjectInterface
 {
+    private static final Logger logger = Logger.getLogger(OTObjectInternal.class.getName());
 	public final static boolean traceListeners = OTConfig.getBooleanProp(
             OTConfig.TRACE_LISTENERS_PROP, false);
 
@@ -599,7 +602,13 @@ public class OTObjectInternal implements OTObjectInterface
 		}
 		
 		if(((OTObject)other).getGlobalId().equals(getGlobalId())) {
-			System.err.println("compared two ot objects with the same ID but different instances");
+		    String msg = "compared two ot objects with the same ID but different instances";
+		    if (logger.isLoggable(Level.FINER)) {
+		    	Throwable t = new Throwable("stacktrace");
+		    	logger.log(Level.FINER, msg, t);
+		    } else {
+		        logger.info(msg);
+		    }
 			return true;
 		}
 		return false;
