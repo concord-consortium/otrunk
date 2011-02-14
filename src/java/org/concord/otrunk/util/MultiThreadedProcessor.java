@@ -6,12 +6,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class MultiThreadedProcessor<T>
-{
-	private final ConcurrentLinkedQueue<T> queue = new ConcurrentLinkedQueue<T>();
-	private final int numberOfThreads;
-	private final MultiThreadedProcessorRunnable<T> runnable;
+public class MultiThreadedProcessor<T> {
+	private static final Logger logger = Logger.getLogger(MultiThreadedProcessor.class.getName());
+	private ConcurrentLinkedQueue<T> queue = new ConcurrentLinkedQueue<T>();
+	private int numberOfThreads;
+	private MultiThreadedProcessorRunnable<T> runnable;
 	private static ExecutorService threadPool = Executors.newCachedThreadPool();
 	
 	public MultiThreadedProcessor(Collection<T> collection, int threads, MultiThreadedProcessorRunnable<T> runnable) {
@@ -29,8 +31,8 @@ public class MultiThreadedProcessor<T>
 					if (item == null) {
 						break;
 					}
-					runnable.setItem(item);
-					runnable.run();
+					// logger.log(Level.INFO, "Processing item: " + item + ", Thread: " + Thread.currentThread().getName());
+					runnable.process(item);
 				}	            
             }
 	    };

@@ -5,16 +5,20 @@ package org.concord.otrunk.util;
  * 
  * The typical workflow will involve external code doing:
  *   MultiThreadedProcessorRunnable r = new MultiThreadedProcessorRunnable() { ... };
- *   r.setItem(someItem);
- *   r.run();
- *   r.setItem(someOtherItem);
- *   r.run();
+ *   r.process(someItem);
+ *   r.process(someOtherItem);
  *   ...
  * @author aunger
  *
  * @param <T>
  */
-public interface MultiThreadedProcessorRunnable<T> extends Runnable
+public interface MultiThreadedProcessorRunnable<T>
 {
-	public void setItem(T item);
+	/**
+	 * Method to process the passed in item.
+	 * 
+	 * MAKE SURE THIS METHOD IS THREADSAFE, as it will be called simultaneously by multiple threads.
+	 * @param item
+	 */
+	public void process(T item);
 }

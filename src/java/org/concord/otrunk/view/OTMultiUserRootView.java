@@ -110,13 +110,7 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 	    
 		// use 3 threads to speed things up
 		MultiThreadedProcessorRunnable<OTUserDatabaseRef> objectLoadingTask = new MultiThreadedProcessorRunnable<OTUserDatabaseRef>(){
-			private OTUserDatabaseRef ref;
-			
-			public void setItem(OTUserDatabaseRef item) {
-	            this.ref = item;
-            }
-			
-			public void run() {
+			public void process(OTUserDatabaseRef ref) {
 				URL url = ref.getUrl();
 				URL overlayURL = ref.getOverlayURL();	    	
 				OTUserObject userObject = null;
@@ -138,7 +132,7 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
 				// set up the overlay, if it exists
 				if (overlayURL != null && userObject != null) {
 					try {
-	    			  	synchronized (this){
+	    			  	synchronized (OTMultiUserRootView.this){
 	    			  		if (overlayManager == null) {
 								overlayManager = OTUserOverlayManagerFactory.getUserOverlayManager(overlayURL, otrunk);
 							}

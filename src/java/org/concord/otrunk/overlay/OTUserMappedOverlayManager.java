@@ -190,15 +190,11 @@ public class OTUserMappedOverlayManager
 		
 		// use 3 threads to speed things up
 		MultiThreadedProcessorRunnable<OTOverlayReference> objectLoadingTask = new MultiThreadedProcessorRunnable<OTOverlayReference>(){
-			private OTOverlayReference ref;
-			
-			public void setItem(OTOverlayReference item) {
-	            this.ref = item;
-            }
-			
-			public void run() {
+			public void process(OTOverlayReference ref) {
 				T newObject = getOTObject(userObject, object, ref);
-				list.add(newObject);
+				synchronized(list) {
+					list.add(newObject);
+				}
             }
 	    };
 	    int numThreads = (allReferences.size() > 3) ? 3 : 1;

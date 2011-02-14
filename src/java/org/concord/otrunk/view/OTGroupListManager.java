@@ -159,14 +159,7 @@ public class OTGroupListManager extends DefaultOTObject
     	// for each user
     	// use 3 threads to speed things up
     	MultiThreadedProcessorRunnable<OTGroupMember> processTask = new MultiThreadedProcessorRunnable<OTGroupMember>() {
-    		private OTGroupMember groupMember;
-
-			public void setItem(OTGroupMember item)
-            {
-	            this.groupMember = item;
-            }
-    		
-			public void run()
+			public void process(OTGroupMember groupMember)
             {
 	    		// if current user is set, make it the current user
 	    		if (groupMember.getIsCurrentUser()) {
