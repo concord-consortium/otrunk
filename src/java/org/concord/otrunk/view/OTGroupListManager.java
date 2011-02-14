@@ -19,6 +19,9 @@ import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
 import org.concord.otrunk.overlay.OTUserOverlayManagerFactory;
 import org.concord.otrunk.user.OTUserObject;
+import org.concord.otrunk.util.MultiThreadedProcessingException;
+import org.concord.otrunk.util.MultiThreadedProcessor;
+import org.concord.otrunk.util.MultiThreadedProcessorRunnable;
 
 public class OTGroupListManager extends DefaultOTObject
     implements OTBundle
@@ -151,35 +154,58 @@ public class OTGroupListManager extends DefaultOTObject
     	return users;
     }
     
-    private void processUserList(boolean reload) {
+    private void processUserList(final boolean reload) {
     	// logger.info("processing users...");
     	// for each user
-    	
+    	// use 3 threads to speed things up
+    	MultiThreadedProcessorRunnable<OTGroupMember> processTask = new MultiThreadedProcessorRunnable<OTGroupMember>() {
+    		private OTGroupMember groupMember;
+
+			public void setItem(OTGroupMember item)
+            {
+	            this.groupMember = item;
+            }
+    		
+			public void run()
+            {
+	    		// if current user is set, make it the current user
+	    		if (groupMember.getIsCurrentUser()) {
+	    			OTGroupListManager.this.currentGroupMember = groupMember;
+	    		}
+				// if overlay url is set, load and register overlay
+	    		if (groupMember.getDataURL() != null) {
+	    			try {
+	    				if (reload) {
+	    					// to avoid problems where the overlayManager still references different versions of the overlay, we'll remove the old ones first
+	    					overlayManager.reload(groupMember.getUserObject());
+	    				} else {
+	    					if (groupMember.getIsCurrentUser()) {
+	    						overlayManager.addWriteable(groupMember.getDataURL(), groupMember.getUserObject(), false);
+	    					} else {
+	    						overlayManager.addReadOnly(groupMember.getDataURL(), groupMember.getUserObject(), false);
+	    					}
+	    				}
+	    			} catch (Exception e) {
+	    				logger.log(Level.WARNING, "Couldn't load overlay for user: " + groupMember.getName(), e);
+	    			}
+	    		}
+            }
+    	};
+    	ArrayList<OTGroupMember> members = new ArrayList<OTGroupMember>();
     	for(OTObject obj: userList){
     		OTGroupMember groupMember = (OTGroupMember) obj;
-
-    		// if current user is set, make it the current user
-    		if (groupMember.getIsCurrentUser()) {
-    			this.currentGroupMember = groupMember;
-    		}
-    		// if overlay url is set, load and register overlay
-    		if (groupMember.getDataURL() != null) {
-    			try {
-    				if (reload) {
-    					// to avoid problems where the overlayManager still references different versions of the overlay, we'll remove the old ones first
-    					overlayManager.reload(groupMember.getUserObject());
-    				} else {
-    					if (groupMember.getIsCurrentUser()) {
-    						overlayManager.addWriteable(groupMember.getDataURL(), groupMember.getUserObject(), false);
-    					} else {
-    						overlayManager.addReadOnly(groupMember.getDataURL(), groupMember.getUserObject(), false);
-    					}
-    				}
-    			} catch (Exception e) {
-    				logger.log(Level.WARNING, "Couldn't load overlay for user: " + groupMember.getName(), e);
-    			}
-    		}
+    		members.add(groupMember);
     	}
+    	
+    	MultiThreadedProcessor<OTGroupMember> processor = new MultiThreadedProcessor<OTGroupMember>(members, 3, processTask);
+    	try {
+        	processor.process();
+        } catch (MultiThreadedProcessingException e) {
+            logger.log(Level.SEVERE, "Error processing user database list - " + e.getExceptions().size() + " exceptions!", e);
+            for (Exception ex : e.getExceptions()) {
+            	logger.log(Level.SEVERE, "Causing exception: ", ex);
+            }
+        }
     }
     
     public OTGroupMember getCurrentGroupMember() {

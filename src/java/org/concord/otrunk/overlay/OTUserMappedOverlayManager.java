@@ -19,6 +19,8 @@ import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.net.HTTPRequestException;
 import org.concord.otrunk.user.OTUserObject;
+import org.concord.otrunk.util.MultiThreadedProcessor;
+import org.concord.otrunk.util.MultiThreadedProcessorRunnable;
 import org.concord.otrunk.xml.XMLDatabase;
 
 public class OTUserMappedOverlayManager
@@ -182,14 +184,26 @@ public class OTUserMappedOverlayManager
 	}
 	
 	@Override
-	public <T extends OTObject> ArrayList<T> getAllOTObjects(OTUserObject userObject, T object) throws Exception {
-		ArrayList<T> list = new ArrayList<T>();
-		ArrayList<OTOverlayReference> allReferences = findAllReferences(userObject, object);
+	public <T extends OTObject> ArrayList<T> getAllOTObjects(final OTUserObject userObject, final T object) throws Exception {
+		final ArrayList<T> list = new ArrayList<T>();
+		final ArrayList<OTOverlayReference> allReferences = findAllReferences(userObject, object);
 		
-		for (OTOverlayReference ref : allReferences) {
-			T newObject = getOTObject(userObject, object, ref);
-			list.add(newObject);
-		}
+		// use 3 threads to speed things up
+		MultiThreadedProcessorRunnable<OTOverlayReference> objectLoadingTask = new MultiThreadedProcessorRunnable<OTOverlayReference>(){
+			private OTOverlayReference ref;
+			
+			public void setItem(OTOverlayReference item) {
+	            this.ref = item;
+            }
+			
+			public void run() {
+				T newObject = getOTObject(userObject, object, ref);
+				list.add(newObject);
+            }
+	    };
+	    int numThreads = (allReferences.size() > 3) ? 3 : 1;
+	    MultiThreadedProcessor<OTOverlayReference> processor = new MultiThreadedProcessor<OTOverlayReference>(allReferences, numThreads, objectLoadingTask);
+	    processor.process();
 		return list;
 	};
 	

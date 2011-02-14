@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTObject;
+import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.view.AbstractOTView;
 import org.concord.framework.otrunk.view.OTXHTMLView;
@@ -38,6 +39,9 @@ import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
 import org.concord.otrunk.overlay.OTUserOverlayManagerFactory;
 import org.concord.otrunk.user.OTUserObject;
+import org.concord.otrunk.util.MultiThreadedProcessingException;
+import org.concord.otrunk.util.MultiThreadedProcessor;
+import org.concord.otrunk.util.MultiThreadedProcessorRunnable;
 
 
 public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView 
@@ -98,78 +102,67 @@ public class OTMultiUserRootView extends AbstractOTView implements OTXHTMLView
         System.out.println("user list load time: " + 
         	(System.currentTimeMillis() - start) + "ms");        
 
-	    final ArrayList<OTObject> userDatabases = 
-	    	new ArrayList<OTObject>(userList.getUserDatabases());
+	    final ArrayList<OTUserDatabaseRef> userDatabases =  new ArrayList<OTUserDatabaseRef>();
+	    OTObjectList dbs = userList.getUserDatabases();
+	    for (OTObject db : dbs) {
+	    	userDatabases.add((OTUserDatabaseRef)db);
+	    }
 	    
-	    Runnable userDBTask = new Runnable(){
-
-	    	public synchronized OTUserDatabaseRef nextDb()
-	    	{
-	    		if(userDatabases.size() == 0){
-	    			return null;
-	    		}
-	    		
-	    		return (OTUserDatabaseRef) userDatabases.remove(0);
-	    	}
-	    	
-			public void run()
-            {	
-				while(true){
-					OTUserDatabaseRef ref = nextDb();
-					if(ref == null){
-						break;
-					}
-					URL url = ref.getUrl();
-					URL overlayURL = ref.getOverlayURL();	    	
-					OTUserObject userObject = null;
-					try {
-						// set up the user session and register it
-						OTMLUserSession userSession;
-						if (url != null) {
-							userSession = new OTMLUserSession(url, null);
-						} else {
-							userSession = new OTMLUserSession();
-						}
-						otrunk.registerUserSession(userSession);
-						userObject = userSession.getUserObject();
-					}
-					catch (Exception e) {
-						logger.log(Level.SEVERE, "Couldn't initialize user session", e);
-					}
-
-					// set up the overlay, if it exists
-					if (overlayURL != null && userObject != null) {
-						try {
-		    			  	synchronized (this){
-		    			  		if (overlayManager == null) {
-									overlayManager = OTUserOverlayManagerFactory.getUserOverlayManager(overlayURL, otrunk);
-								}
-		        				// map the object service/overlay to the user
-		    			  		overlayManager.addReadOnly(overlayURL, userObject, false);
-		    			  	}
-						} catch (Exception e) {
-							logger.log(Level.SEVERE, "Couldn't initialize user overlay", e);
-						}
-					}
-				}	            
-            }
-	    
+		// use 3 threads to speed things up
+		MultiThreadedProcessorRunnable<OTUserDatabaseRef> objectLoadingTask = new MultiThreadedProcessorRunnable<OTUserDatabaseRef>(){
+			private OTUserDatabaseRef ref;
 			
+			public void setItem(OTUserDatabaseRef item) {
+	            this.ref = item;
+            }
+			
+			public void run() {
+				URL url = ref.getUrl();
+				URL overlayURL = ref.getOverlayURL();	    	
+				OTUserObject userObject = null;
+				try {
+					// set up the user session and register it
+					OTMLUserSession userSession;
+					if (url != null) {
+						userSession = new OTMLUserSession(url, null);
+					} else {
+						userSession = new OTMLUserSession();
+					}
+					otrunk.registerUserSession(userSession);
+					userObject = userSession.getUserObject();
+				}
+				catch (Exception e) {
+					logger.log(Level.SEVERE, "Couldn't initialize user session", e);
+				}
+
+				// set up the overlay, if it exists
+				if (overlayURL != null && userObject != null) {
+					try {
+	    			  	synchronized (this){
+	    			  		if (overlayManager == null) {
+								overlayManager = OTUserOverlayManagerFactory.getUserOverlayManager(overlayURL, otrunk);
+							}
+	        				// map the object service/overlay to the user
+	    			  		overlayManager.addReadOnly(overlayURL, userObject, false);
+	    			  	}
+					} catch (Exception e) {
+						logger.log(Level.SEVERE, "Couldn't initialize user overlay", e);
+					}
+				}           
+            }
 	    };
 
-	    Thread [] threads = new Thread[3];
-	    for(int i=0; i<threads.length; i++){
-	    	threads[i] = new Thread(userDBTask);
-	    	threads[i].start();
-	    }
-		try {
-		    for(int i=0; i<threads.length; i++){
-		    	threads[i].join();
-		    }
-        } catch (InterruptedException e1) {
-	        // TODO Auto-generated catch block
-	        e1.printStackTrace();
-        }	    
+	    MultiThreadedProcessor<OTUserDatabaseRef> processor = new MultiThreadedProcessor<OTUserDatabaseRef>(userDatabases, 3, objectLoadingTask);
+	    try {
+	        processor.process();
+        } catch (MultiThreadedProcessingException e) {
+	        System.err.println("Error processing user database list - " + e.getExceptions().size() + " exceptions:" + e.getMessage());
+	        e.printStackTrace();
+	        for (Exception ex : e.getExceptions()) {
+	        	System.err.println("  Exception: " + ex.getMessage());
+	        	ex.printStackTrace();
+	        }
+        }    
         
         System.out.println("total user db and overlay load time: " + 
         	(System.currentTimeMillis() - start) + "ms");        
