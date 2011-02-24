@@ -37,6 +37,7 @@ import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.text.html.parser.ParserDelegator;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
@@ -83,6 +84,11 @@ public class OTAppletViewer extends JApplet
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		// there's a weird bug involving dtd's and textarea components
+		// see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6993073
+		// this should work around it
+		MyParserDelegator.resetDefaultDTD();
 	}	
 	
 	@Override
@@ -478,5 +484,13 @@ public class OTAppletViewer extends JApplet
 			
 		}
 		
+	}
+	
+	private static class MyParserDelegator extends ParserDelegator {
+		private static final long serialVersionUID = 1L;
+		
+		public static void resetDefaultDTD() {
+			ParserDelegator.setDefaultDTD();
+		}
 	}
 }
