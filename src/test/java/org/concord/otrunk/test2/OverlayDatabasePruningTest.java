@@ -115,7 +115,7 @@ public class OverlayDatabasePruningTest
 			logger.fine("Copying objects:\n");
 			logger.fine("Student root: " + root.getGlobalId().getMappedId().toString());
 			logger.fine("Overlay root: " + overlayVersion.getGlobalId().getMappedId().toString());
-			((OTObjectServiceImpl)root.getOTObjectService()).copyInto(root, overlayVersion, -1, true);
+			((OTObjectServiceImpl)root.getOTObjectService()).copyInto(root, overlayVersion, -1, true, false);
 			
 			OTResourceListTestObject overlayResourceList = (OTResourceListTestObject) overlayVersion.getReference();
 			logger.fine("Overlay resource list id: " + overlayResourceList.getGlobalId().getMappedId());

@@ -329,7 +329,7 @@ public class OverlayObjectCopyTest extends TestCase
 		logger.fine(first.getGlobalId().toString());
 		logger.fine(second.getGlobalId().toString());
 		// COPY THE OBJECT
-		((OTObjectServiceImpl)first.getOTObjectService()).copyInto(first, second, -1, true);
+		((OTObjectServiceImpl)first.getOTObjectService()).copyInto(first, second, -1, true, false);
 		
 		logger.fine("Saving overlay");
 		// SAVE THE OVERLAY

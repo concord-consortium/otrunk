@@ -432,12 +432,12 @@ public class OTObjectServiceImpl
 		
 		OTDataObject copyDataObject = 
 			DataObjectUtil.copy(originalDataObject, creationDb, 
-					orphanDataList, maxDepth, this, otrunk.getDataObjectFinder(), false);
+					orphanDataList, maxDepth, this, otrunk.getDataObjectFinder(), false, false);
 
 		return getOTObject(copyDataObject.getGlobalId());		
 	}
 	
-	public void copyInto(OTObject source, OTObject destination, int maxDepth, boolean onlyModifications) throws Exception {
+	public void copyInto(OTObject source, OTObject destination, int maxDepth, boolean onlyModifications, boolean ignoreMissingObjects) throws Exception {
 		OTObjectList orphanObjectList = null;
 		
 		OTDataObject rootDO = otrunk.getRootDataObject();		
@@ -463,7 +463,7 @@ public class OTObjectServiceImpl
 		ArrayList<OTObjectService> idProviders = new ArrayList<OTObjectService>();
 		idProviders.add(source.getOTObjectService());
 		idProviders.add(destination.getOTObjectService());
-		DataObjectUtil.copyInto(sourceDO, destDO, orphanDataList, maxDepth, this, otrunk.getDataObjectFinder(), onlyModifications);
+		DataObjectUtil.copyInto(sourceDO, destDO, orphanDataList, maxDepth, this, otrunk.getDataObjectFinder(), onlyModifications, ignoreMissingObjects);
 	}
 
 	public void addObjectServiceListener(OTObjectServiceListener listener)

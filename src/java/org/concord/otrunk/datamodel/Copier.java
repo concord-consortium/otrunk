@@ -30,6 +30,7 @@ public class Copier
 	private OTExternalIDProvider idProvider;
 	private OTDataObjectFinder dataObjectFinder;
 	private boolean onlyModifications;
+	private boolean ignoreMissingObjects;
 	private static final Logger logger = Logger.getLogger(Copier.class.getCanonicalName());
 
     private static class CopyEntry
@@ -47,7 +48,7 @@ public class Copier
     }
 	
 	public Copier(OTDatabase sourceDb, OTDatabase destinationDb, OTDataList orphanDataList, 
-		OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder, boolean onlyModifications)
+		OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder, boolean onlyModifications, boolean ignoreMissingObjects)
 	{
 		this.destinationDb = destinationDb;
 		this.sourceDb = sourceDb;
@@ -57,6 +58,7 @@ public class Copier
 		this.idProvider = idProvider;
 		this.dataObjectFinder = dataObjectFinder;
 		this.onlyModifications = onlyModifications;
+		this.ignoreMissingObjects = ignoreMissingObjects;
 	}
 	
 	/**
@@ -105,7 +107,11 @@ public class Copier
 				if(itemObj == null){
 					itemObj = dataObjectFinder.findDataObject((OTID)child);
 					if(itemObj == null) {
-						throw new IllegalStateException("Can't find child id: " + child);
+						if (ignoreMissingObjects) {
+							return null;
+						} else {
+							throw new IllegalStateException("Can't find child id: " + child);
+						}
 					}
 				}
 				
@@ -175,11 +181,11 @@ public class Copier
     }
     
     public static void copyInto(OTDataObject source, OTDataObject dest,
-	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder, boolean onlyModifications)
+	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder, boolean onlyModifications, boolean ignoreMissingObjects)
 	    throws Exception
 	{
 		Copier copier =
-		    new Copier(source.getDatabase(), dest.getDatabase(), orphanDataList, idProvider, dataObjectFinder, onlyModifications);
+		    new Copier(source.getDatabase(), dest.getDatabase(), orphanDataList, idProvider, dataObjectFinder, onlyModifications, ignoreMissingObjects);
 		copier.internalCopyInto(source, dest, maxDepth);
 	}
     
@@ -225,9 +231,11 @@ public class Copier
     					for(int j=0; j<list.size(); j++){
         					Object listItem = list.get(j);
         					listItem = handleChild(listItem, entry.maxDepth, copy, keys[i] + "[" + j + "]");
-        					tempList.add(listItem);
-        					if (listItem instanceof CompositeDataObject && ((CompositeDataObject) listItem).isModified()) {
-        						modifiedList = true;
+        					if (listItem != null) {
+            					tempList.add(listItem);
+            					if (listItem instanceof CompositeDataObject && ((CompositeDataObject) listItem).isModified()) {
+            						modifiedList = true;
+            					}
         					}
     					}
     					logger.finer("List is modified: " + (modifiedList || keyModified));
@@ -252,7 +260,9 @@ public class Copier
         					Object listItem = list.get(j);
         					
         					listItem = handleChild(listItem, entry.maxDepth, copy, keys[i] + "[" + j + "]");
-        					copyList.add(listItem);
+        					if (listItem != null) {
+        						copyList.add(listItem);
+        					}
         				}
     				}
     			} else if(resource instanceof OTDataMap){
@@ -265,9 +275,11 @@ public class Copier
     					for(int j=0; j<mapKeys.length; j++){
         					Object item = map.get(mapKeys[j]);
         					item = handleChild(item, entry.maxDepth, copy, keys[i] + "['" + mapKeys[j] + "']");
-        					tempMap.put(mapKeys[j], item);
-        					if (item instanceof CompositeDataObject && ((CompositeDataObject) item).isModified()) {
-        						modifiedMap = true;
+        					if (item != null) {
+            					tempMap.put(mapKeys[j], item);
+            					if (item instanceof CompositeDataObject && ((CompositeDataObject) item).isModified()) {
+            						modifiedMap = true;
+            					}
         					}
     					}
     					logger.finer("Map is modified: " + (modifiedMap || keyModified));
@@ -291,7 +303,9 @@ public class Copier
         				for(int j=0; j<mapKeys.length; j++){
         					Object item = map.get(mapKeys[j]);
         					item = handleChild(item, entry.maxDepth, copy, keys[i] + "['" + mapKeys[j] + "']");
-        					copyMap.put(mapKeys[j], item);
+        					if (item != null) {
+        						copyMap.put(mapKeys[j], item);
+        					}
         				}
     				}
     			} else if(resource instanceof OTXMLString) {
@@ -299,7 +313,7 @@ public class Copier
 					secondPassKeys.add(keys[i]);
     			} else {
     				resource = handleChild(resource, entry.maxDepth, copy, keys[i]);
-    				if (! onlyRecurse) {
+    				if (! onlyRecurse && resource != null) {
     					copy.setResource(keys[i], resource);
     				}
     			}
@@ -422,10 +436,12 @@ public class Copier
 					copiedId = otid;							
 				} else {
 					copiedId = (OTID)handleChild(otid, entry.maxDepth, entry.copy, attributeName);
-					if (onlyModifications && (copiedId instanceof OTTransientMapID)) {
-						// ignore it
-					} else {
-						orphanList.add(copiedId);
+					if (copiedId != null) {
+    					if (onlyModifications && (copiedId instanceof OTTransientMapID)) {
+    						// ignore it
+    					} else {
+    						orphanList.add(copiedId);
+    					}
 					}
 				}						
 			}

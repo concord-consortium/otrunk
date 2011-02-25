@@ -44,7 +44,7 @@ public class DataObjectUtil
     public static void copyInto(OTDataObject original, OTDataObject copy)
     {
     	try {
-			copyInto(original, copy, null, 0, null, null, false);
+			copyInto(original, copy, null, 0, null, null, false, false);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -52,10 +52,10 @@ public class DataObjectUtil
     }
     
     public static void copyInto(OTDataObject source, OTDataObject dest,
-	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder, boolean onlyModifications)
+	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder, boolean onlyModifications, boolean ignoreMissingObjects)
 	    throws Exception
 	{
-		Copier.copyInto(source, dest, orphanDataList, maxDepth, idProvider, dataObjectFinder, onlyModifications);
+		Copier.copyInto(source, dest, orphanDataList, maxDepth, idProvider, dataObjectFinder, onlyModifications, ignoreMissingObjects);
 	}
     
     /**
@@ -70,12 +70,12 @@ public class DataObjectUtil
      * @throws Exception
      */
     public static OTDataObject copy(OTDataObject original, OTDatabase otDb,
-	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder, boolean onlyModifications)
+	    OTDataList orphanDataList, int maxDepth, OTExternalIDProvider idProvider, OTDataObjectFinder dataObjectFinder, boolean onlyModifications, boolean ignoreMissingObjects)
 	    throws Exception
 	{
 		OTDataObject copy = otDb.createDataObject(original.getType());
 
-		copyInto(original, copy, orphanDataList, maxDepth, idProvider, dataObjectFinder, onlyModifications);
+		copyInto(original, copy, orphanDataList, maxDepth, idProvider, dataObjectFinder, onlyModifications, ignoreMissingObjects);
 
 		return copy;
 	}    

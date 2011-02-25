@@ -324,7 +324,7 @@ public abstract class OTUserOverlayManager
             if (newWrappedObject != null) {
             	int depth = -1;
             	boolean onlyChanges = true;
-    	        ((OTObjectServiceImpl) object.getOTObjectService()).copyInto(object, newWrappedObject, depth, onlyChanges);
+    	        ((OTObjectServiceImpl) object.getOTObjectService()).copyInto(object, newWrappedObject, depth, onlyChanges, true);
     	        return true;
             }
             return false;
