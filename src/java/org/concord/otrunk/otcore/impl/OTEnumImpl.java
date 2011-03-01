@@ -1,6 +1,7 @@
 package org.concord.otrunk.otcore.impl;
 
 import org.concord.framework.otrunk.otcore.OTEnum;
+import org.concord.framework.util.EnumHelper;
 
 public class OTEnumImpl extends OTTypeImpl
     implements OTEnum
@@ -18,26 +19,14 @@ public class OTEnumImpl extends OTTypeImpl
 	{
 		Class<Enum> instanceClass2 = (Class<Enum>) getInstanceClass();
 		
-		for(Enum constant: instanceClass2.getEnumConstants()){
-			if(constant.ordinal() == valueOrdinal){
-				return constant;
-			}
-		}
-		
-		return null;		
+		return EnumHelper.getValueByOrdinal(instanceClass2, valueOrdinal);		
 	}
 	
 	public Object getValue(String valueName)
     {
 		Class<Enum> instanceClass2 = (Class<Enum>) getInstanceClass();
 	
-		for(Enum constant: instanceClass2.getEnumConstants()){
-			if(constant.name().equals(valueName)){
-				return constant;
-			}
-		}
-		
-		return null;
+		return EnumHelper.getValueByName(instanceClass2, valueName);
     }
 	
 	
