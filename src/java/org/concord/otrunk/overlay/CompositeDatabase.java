@@ -306,21 +306,21 @@ public class CompositeDatabase
             	// composite database.
             	
             	// emit a warning and try just running with it.
-                OTID underlyingId = mappedID.getMappedId();
-            	OTDataObject dataObject = null;
-            	try {
-            		dataObject = objectFinder.findDataObject(underlyingId);
-            	} catch (Exception e) {
-            		e.printStackTrace();            		
-            	}
-            	URI dbURI = null;
-            	if(dataObject != null){
-            		OTDatabase database = dataObject.getDatabase();
-            		dbURI = database.getURI();
-            	}
-                logger.warning("Can't resolve id: " + mappedID.toInternalForm() + 
-            		"\n   whose underlying object is from database with uri: " + dbURI +
-            		"\n   attempting to load it via its mapped id.");
+//                OTID underlyingId = mappedID.getMappedId();
+//            	OTDataObject dataObject = null;
+//            	try {
+//            		dataObject = objectFinder.findDataObject(underlyingId);
+//            	} catch (Exception e) {
+//            		e.printStackTrace();            		
+//            	}
+//            	URI dbURI = null;
+//            	if(dataObject != null){
+//            		OTDatabase database = dataObject.getDatabase();
+//            		dbURI = database.getURI();
+//            	}
+//                logger.warning("Can't resolve id: " + mappedID.toInternalForm() + 
+//            		"\n   whose underlying object is from database with uri: " + dbURI +
+//            		"\n   attempting to load it via its mapped id.");
             	return mappedID.getMappedId();
             }
         }
