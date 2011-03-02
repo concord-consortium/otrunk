@@ -237,6 +237,7 @@ public abstract class OTUserOverlayManager
     			if (globalOverlays.size() > 0) {
     				overlays.addAll(globalOverlays);
     			}
+    			overlays.addAll(otrunk.getSystemOverlaysList(null));
     			db.setOverlays(overlays);
     		}
     		return db;
