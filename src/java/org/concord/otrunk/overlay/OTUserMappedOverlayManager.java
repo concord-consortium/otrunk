@@ -30,7 +30,7 @@ public class OTUserMappedOverlayManager
 	public OTUserMappedOverlayManager(OTrunkImpl otrunk)
     {
 	    super(otrunk);
-	    tempObjService = otrunk.createTemporaryObjectService();
+	    tempObjService = otrunk.createTemporaryObjectService(null);
     }
 
 	private HashMap<OTUserObject, OTObjectToOverlayReferenceMap> userToOverlayReferenceMaps = new HashMap<OTUserObject, OTObjectToOverlayReferenceMap>();

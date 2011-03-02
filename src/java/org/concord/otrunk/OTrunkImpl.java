@@ -619,17 +619,20 @@ public class OTrunkImpl implements OTrunk
         // After the user database is completely setup, now we get the overlays.  
         // This way the user can change the overlays list and those changes will
         // affect the overlay list when they are loaded.
-        
+        userDb.setOverlays(getSystemOverlaysList(user));
+
+        return userObjService;
+    }
+    
+    public ArrayList<Overlay> getSystemOverlaysList(OTUser user) {
         // The overlay list is added to one overlay at a time.  This allows
         // overlays to also modify the list or its values.
         // OTOverlayGroup objects are useful so an overlay or user can insert
         // an overlay into the list without modifying the whole overlay list.
+    	ArrayList<Overlay> overlays = new ArrayList<Overlay>();
     	try {
-        	ArrayList<Overlay> overlays = null;
 	        OTObjectList otOverlays = getSystemOverlays(user);
 	        if(otOverlays != null && otOverlays.size() > 0){
-	        	overlays = new ArrayList<Overlay>();
-		        userDb.setOverlays(overlays);
 	        	for(int i=0; i<otOverlays.size(); i++){
 	        		OTOverlay otOverlay;
 	        		OTObject otOverlayObj = otOverlays.get(i);
@@ -654,10 +657,8 @@ public class OTrunkImpl implements OTrunk
         } catch (Exception e) {
 	        // TODO Auto-generated catch block
 	        logger.log(Level.WARNING, "Error register overlays", e);
-        }    	
-    	
-
-        return userObjService;
+        }
+        return overlays;
     }
     
     public Hashtable<OTID, CompositeDatabase> getCompositeDatabases() {
@@ -880,7 +881,11 @@ public class OTrunkImpl implements OTrunk
 			return null;
 		}
 		
-		OTSystem userRoot = (OTSystem) getUserRuntimeObject(root, user);
+		
+		OTSystem userRoot = (OTSystem) root;
+		if (user != null) {
+			userRoot = (OTSystem) getUserRuntimeObject(root, user);
+		}
 		
 		return userRoot.getOverlays();		
 	}
@@ -1250,13 +1255,25 @@ public class OTrunkImpl implements OTrunk
     	return parents;
     }
     
-    public OTObjectService createTemporaryObjectService() {
+    public OTObjectService createTemporaryObjectService(OTObjectServiceImpl parentObjectService) {
     	OTDatabase db;
 	    try {
     	    OTOverlay overlay = this.createObject(OTOverlay.class);
     	    db = new CompositeDatabase(this.getDataObjectFinder(), new OverlayImpl(overlay));
+    	    if (parentObjectService != null && parentObjectService.getCreationDb() instanceof CompositeDatabase) {
+    	    	CompositeDatabase parentComposite = (CompositeDatabase) parentObjectService.getCreationDb();
+				ArrayList<Overlay> overlays = parentComposite.getOverlays();
+				overlays.add(parentComposite.getActiveOverlay());
+				((CompositeDatabase)db).setOverlays(overlays);
+    	    } else {
+    	    	// use the system overlays
+    	    	((CompositeDatabase)db).setOverlays(getSystemOverlaysList(null));
+    	    	logger.finest("parent db was not a composite database");
+    	    }
+    	    logger.finest("Created temp object service with composite db");
 	    } catch (Exception e) {
 	    	db = new XMLDatabase();
+	    	logger.finest("Created temp object service with XML db");
 	    }
 	    return this.createObjectService(db);
     }
