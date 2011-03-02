@@ -37,6 +37,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTPackage;
@@ -62,6 +63,7 @@ import org.concord.otrunk.xml.XMLDataObject;
 public class CompositeDatabase
     implements OTDatabase
 {
+    private static final Logger logger = Logger.getLogger(CompositeDatabase.class.getName());
     /**
      * This is a map from the global id of the base object to the compositeDataObject
      * The base object could be in the root database or it could be an object created 
@@ -111,7 +113,19 @@ public class CompositeDatabase
 	    	overlay.addOverlayListener(overlayListener);
 	    }
 	}
-			
+	
+	public ArrayList<Overlay> getOverlays()
+	{
+		ArrayList<Overlay> overlays = new ArrayList<Overlay>();
+	    for (Overlay overlay : middleOverlays) {	        
+	    	overlays.add(overlay);
+	    }
+	    return overlays;
+	}
+	
+	public Overlay getActiveOverlay() {
+		return this.activeOverlay;
+	}
 	
 	public OTID getDatabaseId()
 	{
@@ -289,9 +303,10 @@ public class CompositeDatabase
             } else {
             	// this transient id is not in our database.  So probably this is a case where
             	// multiple overlays are being used. So this object is coming from another 
-            	// composite database. Currently this isn't handled.  So this throws an exception
-            	// to make it a little easier to track down the source of the problem.
-            	OTID underlyingId = mappedID.getMappedId();
+            	// composite database.
+            	
+            	// emit a warning and try just running with it.
+                OTID underlyingId = mappedID.getMappedId();
             	OTDataObject dataObject = null;
             	try {
             		dataObject = objectFinder.findDataObject(underlyingId);
@@ -303,8 +318,10 @@ public class CompositeDatabase
             		OTDatabase database = dataObject.getDatabase();
             		dbURI = database.getURI();
             	}
-            	throw new RuntimeException("Can't resolve id: " + mappedID.toInternalForm() + 
-            		"\n   whose underlying object is from database with uri: " + dbURI);            	
+                logger.warning("Can't resolve id: " + mappedID.toInternalForm() + 
+            		"\n   whose underlying object is from database with uri: " + dbURI +
+            		"\n   attempting to load it via its mapped id.");
+            	return mappedID.getMappedId();
             }
         }
         
