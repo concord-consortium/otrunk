@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.DefaultOTObject;
 import org.concord.framework.otrunk.OTBundle;
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTResourceSchema;
@@ -16,6 +17,7 @@ import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.overlay.OTUserOverlayManager;
 import org.concord.otrunk.overlay.OTUserOverlayManagerFactory;
 import org.concord.otrunk.user.OTUserObject;
@@ -260,11 +262,31 @@ public class OTGroupListManager extends DefaultOTObject
 	}
 	
 	public OTUser getIntrasessionUser(OTUser otrunkUser) {
+		OTUser user = getIntrasessionUserByWorkgroupUuid(otrunkUser);
+		if (user == null) {
+			user = getIntrasessionUserByName(otrunkUser);
+		}
+		return user;
+	}
+	
+	public OTUser getIntrasessionUserByName(OTUser otrunkUser) {
 		OTGroupMember member = getMember(otrunkUser.getName());
 		if (member != null) {
 			return member.getUserObject();
 		}
 		return null;
+	}
+	
+	private OTUser getIntrasessionUserByWorkgroupUuid(OTUser sailUser) {
+		OTID sailUuid = sailUser.getUserId();
+		for (OTObject mem : userList) {
+    		OTGroupMember member = (OTGroupMember) mem;
+    		String uuid = member.getSailUuid();
+    		if (uuid != null && OTIDFactory.createOTID(uuid).equals(sailUuid)) {
+    			return member.getUserObject();
+    		}
+    	}
+    	return null;
 	}
 	
 	public OTGroupMember getMember(String name) {

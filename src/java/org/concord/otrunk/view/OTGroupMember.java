@@ -16,6 +16,13 @@ public interface OTGroupMember extends OTObjectInterface
 	public String getUuid();
 	
 	/**
+	 * The uuid for the SDS workgroup.
+	 * This will be the same as the uuid for the learner session OTUser.
+	 * @return
+	 */
+	public String getSailUuid();
+	
+	/**
 	 * This is an MD5 hex digest of the password
 	 * @return
 	 */
