@@ -122,6 +122,8 @@ import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.text.UserMessageHandler;
 import org.concord.framework.text.UserMessageHandlerExt1;
 import org.concord.framework.util.SimpleTreeNode;
+import org.concord.framework.util.TimeProvider;
+import org.concord.framework.util.TimeProviderImpl;
 import org.concord.otrunk.OTMLToXHTMLConverter;
 import org.concord.otrunk.OTSystem;
 import org.concord.otrunk.OTrunkImpl;
@@ -991,6 +993,10 @@ public class OTViewer extends JFrame
 
         addService(UserMessageHandler.class, new SwingUserMessageHandler(this));        
         addService(OTViewer.class, this);
+
+        if (! isTimeProviderRegistered()) {
+        	addService(TimeProvider.class, new TimeProviderImpl());
+        }
         
         otrunk = new OTrunkImpl(systemDB, xmlDB, services);
 
@@ -1018,7 +1024,17 @@ public class OTViewer extends JFrame
         currentURL = url;        
     }
 
-    // This method was refactored out of loadURL
+    private boolean isTimeProviderRegistered()
+    {
+	    for (OTrunkServiceEntry<?> entry : services) {
+	    	if (entry.serviceInterface.equals(TimeProvider.class)) {
+	    		return true;
+	    	}
+	    }
+	    return false;
+    }
+
+	// This method was refactored out of loadURL
     private void setupBodyPanel()
         throws Exception
     {

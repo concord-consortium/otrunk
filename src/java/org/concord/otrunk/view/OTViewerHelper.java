@@ -49,6 +49,8 @@ import org.concord.framework.otrunk.view.OTUserListService;
 import org.concord.framework.otrunk.view.OTViewContext;
 import org.concord.framework.otrunk.view.OTViewFactory;
 import org.concord.framework.text.UserMessageHandler;
+import org.concord.framework.util.TimeProvider;
+import org.concord.framework.util.TimeProviderImpl;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkServiceEntry;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -79,7 +81,7 @@ public class OTViewerHelper
 	public static OTUserObject createUser(String name, OTObjectService objService)
 	throws Exception
 	{
-		OTUserObject user = (OTUserObject)objService.createObject(OTUserObject.class); 
+		OTUserObject user = objService.createObject(OTUserObject.class); 
 		user.setName(name);
 		return user;
 	}
@@ -148,6 +150,7 @@ public class OTViewerHelper
 	{
 		this.otDB = otDB;
 		addService(UserMessageHandler.class, new PrintUserMessageHandler());
+		addService(TimeProvider.class, new TimeProviderImpl());
 		otrunk = new OTrunkImpl(null, otDB, services);
 		
 	}
@@ -176,7 +179,7 @@ public class OTViewerHelper
 		
 		// only update the instance field if there is a valid view factory
 		OTViewFactory myViewFactory =
-		    (OTViewFactory) ot.getService(OTViewFactory.class);
+		    ot.getService(OTViewFactory.class);
 
 		if(myViewFactory != null){
 			viewFactory = myViewFactory;
@@ -218,6 +221,7 @@ public class OTViewerHelper
 	throws Exception
 	{		
 		addService(UserMessageHandler.class, new SwingUserMessageHandler(parentComponent));
+		addService(TimeProvider.class, new TimeProviderImpl());
 		loadOTrunk2(null, otDB); 
 	}
 
@@ -460,7 +464,7 @@ public class OTViewerHelper
 	{
 		// Check to see if we need to add a user message handler ourselves
 		UserMessageHandler messageHandler = 
-			(UserMessageHandler) findService(UserMessageHandler.class);
+			findService(UserMessageHandler.class);
 	
 		if(messageHandler == null){
 			messageHandler = new PrintUserMessageHandler();
