@@ -12,6 +12,7 @@ import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
+import org.concord.framework.util.TimeProvider;
 import org.concord.otrunk.OTrunkImpl;
 
 public class OTNavigationHistoryService extends DefaultOTObject implements OTBundle
@@ -27,12 +28,14 @@ public class OTNavigationHistoryService extends DefaultOTObject implements OTBun
 		void setNavigationHistory(OTObjectSet history);
 	}
 	private ResourceSchema resources;
+	private TimeProvider timeProvider;
 
 	public OTNavigationHistoryService(ResourceSchema resources)
     {
 	    super(resources);
 	    this.resources = resources;
 	    this.otrunk = (OTrunkImpl) resources.getOTObjectService().getOTrunkService(OTrunk.class);
+	    this.timeProvider = this.otrunk.getService(TimeProvider.class);
     }
 
 	public void initializeBundle(OTServiceContext serviceContext)
@@ -76,7 +79,7 @@ public class OTNavigationHistoryService extends DefaultOTObject implements OTBun
 		logger.fine((user == null ? "null user" : user.getName()) + " " + type + ": " + obj);
 		OTObjectSet history = getUserNavigationHistory(user);
 		OTNavigationEvent event = history.getOTObjectService().createObject(OTNavigationEvent.class);
-		event.setTimestamp(System.currentTimeMillis());
+		event.setTimestamp(timeProvider.currentTimeMillis());
 		event.setObject(obj);
 		event.setType(type);
 		history.getObjects().add(event);

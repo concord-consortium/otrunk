@@ -21,6 +21,7 @@ import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.wrapper.OTInt;
 import org.concord.framework.otrunk.wrapper.OTLong;
+import org.concord.framework.util.TimeProvider;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkUtil;
@@ -51,6 +52,7 @@ public abstract class OTUserOverlayManager
 	
 	private Map<OTUserObject, ArrayList<OverlayUpdateListener>> listenerMap = Collections.synchronizedMap(new HashMap<OTUserObject, ArrayList<OverlayUpdateListener>>());
 	private List<OverlayUpdateListener> globalListeners = Collections.synchronizedList(new ArrayList<OverlayUpdateListener>());
+	private TimeProvider timeProvider;
 	/**
      * String used as the key in the annotations object map to record number of times a student "submits" an object
      */
@@ -147,6 +149,8 @@ public abstract class OTUserOverlayManager
 	public OTUserOverlayManager(OTrunkImpl otrunk) {
 		this.otrunk = otrunk;
 		XMLDatabase.SILENT_DB = true;
+		
+		this.timeProvider = otrunk.getService(TimeProvider.class);
 	}
 	
 	protected <T extends OTObject> T getAuthoredObject(T object) {
@@ -609,7 +613,7 @@ public abstract class OTUserOverlayManager
 	protected void setSubmitTimestamp(OTObject object) {
 		try {
             OTLong timestamp = object.getOTObjectService().createObject(OTLong.class);
-            timestamp.setValue(System.currentTimeMillis());
+            timestamp.setValue(timeProvider.currentTimeMillis());
             object.getAnnotations().putObject(OTUserOverlayManager.SUBMIT_TIMESTAMP_ANNOTATION, timestamp);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Couldn't create OTLong object!", e);
