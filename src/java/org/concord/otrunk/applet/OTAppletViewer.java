@@ -42,6 +42,7 @@ import javax.swing.text.html.parser.ParserDelegator;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTrunk;
+import org.concord.framework.otrunk.view.OTJComponentView;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.view.OTViewContainerPanel;
 import org.concord.otrunk.view.OTViewerHelper;
@@ -293,6 +294,10 @@ public class OTAppletViewer extends JApplet
 	public OTObject getOTObject(String otid) throws Exception {
 		OTID id = getID(otid);
 		return getOTrunk().getOTObject(id);
+	}
+	
+	public OTJComponentView getViewForObject(OTObject obj) {
+		return otContainer.getOTJComponentService().getJComponentViewContext().getViewByObject(obj);
 	}
 
 	/**
