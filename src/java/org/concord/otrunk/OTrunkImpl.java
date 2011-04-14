@@ -275,6 +275,10 @@ public class OTrunkImpl implements OTrunk
 		rootDb.setRoot(id);
 	}
 	
+	public OTServiceContext getServiceContext(){
+		return serviceContext;
+	}
+	
 	public OTSystem getSystem() throws Exception
 	{
 		OTDataObject systemDO = systemDb.getRoot();

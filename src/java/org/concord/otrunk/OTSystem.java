@@ -60,6 +60,15 @@ public interface OTSystem extends OTObjectInterface
 	 * @return
 	 */
 	public OTObjectList getServices();	
+	
+	/**
+	 * This list is only used by external otml files that are being imported by
+	 * the OTDIYExternalRefView. If such a file has an OTSystem with bundlesToBeMergedIntoParent,
+	 * OTDIYExternalRefView will try to register all the non-view bundles in it to the current
+	 * service context. (View bundles are handled separately.)
+	 * @return
+	 */
+	public OTObjectList getBundlesToBeMergedIntoParent();
 
 	public OTObjectList getLibrary();
 
