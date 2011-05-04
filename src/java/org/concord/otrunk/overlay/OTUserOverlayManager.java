@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
@@ -651,5 +652,15 @@ public abstract class OTUserOverlayManager
 //			logger.info("released READ lock: " + Thread.currentThread().getName());
 //		}
 	}
-
+	
+	public URL getOverlayURL(OTObjectService objService) {
+		if (overlayToObjectServiceMap.containsValue(objService)) {
+			for (Entry<URL, OTObjectService> entry : overlayToObjectServiceMap.entrySet()) {
+				if (entry.getValue().equals(objService)) {
+					return entry.getKey();
+				}
+			}
+		}
+		return null;
+	}
 }
