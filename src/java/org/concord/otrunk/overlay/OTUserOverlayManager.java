@@ -192,7 +192,7 @@ public abstract class OTUserOverlayManager
         			remoteObject = objService.createObject(klass);
     
         			xmldb.setRoot(remoteObject.getGlobalId());
-        			otrunk.remoteSaveData(xmldb, url, OTViewer.HTTP_PUT, authenticator);
+        			otrunk.remoteSaveData(xmldb, url, OTViewer.HTTP_PUT, authenticator, true);
     
         			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true);
     			} catch (Exception e) {

@@ -33,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -1034,14 +1035,14 @@ public class OTrunkImpl implements OTrunk
 		if (xmldb.getSourceURL() == null) {
 			throw new MalformedURLException("Invalid source URL on XMLDatabase: " + xmldb.getDatabaseId().toString());
 		}
-		remoteSaveData(xmldb, xmldb.getSourceURL(), method, auth);
+		remoteSaveData(xmldb, xmldb.getSourceURL(), method, auth, false);
 	}
 	
 	public void remoteSaveData(OTDatabase db, URL remoteURL, String method) throws HTTPRequestException,Exception {
-		remoteSaveData(db, remoteURL, method, null);
+		remoteSaveData(db, remoteURL, method, null, false);
 	}
 	
-	public void remoteSaveData(OTDatabase db, URL remoteURL, String method, Authenticator auth)
+	public void remoteSaveData(OTDatabase db, URL remoteURL, String method, Authenticator auth, boolean onlyIfNonExistent)
     throws HTTPRequestException,Exception
     {
     	HttpURLConnection urlConn;
@@ -1062,6 +1063,35 @@ public class OTrunkImpl implements OTrunk
     	
     	if (auth != null) {
     		Authenticator.setDefault(auth);
+    	}
+    	
+    	if (onlyIfNonExistent) {
+    		try {
+        		// Do a HEAD request first, and only continue if we get a 404
+        		urlConn = (HttpURLConnection) remoteURL.openConnection();
+            	urlConn.setDoInput(true);
+            	urlConn.setDoOutput(false);
+            	urlConn.setUseCaches(false);
+            	urlConn.setRequestMethod(OTViewer.HTTP_HEAD);
+            	
+            	urlDataIn =
+            	    new BufferedReader(new InputStreamReader(new DataInputStream(
+            	        urlConn.getInputStream())));
+            	String str;
+            	String response = "";
+            	while (null != ((str = urlDataIn.readLine()))) {
+            		response += str + "\n";
+            	}
+            	urlDataIn.close();
+            	
+            	int code = urlConn.getResponseCode();
+            	if (code != 404) {
+            		throw new HTTPRequestException("HTTP Response: " + urlConn.getResponseMessage() + "\nNeeded 404 Not Found\n\n"
+            		        + response, urlConn.getResponseCode());
+            	}
+    		} catch (FileNotFoundException e) {
+    			// good! we can continue
+    		}
     	}
     
     	urlConn = (HttpURLConnection) remoteURL.openConnection();
