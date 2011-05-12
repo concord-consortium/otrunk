@@ -212,12 +212,25 @@ public abstract class OTUserOverlayManager
 		try {
     		// get the OTOverlay OTObject from the otml at the URL specified
     		OTOverlay overlay = loadRemoteObject(overlayURL, OTOverlay.class);
+    		OTObjectService objService = loadOverlay(overlay, isGlobal);
+    		// if the overlay exists, the create an objectservice for it and register it
+    		if (objService != null) {
+    			overlayToObjectServiceMap.put(overlayURL, objService);
+    		}
+    		return objService;
+		} finally {
+			writeUnlock();
+		}
+	}
+	
+	public OTObjectService loadOverlay(OTOverlay overlay, boolean isGlobal) {
+		writeLock();
+		try {
     		OTObjectService objService = null;
     		// if the overlay exists, the create an objectservice for it and register it
     		if (overlay != null) {
     			OTDatabase db = registerOverlay(overlay, isGlobal);
     			objService = createObjectService(db);
-    			overlayToObjectServiceMap.put(overlayURL, objService);
     		}
     		return objService;
 		} finally {
