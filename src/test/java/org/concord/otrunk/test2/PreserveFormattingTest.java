@@ -1,12 +1,12 @@
 package org.concord.otrunk.test2;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.logging.Logger;
+
+import junit.framework.TestCase;
 
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.datamodel.OTDatabase;
@@ -14,11 +14,9 @@ import org.concord.otrunk.view.OTConfig;
 import org.concord.otrunk.view.OTViewerHelper;
 import org.concord.otrunk.xml.ExporterJDOM;
 
-import junit.framework.TestCase;
-
-public class PreserveFormatingTest extends TestCase
+public class PreserveFormattingTest extends TestCase
 {
-	private static final Logger logger = Logger.getLogger(PreserveFormatingTest.class.getCanonicalName());
+	private static final Logger logger = Logger.getLogger(PreserveFormattingTest.class.getCanonicalName());
 	private OTViewerHelper viewerHelper;
 	private OTDatabase mainDb;
 	private OTrunkImpl otrunk;
@@ -36,30 +34,35 @@ public class PreserveFormatingTest extends TestCase
 		otrunk = (OTrunkImpl) viewerHelper.getOtrunk();
 	}
 
-	public void testContainmentFormating() throws Exception
+	public void testContainmentFormatting() throws Exception
 	{
-		formatingHelper("containment-test.otml");
+		formattingHelper("containment-test.otml");
 	}
 	
-	public void testStringPropertyFormating() throws Exception
+	public void testStringPropertyFormatting() throws Exception
 	{
-		formatingHelper("string-property-formating.otml");
+		formattingHelper("string-property-formatting.otml");
 	}
 
-	public void testMapKeyIdFormating() throws Exception
+	public void testMapKeyIdFormatting() throws Exception
 	{
-		formatingHelper("map-key-id-test.otml");
+		formattingHelper("map-key-id-test.otml");
 	}
 
-	public void testEnumFormating() throws Exception
+	public void testEnumFormatting() throws Exception
 	{
-		formatingHelper("enum-test.otml");
+		formattingHelper("enum-test.otml");
+	}
+	
+	public void testIntValueFormatting() throws Exception
+	{
+		formattingHelper("intvalue-test.otml");
 	}
 
-	public void formatingHelper(String fileName) throws Exception
+	public void formattingHelper(String fileName) throws Exception
 	{
 		URL otmlUrl = 
-			PreserveFormatingTest.class.getResource("/" + fileName);
+			PreserveFormattingTest.class.getResource("/" + fileName);
 		initOtrunk(otmlUrl);
 		
 		ExporterJDOM.useFullClassNames = false;

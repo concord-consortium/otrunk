@@ -32,6 +32,8 @@
 */
 package org.concord.otrunk.xml;
 
+import org.concord.otrunk.xml.XMLReferenceInfo.IntType;
+
 
 /**
  * BooleanTypeHandler
@@ -49,18 +51,44 @@ public class IntegerTypeHandler extends PrimitiveResourceTypeHandler
 		super("int", Integer.class);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.concord.portfolio.xml.ResourceTypeHandler#handleElement(org.w3c.dom.Element, java.util.Properties)
-	 */
 	@Override
-	public Object handleElement(String value)
+	protected Object handleElement(String value)
+	    throws HandlerException
+	{
+		throw new IllegalStateException("This method isn't supported by the IntegerTypeHandler");
+	}
+
+	public Object handleElement(String value, XMLReferenceInfo resInfo)
 		throws HandlerException
 	{
 		try {
-			return Integer.decode(value);
+			int ret = Integer.decode(value);
+			if (resInfo != null) {
+				if (value.startsWith("0x")) {
+					resInfo.intType = IntType.HEX;
+				} else {
+					resInfo.intType = IntType.BASE10;
+				}
+			}
+			return ret;
 		} catch (Throwable e) {
 			throw new HandlerException("malformed integer");
 		}
+	}
+	
+	@Override
+	public Object handleElement(OTXMLElement element, String relativePath, 
+		XMLDataObject parent, String propertyName)
+	throws HandlerException
+	{
+		return handleElement(element.getTextTrim(), parent.getReferenceInfo(propertyName));
+	}
+
+	@Override
+	public Object handleAttribute(String value, String name, XMLDataObject parent)
+	throws HandlerException
+	{
+		return handleElement(value, parent.getReferenceInfo(name));
 	}
 
 }

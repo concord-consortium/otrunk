@@ -10,6 +10,10 @@ public class XMLReferenceInfo
 		STRING, INT
 	}
 	
+	public enum IntType {
+		HEX, BASE10
+	}
+	
 	/**
 	 * This indicates if this resource was stored as a element or an attribute
 	 */
@@ -29,4 +33,9 @@ public class XMLReferenceInfo
 	 * stored.
 	 */
 	public EnumType enumType = EnumType.STRING;
+	
+	/**
+	 * If this is an integer value, record whether the value was represented as a hexadecimal or base-10 number
+	 */
+	public IntType intType = IntType.BASE10;
 }

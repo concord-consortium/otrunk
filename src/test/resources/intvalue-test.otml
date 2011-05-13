@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="33754150-b594-11d9-9669-0800200c9a66">
+  <imports>
+    <import class="org.concord.otrunk.OTSystem" />
+    <import class="org.concord.otrunk.test.OTPrimitivesTestObject" />
+    <import class="org.concord.otrunk.test.OTListTestObject" />
+    <import class="org.concord.otrunk.view.OTViewService" />
+  </imports>
+  <objects>
+    <OTSystem>
+      <services>
+        <OTViewService />
+      </services>
+      <root>
+        <OTListTestObject>
+          <objectList>
+            <OTPrimitivesTestObject int="12" />
+            <OTPrimitivesTestObject int="0x12" />
+            <OTPrimitivesTestObject>
+              <int>13</int>
+            </OTPrimitivesTestObject>
+            <OTPrimitivesTestObject>
+              <int>0x13</int>
+            </OTPrimitivesTestObject>
+          </objectList>
+        </OTListTestObject>
+      </root>
+    </OTSystem>
+  </objects>
+</otrunk>
+

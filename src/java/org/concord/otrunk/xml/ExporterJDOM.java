@@ -42,7 +42,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +62,7 @@ import org.concord.otrunk.datamodel.OTRelativeID;
 import org.concord.otrunk.datamodel.OTUUID;
 import org.concord.otrunk.overlay.OTOverlay;
 import org.concord.otrunk.xml.XMLReferenceInfo.EnumType;
+import org.concord.otrunk.xml.XMLReferenceInfo.IntType;
 import org.concord.otrunk.xml.XMLReferenceInfo.XmlType;
 import org.jdom.Comment;
 import org.jdom.Content;
@@ -736,8 +736,29 @@ public class ExporterJDOM
 				} else {
 					System.err.println("Got null resource value");
 				}
-			} else if(resource instanceof Integer ||
-			        resource instanceof Float ||
+			} else if(resource instanceof Integer) {
+				IntType intType = IntType.BASE10;
+				if(dataObj instanceof XMLDataObject){
+					XMLDataObject xmlObj = (XMLDataObject)dataObj;
+					XMLReferenceInfo resInfo = xmlObj.getReferenceInfo(resourceName);
+					if(resInfo != null){
+						intType = resInfo.intType;
+					}
+				} 
+
+				String str = null;
+				switch(intType){
+				case BASE10:
+					str = resource.toString();
+					break;
+				case HEX:
+					str = "0x" + Integer.toHexString(((Integer)resource).intValue());
+					break;
+				}
+
+				writeResource(dataObj, objectEl, resourceName, str, 
+						XmlType.ATTRIBUTE);		
+			} else if (resource instanceof Float ||
 			        resource instanceof Byte ||
 			        resource instanceof Short ||
 			        resource instanceof Boolean) {
