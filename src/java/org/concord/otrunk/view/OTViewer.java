@@ -578,7 +578,7 @@ public class OTViewer extends JFrame
             getContentPane().add(bodyPanel);
         }
         
-        if (OTConfig.isShowStatus() || noClassAssignedForStudent()) {
+        if (OTConfig.isShowStatus() || noClassAssignedForStudent() || OTConfig.isShowUserDataWarning()) {
             initStatusBar();
         }
 
@@ -751,7 +751,7 @@ public class OTViewer extends JFrame
             waitForDB.start();
         }
         
-        if (noClassAssignedForStudent()) {
+        if (noClassAssignedForStudent() || OTConfig.isShowUserDataWarning()) {
             JLabel readOnlyLabel = new JLabel("User Data Will Not Be Saved!");
             statusPanel.setBackground(Color.RED);
             statusPanel.add(readOnlyLabel);

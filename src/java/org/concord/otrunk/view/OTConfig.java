@@ -21,6 +21,7 @@ public class OTConfig
 	public final static String VIEW_MODE_PROP = "otrunk.view.mode";
 	public final static String CODEBASE_PROP = "otrunk.codebase";
 	public final static String SHOW_STATUS_PROP = "otrunk.view.status";
+	public final static String SHOW_USER_DATA_WARNING = "otrunk.view.user_data_warning";
 	public final static String USERDATA_URL_PROP = "otrunk.userdata_url";
 	public final static String SHOW_DESTRUCTIVE_MENU_ITEMS_PROP = "otrunk.view.destructive_menu";	// "New" and "Open"
 	public final static String TRACE_DB_LOAD_TIME = "otrunk.db.trace.load";
@@ -148,4 +149,9 @@ public class OTConfig
 	{
 		return getBooleanProp(USE_ALTERNATIVE_EXPORT, false);
 	}
+
+	public static boolean isShowUserDataWarning()
+    {
+		return getBooleanProp(SHOW_USER_DATA_WARNING, false);
+    }
 }
