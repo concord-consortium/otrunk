@@ -41,6 +41,11 @@ public class OTLabbookBundle extends DefaultOTObject
         public int getLimit();
         public void setLimit(int limit);
         public static int DEFAULT_limit = 10;
+
+		public boolean getScaleDrawTools();
+		public boolean setScaleDrawTools(boolean shouldWe);
+		public static boolean DEFAULT_scaleDrawTools = true;
+       
     }
 	
 	ResourceSchema resources;

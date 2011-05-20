@@ -304,4 +304,8 @@ public class OTLabbookManagerImpl
 	public ImageFiletype getSnapshotFiletype(){
 		return resources.getSnapshotFiletype();
 	}
+
+	public boolean getScaleDrawTools(){
+	    return this.resources.getScaleDrawTools();
+    }
 }
