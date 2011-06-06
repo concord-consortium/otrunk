@@ -555,6 +555,12 @@ public abstract class OTUserOverlayManager
 		if (xmlDb == null) {
 			return false;
 		}
+		
+		if (xmlDb.getSourceURL() == null) {
+			logger.fine("Database (" + xmlDb.getDatabaseId() + ") doesn't have a source URL! Can't reload.");
+			return false;
+		}
+		
 		if (doHeadBeforeGet) {
     		long existingTime = xmlDb.getUrlLastModifiedTime();
     		String existingETag = xmlDb.getETag();

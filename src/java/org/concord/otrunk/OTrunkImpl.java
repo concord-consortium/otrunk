@@ -1033,7 +1033,11 @@ public class OTrunkImpl implements OTrunk
 	
 	public void remoteSaveData(XMLDatabase xmldb, String method, Authenticator auth) throws HTTPRequestException,Exception {
 		if (xmldb.getSourceURL() == null) {
-			throw new MalformedURLException("Invalid source URL on XMLDatabase: " + xmldb.getDatabaseId().toString());
+			String dbId = "unknown";
+			if (xmldb != null && xmldb.getDatabaseId() != null) {
+				dbId = xmldb.getDatabaseId().toString();
+			}
+			throw new MalformedURLException("Missing source URL on XMLDatabase: " + dbId);
 		}
 		remoteSaveData(xmldb, xmldb.getSourceURL(), method, auth, false);
 	}
