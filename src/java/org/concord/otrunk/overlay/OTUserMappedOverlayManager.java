@@ -390,4 +390,19 @@ public class OTUserMappedOverlayManager
 		}
 	    return ref.getNumber();
     }
+	
+	@Override
+    public int[] getAllSubmissionNumbers(OTUserObject user, OTObject object)
+        throws Exception
+    {
+		ArrayList<OTOverlayReference> refs = findAllReferences(user, object);
+		if (refs == null || refs.size() < 1) {
+			return new int[] { };
+		}
+		int[] nums = new int[refs.size()];
+		for (int i = 0; i < refs.size(); i++) {
+			nums[i] = refs.get(i).getNumber();
+		}
+	    return nums;
+    }
 }

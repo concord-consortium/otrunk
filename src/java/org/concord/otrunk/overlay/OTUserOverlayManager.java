@@ -83,6 +83,7 @@ public abstract class OTUserOverlayManager
 	protected abstract OTObjectService getObjectService(OTUserObject userObject, OTObject object);
 
 	public abstract int getSubmissionNumber(OTUserObject user, OTObject object) throws Exception;
+	public abstract int[] getAllSubmissionNumbers(OTUserObject user, OTObject object) throws Exception;
 
 	public void remove(OTUserObject userObject) {
 		writeLock();

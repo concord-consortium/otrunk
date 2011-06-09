@@ -160,4 +160,11 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
     {
 	    return UserSubmission.MOST_RECENT_SUBMISSION;
     }
+	
+	@Override
+    public int[] getAllSubmissionNumbers(OTUserObject user, OTObject object)
+        throws Exception
+    {
+	    return new int[] { UserSubmission.MOST_RECENT_SUBMISSION };
+    }
 }
