@@ -98,34 +98,43 @@
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
+        <groupId>com.atlassian.maven.plugins</groupId>
+        <artifactId>jarjar-maven-plugin</artifactId>
+        <version>0.0.4</version>
         <executions>
           <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
             <configuration>
-              <tasks>
-                <property name="maven-jar" value="${project.build.directory}/${project.build.finalName}.jar"/>
-                <!--  this is a hack because I couldn't find another way to get the path to a dependency jar
-                    the dependency plugin can be used to copy a jar but why copy it when we just 
-                    need to reference it -->
-                <property name="asm-jar" value="${settings.localRepository}/asm/asm/3.1/asm-3.1.jar"/>
-                <ant inheritRefs="true" target="jar"/>
-              </tasks>
+              <projectPackage>org.concord.otrunk</projectPackage>
+              <zips>
+                <zip>
+                  <dependency>asm:asm</dependency>
+               </zip>
+              </zips>
+              <rules>
+                <rule>org.objectweb.asm.**</rule>
+              </rules>
             </configuration>
+            <goals>
+              <goal>jarjar</goal>
+            </goals>
           </execution>
         </executions>
-        <dependencies>
-           <dependency>
-             <groupId>com.tonicsystems</groupId>
-             <artifactId>jarjar</artifactId>
-             <version>0.6</version>
-           </dependency>
-        </dependencies>
       </plugin>
-  	</plugins>
+      <!--  build a jar containing the test code so it can be reused by other projects see:
+               http://maven.apache.org/guides/mini/guide-attached-tests.html -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
   <!--this is required to find the parent pom -->
