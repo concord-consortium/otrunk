@@ -6,6 +6,7 @@ package org.concord.otrunk.datamodel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -208,6 +209,15 @@ public class Copier
     		
     		String [] keys = original.getResourceKeys();
     		
+    		// also figure out which keys need unset if we're working with a CompositeDataObject
+    		if (copy instanceof CompositeDataObject) {
+        		String [] destKeys = copy.getResourceKeys();
+        		
+        		for (String unsetKey : onlyIn(destKeys, keys)) {        	
+        			((CompositeDataObject)copy).removeOverrideInTopOverlay(unsetKey);
+        		}
+    		}
+    		
     		// This is used to handle a hack for strings which reference objects
     		ArrayList<String> secondPassKeys = new ArrayList<String>();
     		
@@ -354,7 +364,25 @@ public class Copier
     	}
     }
     
-    private boolean isAttributeModified(OTDataObject original, String key) {
+    // returns the values in arr1 that are *not* in arr2
+    private Set<String> onlyIn(String[] arr1, String[] arr2)
+    {
+    	HashMap<String, Boolean> set = new HashMap<String, Boolean>();
+    	// map all the values in arr1
+    	for (String str : arr1) {
+    		set.put(str, true);
+    	}
+    	
+    	// now remove all the values in arr2
+    	for (String str : arr2) {
+    		set.remove(str);
+    	}
+	    
+    	// and the result is what's in arr1 that's not in arr2
+	    return set.keySet();
+    }
+
+	private boolean isAttributeModified(OTDataObject original, String key) {
     	if (original instanceof CompositeDataObject) {
 			if (((CompositeDataObject) original).isModified()) {
 				OTDataObject deltaObj = ((CompositeDataObject) original).getActiveDeltaObject();
