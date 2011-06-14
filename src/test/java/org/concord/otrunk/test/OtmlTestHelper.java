@@ -2,6 +2,7 @@ package org.concord.otrunk.test;
 
 import java.net.URL;
 
+import org.concord.framework.otrunk.OTControllerService;
 import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTUser;
@@ -19,6 +20,7 @@ public class OtmlTestHelper
 	private OTViewerHelper viewerHelper;
 	private OTDatabase mainDb;
 	private OTrunkImpl otrunk;
+	private OTControllerService controllerService;
 
 	public void initOtrunk(URL authoredContent) throws Exception {
 		System.setProperty(OTConfig.NO_USER_PROP, "true");
@@ -54,5 +56,14 @@ public class OtmlTestHelper
 		panel.setCurrentObject(object);
 		Thread.sleep(2000);
 		return panel.getView();
-	}	
+	}
+	
+	public OTControllerService getControllerService() {
+		if(controllerService != null){
+			return controllerService;
+		}
+		controllerService = otrunk.getRootObjectService().createControllerService();
+		return controllerService;
+	}
+	
 }
