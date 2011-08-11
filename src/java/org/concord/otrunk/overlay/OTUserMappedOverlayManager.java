@@ -184,9 +184,9 @@ public class OTUserMappedOverlayManager
 	}
 	
 	@Override
-	public <T extends OTObject> ArrayList<T> getAllOTObjects(final OTUserObject userObject, final T object) throws Exception {
+	public <T extends OTObject, V extends OTObject> ArrayList<T> getAllOTObjects(final OTUserObject userObject, final T object, final V wrappingObject) throws Exception {
 		final ArrayList<T> list = new ArrayList<T>();
-		final ArrayList<OTOverlayReference> allReferences = findAllReferences(userObject, object);
+		final ArrayList<OTOverlayReference> allReferences = findAllReferences(userObject, wrappingObject);
 		
 		// use 3 threads to speed things up
 		MultiThreadedProcessorRunnable<OTOverlayReference> objectLoadingTask = new MultiThreadedProcessorRunnable<OTOverlayReference>(){

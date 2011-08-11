@@ -78,7 +78,7 @@ public abstract class OTUserOverlayManager
 	public abstract <T extends OTObject> T getOTObject(OTUserObject userObject, T object) throws Exception;
 	public abstract <T extends OTObject> T getOTObject(UserSubmission submission, T object) throws Exception;
 	
-	public abstract <T extends OTObject> ArrayList<T> getAllOTObjects(OTUserObject userObject, T object) throws Exception;
+	public abstract <T extends OTObject, V extends OTObject> ArrayList<T> getAllOTObjects(OTUserObject userObject, T object, V wrappingObject) throws Exception;
 	
 	protected abstract OTObjectService getObjectService(OTUserObject userObject, OTObject object);
 

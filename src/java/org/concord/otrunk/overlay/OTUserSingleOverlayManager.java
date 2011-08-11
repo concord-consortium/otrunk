@@ -88,7 +88,7 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
     }
 	
 	@Override
-	public <T extends OTObject> java.util.ArrayList<T> getAllOTObjects(OTUserObject userObject, T object) throws Exception {
+	public <T extends OTObject, V extends OTObject> java.util.ArrayList<T> getAllOTObjects(OTUserObject userObject, T object, V wrappingObject) throws Exception {
 		ArrayList<T> list = new ArrayList<T>();
 		list.add(getOTObject(userObject, object));
 		return list;
