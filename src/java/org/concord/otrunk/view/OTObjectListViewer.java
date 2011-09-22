@@ -16,6 +16,7 @@ import java.awt.Dimension;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -113,7 +114,7 @@ public class OTObjectListViewer extends JPanel
 			System.err.println("Error: list of objects is empty or null. No objects to insert.");
 			return null;
 		}
-				
+		
 		OTObjectListViewer selectPanel = new OTObjectListViewer(frameManager, showPreview);
 		selectPanel.setOTViewFactory(viewFactory);
 		selectPanel.setOtObjList(objList);
@@ -218,7 +219,9 @@ public class OTObjectListViewer extends JPanel
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.add(copyCheck);
 		
-		add(tree, BorderLayout.WEST);
+		JScrollPane treeScroll = new JScrollPane(tree);
+		
+		add(treeScroll, BorderLayout.WEST);
 		add(bottomPanel, BorderLayout.SOUTH);
 	}
 
