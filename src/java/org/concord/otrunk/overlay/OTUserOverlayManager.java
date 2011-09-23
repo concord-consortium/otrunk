@@ -54,6 +54,9 @@ public abstract class OTUserOverlayManager
 	private Map<OTUserObject, ArrayList<OverlayUpdateListener>> listenerMap = Collections.synchronizedMap(new HashMap<OTUserObject, ArrayList<OverlayUpdateListener>>());
 	private List<OverlayUpdateListener> globalListeners = Collections.synchronizedList(new ArrayList<OverlayUpdateListener>());
 	private TimeProvider timeProvider;
+	
+	private Map<OTID, OTUserOverlayObjectConfiguration> objectConfigurationMap = Collections.synchronizedMap(new HashMap<OTID, OTUserOverlayObjectConfiguration>());
+	
 	/**
      * String used as the key in the annotations object map to record number of times a student "submits" an object
      */
@@ -342,8 +345,13 @@ public abstract class OTUserOverlayManager
         	}
         	// only save if there are changes
             if (newWrappedObject != null) {
+            	OTUserOverlayObjectConfiguration config = getObjectConfiguration(object);
             	int depth = -1;
             	boolean onlyChanges = true;
+            	if (config != null) {
+            		depth = config.getCopyDepth();
+            		onlyChanges = config.isCopyOnlyChanges();
+            	}
     	        ((OTObjectServiceImpl) object.getOTObjectService()).copyInto(object, newWrappedObject, depth, onlyChanges, true);
     	        return true;
             }
@@ -511,7 +519,12 @@ public abstract class OTUserOverlayManager
 	protected boolean isObjectModified(OTUserObject user, OTObject currentObj) throws Exception {
 		OTObject authoredObj = getAuthoredObject(currentObj);
         OTObject mostRecentSubmission = getOTObject(user, authoredObj);
-        boolean areSame = OTrunkUtil.compareObjects(mostRecentSubmission, currentObj, true);
+        int depth = -1;
+        OTUserOverlayObjectConfiguration objectConfiguration = getObjectConfiguration(authoredObj);
+		if (objectConfiguration != null) {
+        	depth = objectConfiguration.getCopyDepth();
+        }
+        boolean areSame = OTrunkUtil.compareObjects(mostRecentSubmission, currentObj, true, depth);
         return !areSame;
 	}
 	
@@ -682,5 +695,13 @@ public abstract class OTUserOverlayManager
 			}
 		}
 		return null;
+	}
+	
+	public void addObjectConfiguration(OTObject obj, OTUserOverlayObjectConfiguration config) {
+		this.objectConfigurationMap.put(getAuthoredId(obj), config);
+	}
+	
+	public OTUserOverlayObjectConfiguration getObjectConfiguration(OTObject obj) {
+		return this.objectConfigurationMap.get(getAuthoredId(obj));
 	}
 }
