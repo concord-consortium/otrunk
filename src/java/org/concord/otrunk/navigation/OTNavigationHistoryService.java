@@ -48,7 +48,8 @@ public class OTNavigationHistoryService extends DefaultOTObject implements OTBun
 		serviceContext.addService(OTNavigationHistoryService.class, this);
 	}
 	
-	private OTObjectSet getUserNavigationHistory(OTUser user) throws Exception {
+	// This is really intended for internal use. Use with caution!
+	public OTObjectSet getUserNavigationHistory(OTUser user) throws Exception {
 		if (user == null) {
 			user = otrunk.getUsers().size() > 0 ? otrunk.getUsers().get(0) : null;
 		}
