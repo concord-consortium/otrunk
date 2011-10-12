@@ -134,6 +134,8 @@ public class OTViewContainerPanel extends JPanel
 
 	private OTObject previousObject;
 	
+	private boolean currentObjectFinishedInitializing = false;
+	
 	/**
 	 * 
 	 */
@@ -241,6 +243,8 @@ public class OTViewContainerPanel extends JPanel
 		
 	public void setCurrentObject(OTObject otObject, OTViewEntry viewEntry)
 	{
+
+    	currentObjectFinishedInitializing = false;
 		if(currentView != null) {
 			try {
 				// Call on the event thread if we're not already on it
@@ -544,6 +548,7 @@ public class OTViewContainerPanel extends JPanel
 	    	add(myComponent, BorderLayout.CENTER);
 	    	
 	    	revalidate();
+	    	currentObjectFinishedInitializing = true;
 	    	notifyListeners();
 	    	if(isAutoRequestFocus()){
 	    		myComponent.requestFocus();
@@ -733,5 +738,10 @@ public class OTViewContainerPanel extends JPanel
 	public void setShowTemporaryLoadingLabel(boolean showTempLoadingLabel)
     {
     	this.showTempLoadingLabel = showTempLoadingLabel;
+    }
+
+	public boolean isCurrentObjectFinishedInitializing()
+    {
+	    return currentObjectFinishedInitializing;
     }
 }
