@@ -103,6 +103,10 @@ public class OTUserMappedOverlayManager
 		ArrayList<OTOverlayReference> references = new ArrayList<OTOverlayReference>();
 		readLock();
 		try {
+			OTUserObject tempUser = getAuthoredObject(user);
+			if (tempUser != null) {
+				user = tempUser;
+			}
 			if (userToOverlayReferenceMaps.containsKey(user)) {
     			OTID authoredId = getAuthoredId(object);
     			OTObjectToOverlayReferenceMap referenceMap = userToOverlayReferenceMaps.get(user);
