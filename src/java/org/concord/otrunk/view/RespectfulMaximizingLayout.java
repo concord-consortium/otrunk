@@ -45,6 +45,8 @@ public class RespectfulMaximizingLayout implements LayoutManager, LayoutManager2
         if (arg0.getComponentCount() > 0) {
             Dimension maxSize = preferredLayoutSize(arg0);
             Insets insets = arg0.getInsets();
+            Dimension containerSize = new Dimension(maxSize.width + insets.left + insets.right, maxSize.height + insets.top + insets.bottom);
+            arg0.setSize(containerSize);
             getComponent(arg0).setBounds(insets.left, insets.top, maxSize.width, maxSize.height);
         }
     }
