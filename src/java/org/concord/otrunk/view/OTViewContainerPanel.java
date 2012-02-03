@@ -617,6 +617,14 @@ public class OTViewContainerPanel extends JPanel
         {
 			return currentViewEntry;
         }
+		
+		public void addViewContainerListener(OTViewContainerListener listener) {
+			OTViewContainerPanel.this.addViewContainerListener(listener);
+		}
+		
+		public void removeViewContainerListener(OTViewContainerListener listener) {
+			OTViewContainerPanel.this.removeViewContainerListener(listener);
+		}
 	}
 
 	/**
