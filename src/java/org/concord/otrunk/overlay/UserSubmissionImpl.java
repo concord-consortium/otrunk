@@ -10,6 +10,11 @@ import org.concord.otrunk.user.OTUserObject;
  */
 public class UserSubmissionImpl implements UserSubmission {
     public static final int MOST_RECENT_SUBMISSION = -1;
+    
+    // Add some fake submission numbers, used to signal when to display something special
+    public static final int EXAMPLE_SUBMISSION = 1; // using 1 for backward compatibility
+    public static final int CONDENSED_EXAMPLE_SUBMISSION = 2; // using positive numbers so that StudentWorkPanel thinks something has been submitted
+    
     private OTUserObject user;
     private int submissionNumber = MOST_RECENT_SUBMISSION;
     
