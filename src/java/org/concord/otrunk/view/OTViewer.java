@@ -65,6 +65,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Timer;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -997,6 +998,8 @@ public class OTViewer extends JFrame
         if (! isTimeProviderRegistered()) {
         	addService(TimeProvider.class, new TimeProviderImpl());
         }
+        
+        addService(Timer.class, new Timer("global-otrunk-timer", true));
         
         otrunk = new OTrunkImpl(systemDB, xmlDB, services);
 
