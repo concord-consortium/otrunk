@@ -114,7 +114,10 @@ public class OTrunkImpl implements OTrunk
     protected OTObjectServiceImpl rootObjectService;
     
     // synchronized since multiple threads might be modifying the list of databases (esp. the otrunk-intrasession code)
-	List<OTDatabase> databases = Collections.synchronizedList(new ArrayList<OTDatabase>());
+	List<OTDatabase> authoredDatabases = Collections.synchronizedList(new ArrayList<OTDatabase>());
+	List<OTDatabase> deltaDatabases = Collections.synchronizedList(new ArrayList<OTDatabase>());
+	ArrayList<List<OTDatabase>> databaseList = new ArrayList<List<OTDatabase>>();
+	
 	Vector<OTUser> users = new Vector<OTUser>();
 	
     List<OTObjectServiceImpl> objectServices = Collections.synchronizedList(new ArrayList<OTObjectServiceImpl>());
@@ -159,6 +162,8 @@ public class OTrunkImpl implements OTrunk
 	@SuppressWarnings("unchecked")
     public OTrunkImpl(OTDatabase systemDb, OTDatabase db, ArrayList<OTrunkServiceEntry<?>> services) 
 	{	
+		databaseList.add(authoredDatabases);
+		databaseList.add(deltaDatabases);
 		try {
 			ConcordHostnameVerifier verifier = new ConcordHostnameVerifier();
 			HttpsURLConnection.setDefaultHostnameVerifier(verifier);
@@ -202,11 +207,11 @@ public class OTrunkImpl implements OTrunk
 		try {
 			if(systemDb != null){
 				this.systemDb = systemDb;
-				systemObjectService = initObjectService(systemDb, "system");
+				systemObjectService = initObjectService(systemDb, true, "system");
 			} 
 			
 			this.rootDb = db;
-			rootObjectService = initObjectService(rootDb, "root");        
+			rootObjectService = initObjectService(rootDb, true, "root");        
 
 			if(systemObjectService == null){
 				// there is no real system db so just use the main db
@@ -328,11 +333,13 @@ public class OTrunkImpl implements OTrunk
 	        return null;
 	    }
 	    
-	    synchronized(databases) {
-    	    for (OTDatabase db : databases) {	     	   
-    	        if(db.contains(id)) {
-    	            return db;
-    	        }
+	    for (List<OTDatabase> databases : databaseList) {
+    	    synchronized(databases) {
+        	    for (OTDatabase db : databases) {
+        	        if(db.contains(id)) {
+        	            return db;
+        	        }
+        	    }
     	    }
 	    }
 	    return null;
@@ -407,30 +414,15 @@ public class OTrunkImpl implements OTrunk
      * 
      * @param url
      * @param parentObjectService
-     * @return
-     * @throws Exception
-     */
-    public OTObject getExternalObject(URL url, OTObjectService parentObjectService) throws Exception
-	{
-    	return getExternalObject(url, parentObjectService, false);
-	}
-    
-    /**
-     * the parentObjectService needs to be passed in so the returned object
-     * uses the correct layers based on the context in which this method is
-     * called.
-     * 
-     * @param url
-     * @param parentObjectService
      * @param reload
      * @return
      * @throws Exception
      */
-    public OTObject getExternalObject(URL url, OTObjectService parentObjectService, boolean reload) 
+    public OTObject getExternalObject(URL url, OTObjectService parentObjectService, boolean reload, boolean isAuthored) 
     	throws Exception
     {
     	OTObjectServiceImpl externalObjectService = 
-    		loadDatabase(url, reload);
+    		loadDatabase(url, reload, isAuthored);
 		
     	// get the root object either the real root or the system root
     	OTObject root = getRoot(externalObjectService, reload);
@@ -459,51 +451,51 @@ public class OTrunkImpl implements OTrunk
 		return null;			    	
     }
     
-    protected OTObjectServiceImpl loadDatabase(URL url) throws Exception {
-    	return loadDatabase(url, false);
-    }
-    
-    protected OTObjectServiceImpl loadDatabase(URL url, boolean reload) 
+    protected OTObjectServiceImpl loadDatabase(URL url, boolean reload, boolean isAuthored) 
     	throws Exception
     {    	
     	// first see if we have a database with the same context url
-    	synchronized(databases) {
-    		XMLDatabase dbToRemove = null;
-        	for (OTDatabase db : databases) {
-        		if(!(db instanceof XMLDatabase)) continue;
-        		
-        		XMLDatabase xmlDatabase = (XMLDatabase) db;
-        		URL contextURL = xmlDatabase.getContextURL();
-        		if (contextURL == null) {
-        			logger.info("Database without a context url! " + xmlDatabase.getDatabaseId());
-        		}
-        		else if (contextURL.equals(url)){
-        			if (reload) {
-        				// remove the current database, so we can reload it below
-        				logger.info("Removing database so we can reload it.");
-        				dbToRemove = xmlDatabase;
-        				break;
-        			} else {
-        				return getExistingObjectService(xmlDatabase);
-        			}
-        		}
-        	}
-        	if (dbToRemove != null) {
-    			databases.remove(dbToRemove);
-    			OTObjectServiceImpl existingObjectService = getExistingObjectService(dbToRemove);
-				removeObjectService(existingObjectService);
-				removeLoadedObjects(dbToRemove);
+    	for (List<OTDatabase> databases : databaseList) {
+        	synchronized(databases) {
+        		XMLDatabase dbToRemove = null;
+            	for (OTDatabase db : databases) {
+            		if(!(db instanceof XMLDatabase)) continue;
+            		
+            		XMLDatabase xmlDatabase = (XMLDatabase) db;
+            		URL contextURL = xmlDatabase.getContextURL();
+            		if (contextURL == null) {
+            			logger.info("Database without a context url! " + xmlDatabase.getDatabaseId());
+            		}
+            		else if (contextURL.equals(url)){
+            			if (reload) {
+            				// remove the current database, so we can reload it below
+            				logger.info("Removing database so we can reload it.");
+            				dbToRemove = xmlDatabase;
+            				break;
+            			} else {
+            				return getExistingObjectService(xmlDatabase);
+            			}
+            		}
+            	}
+            	if (dbToRemove != null) {
+        			databases.remove(dbToRemove);
+        			OTObjectServiceImpl existingObjectService = getExistingObjectService(dbToRemove);
+    				removeObjectService(existingObjectService);
+    				removeLoadedObjects(dbToRemove);
+            	}
         	}
     	}
 
 		XMLDatabase includeDb = new XMLDatabase(url);
 
-		// load the data base		
-		if(databases.contains(includeDb)){
-			logger.info("already loaded database with id: " + includeDb.getDatabaseId() + 
-				" database: " + includeDb.getContextURL().toExternalForm() + " will not be loaded again");
-		
-			return getExistingObjectService(includeDb);
+		// load the data base
+		for (List<OTDatabase> databases : databaseList) {
+    		if(databases.contains(includeDb)){
+    			logger.info("already loaded database with id: " + includeDb.getDatabaseId() + 
+    				" database: " + includeDb.getContextURL().toExternalForm() + " will not be loaded again");
+    		
+    			return getExistingObjectService(includeDb);
+    		}
 		}
 		
     	// register it with the OTrunkImpl
@@ -511,7 +503,7 @@ public class OTrunkImpl implements OTrunk
 		includeDb.setTrackResourceInfo(true);
 		includeDb.loadObjects();
     	
-		return initObjectService(includeDb, url.toExternalForm());
+		return initObjectService(includeDb, isAuthored, url.toExternalForm());
     }
     
     protected OTObject getRoot(OTObjectServiceImpl objectService, boolean reload) 
@@ -530,28 +522,28 @@ public class OTrunkImpl implements OTrunk
 		return root;
     }
 
-    public OTObjectServiceImpl initObjectService(OTDatabase db, String logLabel) throws Exception 
+    public OTObjectServiceImpl initObjectService(OTDatabase db, boolean isAuthored, String logLabel) throws Exception 
     {
-    	return initObjectService(db, logLabel, true);
+    	return initObjectService(db, isAuthored, logLabel, true);
     }
     
-    public OTObjectServiceImpl initObjectService(OTDatabase db, String logLabel, boolean loadIncludes) 
+    public OTObjectServiceImpl initObjectService(OTDatabase db, boolean isAuthored, String logLabel, boolean loadIncludes) 
     	throws Exception
     {
-		addDatabase(db);
+		addDatabase(db, isAuthored);
 		OTObjectServiceImpl objectService = createObjectService(db);
         if(OTConfig.isTrace()) {
         	objectService.addObjectServiceListener(new TraceListener(logLabel + ": " + db));
         }
         
         if(loadIncludes){
-        	loadIncludes(objectService);
+        	loadIncludes(objectService, isAuthored);
         }
         
         return objectService;
     }
     
-    protected void loadIncludes(OTObjectServiceImpl objectService) 
+    protected void loadIncludes(OTObjectServiceImpl objectService, boolean isAuthored) 
     	throws Exception
     {
     	OTDatabase db = objectService.getMainDb();    	
@@ -575,7 +567,7 @@ public class OTrunkImpl implements OTrunk
 			URL hrefUrl = include.getHref();
 			
 			try {
-				loadDatabase(hrefUrl);
+				loadDatabase(hrefUrl, false, isAuthored);
 			} catch (Exception e) {
 				logger.log(Level.WARNING, "Error while loading database. Trying to continue.", e);
 				continue;
@@ -596,7 +588,9 @@ public class OTrunkImpl implements OTrunk
         OTDatabase oldCompositeDB = compositeDatabases.remove(userId);	
         userObjectServices.remove(userId);
         
-        databases.remove(oldCompositeDB);
+        for (List<OTDatabase> databases : databaseList) {
+        	databases.remove(oldCompositeDB);
+        }
 
         registerReferenceMap(refMap);
     	
@@ -616,7 +610,7 @@ public class OTrunkImpl implements OTrunk
     	    	
         CompositeDatabase userDb = new CompositeDatabase(dataObjectFinder, userStateMap);
 
-        addDatabase(userDb);
+        addDatabase(userDb, false);
         userObjService = createObjectService(userDb);
         compositeDatabases.put(userId, userDb);	
         userObjectServices.put(userId, userObjService);
@@ -736,8 +730,9 @@ public class OTrunkImpl implements OTrunk
     	return false;
     }
         
-    public void addDatabase(OTDatabase db)
+    public void addDatabase(OTDatabase db, boolean authored)
     {
+    	List<OTDatabase> databases = authored ? authoredDatabases : deltaDatabases;
         if(!databases.contains(db)) {
             databases.add(db);
             
@@ -1159,28 +1154,30 @@ public class OTrunkImpl implements OTrunk
     public <T extends OTObject> ArrayList<T> getAllObjects(Class<T> klass, OTObjectService objService) {
     	logger.finest("Getting all objects for class: " + klass.getName());
     	ArrayList<T> allObjects = new ArrayList<T>();
-    	logger.finest("Datases: " + databases.size());
-    	synchronized(databases) {
-        	for (OTDatabase db : databases) {
-        		logger.finest("Searching db: " + db.getURI());
-        		HashMap<OTID, ? extends OTDataObject> map = db.getDataObjects();
-        		logger.finest("db has " + map.size() + " objects");
-        		for (Entry<OTID, ? extends OTDataObject> entry : map.entrySet()) {
-        			OTDataObject dataObj = entry.getValue();
-        			OTID id = entry.getKey();
-        			logger.finest("Data object class is: " + dataObj.getType().getClassName());
-                        try {
-    	                    Class<?> objClass = Class.forName(dataObj.getType().getClassName());
-                			if (klass.isAssignableFrom(objClass)) {
-                				logger.finest("It's a match! Adding it.");
-                				allObjects.add((T) objService.getOTObject(id));
-                			}
-                        } catch (ClassNotFoundException e) {
-                        	logger.log(Level.WARNING, "Couldn't instantiate class: " + dataObj.getType().getClassName(), e);
-                        } catch (Exception e) {
-         					logger.log(Level.WARNING, "Couldn't get OTObject for object: " + id.toExternalForm(), e);
-         				}
-        		}
+    	for (List<OTDatabase> databases : databaseList) {
+        	logger.finest("Databases: " + databases.size());
+        	synchronized(databases) {
+            	for (OTDatabase db : databases) {
+            		logger.finest("Searching db: " + db.getURI());
+            		HashMap<OTID, ? extends OTDataObject> map = db.getDataObjects();
+            		logger.finest("db has " + map.size() + " objects");
+            		for (Entry<OTID, ? extends OTDataObject> entry : map.entrySet()) {
+            			OTDataObject dataObj = entry.getValue();
+            			OTID id = entry.getKey();
+            			logger.finest("Data object class is: " + dataObj.getType().getClassName());
+                            try {
+        	                    Class<?> objClass = Class.forName(dataObj.getType().getClassName());
+                    			if (klass.isAssignableFrom(objClass)) {
+                    				logger.finest("It's a match! Adding it.");
+                    				allObjects.add((T) objService.getOTObject(id));
+                    			}
+                            } catch (ClassNotFoundException e) {
+                            	logger.log(Level.WARNING, "Couldn't instantiate class: " + dataObj.getType().getClassName(), e);
+                            } catch (Exception e) {
+             					logger.log(Level.WARNING, "Couldn't get OTObject for object: " + id.toExternalForm(), e);
+             				}
+            		}
+            	}
         	}
     	}
     	return allObjects;
@@ -1205,8 +1202,8 @@ public class OTrunkImpl implements OTrunk
     		excludeIDs = new ArrayList<OTID>();
     	}
     	// XXX Should we be searching all databases?
-    	synchronized(databases) {
-        	for (OTDatabase db : databases) {
+    	synchronized(authoredDatabases) {
+        	for (OTDatabase db : authoredDatabases) {
             	try {
         	        ArrayList<OTDataPropertyReference> parents = null;
         	        if (incoming) {

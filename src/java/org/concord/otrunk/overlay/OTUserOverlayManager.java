@@ -177,7 +177,7 @@ public abstract class OTUserOverlayManager
     		// OTObjectServiceImpl.DEBUG = true;
     		T remoteObject = null;
     		try {
-    			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true);
+    			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true, false);
     		} catch (ClassCastException e) {
     			// something is there, but not the type of object expected
     			throw e;
@@ -198,7 +198,7 @@ public abstract class OTUserOverlayManager
         			xmldb.setRoot(remoteObject.getGlobalId());
         			otrunk.remoteSaveData(xmldb, url, OTViewer.HTTP_PUT, authenticator, true);
     
-        			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true);
+        			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true, false);
     			} catch (Exception e) {
     				// still an error. skip the overlay for this user/url
     				logger.warning("Couldn't create a default overlay for user\n" + url + "\n" + e.getMessage());

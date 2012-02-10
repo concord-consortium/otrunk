@@ -189,7 +189,7 @@ public class OTMLUserSession
 	{
 		// need to make a brand new stateDB
 		userDataDB = new XMLDatabase();
-		otrunk.addDatabase(userDataDB);
+		otrunk.addDatabase(userDataDB, false);
 		
 		// System.out.println("otrunk: " + otrunk + " userDatabase: " +
 		// userDataDB);
@@ -320,7 +320,7 @@ public class OTMLUserSession
 	throws Exception
 	{
 		this.userDataDB = userDataDb;
-		otrunk.addDatabase(userDataDB);		
+		otrunk.addDatabase(userDataDB, false);		
 
 		OTObjectService objService = otrunk.createObjectService(userDataDb);
 

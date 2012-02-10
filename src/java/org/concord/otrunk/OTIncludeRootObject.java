@@ -41,7 +41,7 @@ public class OTIncludeRootObject extends DefaultOTObject
 		OTrunkImpl otrunkImpl = (OTrunkImpl)getOTObjectService().getOTrunkService(OTrunk.class);
 		
 		try {
-			refObject = otrunkImpl.getExternalObject(url, getOTObjectService());
+			refObject = otrunkImpl.getExternalObject(url, getOTObjectService(), false, true);
 			logger.info("included root object: " + refObject.otExternalId());
 			return refObject;
 		} catch (Exception e) {

@@ -19,7 +19,7 @@ public class OTUserOverlayManagerFactory
 	public static OTUserOverlayManager getUserOverlayManager(URL url, OTrunkImpl otrunk) {
 		if (url != null) {
     		try {
-    	        OTObject externalObject = otrunk.getExternalObject(url, otrunk.getRootObjectService());
+    	        OTObject externalObject = otrunk.getExternalObject(url, otrunk.getRootObjectService(), false, false);
     	        if (externalObject instanceof OTOverlay) {
     	        	return new OTUserSingleOverlayManager(otrunk);
     	        }

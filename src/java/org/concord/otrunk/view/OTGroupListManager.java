@@ -122,7 +122,7 @@ public class OTGroupListManager extends DefaultOTObject
 
 	private void initializeUserListFromURL() {
 		try {
-	        OTObjectSet set = (OTObjectSet) otrunk.getExternalObject(groupListURL, resources.getOTObjectService());
+	        OTObjectSet set = (OTObjectSet) otrunk.getExternalObject(groupListURL, resources.getOTObjectService(), false, true);
 	        
 	        // add non-duplicated objects
 	        for (OTObject obj : set.getObjects()) {
