@@ -30,6 +30,7 @@ public class OTConfig
 	public final static String IGNORE_SAIL_VIEW_MODE = "otrunk.debug.ignore_sail_view_mode";
 	public final static String USE_ALTERNATIVE_EXPORT = "otrunk.export.use_alternative";
 	public final static String SILENT_DB = "otrunk.db.silent";
+	public final static String LEFT_PANEL_TITLE_PROP = "otrunk.view.left_panel_title";
 	
 	/**
      * This is yet another hack to support something like layers or mutliple files.
@@ -80,6 +81,14 @@ public class OTConfig
     		return null;
     	}				
     }
+	
+	public static String getStringProp(String property, String defaultValue) {
+		String val = getStringProp(property);
+		if (val == null) {
+			val = defaultValue;
+		}
+		return val;
+	}
 
 	protected static boolean cannotReadProperties = false;
 
