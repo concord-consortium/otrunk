@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrunk id="33754150-b594-11d9-9669-0800200c9a66" >
+  <imports>
+    <import class="org.concord.otrunk.OTSystem"/>
+    <import class="org.concord.otrunk.view.OTFolderObject"/> 
+    <import class="org.concord.otrunk.test.OTDocumentTestObject"/>
+    <import class="org.concord.otrunk.test.OTBasicTestObject"/>
+  </imports>
+  <objects>
+    <OTSystem>
+      <root>
+        <OTFolderObject> 
+        <children>
+          <OTFolderObject local_id="first" name="top level folder">
+            <children>
+              <object refid="${first}"/>
+            </children>
+          </OTFolderObject>
+          <OTFolderObject local_id="second" name="top level folder">
+            <children>
+              <object refid="${second}"/>
+            </children>
+          </OTFolderObject>
+          <OTFolderObject local_id="third" name="top level folder">
+            <children>
+              <OTFolderObject name="a different folder"/>
+            </children>
+          </OTFolderObject>
+        </children>
+        </OTFolderObject>
+      </root>
+    </OTSystem>
+  </objects>
+</otrunk>
