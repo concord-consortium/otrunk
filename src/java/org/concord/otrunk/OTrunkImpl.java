@@ -1154,30 +1154,27 @@ public class OTrunkImpl implements OTrunk
     public <T extends OTObject> ArrayList<T> getAllObjects(Class<T> klass, OTObjectService objService) {
     	logger.finest("Getting all objects for class: " + klass.getName());
     	ArrayList<T> allObjects = new ArrayList<T>();
-    	for (List<OTDatabase> databases : databaseList) {
-        	logger.finest("Databases: " + databases.size());
-        	synchronized(databases) {
-            	for (OTDatabase db : databases) {
-            		logger.finest("Searching db: " + db.getURI());
-            		HashMap<OTID, ? extends OTDataObject> map = db.getDataObjects();
-            		logger.finest("db has " + map.size() + " objects");
-            		for (Entry<OTID, ? extends OTDataObject> entry : map.entrySet()) {
-            			OTDataObject dataObj = entry.getValue();
-            			OTID id = entry.getKey();
-            			logger.finest("Data object class is: " + dataObj.getType().getClassName());
-                            try {
-        	                    Class<?> objClass = Class.forName(dataObj.getType().getClassName());
-                    			if (klass.isAssignableFrom(objClass)) {
-                    				logger.finest("It's a match! Adding it.");
-                    				allObjects.add((T) objService.getOTObject(id));
-                    			}
-                            } catch (ClassNotFoundException e) {
-                            	logger.log(Level.WARNING, "Couldn't instantiate class: " + dataObj.getType().getClassName(), e);
-                            } catch (Exception e) {
-             					logger.log(Level.WARNING, "Couldn't get OTObject for object: " + id.toExternalForm(), e);
-             				}
-            		}
-            	}
+    	synchronized(authoredDatabases) {
+        	for (OTDatabase db : authoredDatabases) {
+        		logger.finest("Searching db: " + db.getURI());
+        		HashMap<OTID, ? extends OTDataObject> map = db.getDataObjects();
+        		logger.finest("db has " + map.size() + " objects");
+        		for (Entry<OTID, ? extends OTDataObject> entry : map.entrySet()) {
+        			OTDataObject dataObj = entry.getValue();
+        			OTID id = entry.getKey();
+        			logger.finest("Data object class is: " + dataObj.getType().getClassName());
+                        try {
+    	                    Class<?> objClass = Class.forName(dataObj.getType().getClassName());
+                			if (klass.isAssignableFrom(objClass)) {
+                				logger.finest("It's a match! Adding it.");
+                				allObjects.add((T) objService.getOTObject(id));
+                			}
+                        } catch (ClassNotFoundException e) {
+                        	logger.log(Level.WARNING, "Couldn't instantiate class: " + dataObj.getType().getClassName(), e);
+                        } catch (Exception e) {
+         					logger.log(Level.WARNING, "Couldn't get OTObject for object: " + id.toExternalForm(), e);
+         				}
+        		}
         	}
     	}
     	return allObjects;
