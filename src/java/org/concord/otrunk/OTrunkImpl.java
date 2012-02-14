@@ -975,7 +975,7 @@ public class OTrunkImpl implements OTrunk
         return null;
     }
 
-	public OTObjectServiceImpl getRootObjectService() {
+	public OTObjectService getRootObjectService() {
 		return rootObjectService;
 	}	
 	
