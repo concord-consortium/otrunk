@@ -86,6 +86,13 @@ public class OTUserSingleOverlayManager extends OTUserOverlayManager
     {
 	    return getOTObject(submission.getUser(), object);
     }
+
+	@Override
+    public <T extends OTObject, V extends OTObject> T getOTObject(UserSubmission submission, T object, V wrappingObject)
+        throws Exception
+    {
+	    return getOTObject(submission.getUser(), object);
+    }
 	
 	@Override
 	public <T extends OTObject, V extends OTObject> java.util.ArrayList<T> getAllOTObjects(OTUserObject userObject, T object, V wrappingObject) throws Exception {

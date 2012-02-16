@@ -188,6 +188,16 @@ public class OTUserMappedOverlayManager
 	}
 	
 	@Override
+    public <T extends OTObject, V extends OTObject> T getOTObject(UserSubmission submission, T object, V wrappingObject) throws Exception
+	{
+		if (submission.getSubmissionNumber() == 0) {
+			return null;
+		}
+		OTOverlayReference reference = findReference(submission.getUser(), wrappingObject, submission.getSubmissionNumber());
+		return getOTObject(submission.getUser(), object, reference);
+	}
+	
+	@Override
 	public <T extends OTObject, V extends OTObject> ArrayList<T> getAllOTObjects(final OTUserObject userObject, final T object, final V wrappingObject) throws Exception {
 		final ArrayList<T> list = new ArrayList<T>();
 		final ArrayList<OTOverlayReference> allReferences = findAllReferences(userObject, wrappingObject);
