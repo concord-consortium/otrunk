@@ -27,7 +27,7 @@ import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.OTrunkUtil;
 import org.concord.otrunk.datamodel.OTDatabase;
-import org.concord.otrunk.datamodel.OTTransientMapID;
+import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.net.HTTPRequestException;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.util.StandardPasswordAuthenticator;
@@ -544,14 +544,6 @@ public abstract class OTUserOverlayManager
 		}
 	}
 	
-	protected OTID getAuthoredId(OTObject object) {
-		OTID id = object.getGlobalId();
-		if (id instanceof OTTransientMapID) {
-			id = ((OTTransientMapID)id).getMappedId();
-		}
-		return id;
-	}
-	
 	protected boolean doesUrlNeedReloaded(URL url) throws ProtocolException, IOException {
 		readLock();
 		try {
@@ -699,10 +691,10 @@ public abstract class OTUserOverlayManager
 	}
 	
 	public void addObjectConfiguration(OTObject obj, OTUserOverlayObjectConfiguration config) {
-		this.objectConfigurationMap.put(getAuthoredId(obj), config);
+		this.objectConfigurationMap.put(OTIDFactory.getAuthoredId(obj), config);
 	}
 	
 	public OTUserOverlayObjectConfiguration getObjectConfiguration(OTObject obj) {
-		return this.objectConfigurationMap.get(getAuthoredId(obj));
+		return this.objectConfigurationMap.get(OTIDFactory.getAuthoredId(obj));
 	}
 }

@@ -33,6 +33,7 @@
 package org.concord.otrunk.datamodel;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTObject;
 
 
 /**
@@ -92,4 +93,14 @@ public class OTIDFactory
 		OTID relativeId = createOTID(relativePath);
 		return new OTRelativeID(currentId, relativeId);		
     }
+	
+	public static OTID getAuthoredId(OTObject object) {
+		if (object == null) { return null; }
+		
+		OTID id = object.getGlobalId();
+		if (id instanceof OTTransientMapID) {
+			id = ((OTTransientMapID)id).getMappedId();
+		}
+		return id;
+	}
 }

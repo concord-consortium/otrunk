@@ -17,6 +17,7 @@ import org.concord.framework.otrunk.OTObjectService;
 import org.concord.framework.otrunk.wrapper.OTObjectSet;
 import org.concord.otrunk.OTObjectServiceImpl;
 import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.datamodel.OTIDFactory;
 import org.concord.otrunk.net.HTTPRequestException;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.util.MultiThreadedProcessor;
@@ -47,7 +48,7 @@ public class OTUserMappedOverlayManager
     public <T extends OTObject> T getOTObject(OTUserObject user, T original, OTOverlayReference reference) {
 		writeLock();
 		try {
-    		OTID authoredId = getAuthoredId(original);
+    		OTID authoredId = OTIDFactory.getAuthoredId(original);
     		
     		if (reference == null) {
     			reference = findLastReference(user, original);
@@ -108,7 +109,7 @@ public class OTUserMappedOverlayManager
 				user = tempUser;
 			}
 			if (userToOverlayReferenceMaps.containsKey(user)) {
-    			OTID authoredId = getAuthoredId(object);
+    			OTID authoredId = OTIDFactory.getAuthoredId(object);
     			OTObjectToOverlayReferenceMap referenceMap = userToOverlayReferenceMaps.get(user);
     			
     			OTObjectSet set = (OTObjectSet) referenceMap.getObjectToOverlayMap().getObject(authoredId.toExternalForm());
@@ -321,7 +322,7 @@ public class OTUserMappedOverlayManager
 		writeLock();
 		try {
     	    // add overlay reference to the user's overlay reference map
-    		OTID authoredId = getAuthoredId(object);
+    		OTID authoredId = OTIDFactory.getAuthoredId(object);
     		OTObjectToOverlayReferenceMap map = userToOverlayReferenceMaps.get(user);
     		OTObjectSet otObjectSet = (OTObjectSet)map.getObjectToOverlayMap().getObject(authoredId.toExternalForm());
     		if (otObjectSet == null) {
@@ -361,7 +362,7 @@ public class OTUserMappedOverlayManager
     {
 		readLock();
 		try {
-    		OTID authoredId = getAuthoredId(object);
+    		OTID authoredId = OTIDFactory.getAuthoredId(object);
     	    OTOverlayReference lastRef = findLastReference(user, object);
     	    int number = 1;
     	    if (lastRef != null) {
