@@ -3,6 +3,7 @@ package org.concord.otrunk.overlay;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -177,7 +178,7 @@ public abstract class OTUserOverlayManager
     	try {
     		// OTObjectServiceImpl.DEBUG = true;
     		T remoteObject = null;
-    		String exceptionMessage = null;
+    		String exceptionMessage = "";
     		try {
     			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true, false);
     		} catch (ClassCastException e) {
@@ -207,7 +208,8 @@ public abstract class OTUserOverlayManager
     			// Only save it remotely if we got a 404 exception earlier, or no exception at all.
     			// That way we don't accidentally clobber a file that's already there in the case of a
     			// temporary server failure.
-    			if (exceptionMessage == null || exceptionMessage.equals("Non 2XX response code: 404")) {
+    			if (exceptionMessage.equals("") || exceptionMessage.startsWith("Non 2XX response code: 404")) {
+    				logger.info("Remotely saving new empty database (url: " + url + ")...");
         			try {
             			otrunk.remoteSaveData(xmldb, url, OTViewer.HTTP_PUT, authenticator, true);
         
@@ -399,7 +401,13 @@ public abstract class OTUserOverlayManager
             	logger.info("Not saving overlay because SAIL saving is disabled");
             } else {
             	pruneDatabase(overlayObjectService);
-            	otrunk.remoteSaveData(getXMLDatabase(overlayObjectService), OTViewer.HTTP_PUT, authenticator);
+        		XMLDatabase xmlDatabase = getXMLDatabase(overlayObjectService);
+            	try {
+					otrunk.remoteSaveData(xmlDatabase, OTViewer.HTTP_PUT, authenticator);
+            	} catch (MalformedURLException e) {
+            		// ??? Do we care if the db has a bad url?
+            		logger.log(Level.WARNING, "Malformed url for database!", e);
+            	}
             }
 		} finally {
 			writeUnlock();
