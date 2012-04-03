@@ -177,6 +177,7 @@ public abstract class OTUserOverlayManager
     	try {
     		// OTObjectServiceImpl.DEBUG = true;
     		T remoteObject = null;
+    		String exceptionMessage = null;
     		try {
     			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true, false);
     		} catch (ClassCastException e) {
@@ -184,25 +185,37 @@ public abstract class OTUserOverlayManager
     			throw e;
     		} catch (Exception e) {
     			// some error occurred...
-    			logger.warning("Couldn't get overlay for user\n" + url + "\n" + e.getMessage());
+    			exceptionMessage = e.getMessage();
+    			logger.warning("Couldn't get overlay for user\n" + url + "\n" + exceptionMessage);
     		}
     		
     		// if there isn't an overlay object, and it's not supposed to be a global one, go ahead and try to make a default one
     		if (remoteObject == null) {
     			// create a blank one
+				logger.info("Creating empty database on the fly (root: " + klass.getSimpleName() + ")...");
+    			XMLDatabase xmldb = new XMLDatabase();
     			try {
-    				logger.info("Creating empty database on the fly (root: " + klass.getSimpleName() + ")...");
-        			XMLDatabase xmldb = new XMLDatabase();
         			OTObjectServiceImpl objService = otrunk.createObjectService(xmldb);
         			remoteObject = objService.createObject(klass);
     
         			xmldb.setRoot(remoteObject.getGlobalId());
-        			otrunk.remoteSaveData(xmldb, url, OTViewer.HTTP_PUT, authenticator, true);
-    
-        			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true, false);
     			} catch (Exception e) {
     				// still an error. skip the overlay for this user/url
     				logger.warning("Couldn't create a default overlay for user\n" + url + "\n" + e.getMessage());
+    			}
+    			
+    			// Only save it remotely if we got a 404 exception earlier, or no exception at all.
+    			// That way we don't accidentally clobber a file that's already there in the case of a
+    			// temporary server failure.
+    			if (exceptionMessage == null || exceptionMessage.equals("Non 2XX response code: 404")) {
+        			try {
+            			otrunk.remoteSaveData(xmldb, url, OTViewer.HTTP_PUT, authenticator, true);
+        
+            			remoteObject = (T) otrunk.getExternalObject(url, otrunk.getRootObjectService(), true, false);
+        			} catch (Exception e) {
+        				// still an error. skip the overlay for this user/url
+        				logger.warning("Couldn't remotely save default overlay for user\n" + url + "\n" + e.getMessage());
+        			}
     			}
     		}
     		return remoteObject;
