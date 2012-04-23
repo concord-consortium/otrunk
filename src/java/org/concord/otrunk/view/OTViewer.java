@@ -303,6 +303,8 @@ public class OTViewer extends JFrame
                 }
             });
         }
+        
+        Util.setFrameIcon(this);
 
         commDialog = new JDialog(this, true);
         registerDebugEventListeners();
