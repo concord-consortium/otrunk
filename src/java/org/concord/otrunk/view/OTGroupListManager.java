@@ -2,6 +2,8 @@ package org.concord.otrunk.view;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -143,6 +145,27 @@ public class OTGroupListManager extends DefaultOTObject
 	    return userList;
     }
     
+    ArrayList<OTGroupMember> sortedUserList;
+	public ArrayList<OTGroupMember> getAlphabeticalUserList()
+    {
+		if (sortedUserList == null) {
+			sortedUserList = new ArrayList<OTGroupMember>();
+			for (OTObject us : userList) {
+				if (us instanceof OTGroupMember) {
+					sortedUserList.add((OTGroupMember) us);
+				}
+			}
+			Collections.sort(sortedUserList, new Comparator<OTGroupMember>() {
+				public int compare(OTGroupMember arg0, OTGroupMember arg1)
+                {
+	                return arg0.getName().toLowerCase().compareTo(arg1.getName().toLowerCase());
+                }
+			});
+		}
+
+	    return sortedUserList;
+    }
+    
     public OTUserObject getGroupUser() {
     	return groupUserObject;
     }
@@ -151,6 +174,15 @@ public class OTGroupListManager extends DefaultOTObject
     	ArrayList<OTUserObject> users = new ArrayList<OTUserObject>();
     	for (OTObject obj : userList) {
     		OTUserObject user = ((OTGroupMember) obj).getUserObject();
+    		users.add(user);
+    	}
+    	return users;
+    }
+    
+    public ArrayList<OTUserObject> getAlphabeticalUsers() {
+    	ArrayList<OTUserObject> users = new ArrayList<OTUserObject>();
+    	for (OTGroupMember mem : sortedUserList) {
+    		OTUserObject user = mem.getUserObject();
     		users.add(user);
     	}
     	return users;
