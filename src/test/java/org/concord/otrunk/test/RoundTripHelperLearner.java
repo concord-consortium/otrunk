@@ -7,7 +7,9 @@ import java.io.InputStreamReader;
 
 import org.concord.framework.otrunk.OTObject;
 import org.concord.framework.otrunk.OTObjectService;
-import org.concord.framework.otrunk.OTrunk;
+import org.concord.otrunk.OTrunkImpl;
+import org.concord.otrunk.overlay.CompositeDatabase;
+import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.view.OTMLUserSession;
 import org.concord.otrunk.view.OTViewerHelper;
 import org.concord.otrunk.xml.XMLDatabase;
@@ -24,7 +26,7 @@ public class RoundTripHelperLearner implements RoundTripHelper
 	private OTViewerHelper viewerHelper;
 	private XMLDatabase authorDb;
 	private XMLDatabase learnerDb;
-	private OTrunk otrunk;
+	private OTrunkImpl otrunk;
 	private OTMLUserSession userSession;
 	private OTObjectService otObjectService;
 	
@@ -37,7 +39,7 @@ public class RoundTripHelperLearner implements RoundTripHelper
 
         viewerHelper.loadOTrunk2(null, authorDb);
 
-        otrunk = viewerHelper.getOtrunk();
+        otrunk = (OTrunkImpl) viewerHelper.getOtrunk();
         
         OTObject root = otrunk.createObject(otClass);
         otrunk.setRoot(root);
@@ -47,6 +49,8 @@ public class RoundTripHelperLearner implements RoundTripHelper
         viewerHelper.newUserData("roundtrip test");
         
         learnerDb = (XMLDatabase) userSession.getUserDataDb();
+        
+        otObjectService = viewerHelper.getRootObject().getOTObjectService();
 	}
 
 	public void reload() throws Exception
@@ -66,7 +70,7 @@ public class RoundTripHelperLearner implements RoundTripHelper
 		viewerHelper = new OTViewerHelper();
 				
 		viewerHelper.loadOTrunk2(null, authorDb);		
-        otrunk = viewerHelper.getOtrunk();
+        otrunk = (OTrunkImpl) viewerHelper.getOtrunk();
         
         learnerDb = (XMLDatabase) viewerHelper.loadOTDatabase(new ByteArrayInputStream(output.toByteArray()), 
 			null);
@@ -85,5 +89,24 @@ public class RoundTripHelperLearner implements RoundTripHelper
 	{
         return otObjectService.createObject(klass);
 	}
+	
+	public OTUserObject getLearnerUser() {
+		return userSession.getUserObject();
+	}
 
+	public CompositeDatabase getReferenceMapDb() {
+		return otrunk.getCompositeDatabases().get(getLearnerUser().getGlobalId());
+	}
+	
+	public OTrunkImpl getOTrunk()
+    {
+	    return otrunk;
+    }
+	
+	public String getExportedReferenceMapDb() throws Exception {
+		CompositeDatabase db = getReferenceMapDb();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		viewerHelper.saveOTDatabase(db.getActiveOverlay().getOverlayDatabase(), baos);
+		return baos.toString();
+	}
 }

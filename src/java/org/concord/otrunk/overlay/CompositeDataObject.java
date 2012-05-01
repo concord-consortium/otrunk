@@ -80,6 +80,7 @@ public class CompositeDataObject
 	
 	private OTDataObject container;
 	private String containerResourceKey;
+	private boolean pullAllAttributesIntoCurrentLayer = false;
 	
 	public CompositeDataObject(OTDataObject baseObject, 
 	        CompositeDatabase db, OTDataObject[] middleDeltas, boolean composite)
@@ -88,10 +89,15 @@ public class CompositeDataObject
 		database = db;
 		this.middleDeltas = middleDeltas;
 		this.composite = composite;
-		if(composite){
+		resetActiveDeltaObject();
+	}
+
+	void resetActiveDeltaObject()
+    {
+	    if(composite){
 			activeDeltaObject = database.getActiveDeltaObject(baseObject);
 		}
-	}
+    }
 	
 	public OTDatabase getDatabase()
 	{
@@ -226,6 +232,14 @@ public class CompositeDataObject
 			activeDeltaObject = database.createActiveDeltaObject(baseObject);			
 			activeDeltaObject.setContainer(this.container);
 			activeDeltaObject.setContainerResourceKey(this.containerResourceKey);
+			if (shouldPullAllAttributesIntoCurrentLayer()) {
+				for (String key : getResourceKeys()) {
+					Object resource = getResource(key);
+					if (resource != null) {
+						activeDeltaObject.setResource(key, resource);
+					}
+				}
+			}
 		}
 		
 		return activeDeltaObject;
@@ -422,6 +436,28 @@ public class CompositeDataObject
 		return composite;
 	}
 	
+	public void resetBaseObject() {
+		if (!composite) {
+    		try {
+    			OTID baseId = baseObject.getGlobalId();
+    			if (baseId instanceof OTTransientMapID) {
+    				baseId = baseId.getMappedId();
+    			}
+        		OTDataObject newBase = database.getActiveOverlayDb().createDataObject(baseObject.getType(), baseId);
+        		for (String key : baseObject.getResourceKeys()) {
+        			newBase.setResource(key, baseObject.getResource(key));
+        		}
+        		newBase.setContainer(baseObject.getContainer());
+        		newBase.setContainerResourceKey(baseObject.getContainerResourceKey());
+        		baseObject = newBase;
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+		} else {
+			
+		}
+	}
+	
 	public OTDataObject getContainer()
     {
 		if (composite) {
@@ -478,5 +514,15 @@ public class CompositeDataObject
 			baseObject.setContainerResourceKey(containerResourceKey);
 		}
 		this.containerResourceKey = containerResourceKey;
+    }
+
+	public boolean shouldPullAllAttributesIntoCurrentLayer()
+    {
+	    return pullAllAttributesIntoCurrentLayer;
+    }
+
+	public void setPullAllAttributesIntoCurrentLayer(boolean pullAllAttributesIntoCurrentLayer)
+    {
+	    this.pullAllAttributesIntoCurrentLayer = pullAllAttributesIntoCurrentLayer;
     }
 }

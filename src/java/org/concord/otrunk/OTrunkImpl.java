@@ -50,6 +50,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -81,6 +83,7 @@ import org.concord.otrunk.overlay.OTOverlay;
 import org.concord.otrunk.overlay.OTOverlayGroup;
 import org.concord.otrunk.overlay.Overlay;
 import org.concord.otrunk.overlay.OverlayImpl;
+import org.concord.otrunk.overlay.RotatingReferenceMapDatabase;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.util.ConcordHostnameVerifier;
@@ -347,6 +350,9 @@ public class OTrunkImpl implements OTrunk
 	
 	public void close()
 	{
+		if (rotateTask != null) {
+			rotateTask.run();
+		}
 		rootDb.close();
 	}
 	
@@ -591,6 +597,8 @@ public class OTrunkImpl implements OTrunk
         for (List<OTDatabase> databases : databaseList) {
         	databases.remove(oldCompositeDB);
         }
+        
+        // PUB Need to handle making sure all of the rotated layers still get included in the new database!
 
         registerReferenceMap(refMap);
     	
@@ -608,7 +616,12 @@ public class OTrunkImpl implements OTrunk
     	
     	OTID userId = user.getUserId();
     	    	
-        CompositeDatabase userDb = new CompositeDatabase(dataObjectFinder, userStateMap);
+        CompositeDatabase userDb;
+        if (OTConfig.isPeriodicUploadingUserDataEnabled()) {
+        	userDb = new RotatingReferenceMapDatabase(dataObjectFinder, userStateMap);
+        } else {
+        	userDb = new CompositeDatabase(dataObjectFinder, userStateMap);
+        }
 
         addDatabase(userDb, false);
         userObjService = createObjectService(userDb);
@@ -619,11 +632,64 @@ public class OTrunkImpl implements OTrunk
         // This way the user can change the overlays list and those changes will
         // affect the overlay list when they are loaded.
         userDb.setOverlays(getSystemOverlaysList(user));
+        
+        if (OTConfig.isPeriodicUploadingUserDataEnabled()) {
+        	setupPeriodicUploading((RotatingReferenceMapDatabase) userDb);
+        }
 
         return userObjService;
     }
     
-    public ArrayList<Overlay> getSystemOverlaysList(OTUser user) {
+    public OTReferenceMap rotateUserDatabase(RotatingReferenceMapDatabase db) throws Exception {
+    	XMLDatabase activeDb = new XMLDatabase();
+    	OTObjectService objService = createObjectService(activeDb);
+    	OTReferenceMap refMap = objService.createObject(OTReferenceMap.class);
+    	activeDb.setRoot(refMap.getGlobalId());
+
+    	OTReferenceMap oldActiveReferenceMap = db.rotate(refMap);
+    	return oldActiveReferenceMap;
+    }
+    
+    TimerTask rotateTask = null;
+    private void setupPeriodicUploading(final RotatingReferenceMapDatabase db) throws Exception {
+	    // Rotate the db to set up the current active layer
+    	OTReferenceMap oldActiveReferenceMap = rotateUserDatabase(db);
+    	
+    	rotateTask = new TimerTask() {
+			@Override
+			public void run()
+			{
+		    	// Set up a time-based task for:
+		    	  // Rotating
+		    	  // Uploading old rotated layers
+		    	try {
+	                Overlay oldActiveOverlay = rotateUserDatabase(db);
+	                if (OTConfig.getPeriodicUploadingUserDataUrl() != null) {
+	                	remoteSaveData(oldActiveOverlay.getOverlayDatabase(), new URL(OTConfig.getPeriodicUploadingUserDataUrl()), "POST");
+	                }
+                } catch (Exception e) {
+	                logger.log(Level.SEVERE, "Failed to rotate and save user learner database!", e);
+                }
+			}
+		};
+	    Timer globalTimer = getGlobalTimer();
+	    
+	    // Every 5 minutes, rotate and save
+	    int interval = 300000; // PUB Change this back to 5 minutes
+	    globalTimer.schedule(rotateTask, interval, interval);
+    }
+
+	private Timer getGlobalTimer()
+    {
+	    Timer t = getService(Timer.class);
+	    if (t == null) {
+	    	t = new Timer();
+	    	serviceContext.addService(Timer.class, t);
+	    }
+	    return t;
+    }
+
+	public ArrayList<Overlay> getSystemOverlaysList(OTUser user) {
         // The overlay list is added to one overlay at a time.  This allows
         // overlays to also modify the list or its values.
         // OTOverlayGroup objects are useful so an overlay or user can insert

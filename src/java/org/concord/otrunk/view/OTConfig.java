@@ -38,6 +38,9 @@ public class OTConfig
      * 
      */
     public final static String SYSTEM_OTML_PROP = "otrunk.system.otml";
+    
+	public static final String PERIODIC_UPLOADING_USER_DATA = "otrunk.periodic.uploading.enabled";
+	public static final String PERIODIC_UPLOADING_USER_DATA_URL = "otrunk.periodic.uploading.url";
 
 	/**
      * This method should be used to read properties because in some places
@@ -162,4 +165,13 @@ public class OTConfig
     {
 		return getBooleanProp(SHOW_USER_DATA_WARNING, false);
     }
+
+	public static boolean isPeriodicUploadingUserDataEnabled()
+    {
+		return getBooleanProp(PERIODIC_UPLOADING_USER_DATA, false);
+    }
+	
+	public static String getPeriodicUploadingUserDataUrl() {
+		return getStringProp(PERIODIC_UPLOADING_USER_DATA_URL, null);
+	}
 }

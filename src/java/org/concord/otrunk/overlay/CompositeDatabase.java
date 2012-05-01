@@ -266,7 +266,7 @@ public class CompositeDatabase
         return userDataObject;
     }
 
-	private OTDataObject[] createMiddleDeltas(OTDataObject baseObject)
+	protected OTDataObject[] createMiddleDeltas(OTDataObject baseObject)
     {
 	    OTDataObject middleDeltas [] = null;
         if(middleOverlays != null){

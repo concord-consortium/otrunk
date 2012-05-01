@@ -575,6 +575,10 @@ public class OTViewerHelper
 		services.add(entry);
 	}
 	
+	public void close() {
+		otrunk.close();
+	}
+	
     static 
     {
     	try {
