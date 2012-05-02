@@ -674,8 +674,8 @@ public class OTrunkImpl implements OTrunk
 		};
 	    Timer globalTimer = getGlobalTimer();
 	    
-	    // Every 5 minutes, rotate and save
-	    int interval = 300000; // PUB Change this back to 5 minutes
+	    // Every so often, rotate and save
+	    int interval = OTConfig.getPeriodicUploadingUserDataInterval();
 	    globalTimer.schedule(rotateTask, interval, interval);
     }
 

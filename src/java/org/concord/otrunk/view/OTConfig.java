@@ -41,6 +41,7 @@ public class OTConfig
     
 	public static final String PERIODIC_UPLOADING_USER_DATA = "otrunk.periodic.uploading.enabled";
 	public static final String PERIODIC_UPLOADING_USER_DATA_URL = "otrunk.periodic.uploading.url";
+	public static final String PERIODIC_UPLOADING_USER_DATA_INTERVAL = "otrunk.periodic.uploading.interval";
 
 	/**
      * This method should be used to read properties because in some places
@@ -173,5 +174,14 @@ public class OTConfig
 	
 	public static String getPeriodicUploadingUserDataUrl() {
 		return getStringProp(PERIODIC_UPLOADING_USER_DATA_URL, null);
+	}
+	
+	public static int getPeriodicUploadingUserDataInterval() {
+		String in = getStringProp(PERIODIC_UPLOADING_USER_DATA_INTERVAL, "300000");
+		int i = 300000;
+		try {
+			i = Integer.parseInt(in);
+		} catch (NumberFormatException e) { }
+		return i;
 	}
 }
