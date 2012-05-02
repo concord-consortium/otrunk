@@ -19,7 +19,7 @@ import org.concord.otrunk.test.OTBasicTestObject;
 import org.concord.otrunk.test.OTListTestObject;
 import org.concord.otrunk.test.OTMapTestObject;
 import org.concord.otrunk.test.OTPrimitivesTestObject;
-import org.concord.otrunk.test.RoundTripHelperLearner;
+import org.concord.otrunk.test.RotatingRoundTripHelperLearner;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.view.OTConfig;
 import org.junit.BeforeClass;
@@ -28,12 +28,12 @@ import org.junit.Test;
 
 public class PeriodicUploadingLearnerDataTest
 {
-	private static RoundTripHelperLearner helper;
+	private static RotatingRoundTripHelperLearner helper;
 	
 	@BeforeClass
 	public static void setup() {
 		System.setProperty(OTConfig.PERIODIC_UPLOADING_USER_DATA, "true");
-		helper = new RoundTripHelperLearner();
+		helper = new RotatingRoundTripHelperLearner();
 	}
 	
 	@Test
