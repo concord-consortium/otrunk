@@ -27,12 +27,16 @@ import org.concord.otrunk.test.RotatingRoundTripHelperLearner;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.view.OTConfig;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class PeriodicUploadingLearnerDataTest
 {
 	private static RotatingRoundTripHelperLearner helper;
 	private static final Logger logger = Logger.getLogger(PeriodicUploadingLearnerDataTest.class.getName());
+	
+//	@Rule
+//	public ClientDriverRule driver = new ClientDriverRule();
 	
 	@BeforeClass
 	public static void setup() {
@@ -363,6 +367,18 @@ public class PeriodicUploadingLearnerDataTest
 	
 	@Test
 	public void testOnlyChangedObjectsGetWritten() throws Exception {
+		testOnlyChangedObjectGetWrittenImpl(false);
+	}
+	
+	@Test
+	@Ignore
+	public void testUploading() throws Exception {
+		// TODO Configure capturing requests and make sure the requests look correct.
+//		System.setProperty(OTConfig.PERIODIC_UPLOADING_USER_DATA_URL, driver.getBaseUrl() + "/bundles");
+		testOnlyChangedObjectGetWrittenImpl(true);
+	}
+	
+	private void testOnlyChangedObjectGetWrittenImpl(boolean checkHttp) throws Exception {
 		helper.initOTrunk(OTBasicTestObject.class);
 		
 		OTBasicTestObject root = (OTBasicTestObject) helper.getAuthoredRootObject();
@@ -382,7 +398,9 @@ public class PeriodicUploadingLearnerDataTest
 		child2.setReference(child3);
 		
 		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-clean.xml", helper.getExportedReferenceMapDb());
-		
+		if (checkHttp) {
+//			driver.addExpectation(onRequestTo("/bundles"), giveEmptyResponse().withStatus(201));
+		}
 		rotate();
 		
 		root = (OTBasicTestObject) helper.getRootObject();
@@ -396,19 +414,27 @@ public class PeriodicUploadingLearnerDataTest
 		child2.setString("Something changed, three");
 		
 		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-changed.xml", helper.getExportedReferenceMapDb());
-		
+
+		if (checkHttp) {
+//			driver.addExpectation(onRequestTo("/bundles"), giveEmptyResponse().withStatus(201));
+		}
 		rotate();
 
 		child1.setString("Something changed, too");
 		child3.setString("Something changed, four");
 		
 		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-changed2.xml", helper.getExportedReferenceMapDb());
+		
+		if (checkHttp) {
+//			driver.addExpectation(onRequestTo("/bundles"), giveEmptyResponse().withStatus(201));
+		}
+		rotate();
 	}
 	
 	private OTReferenceMap rotate() throws Exception {
 		CompositeDatabase referenceMapDb = helper.getReferenceMapDb();
 		if (referenceMapDb instanceof RotatingReferenceMapDatabase) {
-			return helper.getOTrunk().rotateUserDatabase((RotatingReferenceMapDatabase) referenceMapDb);
+			return helper.getOTrunk().rotateAndSaveUserDatabase((RotatingReferenceMapDatabase) referenceMapDb);
 		}
 		return null;
 	}

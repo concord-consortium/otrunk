@@ -651,6 +651,14 @@ public class OTrunkImpl implements OTrunk
     	return oldActiveReferenceMap;
     }
     
+    public OTReferenceMap rotateAndSaveUserDatabase(RotatingReferenceMapDatabase db) throws Exception {
+        OTReferenceMap oldActiveOverlay = rotateUserDatabase(db);
+        if (OTConfig.getPeriodicUploadingUserDataUrl() != null) {
+        	remoteSaveData(oldActiveOverlay.getOverlayDatabase(), new URL(OTConfig.getPeriodicUploadingUserDataUrl()), "POST");
+        }
+        return oldActiveOverlay;
+    }
+    
     TimerTask rotateTask = null;
     private void setupPeriodicUploading(final RotatingReferenceMapDatabase db) throws Exception {
 	    // Rotate the db to set up the current active layer
@@ -664,10 +672,7 @@ public class OTrunkImpl implements OTrunk
 		    	  // Rotating
 		    	  // Uploading old rotated layers
 		    	try {
-	                Overlay oldActiveOverlay = rotateUserDatabase(db);
-	                if (OTConfig.getPeriodicUploadingUserDataUrl() != null) {
-	                	remoteSaveData(oldActiveOverlay.getOverlayDatabase(), new URL(OTConfig.getPeriodicUploadingUserDataUrl()), "POST");
-	                }
+		    		rotateAndSaveUserDatabase(db);
                 } catch (Exception e) {
 	                logger.log(Level.SEVERE, "Failed to rotate and save user learner database!", e);
                 }
