@@ -87,6 +87,7 @@ import org.concord.otrunk.overlay.RotatingReferenceMapDatabase;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
 import org.concord.otrunk.util.ConcordHostnameVerifier;
+import org.concord.otrunk.util.ReferenceUtil;
 import org.concord.otrunk.view.OTConfig;
 import org.concord.otrunk.view.OTUserSession;
 import org.concord.otrunk.view.OTViewer;
@@ -1256,75 +1257,7 @@ public class OTrunkImpl implements OTrunk
     
     public ArrayList<ArrayList<OTDataPropertyReference>> getIncomingReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences, ArrayList<OTID> excludeIDs) {
     	ArrayList<OTDataPropertyReference> path = new ArrayList<OTDataPropertyReference>();
-    	return getReferences(true, objectID, filterClass, getIndirectReferences, path, excludeIDs);
-    }
-    
-    private ArrayList<ArrayList<OTDataPropertyReference>> getReferences(boolean incoming, OTID objectID, Class<?> filterClass, boolean getIndirectReferences, ArrayList<OTDataPropertyReference> currentPath, ArrayList<OTID> excludeIDs) {
-    	ArrayList<ArrayList<OTDataPropertyReference>> allParents = new ArrayList<ArrayList<OTDataPropertyReference>>();
-    	if (excludeIDs == null) {
-    		excludeIDs = new ArrayList<OTID>();
-    	}
-    	// XXX Should we be searching all databases?
-    	synchronized(authoredDatabases) {
-        	for (OTDatabase db : authoredDatabases) {
-            	try {
-        	        ArrayList<OTDataPropertyReference> parents = null;
-        	        if (incoming) {
-        	        	parents = db.getIncomingReferences(objectID);
-        	        } else {
-        	        	parents = db.getOutgoingReferences(objectID);
-        	        }
-        	        if (parents != null) {
-            	        logger.finest("Found " + parents.size() + " references");
-            	        for (OTDataPropertyReference reference : parents) {
-            	        	/* FIXME by skipping objects we've seen already, it's possible that we're not including all of the possible paths to an object.
-            	        	 * For instance, if A indirectly references D through both B and C, only one of A -> B -> D or A -> C -> D will be returned.
-            	        	 * So while this code *will* find all the correct endpoints, it won't necessarily reflect all of the possible paths between those endpoints.
-            	        	 */
-            	        	OTID pId;
-            	        	if (incoming) {
-            	        		pId= reference.getSource();
-            	        	} else {
-            	        		pId = reference.getDest();
-            	        	}
-            	        	if (! excludeIDs.contains(pId)) {
-            	        		logger.finest("Found reference id: " + pId);
-            	        		excludeIDs.add(pId);
-            	        		
-            	        		ArrayList<OTDataPropertyReference> pPath = (ArrayList<OTDataPropertyReference>) currentPath.clone();
-            	        		pPath.add(reference);
-            	        		
-                    	        OTDataObject parentObj = db.getOTDataObject(null, pId);
-                    	        if (parentObj != null) {
-                        	        if (filterClass != null) {
-                        	        	logger.finest("Filter class: " + filterClass.getSimpleName() + ", parent class: " + parentObj.getType().getClassName());
-                        	        }
-                        	        if (filterClass == null || filterClass.isAssignableFrom(Class.forName(parentObj.getType().getClassName()))) {
-                        	        	logger.finest("Found a matching parent: " + parentObj.getGlobalId());
-                        	        	allParents.add(pPath);
-                        	        }
-                    	        	if (getIndirectReferences) {
-                    	        		logger.finest("recursing");
-                    	        		allParents.addAll(getReferences(incoming, pId, filterClass, true, pPath, excludeIDs));
-                    	        		logger.finest("unrecursing");
-                    	        	}
-                    	        } else {
-                    	        	logger.warning("Had parent id but no real object!: " + pId);
-                    	        }
-            	        	} else {
-            	        		logger.finest("Already seen this id: " + pId);
-            	        	}
-            	        }
-        	        } else {
-        	        	logger.finest("null parents");
-        	        }
-                } catch (Exception e) {
-        	        // TODO Auto-generated catch block
-                	logger.log(Level.WARNING, "Error finding parents", e);
-                }
-        	}
-    	}
-    	return allParents;
+    	return ReferenceUtil.getReferences(true, objectID, filterClass, getIndirectReferences, path, excludeIDs, authoredDatabases);
     }
     
     public ArrayList<ArrayList<OTDataPropertyReference>> getIncomingReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences) {
@@ -1343,7 +1276,7 @@ public class OTrunkImpl implements OTrunk
     }
     
     public ArrayList<ArrayList<OTDataPropertyReference>> getOutgoingReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences, ArrayList<OTID> excludeIDs) {
-    	return getReferences(false, objectID, filterClass, getIndirectReferences, new ArrayList<OTDataPropertyReference>(), excludeIDs);
+    	return ReferenceUtil.getReferences(false, objectID, filterClass, getIndirectReferences, new ArrayList<OTDataPropertyReference>(), excludeIDs, authoredDatabases);
     }
     
     public ArrayList<ArrayList<OTDataPropertyReference>> getOutgoingReferences(OTID objectID, Class<?> filterClass, boolean getIndirectReferences) {
