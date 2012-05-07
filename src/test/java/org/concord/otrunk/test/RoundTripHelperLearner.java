@@ -87,4 +87,9 @@ public class RoundTripHelperLearner implements RoundTripHelper
 	{
         return otObjectService.createObject(klass);
 	}
+	
+	public <T extends OTObject> T createObject(Class<T> klass, OTObject parent) throws Exception
+	{
+        return parent.getOTObjectService().createObject(klass);
+	}
 }

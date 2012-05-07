@@ -35,6 +35,8 @@ public class RotatingReferenceMapDatabase extends CompositeDatabase
 		this.activeOverlay = newActiveReferenceMap;
 		this.activeOverlayDb = newActiveReferenceMap.getOverlayDatabase();
 		
+		setPullAllAttributesIntoCurrentLayer(true);
+		
 		// Move the old activeoverlay into the middle deltas
 		pushMiddleOverlay(oldActiveReferenceMap);
 		
@@ -52,7 +54,6 @@ public class RotatingReferenceMapDatabase extends CompositeDatabase
 	private void pushMiddleDeltas()
     {
 	    for (CompositeDataObject dataObj : dataObjectMap.values()) {
-	    	dataObj.setPullAllAttributesIntoCurrentLayer(true);
 	    	dataObj.resetBaseObject();
 	    	OTDataObject[] middleDeltas = createMiddleDeltas(dataObj.getBaseObject());
 	    	dataObj.resetActiveDeltaObject();

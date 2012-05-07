@@ -77,6 +77,7 @@ public class CompositeDatabase
 	Overlay activeOverlay;
 	ArrayList<Overlay> middleOverlays;
 	OTID databaseId;
+	private boolean pullAllAttributesIntoCurrentLayer = false;
 
 	private OverlayListener overlayListener = new OverlayListener(){
 
@@ -159,6 +160,7 @@ public class CompositeDatabase
         CompositeDataObject compositeDataObject = 
         	new CompositeDataObject(childObject, this, null, false);
         activeOverlay.registerNonDeltaObject(childObject);
+        dataObjectMap.put(compositeDataObject.getGlobalId(), compositeDataObject);
         //System.out.println("v3. " + userDataObject.getGlobalId());
         return compositeDataObject;
     }
@@ -173,6 +175,7 @@ public class CompositeDatabase
         CompositeDataObject userDataObject = 
         	new CompositeDataObject(childObject, this, null, false);
         activeOverlay.registerNonDeltaObject(childObject);
+        dataObjectMap.put(id, userDataObject);
         //System.out.println("v3. " + userDataObject.getGlobalId());
         return userDataObject;
     }
@@ -415,6 +418,16 @@ public class CompositeDatabase
 	public void removeReference(OTID parentID, OTID childID)
     {
 	    activeOverlayDb.removeReference(parentID, childID);
+    }
+
+	public boolean shouldPullAllAttributesIntoCurrentLayer()
+    {
+	    return pullAllAttributesIntoCurrentLayer;
+    }
+
+	public void setPullAllAttributesIntoCurrentLayer(boolean pullAllAttributesIntoCurrentLayer)
+    {
+	    this.pullAllAttributesIntoCurrentLayer = pullAllAttributesIntoCurrentLayer;
     }
 
 }

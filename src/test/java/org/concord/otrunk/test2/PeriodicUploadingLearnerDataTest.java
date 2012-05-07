@@ -3,11 +3,14 @@ package org.concord.otrunk.test2;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
@@ -310,9 +313,78 @@ public class PeriodicUploadingLearnerDataTest
 	
 	@Test
 	@Ignore
+	public void testOnlyChangedCreatedObjectsGetWritten() throws Exception {
+		helper.initOTrunk(OTBasicTestObject.class);
+		
+		OTBasicTestObject root = (OTBasicTestObject) helper.getRootObject();
+		root.setName("Root");
+		
+		OTBasicTestObject child1 = helper.createObject(OTBasicTestObject.class);
+		child1.setName("Child 1");
+		
+		OTBasicTestObject child2 = helper.createObject(OTBasicTestObject.class);
+		child2.setName("Child 2");
+		
+		OTBasicTestObject child3 = helper.createObject(OTBasicTestObject.class);
+		child3.setName("Child 3");
+		
+		root.setReference(child1);
+		child1.setReference(child2);
+		child2.setReference(child3);
+		
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-created-initial.xml", helper.getExportedReferenceMapDb());
+		
+		rotate();
+		
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-clean.xml", helper.getExportedReferenceMapDb());
+
+		child3.setString("Something changed, too");
+		
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-created-changed.xml", helper.getExportedReferenceMapDb());
+	}
+	
+	@Test
 	public void testOnlyChangedObjectsGetWritten() throws Exception {
-		// TODO
-		assertThat(true).isFalse();
+		helper.initOTrunk(OTBasicTestObject.class);
+		
+		OTBasicTestObject root = (OTBasicTestObject) helper.getAuthoredRootObject();
+		root.setName("Root");
+		
+		OTBasicTestObject child1 = helper.createObject(OTBasicTestObject.class, root);
+		child1.setName("Child 1");
+		
+		OTBasicTestObject child2 = helper.createObject(OTBasicTestObject.class, root);
+		child2.setName("Child 2");
+		
+		OTBasicTestObject child3 = helper.createObject(OTBasicTestObject.class, root);
+		child3.setName("Child 3");
+		
+		root.setReference(child1);
+		child1.setReference(child2);
+		child2.setReference(child3);
+		
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-clean.xml", helper.getExportedReferenceMapDb());
+		
+		rotate();
+		
+		root = (OTBasicTestObject) helper.getRootObject();
+		child1 = (OTBasicTestObject) root.getReference();
+		child2 = (OTBasicTestObject) child1.getReference();
+		child3 = (OTBasicTestObject) child2.getReference();
+		
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-clean.xml", helper.getExportedReferenceMapDb());
+		
+		root.setString("Something changed");
+		child2.setString("Something changed, three");
+		
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-changed.xml", helper.getExportedReferenceMapDb());
+		
+		rotate();
+
+		child1.setString("Something changed, too");
+		child3.setString("Something changed, four");
+		
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-changed2.xml", helper.getExportedReferenceMapDb());
 	}
 	
 	private OTReferenceMap rotate() throws Exception {
@@ -348,7 +420,26 @@ public class PeriodicUploadingLearnerDataTest
 	}
 	
 	private void verifyOutputOtml(String expectedResource, String actualOutput) throws Exception {
-		URL expectedUrl = PeriodicUploadingLearnerDataTest.class.getResource(expectedResource);
+		String expectedOutput = getExpectedOutput(expectedResource);
+
+        assertThat(actualOutput).as("OTML export").contains(expectedOutput);
+	}
+	
+	private void verifyOutputRegexpOtml(String expectedResource, String actualOutput) throws Exception {
+		String expectedOutput = getExpectedOutput(expectedResource);
+		Pattern regexp = Pattern.compile(expectedOutput, Pattern.DOTALL | Pattern.MULTILINE);
+		Matcher m = regexp.matcher(actualOutput);
+		if (m.matches()) {
+			// awesome!
+		} else {
+			assertThat(actualOutput).as("OTML export").matches(expectedOutput);
+		}
+	}
+
+	private String getExpectedOutput(String expectedResource)
+        throws IOException
+    {
+	    URL expectedUrl = PeriodicUploadingLearnerDataTest.class.getResource(expectedResource);
 		BufferedReader in = new BufferedReader(new InputStreamReader(expectedUrl.openStream()));
 		StringBuffer expectedOutput = new StringBuffer();
         String line;
@@ -358,7 +449,6 @@ public class PeriodicUploadingLearnerDataTest
         }
         expectedOutput.setLength(expectedOutput.length()-System.getProperty("line.separator").length());
         in.close();
-
-        assertThat(actualOutput).as("OTML export").contains(expectedOutput.toString());
-	}
+	    return expectedOutput.toString();
+    }
 }

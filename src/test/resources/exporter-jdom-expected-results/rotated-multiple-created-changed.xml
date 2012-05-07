@@ -1,0 +1,15 @@
+.*<entry key=".*">
+          <OTBasicTestObject name="Root">
+            <reference>
+              <OTBasicTestObject name="Child 1">
+                <reference>
+                  <OTBasicTestObject name="Child 2">
+                    <reference>
+                      <OTBasicTestObject name="Child 3" string="Something changed, too" />
+                    </reference>
+                  </OTBasicTestObject>
+                </reference>
+              </OTBasicTestObject>
+            </reference>
+          </OTBasicTestObject>
+        </entry>.*

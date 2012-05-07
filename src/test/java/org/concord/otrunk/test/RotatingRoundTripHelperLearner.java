@@ -2,6 +2,7 @@ package org.concord.otrunk.test;
 
 import java.io.ByteArrayOutputStream;
 
+import org.concord.framework.otrunk.OTObject;
 import org.concord.otrunk.OTrunkImpl;
 import org.concord.otrunk.overlay.CompositeDatabase;
 import org.concord.otrunk.user.OTUserObject;
@@ -34,4 +35,9 @@ public class RotatingRoundTripHelperLearner extends RoundTripHelperLearner
 		viewerHelper.saveOTDatabase(db.getActiveOverlay().getOverlayDatabase(), baos);
 		return baos.toString();
 	}
+
+	public OTObject getAuthoredRootObject() throws Exception
+    {
+	    return viewerHelper.getAuthoredRoot();
+    }
 }

@@ -80,7 +80,6 @@ public class CompositeDataObject
 	
 	private OTDataObject container;
 	private String containerResourceKey;
-	private boolean pullAllAttributesIntoCurrentLayer = false;
 	
 	public CompositeDataObject(OTDataObject baseObject, 
 	        CompositeDatabase db, OTDataObject[] middleDeltas, boolean composite)
@@ -232,7 +231,7 @@ public class CompositeDataObject
 			activeDeltaObject = database.createActiveDeltaObject(baseObject);			
 			activeDeltaObject.setContainer(this.container);
 			activeDeltaObject.setContainerResourceKey(this.containerResourceKey);
-			if (shouldPullAllAttributesIntoCurrentLayer()) {
+			if (database.shouldPullAllAttributesIntoCurrentLayer()) {
 				for (String key : getResourceKeys()) {
 					Object resource = getResource(key);
 					if (resource != null) {
@@ -271,12 +270,23 @@ public class CompositeDataObject
 	    }
 	    
 	    if(!composite){
+	    	if (database.shouldPullAllAttributesIntoCurrentLayer()) {
+	    		// TODO We need to find this object's closest composite parent, and
+	    		// make sure that it gets the resourcekey which leads to this object
+	    		// written in the current delta layer
+	    	}
 	    	return baseObject.setResource(key, resource);
 	    }
 	    
 	    // get the existing active delta object or create a new one
 	    OTDataObject localActiveDelta = getOrCreateActiveDeltaObject();        	    
-		return localActiveDelta.setResource(key, resource);		
+		boolean ret = localActiveDelta.setResource(key, resource);
+		if (database.shouldPullAllAttributesIntoCurrentLayer()) {
+    		for (String rKey : getResourceKeys()) {
+    			localActiveDelta.setResource(rKey, getResource(rKey));
+    		}
+		}
+		return ret;
 	}
 	
     /**
@@ -514,15 +524,5 @@ public class CompositeDataObject
 			baseObject.setContainerResourceKey(containerResourceKey);
 		}
 		this.containerResourceKey = containerResourceKey;
-    }
-
-	public boolean shouldPullAllAttributesIntoCurrentLayer()
-    {
-	    return pullAllAttributesIntoCurrentLayer;
-    }
-
-	public void setPullAllAttributesIntoCurrentLayer(boolean pullAllAttributesIntoCurrentLayer)
-    {
-	    this.pullAllAttributesIntoCurrentLayer = pullAllAttributesIntoCurrentLayer;
     }
 }
