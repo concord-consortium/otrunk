@@ -49,7 +49,9 @@ import org.concord.otrunk.datamodel.OTDataPropertyReference;
 import org.concord.otrunk.datamodel.OTDatabase;
 import org.concord.otrunk.datamodel.OTTransientMapID;
 import org.concord.otrunk.datamodel.OTUUID;
+import org.concord.otrunk.util.ReferenceUtil;
 import org.concord.otrunk.xml.XMLDataObject;
+import org.concord.otrunk.xml.XMLDataObjectRef;
 
 /**
  * OTTemplateDatabase
@@ -78,6 +80,12 @@ public class CompositeDatabase
 	ArrayList<Overlay> middleOverlays;
 	OTID databaseId;
 	private boolean pullAllAttributesIntoCurrentLayer = false;
+	
+	private HashMap<OTID, ArrayList<OTDataPropertyReference>> incomingReferences = 
+		new HashMap<OTID, ArrayList<OTDataPropertyReference>>();
+	
+	private HashMap<OTID, ArrayList<OTDataPropertyReference>> outgoingReferences = 
+		new HashMap<OTID, ArrayList<OTDataPropertyReference>>();
 
 	private OverlayListener overlayListener = new OverlayListener(){
 
@@ -388,37 +396,123 @@ public class CompositeDatabase
 
 	public ArrayList<OTDataPropertyReference> getOutgoingReferences(OTID otid)
     {
-		return activeOverlayDb.getOutgoingReferences(otid);
+		return outgoingReferences.get(otid);
     }
 
 	public ArrayList<OTDataPropertyReference> getIncomingReferences(OTID otid)
     {
-		return activeOverlayDb.getIncomingReferences(otid);
+		return incomingReferences.get(otid);
     }
 	
 	public synchronized void pruneNonDeltaObjects() {
 		activeOverlay.pruneNonDeltaObjects();
 	}
-
-	public void recordReference(OTID parentID, OTID childID, String property)
-    {
-	    activeOverlayDb.recordReference(parentID, childID, property);
-    }
-
+	
 	public void recordReference(OTDataObject parent, OTDataObject child, String property)
-    {
-	    activeOverlayDb.recordReference(parent, child, property);
-    }
+	{
+		if (parent == null || child == null) {
+			// can't reference "null"
+			return;
+		}
 
-	public void removeReference(OTDataObject parent, OTDataObject child)
-    {
-	    activeOverlayDb.removeReference(parent, child);
-    }
+		if (child instanceof XMLDataObjectRef) {
+			// this will be handled in the second pass
+			return;
+		}
+		
+		OTID parentID = parent.getGlobalId();
+		OTID childID = child.getGlobalId();
 
-	public void removeReference(OTID parentID, OTID childID)
-    {
-	    activeOverlayDb.removeReference(parentID, childID);
-    }
+		recordReference(parentID, childID, property);
+	}
+	
+	public void recordReference(OTID parentID, OTID childID, String property) {
+		if (parentID == null || childID == null) {
+			// can't reference null
+			return;
+		}
+		parentID = parentID.getMappedId();
+		childID  = childID.getMappedId();
+		
+		logger.finer("Recording reference: " + parentID + " (" + property + ") --> " + childID);
+		
+		OTDataPropertyReference ref = new OTDataPropertyReference(parentID, childID, property);
+		
+		ArrayList<OTDataPropertyReference> parents = incomingReferences.get(childID);
+		ArrayList<OTDataPropertyReference> children = outgoingReferences.get(parentID);
+		if (parents == null) {
+			parents = new ArrayList<OTDataPropertyReference>();
+		}
+		if (children == null) {
+			children = new ArrayList<OTDataPropertyReference>();
+		}
+		if (! parents.contains(ref)) {
+			parents.add(ref);
+			incomingReferences.put(childID, parents);
+		}
+		
+		if (! children.contains(ref)) {
+			children.add(ref);
+			outgoingReferences.put(parentID, children);
+		}
+	}
+	
+	public void removeReference(OTDataObject parent, OTDataObject child) {
+		if (parent == null || child == null) {
+			// can't reference null
+			return;
+		}
+		
+		OTID parentID = parent.getGlobalId();
+		OTID childID = child.getGlobalId();
+
+		removeReference(parentID, childID);
+	}
+	
+	public void removeReference(OTID parentID, OTID childID) {
+		if (parentID == null || childID == null) {
+			// can't reference null
+			return;
+		}
+		
+		parentID = parentID.getMappedId();
+		childID  = childID.getMappedId();
+		
+		logger.finer("Removing reference: " + parentID + " --> " + childID);	
+		
+		ArrayList<OTDataPropertyReference> parents = incomingReferences.get(childID);
+		ArrayList<OTDataPropertyReference> children = outgoingReferences.get(parentID);
+
+		if (parents != null) {
+			OTDataPropertyReference refToRemove = null;
+			for (OTDataPropertyReference ref : parents) {
+				if (ref.getSource().equals(parentID) && ref.getDest().equals(childID)) {
+					refToRemove = ref;
+					break;
+				}
+			}
+			
+			if (refToRemove != null) {
+				parents.remove(refToRemove);
+				incomingReferences.put(childID, parents);
+			}
+		}
+		
+		if (children != null) {
+			OTDataPropertyReference refToRemove = null;
+			for (OTDataPropertyReference ref : children) {
+				if (ref.getSource().equals(parentID) && ref.getDest().equals(childID)) {
+					refToRemove = ref;
+					break;
+				}
+			}
+			
+			if (refToRemove != null) {
+				children.remove(refToRemove);
+				outgoingReferences.put(parentID, children);
+			}
+		}
+	}
 
 	public boolean shouldPullAllAttributesIntoCurrentLayer()
     {
@@ -428,6 +522,75 @@ public class CompositeDatabase
 	public void setPullAllAttributesIntoCurrentLayer(boolean pullAllAttributesIntoCurrentLayer)
     {
 	    this.pullAllAttributesIntoCurrentLayer = pullAllAttributesIntoCurrentLayer;
+    }
+
+	public void writeClosestCompositeParentKey(CompositeDataObject compositeDataObject)
+    {
+	    // Find closest composite parent
+		// Set the resource key that leads to the composite object
+		ArrayList<OTDatabase> dbs = new ArrayList<OTDatabase>();
+		dbs.add(this);
+		ArrayList<ArrayList<OTDataPropertyReference>> incomingReferences = ReferenceUtil.getIncomingReferences(compositeDataObject.getGlobalId().getMappedId(), true, dbs);
+		ArrayList<OTDataPropertyReference> shortest = null;
+		int shortestLength = Integer.MAX_VALUE;
+		for (ArrayList<OTDataPropertyReference> refChain : incomingReferences) {
+			if (refChain.size() < shortestLength) {
+				OTDataObject parent = findDataObject(refChain.get(refChain.size()-1).getSource());
+				if (parent instanceof CompositeDataObject && ((CompositeDataObject) parent).isComposite()) {
+    				shortest = refChain;
+    				shortestLength = refChain.size();
+				}
+			}
+		}
+		
+		if (shortest != null) {
+			OTDataPropertyReference ref = shortest.get(shortest.size()-1);
+			OTID pId = ref.getSource();
+			OTID cId = ref.getDest();
+			String prop = ref.getProperty();
+			
+			// if (! prop.equals("unknown")) {
+    			OTDataObject pDo = findDataObject(pId);
+    			OTDataObject cDo = findDataObject(cId);
+    			
+    			if (pDo != null && cDo != null && prop != null) {
+    				pDo.setResource(prop, null);
+    				pDo.setResource(prop, cDo.getGlobalId());
+    			}
+			// }
+		}
+    }
+	
+	private OTDataObject findDataObject(OTID id) {
+		// First try matching the id directly
+		OTDataObject obj = dataObjectMap.get(id);
+		if (obj != null) { return obj; }
+		
+		// Then try mapping the dataObjectMap's keys to mapped ids
+		for (OTID k : dataObjectMap.keySet()) {
+			OTID mk = k.getMappedId();
+			if (mk.equals(id)) {
+				return dataObjectMap.get(k);
+			}
+		}
+		
+		// Finally, check if the mapped id is different than the id
+		OTID mId = id.getMappedId();
+		if (mId.equals(id)) {
+			return null;
+		}
+		// If it's different, try searching with the mapped id
+		return findDataObject(mId);
+	}
+
+	public HashMap<OTID, ArrayList<OTDataPropertyReference>> getIncomingReferences()
+    {
+	    return incomingReferences;
+    }
+
+	public HashMap<OTID, ArrayList<OTDataPropertyReference>> getOutgoingReferences()
+    {
+	    return outgoingReferences;
     }
 
 }

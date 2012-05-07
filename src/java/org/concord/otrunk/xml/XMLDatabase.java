@@ -51,7 +51,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
@@ -1246,5 +1245,15 @@ public class XMLDatabase
 	public String getETag()
     {
 	    return eTag;
+    }
+
+	public HashMap<OTID, ArrayList<OTDataPropertyReference>> getIncomingReferences()
+    {
+	    return incomingReferences;
+    }
+
+	public HashMap<OTID, ArrayList<OTDataPropertyReference>> getOutgoingReferences()
+    {
+	    return outgoingReferences;
     }
 }

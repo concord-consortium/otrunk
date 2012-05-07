@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,12 +27,12 @@ import org.concord.otrunk.test.RotatingRoundTripHelperLearner;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.view.OTConfig;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class PeriodicUploadingLearnerDataTest
 {
 	private static RotatingRoundTripHelperLearner helper;
+	private static final Logger logger = Logger.getLogger(PeriodicUploadingLearnerDataTest.class.getName());
 	
 	@BeforeClass
 	public static void setup() {
@@ -311,9 +312,13 @@ public class PeriodicUploadingLearnerDataTest
 		verifyMapsMatch(testObjects, root.getResourceMap());
 	}
 	
+	/*
+	 * Basically, verify that changing an object that was created within the delta layer (non-composite) will write
+	 * out the closest ancestor that's a composite object.
+	 */
 	@Test
-	@Ignore
 	public void testOnlyChangedCreatedObjectsGetWritten() throws Exception {
+		logger.info("\n\nStarting created test.\n\n");
 		helper.initOTrunk(OTBasicTestObject.class);
 		
 		OTBasicTestObject root = (OTBasicTestObject) helper.getRootObject();
@@ -328,19 +333,32 @@ public class PeriodicUploadingLearnerDataTest
 		OTBasicTestObject child3 = helper.createObject(OTBasicTestObject.class);
 		child3.setName("Child 3");
 		
+		logger.info("Setting root => child1");
 		root.setReference(child1);
+		logger.info("Setting child1 => child2");
 		child1.setReference(child2);
+		logger.info("Setting child2 => child3");
 		child2.setReference(child3);
+
+		logger.info("   Root id: " +   root.getGlobalId() + "\n");
+		logger.info("Child 1 id: " + child1.getGlobalId() + "\n");
+		logger.info("Child 2 id: " + child2.getGlobalId() + "\n");
+		logger.info("Child 3 id: " + child3.getGlobalId() + "\n");
 		
 		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-created-initial.xml", helper.getExportedReferenceMapDb());
 		
+		logger.info("rotating");
 		rotate();
 		
 		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-clean.xml", helper.getExportedReferenceMapDb());
+		
 
+		logger.info("Setting child 3 string");
 		child3.setString("Something changed, too");
 		
 		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-created-changed.xml", helper.getExportedReferenceMapDb());
+
+		logger.info("\n\nFinished created test.\n\n");
 	}
 	
 	@Test
@@ -426,13 +444,16 @@ public class PeriodicUploadingLearnerDataTest
 	}
 	
 	private void verifyOutputRegexpOtml(String expectedResource, String actualOutput) throws Exception {
+		verifyOutputRegexpOtml(expectedResource, actualOutput, "");
+	}
+	private void verifyOutputRegexpOtml(String expectedResource, String actualOutput, String as) throws Exception {
 		String expectedOutput = getExpectedOutput(expectedResource);
 		Pattern regexp = Pattern.compile(expectedOutput, Pattern.DOTALL | Pattern.MULTILINE);
 		Matcher m = regexp.matcher(actualOutput);
 		if (m.matches()) {
 			// awesome!
 		} else {
-			assertThat(actualOutput).as("OTML export").matches(expectedOutput);
+			assertThat(actualOutput).as("OTML export: " + as).matches(expectedOutput);
 		}
 	}
 

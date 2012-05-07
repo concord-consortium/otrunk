@@ -139,5 +139,6 @@ public interface OTDatabase
 	public void removeReference(OTDataObject parent, OTDataObject child);
 	public void removeReference(OTID parentID, OTID childID);
 	
-	
+	public HashMap<OTID, ArrayList<OTDataPropertyReference>> getIncomingReferences();
+	public HashMap<OTID, ArrayList<OTDataPropertyReference>> getOutgoingReferences();
 }

@@ -274,12 +274,19 @@ public class CompositeDataObject
 	    		// TODO We need to find this object's closest composite parent, and
 	    		// make sure that it gets the resourcekey which leads to this object
 	    		// written in the current delta layer
+	    		database.writeClosestCompositeParentKey(this);
+	    	}
+	    	if (resource instanceof OTID) {
+	    		database.recordReference(getGlobalId(), (OTID) resource, key);
 	    	}
 	    	return baseObject.setResource(key, resource);
 	    }
 	    
 	    // get the existing active delta object or create a new one
-	    OTDataObject localActiveDelta = getOrCreateActiveDeltaObject();        	    
+	    OTDataObject localActiveDelta = getOrCreateActiveDeltaObject();
+    	if (resource instanceof OTID) {
+    		database.recordReference(getGlobalId(), (OTID) resource, key);
+    	}
 		boolean ret = localActiveDelta.setResource(key, resource);
 		if (database.shouldPullAllAttributesIntoCurrentLayer()) {
     		for (String rKey : getResourceKeys()) {
@@ -450,16 +457,18 @@ public class CompositeDataObject
 		if (!composite) {
     		try {
     			OTID baseId = baseObject.getGlobalId();
-    			if (baseId instanceof OTTransientMapID) {
-    				baseId = baseId.getMappedId();
+    			if (! database.getActiveOverlayDb().contains(baseId)) {
+        			if (baseId instanceof OTTransientMapID) {
+        				baseId = baseId.getMappedId();
+        			}
+            		OTDataObject newBase = database.getActiveOverlayDb().createDataObject(baseObject.getType(), baseId);
+            		for (String key : baseObject.getResourceKeys()) {
+            			newBase.setResource(key, baseObject.getResource(key));
+            		}
+            		newBase.setContainer(baseObject.getContainer());
+            		newBase.setContainerResourceKey(baseObject.getContainerResourceKey());
+            		baseObject = newBase;
     			}
-        		OTDataObject newBase = database.getActiveOverlayDb().createDataObject(baseObject.getType(), baseId);
-        		for (String key : baseObject.getResourceKeys()) {
-        			newBase.setResource(key, baseObject.getResource(key));
-        		}
-        		newBase.setContainer(baseObject.getContainer());
-        		newBase.setContainerResourceKey(baseObject.getContainerResourceKey());
-        		baseObject = newBase;
     		} catch (Exception e) {
     			e.printStackTrace();
     		}

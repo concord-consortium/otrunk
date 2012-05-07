@@ -379,4 +379,14 @@ public class FsDatabase implements OTDatabase
     {
 		throw new UnsupportedOperationException("not implemented yet");
     }
+
+	public HashMap<OTID, ArrayList<OTDataPropertyReference>> getIncomingReferences()
+    {
+		throw new UnsupportedOperationException("not implemented yet");
+    }
+
+	public HashMap<OTID, ArrayList<OTDataPropertyReference>> getOutgoingReferences()
+    {
+		throw new UnsupportedOperationException("not implemented yet");
+    }
 }
