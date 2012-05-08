@@ -641,6 +641,23 @@ public class OTrunkImpl implements OTrunk
         return userObjService;
     }
     
+    public void unregisterReferenceMap(OTReferenceMap userStateMap)
+    throws Exception
+    {
+        if (rotateTask != null) {
+        	rotateTask.run();
+        	rotateTask.cancel();
+        }
+        
+    	OTUser user = userStateMap.getUser();
+    	OTID userId = user.getUserId();
+    	
+        CompositeDatabase userDb = compositeDatabases.remove(userId);	
+        userObjectServices.remove(userId);
+        
+        deltaDatabases.remove(userDb);
+    }
+    
     public OTReferenceMap rotateUserDatabase(RotatingReferenceMapDatabase db) throws Exception {
     	XMLDatabase activeDb = new XMLDatabase();
     	OTObjectService objService = createObjectService(activeDb);

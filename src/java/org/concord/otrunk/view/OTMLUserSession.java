@@ -358,7 +358,11 @@ public class OTMLUserSession
 
 	public void close()
 	{
-		// there is nothing to do on close		
+		try {
+	        otrunk.unregisterReferenceMap(getReferenceMap());
+        } catch (Exception e) {
+	        e.printStackTrace();
+        }
 	}
 	
 	public void setWorkgroup(String workgroupName, String workgroupToken, UUID workgroupId)
