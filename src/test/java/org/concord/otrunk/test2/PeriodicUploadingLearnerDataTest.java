@@ -28,6 +28,7 @@ import org.concord.otrunk.test.OTPrimitivesTestObject;
 import org.concord.otrunk.test.RotatingRoundTripHelperLearner;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.view.OTConfig;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -44,6 +45,11 @@ public class PeriodicUploadingLearnerDataTest
 	public static void setup() {
 		System.setProperty(OTConfig.PERIODIC_UPLOADING_USER_DATA, "true");
 		helper = new RotatingRoundTripHelperLearner();
+	}
+	
+	@AfterClass
+	public static void tearDown() {
+		System.setProperty(OTConfig.PERIODIC_UPLOADING_USER_DATA, "false");
 	}
 	
 	@Test
@@ -110,7 +116,7 @@ public class PeriodicUploadingLearnerDataTest
 		root.setBoolean(false); // set an attribute so the object will get written out
 		
 		// Verify exported otml looks like we expect
-		verifyOutputOtml("/exporter-jdom-expected-results/rotated-primitives.xml", helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-primitives.xml", helper.getExportedReferenceMapDb());
 	}
 	
 	@Test
