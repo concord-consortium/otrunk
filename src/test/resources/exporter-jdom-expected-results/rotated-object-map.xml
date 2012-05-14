@@ -1,4 +1,4 @@
-          <OTMapTestObject>
+.*          <OTMapTestObject>
             <objectMap>
               <entry key="Item: 0">
                 <OTBasicTestObject name="Value: 0" />
@@ -25,4 +25,4 @@
                 <OTBasicTestObject name="Some name" />
               </entry>
             </objectMap>
-          </OTMapTestObject>
+          </OTMapTestObject>.*

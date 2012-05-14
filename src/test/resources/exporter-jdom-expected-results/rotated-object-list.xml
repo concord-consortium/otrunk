@@ -1,8 +1,8 @@
-          <OTListTestObject>
+.*          <OTListTestObject>
             <objectList>
               <OTBasicTestObject name="Item: 1" />
               <OTBasicTestObject name="Item: 3" />
               <OTBasicTestObject name="Item: 4" />
               <OTBasicTestObject name="Item: 6" />
             </objectList>
-          </OTListTestObject>
+          </OTListTestObject>.*

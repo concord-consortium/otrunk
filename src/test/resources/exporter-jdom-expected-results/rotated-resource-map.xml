@@ -1,4 +1,4 @@
-          <OTMapTestObject>
+.*          <OTMapTestObject>
             <resourceMap>
               <entry key="Item: 0">
                 <string>Value: 0</string>
@@ -25,4 +25,4 @@
                 <string>Some name</string>
               </entry>
             </resourceMap>
-          </OTMapTestObject>
+          </OTMapTestObject>.*

@@ -167,7 +167,7 @@ public class PeriodicUploadingLearnerDataTest
 		root.getObjectList().remove(0);
 		
 		// Verify exported otml looks like we expect
-		verifyOutputOtml("/exporter-jdom-expected-results/rotated-object-list.xml", helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-object-list.xml", helper.getExportedReferenceMapDb());
 	}
 	
 	@Test
@@ -216,7 +216,7 @@ public class PeriodicUploadingLearnerDataTest
 		root.getResourceList().remove(0);
 		
 		// Verify exported otml looks like we expect
-		verifyOutputOtml("/exporter-jdom-expected-results/rotated-resource-list.xml", helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-resource-list.xml", helper.getExportedReferenceMapDb());
 	}
 	
 	@Test
@@ -262,7 +262,7 @@ public class PeriodicUploadingLearnerDataTest
 		root.getObjectMap().putObject("Change Item",v);
 		
 		// Verify exported otml looks like we expect
-		verifyOutputOtml("/exporter-jdom-expected-results/rotated-object-map.xml", helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-object-map.xml", helper.getExportedReferenceMapDb());
 		
 		testObjects.clear();
 		root.getObjectMap().clear();
@@ -312,7 +312,7 @@ public class PeriodicUploadingLearnerDataTest
 		root.getResourceMap().put("Change Item",v);
 		
 		// Verify exported otml looks like we expect
-		verifyOutputOtml("/exporter-jdom-expected-results/rotated-resource-map.xml", helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-resource-map.xml", helper.getExportedReferenceMapDb());
 		
 		testObjects.clear();
 		root.getResourceMap().clear();
@@ -564,12 +564,6 @@ public class PeriodicUploadingLearnerDataTest
 		}
 	}
 	
-	private void verifyOutputOtml(String expectedResource, String actualOutput) throws Exception {
-		String expectedOutput = getExpectedOutput(expectedResource);
-
-        assertThat(actualOutput).as("OTML export").contains(expectedOutput);
-	}
-	
 	private void verifyOutputRegexpOtml(String expectedResource, String actualOutput) throws Exception {
 		verifyOutputRegexpOtml(expectedResource, actualOutput, "");
 	}
@@ -597,6 +591,7 @@ public class PeriodicUploadingLearnerDataTest
 		StringBuffer expectedOutput = new StringBuffer();
         String line;
         while ((line = in.readLine()) != null) {
+        	line = line.replaceAll("\\s{2,}", "\\\\s+");
             expectedOutput.append(line);
             expectedOutput.append(System.getProperty("line.separator"));
         }
