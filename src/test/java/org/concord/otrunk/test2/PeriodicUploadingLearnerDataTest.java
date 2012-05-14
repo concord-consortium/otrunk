@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.concord.framework.otrunk.OTID;
 import org.concord.framework.otrunk.OTObjectList;
 import org.concord.framework.otrunk.OTObjectMap;
 import org.concord.framework.otrunk.OTResourceList;
@@ -22,6 +23,7 @@ import org.concord.otrunk.overlay.RotatingReferenceMapDatabase;
 import org.concord.otrunk.test.OTBasicTestObject;
 import org.concord.otrunk.test.OTListTestObject;
 import org.concord.otrunk.test.OTMapTestObject;
+import org.concord.otrunk.test.OTMultiReferenceTestObject;
 import org.concord.otrunk.test.OTPrimitivesTestObject;
 import org.concord.otrunk.test.RotatingRoundTripHelperLearner;
 import org.concord.otrunk.user.OTReferenceMap;
@@ -322,7 +324,6 @@ public class PeriodicUploadingLearnerDataTest
 	 */
 	@Test
 	public void testOnlyChangedCreatedObjectsGetWritten() throws Exception {
-		logger.info("\n\nStarting created test.\n\n");
 		helper.initOTrunk(OTBasicTestObject.class);
 		
 		OTBasicTestObject root = (OTBasicTestObject) helper.getRootObject();
@@ -337,32 +338,19 @@ public class PeriodicUploadingLearnerDataTest
 		OTBasicTestObject child3 = helper.createObject(OTBasicTestObject.class);
 		child3.setName("Child 3");
 		
-		logger.info("Setting root => child1");
 		root.setReference(child1);
-		logger.info("Setting child1 => child2");
 		child1.setReference(child2);
-		logger.info("Setting child2 => child3");
 		child2.setReference(child3);
-
-		logger.info("   Root id: " +   root.getGlobalId() + "\n");
-		logger.info("Child 1 id: " + child1.getGlobalId() + "\n");
-		logger.info("Child 2 id: " + child2.getGlobalId() + "\n");
-		logger.info("Child 3 id: " + child3.getGlobalId() + "\n");
 		
 		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-created-initial.xml", helper.getExportedReferenceMapDb());
-		
-		logger.info("rotating");
+
 		rotate();
 		
 		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-clean.xml", helper.getExportedReferenceMapDb());
-		
 
-		logger.info("Setting child 3 string");
 		child3.setString("Something changed, too");
 		
 		verifyOutputRegexpOtml("/exporter-jdom-expected-results/rotated-multiple-created-changed.xml", helper.getExportedReferenceMapDb());
-
-		logger.info("\n\nFinished created test.\n\n");
 	}
 	
 	@Test
@@ -376,6 +364,113 @@ public class PeriodicUploadingLearnerDataTest
 		// TODO Configure capturing requests and make sure the requests look correct.
 //		System.setProperty(OTConfig.PERIODIC_UPLOADING_USER_DATA_URL, driver.getBaseUrl() + "/bundles");
 		testOnlyChangedObjectGetWrittenImpl(true);
+	}
+	
+	@Test
+	public void testCreatedObjectsMaintainConsistentIds() throws Exception {
+		helper.initOTrunk(OTMultiReferenceTestObject.class);
+		
+		OTMultiReferenceTestObject root = (OTMultiReferenceTestObject) helper.getRootObject();
+		root.setName("Root");
+		
+		OTBasicTestObject child1 = helper.createObject(OTBasicTestObject.class);
+		child1.setName("Child 1");
+		
+		OTMultiReferenceTestObject child2 = helper.createObject(OTMultiReferenceTestObject.class);
+		child2.setName("Child 2");
+		
+		OTMultiReferenceTestObject child3 = helper.createObject(OTMultiReferenceTestObject.class);
+		child3.setName("Child 3");
+		
+		OTID child1Id = child1.getGlobalId();
+		OTID child2Id = child2.getGlobalId();
+		
+		root.setReference(child3);
+		root.setData(child2);
+		root.setStuff(child1);
+		
+		child3.setReference(child1);
+		child3.setObject(child2);
+
+		String expected1 = ".*<OTBasicTestObject id=\"" + child1Id.getMappedId().toExternalForm() + "\" name=\"Child 1\" />.*";
+		String expected2 = ".*<OTMultiReferenceTestObject id=\"" + child2Id.getMappedId().toExternalForm() + "\" name=\"Child 2\" />.*";
+		String expected3 = ".*<object refid=\"" + child2Id.getMappedId().toExternalForm() + "\" />.*";
+		String expected4 = ".*<object refid=\"" + child1Id.getMappedId().toExternalForm() + "\" />.*";
+
+		verifyOutputRegexpOtml(expected1, helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml(expected2, helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml(expected3, helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml(expected4, helper.getExportedReferenceMapDb());
+		
+		rotate();
+		
+		root.setName("Something different");
+		
+		verifyOutputRegexpOtml(expected1, helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml(expected2, helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml(expected3, helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml(expected4, helper.getExportedReferenceMapDb());
+		
+		rotate();
+		
+		child3.setName("A new name");
+		
+		verifyOutputRegexpOtml(expected1, helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml(expected2, helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml(expected3, helper.getExportedReferenceMapDb());
+		verifyOutputRegexpOtml(expected4, helper.getExportedReferenceMapDb());
+	}
+	
+	@Test
+	public void testCreatedObjectsWithMultipleParentsAlwaysExportId() throws Exception {
+		helper.initOTrunk(OTMultiReferenceTestObject.class);
+
+		// Authored tree setup
+		OTMultiReferenceTestObject authoredRoot = (OTMultiReferenceTestObject) helper.getAuthoredRootObject();
+		authoredRoot.setName("Root");
+		
+		OTMultiReferenceTestObject authoredChild3 = helper.createObject(OTMultiReferenceTestObject.class, authoredRoot);
+		authoredChild3.setName("Child 3");
+		
+		OTMultiReferenceTestObject authoredChild4 = helper.createObject(OTMultiReferenceTestObject.class, authoredRoot);
+		authoredChild4.setName("Child 4");
+		
+		authoredRoot.setReference(authoredChild3);
+		authoredRoot.setData(authoredChild4);
+		
+		// Student data manipulation
+		
+		OTMultiReferenceTestObject root = (OTMultiReferenceTestObject) helper.getRootObject();
+		OTMultiReferenceTestObject child3 = (OTMultiReferenceTestObject) root.getReference();
+		OTMultiReferenceTestObject child4 = (OTMultiReferenceTestObject) root.getData();
+		
+		OTBasicTestObject child1 = helper.createObject(OTBasicTestObject.class);
+		child1.setName("Child 1");
+		
+		OTID child1Id = child1.getGlobalId();
+
+		child3.setReference(child1);
+		
+		String expected1 = ".*<entry key=\"" + child3.getGlobalId().getMappedId().toExternalForm() + "\">.*<reference>.*<OTBasicTestObject name=\"Child 1\" />.*</reference>.*</entry>.*";
+		verifyOutputRegexpOtml(expected1, helper.getExportedReferenceMapDb());
+		
+		rotate();
+
+		child4.setData(child1);
+		
+		String expected2 = ".*<entry key=\"" + child4.getGlobalId().getMappedId().toExternalForm() + "\">.*<data>.*<OTBasicTestObject id=\"" + child1Id.getMappedId().toExternalForm() + "\" name=\"Child 1\" />.*</data>.*</entry>.*";
+		verifyOutputRegexpOtml(expected2, helper.getExportedReferenceMapDb());
+		
+		rotate();
+		
+		child3.setReference(null);
+		child4.setData(null);
+		child3.setReference(child1);
+		child4.setData(child1);
+		
+		String expected3a = ".*<entry key=\"" + child3.getGlobalId().getMappedId().toExternalForm() + "\">.*<reference>.*<OTBasicTestObject id=\"" + child1Id.getMappedId().toExternalForm() + "\" name=\"Child 1\" />.*</reference>.*</entry>.*";
+		String expected3b = "<entry key=\"" + child4.getGlobalId().getMappedId().toExternalForm() + "\">.*<data>.*<object refid=\"" + child1Id.getMappedId().toExternalForm() + "\" />.*</data>.*</entry>.*";
+		verifyOutputRegexpOtml(expected3a + expected3b, helper.getExportedReferenceMapDb());
 	}
 	
 	private void testOnlyChangedObjectGetWrittenImpl(boolean checkHttp) throws Exception {
@@ -472,6 +567,7 @@ public class PeriodicUploadingLearnerDataTest
 	private void verifyOutputRegexpOtml(String expectedResource, String actualOutput) throws Exception {
 		verifyOutputRegexpOtml(expectedResource, actualOutput, "");
 	}
+	
 	private void verifyOutputRegexpOtml(String expectedResource, String actualOutput, String as) throws Exception {
 		String expectedOutput = getExpectedOutput(expectedResource);
 		Pattern regexp = Pattern.compile(expectedOutput, Pattern.DOTALL | Pattern.MULTILINE);
@@ -487,6 +583,10 @@ public class PeriodicUploadingLearnerDataTest
         throws IOException
     {
 	    URL expectedUrl = PeriodicUploadingLearnerDataTest.class.getResource(expectedResource);
+	    if (expectedUrl == null) {
+	    	// assume that we weren't passed a resource after all, but an actual expected value
+	    	return expectedResource;
+	    }
 		BufferedReader in = new BufferedReader(new InputStreamReader(expectedUrl.openStream()));
 		StringBuffer expectedOutput = new StringBuffer();
         String line;

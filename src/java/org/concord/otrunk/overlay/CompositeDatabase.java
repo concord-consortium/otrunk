@@ -169,6 +169,7 @@ public class CompositeDatabase
         	new CompositeDataObject(childObject, this, null, false);
         activeOverlay.registerNonDeltaObject(childObject);
         dataObjectMap.put(compositeDataObject.getGlobalId(), compositeDataObject);
+        dataObjectMap.put(childObject.getGlobalId(), compositeDataObject);
         //System.out.println("v3. " + userDataObject.getGlobalId());
         return compositeDataObject;
     }

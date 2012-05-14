@@ -467,6 +467,9 @@ public class CompositeDataObject
             		}
             		newBase.setContainer(baseObject.getContainer());
             		newBase.setContainerResourceKey(baseObject.getContainerResourceKey());
+            		if (newBase instanceof XMLDataObject && baseObject instanceof XMLDataObject) {
+            			((XMLDataObject)newBase).setPreserveUUID(((XMLDataObject) baseObject).isPreserveUUID());
+            		}
             		baseObject = newBase;
     			}
     		} catch (Exception e) {
