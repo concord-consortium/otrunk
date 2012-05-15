@@ -593,9 +593,11 @@ public class PeriodicUploadingLearnerDataTest
         while ((line = in.readLine()) != null) {
         	line = line.replaceAll("\\s{2,}", "\\\\s+");
             expectedOutput.append(line);
-            expectedOutput.append(System.getProperty("line.separator"));
+            expectedOutput.append("\\s");
+            // expectedOutput.append(System.getProperty("line.separator"));
         }
-        expectedOutput.setLength(expectedOutput.length()-System.getProperty("line.separator").length());
+        expectedOutput.setLength(expectedOutput.length()-2);
+        // expectedOutput.setLength(expectedOutput.length()-System.getProperty("line.separator").length());
         in.close();
 	    return expectedOutput.toString();
     }
