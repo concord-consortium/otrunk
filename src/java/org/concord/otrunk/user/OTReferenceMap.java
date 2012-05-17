@@ -93,7 +93,9 @@ public class OTReferenceMap extends DefaultOTObject
         return resources.getUser();
     }
     
-    
+    public OTResourceMap getMap() {
+    	return resources.getMap();
+    }
     
     public String getWorkgroupId()
     {

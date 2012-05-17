@@ -1,14 +1,18 @@
 package org.concord.otrunk.overlay;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
+import org.concord.framework.otrunk.OTResourceMap;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectFinder;
 import org.concord.otrunk.datamodel.OTDataPropertyReference;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
+import org.concord.otrunk.xml.XMLDataList;
+import org.concord.otrunk.xml.XMLDataMap;
 import org.concord.otrunk.xml.XMLDataObject;
 
 public class RotatingReferenceMapDatabase extends CompositeDatabase
@@ -20,8 +24,61 @@ public class RotatingReferenceMapDatabase extends CompositeDatabase
     {
 	    super(objectFinder, activeOverlay);
 	    this.originalReferenceMap = activeOverlay;
+	    
+	    registerNonDeltaObjects(activeOverlay);
     }
 	
+    // we need to find and record all of the non-delta objects in this base active overlay
+    // so that later when we rotate, they'll be properly pulled up into the new layer
+	private void registerNonDeltaObjects(OTReferenceMap activeOverlay)
+    {
+	    OTResourceMap map = activeOverlay.getMap();
+	    for (String key : map.getKeys()) {
+	    	Object value = map.get(key);
+	    	if (value instanceof OTID) {
+	    		recursivelyResolve((OTID) value);
+	    	}
+	    }
+    }
+	
+	private ArrayList<OTID> resolvedIds = new ArrayList<OTID>();
+	private void recursivelyResolve(OTID id) {
+		if (resolvedIds.contains(id)) {
+			return;
+		}
+		resolvedIds.add(id);
+		try {
+    		OTDataObject otDataObject = getOTDataObject(null, id);
+    		if (otDataObject != null) {
+        		for (String k : otDataObject.getResourceKeys()) {
+        			Object child = otDataObject.getResource(k);
+        			if (child instanceof OTID) {
+        				recursivelyResolve((OTID) child);
+        			} else if (child instanceof XMLDataList) {
+        				XMLDataList list = (XMLDataList) child;
+        				for (int i = 0; i < list.size(); i++) {
+        					Object o = list.get(i);
+        					if (o instanceof OTID) {
+        						recursivelyResolve((OTID) o);
+        					}
+        				}
+        			} else if (child instanceof XMLDataMap) {
+        				XMLDataMap map = (XMLDataMap) child;
+        				for (String key : map.getKeys()) {
+        					Object o = map.get(key);
+        					if (o instanceof OTID) {
+        						recursivelyResolve((OTID) o);
+        					}
+        				}
+        			}
+        		}
+    		}
+		} catch (Exception e) {
+			// failed to find the data object for this id
+			logger.log(Level.WARNING, "Failed to find data object for id: " + id.toString(), e);
+		}
+	}
+
 	@Override
 	public OTDataObject getRoot() throws Exception
 	{
