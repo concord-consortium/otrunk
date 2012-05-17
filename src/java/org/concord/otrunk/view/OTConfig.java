@@ -1,9 +1,15 @@
 package org.concord.otrunk.view;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.AccessControlException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class OTConfig
 {
+	private final static Logger logger = Logger.getLogger(OTConfig.class.getName());
+	
 	public final static int MULTIPLE_USER_MODE = 2;
 	public final static int SINGLE_USER_MODE = 1;
 	public final static int NO_USER_MODE = 0;
@@ -42,6 +48,7 @@ public class OTConfig
 	public static final String PERIODIC_UPLOADING_USER_DATA = "otrunk.periodic.uploading.enabled";
 	public static final String PERIODIC_UPLOADING_USER_DATA_URL = "otrunk.periodic.uploading.url";
 	public static final String PERIODIC_UPLOADING_USER_DATA_INTERVAL = "otrunk.periodic.uploading.interval";
+	public static final String SESSION_END_NOTIFICATION_URL = "otrunk.session_end.notification.url";
 
 	/**
      * This method should be used to read properties because in some places
@@ -172,8 +179,8 @@ public class OTConfig
 		return getBooleanProp(PERIODIC_UPLOADING_USER_DATA, false);
     }
 	
-	public static String getPeriodicUploadingUserDataUrl() {
-		return getStringProp(PERIODIC_UPLOADING_USER_DATA_URL, null);
+	public static URL getPeriodicUploadingUserDataUrl() {
+		return getUrl(PERIODIC_UPLOADING_USER_DATA_URL);
 	}
 	
 	public static int getPeriodicUploadingUserDataInterval() {
@@ -183,5 +190,22 @@ public class OTConfig
 			i = Integer.parseInt(in);
 		} catch (NumberFormatException e) { }
 		return i;
+	}
+	
+	public static URL getSessionEndNotificationUrl() {
+		return getUrl(SESSION_END_NOTIFICATION_URL);
+	}
+	
+	private static URL getUrl(String prop) {
+		String urlStr = getStringProp(prop, null);
+		URL url = null;
+		if (urlStr != null) {
+			try {
+	            url = new URL(urlStr);
+            } catch (MalformedURLException e) {
+	            logger.log(Level.INFO, "Invalid url (" + urlStr + ") for property: " + prop, e);
+            }
+		}
+		return url;
 	}
 }

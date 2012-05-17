@@ -354,6 +354,45 @@ public class OTrunkImpl implements OTrunk
 		if (rotateTask != null) {
 			rotateTask.run();
 		}
+		URL notificationUrl = OTConfig.getSessionEndNotificationUrl();
+		if (notificationUrl != null) {
+			try {
+				// TODO Try to DRY this up with the remoteSaveData code
+    			HttpURLConnection urlConn = (HttpURLConnection) notificationUrl.openConnection();
+    	    	urlConn.setDoInput(true);
+    	    	urlConn.setDoOutput(true);
+    	    	urlConn.setUseCaches(false);
+    	    	urlConn.setRequestMethod("POST");
+    	    	urlConn.setRequestProperty("Content-Type", "application/xml");
+    	    
+    	    	// Send POST output.
+    	    	DataOutputStream urlDataOut = new DataOutputStream(urlConn.getOutputStream());
+    	    	urlDataOut.writeBytes("<session-ended/>");
+    	    	urlDataOut.flush();
+    	    	urlDataOut.close();
+    	    
+    	    	// Get response data.
+    	    	BufferedReader urlDataIn =
+    	    	    new BufferedReader(new InputStreamReader(new DataInputStream(
+    	    	        urlConn.getInputStream())));
+    	    	String str;
+    	    	String response = "";
+    	    	while (null != ((str = urlDataIn.readLine()))) {
+    	    		response += str + "\n";
+    	    	}
+    	    	urlDataIn.close();
+    	    	// Need to trap non-HTTP 200/300 responses and throw an exception (if an
+    	    	// exception isn't thrown already) and capture the exceptions upstream
+    	    	int code = urlConn.getResponseCode();
+    	    	if (code >= 400) {
+    	    		logger.info("Failed to post session end notification to url: " + notificationUrl.toExternalForm());
+    	    		logger.info("Response code: " + code + ", response: " + response);
+    	    	}
+    	    	urlConn.disconnect();
+			} catch (IOException e) {
+				logger.log(Level.INFO, "Failed to post session end notification to url: " + notificationUrl.toExternalForm(), e);
+			}
+		}
 		rootDb.close();
 	}
 	
@@ -670,8 +709,9 @@ public class OTrunkImpl implements OTrunk
     
     public OTReferenceMap rotateAndSaveUserDatabase(RotatingReferenceMapDatabase db) throws Exception {
         OTReferenceMap oldActiveOverlay = rotateUserDatabase(db);
-        if (OTConfig.getPeriodicUploadingUserDataUrl() != null) {
-        	remoteSaveData(oldActiveOverlay.getOverlayDatabase(), new URL(OTConfig.getPeriodicUploadingUserDataUrl()), "POST");
+        URL saveUrl = OTConfig.getPeriodicUploadingUserDataUrl();
+		if (saveUrl != null) {
+        	remoteSaveData(oldActiveOverlay.getOverlayDatabase(), saveUrl, "POST");
         }
         return oldActiveOverlay;
     }
