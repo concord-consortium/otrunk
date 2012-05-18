@@ -125,7 +125,7 @@ public class OTMLUserSession
         	aUser.setName(userName);
         }
         
-		otrunk.registerReferenceMap(getReferenceMap());
+		otrunk.registerReferenceMap(getReferenceMap(), this);
 		
 		// just loading the database shouldn't cause it to have changes that need
 		// saving.  If the user name was set that would be change.
@@ -210,7 +210,7 @@ public class OTMLUserSession
         userStateMapMap.putObject(userId.toExternalForm(), refMap);
         refMap.setUser(userObject);
 
-        otrunk.registerReferenceMap(refMap);
+        otrunk.registerReferenceMap(refMap, this);
 
 		userDataDB.setDirty(false);
 
@@ -314,6 +314,17 @@ public class OTMLUserSession
 	public OTDatabase getUserDataDb()
     {
 		return userDataDB;
+    }
+	
+	/**
+	 * Set the user data db to a different db. This is used by the periodic bundle uploading
+	 * so that the "Save As..." menu action will save the current layer of student data, and not
+	 * the layer that was originally loaded in.
+	 * @param db
+	 */
+	public void setUserDataDb(XMLDatabase db)
+    {
+		userDataDB = db;
     }
 
 	protected void initUserDb(XMLDatabase userDataDb) 

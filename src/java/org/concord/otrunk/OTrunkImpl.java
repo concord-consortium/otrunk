@@ -646,11 +646,11 @@ public class OTrunkImpl implements OTrunk
         
         // PUB Need to handle making sure all of the rotated layers still get included in the new database!
 
-        registerReferenceMap(refMap);
+        registerReferenceMap(refMap, userSession);
     	
     }
     
-    public OTObjectService registerReferenceMap(OTReferenceMap userStateMap)
+    public OTObjectService registerReferenceMap(OTReferenceMap userStateMap, OTUserSession session)
     throws Exception
     {
     	OTObjectServiceImpl userObjService;
@@ -664,7 +664,7 @@ public class OTrunkImpl implements OTrunk
     	    	
         CompositeDatabase userDb;
         if (OTConfig.isPeriodicUploadingUserDataEnabled()) {
-        	userDb = new RotatingReferenceMapDatabase(dataObjectFinder, userStateMap);
+        	userDb = new RotatingReferenceMapDatabase(dataObjectFinder, userStateMap, session);
         } else {
         	userDb = new CompositeDatabase(dataObjectFinder, userStateMap);
         }

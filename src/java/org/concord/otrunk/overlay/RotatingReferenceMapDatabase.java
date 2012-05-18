@@ -11,19 +11,24 @@ import org.concord.otrunk.datamodel.OTDataObjectFinder;
 import org.concord.otrunk.datamodel.OTDataPropertyReference;
 import org.concord.otrunk.user.OTReferenceMap;
 import org.concord.otrunk.user.OTUserObject;
+import org.concord.otrunk.view.OTMLUserSession;
+import org.concord.otrunk.view.OTUserSession;
 import org.concord.otrunk.xml.XMLDataList;
 import org.concord.otrunk.xml.XMLDataMap;
 import org.concord.otrunk.xml.XMLDataObject;
+import org.concord.otrunk.xml.XMLDatabase;
 
 public class RotatingReferenceMapDatabase extends CompositeDatabase
 {
 	private static final Logger logger = Logger.getLogger(RotatingReferenceMapDatabase.class.getName());
 	private OTReferenceMap originalReferenceMap;
+	private OTUserSession userSession;
 	
-	public RotatingReferenceMapDatabase(OTDataObjectFinder objectFinder, OTReferenceMap activeOverlay)
+	public RotatingReferenceMapDatabase(OTDataObjectFinder objectFinder, OTReferenceMap activeOverlay, OTUserSession userSession)
     {
 	    super(objectFinder, activeOverlay);
 	    this.originalReferenceMap = activeOverlay;
+	    this.userSession = userSession;
 	    
 	    registerNonDeltaObjects(activeOverlay);
     }
@@ -95,6 +100,10 @@ public class RotatingReferenceMapDatabase extends CompositeDatabase
 		
 		this.activeOverlay = newActiveReferenceMap;
 		this.activeOverlayDb = newActiveReferenceMap.getOverlayDatabase();
+		
+		if (userSession instanceof OTMLUserSession && this.activeOverlayDb instanceof XMLDatabase) {
+			((OTMLUserSession) userSession).setUserDataDb((XMLDatabase) this.activeOverlayDb);
+		}
 		
 		setPullAllAttributesIntoCurrentLayer(true);
 		
