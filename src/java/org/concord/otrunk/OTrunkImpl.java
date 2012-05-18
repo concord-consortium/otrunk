@@ -352,9 +352,16 @@ public class OTrunkImpl implements OTrunk
 	public void close()
 	{
 		if (rotateTask != null) {
+			System.out.println("Running rotate task.");
 			rotateTask.run();
 		}
-		URL notificationUrl = OTConfig.getSessionEndNotificationUrl();
+		notifySessionClosed();
+		rootDb.close();
+	}
+
+	private void notifySessionClosed()
+    {
+	    URL notificationUrl = OTConfig.getSessionEndNotificationUrl();
 		if (notificationUrl != null) {
 			try {
 				// TODO Try to DRY this up with the remoteSaveData code
@@ -393,8 +400,7 @@ public class OTrunkImpl implements OTrunk
 				logger.log(Level.INFO, "Failed to post session end notification to url: " + notificationUrl.toExternalForm(), e);
 			}
 		}
-		rootDb.close();
-	}
+    }
 	
 	/**
 	 * Warning: this is method should only be used when you don't know
@@ -695,6 +701,10 @@ public class OTrunkImpl implements OTrunk
         userObjectServices.remove(userId);
         
         deltaDatabases.remove(userDb);
+        
+        // Right now we don't really support unloading a session and loading a new one,
+        // so under typical usage this should only get called when the app is closing.
+        notifySessionClosed();
     }
     
     public OTReferenceMap rotateUserDatabase(RotatingReferenceMapDatabase db) throws Exception {
