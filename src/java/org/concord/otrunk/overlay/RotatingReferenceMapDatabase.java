@@ -1,5 +1,7 @@
 package org.concord.otrunk.overlay;
 
+import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -90,28 +92,46 @@ public class RotatingReferenceMapDatabase extends CompositeDatabase
 	    return activeOverlayDb.getRoot();
 	}
 	
-	public OTReferenceMap rotate(OTReferenceMap newActiveReferenceMap) {
-		newActiveReferenceMap.setUser(getUser());
-		newActiveReferenceMap.setWorkgroupId(getWorkgroupId());
-		newActiveReferenceMap.setWorkgroupToken(getWorkgroupToken());
-		
-		// Set a new activedb and activeoverlay
-		OTReferenceMap oldActiveReferenceMap = (OTReferenceMap) this.activeOverlay;
-		
-		this.activeOverlay = newActiveReferenceMap;
-		this.activeOverlayDb = newActiveReferenceMap.getOverlayDatabase();
-		
-		if (userSession instanceof OTMLUserSession && this.activeOverlayDb instanceof XMLDatabase) {
-			((OTMLUserSession) userSession).setUserDataDb((XMLDatabase) this.activeOverlayDb);
+	public OTReferenceMap rotate(final OTReferenceMap newActiveReferenceMap) {
+		final OTReferenceMap oldActiveReferenceMap = (OTReferenceMap) this.activeOverlay;
+
+		Runnable rotator = new Runnable() {
+	        public void run()
+	        {
+				newActiveReferenceMap.setUser(getUser());
+				newActiveReferenceMap.setWorkgroupId(getWorkgroupId());
+				newActiveReferenceMap.setWorkgroupToken(getWorkgroupToken());
+				
+				// Set a new activedb and activeoverlay
+				activeOverlay = newActiveReferenceMap;
+				activeOverlayDb = newActiveReferenceMap.getOverlayDatabase();
+				
+				if (userSession instanceof OTMLUserSession && activeOverlayDb instanceof XMLDatabase) {
+					((OTMLUserSession) userSession).setUserDataDb((XMLDatabase) activeOverlayDb);
+				}
+				
+				setPullAllAttributesIntoCurrentLayer(true);
+				
+				// Move the old activeoverlay into the middle deltas
+				pushMiddleOverlay(oldActiveReferenceMap);
+				
+				// Update all of the existing composite data objects to refresh their middle deltas
+				pushMiddleDeltas();
+	        }
+        };
+		if (! EventQueue.isDispatchThread()) {
+			try {
+	            EventQueue.invokeAndWait(rotator);
+            } catch (InterruptedException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+            } catch (InvocationTargetException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+            }
+		} else {
+			rotator.run();
 		}
-		
-		setPullAllAttributesIntoCurrentLayer(true);
-		
-		// Move the old activeoverlay into the middle deltas
-		pushMiddleOverlay(oldActiveReferenceMap);
-		
-		// Update all of the existing composite data objects to refresh their middle deltas
-		pushMiddleDeltas();
 
 		return oldActiveReferenceMap;
 	}
