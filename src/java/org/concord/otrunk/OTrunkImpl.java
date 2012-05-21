@@ -53,6 +53,7 @@ import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -354,6 +355,7 @@ public class OTrunkImpl implements OTrunk
 		if (rotateTask != null) {
 			System.out.println("Running rotate task.");
 			rotateTask.run();
+        	queueUploaderTask.run();
 		}
 		notifySessionClosed();
 		rootDb.close();
@@ -692,6 +694,8 @@ public class OTrunkImpl implements OTrunk
         if (rotateTask != null) {
         	rotateTask.run();
         	rotateTask.cancel();
+        	queueUploaderTask.run();
+        	queueUploaderTask.cancel();
         }
         
     	OTUser user = userStateMap.getUser();
@@ -717,16 +721,15 @@ public class OTrunkImpl implements OTrunk
     	return oldActiveReferenceMap;
     }
     
+    ConcurrentLinkedQueue<OTReferenceMap> uploadQueue = new ConcurrentLinkedQueue<OTReferenceMap>();
     public OTReferenceMap rotateAndSaveUserDatabase(RotatingReferenceMapDatabase db) throws Exception {
         OTReferenceMap oldActiveOverlay = rotateUserDatabase(db);
-        URL saveUrl = OTConfig.getPeriodicUploadingUserDataUrl();
-		if (saveUrl != null) {
-        	remoteSaveData(oldActiveOverlay.getOverlayDatabase(), saveUrl, "POST");
-        }
+        uploadQueue.add(oldActiveOverlay);
         return oldActiveOverlay;
     }
     
     TimerTask rotateTask = null;
+    TimerTask queueUploaderTask = null;
     private void setupPeriodicUploading(final RotatingReferenceMapDatabase db) throws Exception {
 	    // Rotate the db to set up the current active layer
     	OTReferenceMap oldActiveReferenceMap = rotateUserDatabase(db);
@@ -745,11 +748,68 @@ public class OTrunkImpl implements OTrunk
                 }
 			}
 		};
+		
+		queueUploaderTask = new TimerTask() {
+			@Override
+			public void run()
+			{
+		    	// Set up a time-based task for:
+		    	  // Rotating
+		    	  // Uploading old rotated layers
+                URL saveUrl = OTConfig.getPeriodicUploadingUserDataUrl();
+        		if (saveUrl != null) {
+        			OTReferenceMap refMap = null;
+        			synchronized(uploadQueue) {
+    			    	try {
+    			    		// Work through the queue, but if we have any problems uploading, abort processing anything else, and leave the
+    			    		// problematic reference map in the queue to be tried again later.
+    		    			while ((refMap = uploadQueue.peek()) != null) {
+    		    				remoteSaveData(refMap.getOverlayDatabase(), saveUrl, "POST");
+    		    				uploadQueue.remove();
+    		    				notifyPeriodicUploadingEventListeners(refMap, null);
+    		    			}
+    	                } catch (Exception e) {
+    		                logger.log(Level.SEVERE, "Failed to rotate and save user learner database!", e);
+    		                // We need to put up some sort of indication to the user that things aren't saving...
+		    				notifyPeriodicUploadingEventListeners(refMap, e);
+    	                }
+        			}
+                }
+			}
+		};
+		
 	    Timer globalTimer = getGlobalTimer();
 	    
 	    // Every so often, rotate and save
 	    int interval = OTConfig.getPeriodicUploadingUserDataInterval();
 	    globalTimer.schedule(rotateTask, interval, interval);
+	    globalTimer.schedule(queueUploaderTask, interval, interval+20000);
+    }
+    
+    public void triggerPeriodicUploading() {
+    	queueUploaderTask.run();
+    }
+    
+    private ArrayList<PeriodicUploadingEventListener> periodicUploadingEventListeners = new ArrayList<PeriodicUploadingEventListener>();
+    public void addPeriodicUploadingEventListener(PeriodicUploadingEventListener listener) {
+    	if (! periodicUploadingEventListeners.contains(listener)) {
+    		periodicUploadingEventListeners.add(listener);
+    	}
+    }
+    
+    public void removePeriodicUploadingEventListener(PeriodicUploadingEventListener listener) {
+    	periodicUploadingEventListeners.remove(listener);
+    }
+    
+    public void notifyPeriodicUploadingEventListeners(OTReferenceMap refMap, Exception e) {
+    	for (PeriodicUploadingEventListener l : periodicUploadingEventListeners) {
+        	if (e == null) {
+        		// this means a successful upload
+        		l.uploadSucceeded(refMap);
+        	} else {
+        		l.uploadFailed(refMap, e);
+        	}
+    	}
     }
 
 	private Timer getGlobalTimer()

@@ -640,6 +640,9 @@ public class OTViewer extends JFrame
 
         if (OTConfig.isShowStatus()) {
             final JLabel saveStateLabel = new JLabel("File saved");
+        	final PeriodicUploadingStatusPanel periodicUploadingStatusPanel = new PeriodicUploadingStatusPanel();
+			statusPanel.add(periodicUploadingStatusPanel);
+        	statusPanel.add(Box.createHorizontalStrut(5));
             statusPanel.add(saveStateLabel);
             statusPanel.add(Box.createHorizontalStrut(20));
             statusPanel.add(new MemoryMonitorPanel());
@@ -650,12 +653,14 @@ public class OTViewer extends JFrame
                 @Override
                 public void run()
                 {
-                    while (xmlDB == null) {
+                    while (xmlDB == null && otrunk == null) {
                         try {
                             sleep(1000);
                         } catch (Exception e) {
                         }
                     }
+                    
+                    periodicUploadingStatusPanel.setOtrunk(otrunk);
                     
                     xmlDB.addXMLDatabaseChangeListener(new XMLDatabaseChangeListener() {
 
