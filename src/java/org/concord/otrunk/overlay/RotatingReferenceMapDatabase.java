@@ -98,25 +98,30 @@ public class RotatingReferenceMapDatabase extends CompositeDatabase
 		Runnable rotator = new Runnable() {
 	        public void run()
 	        {
-				newActiveReferenceMap.setUser(getUser());
-				newActiveReferenceMap.setWorkgroupId(getWorkgroupId());
-				newActiveReferenceMap.setWorkgroupToken(getWorkgroupToken());
-				
-				// Set a new activedb and activeoverlay
-				activeOverlay = newActiveReferenceMap;
-				activeOverlayDb = newActiveReferenceMap.getOverlayDatabase();
-				
-				if (userSession instanceof OTMLUserSession && activeOverlayDb instanceof XMLDatabase) {
-					((OTMLUserSession) userSession).setUserDataDb((XMLDatabase) activeOverlayDb);
-				}
-				
-				setPullAllAttributesIntoCurrentLayer(true);
-				
-				// Move the old activeoverlay into the middle deltas
-				pushMiddleOverlay(oldActiveReferenceMap);
-				
-				// Update all of the existing composite data objects to refresh their middle deltas
-				pushMiddleDeltas();
+	    		try {
+	    			writeLock();
+    				newActiveReferenceMap.setUser(getUser());
+    				newActiveReferenceMap.setWorkgroupId(getWorkgroupId());
+    				newActiveReferenceMap.setWorkgroupToken(getWorkgroupToken());
+    				
+    				// Set a new activedb and activeoverlay
+    				activeOverlay = newActiveReferenceMap;
+    				activeOverlayDb = newActiveReferenceMap.getOverlayDatabase();
+    				
+    				if (userSession instanceof OTMLUserSession && activeOverlayDb instanceof XMLDatabase) {
+    					((OTMLUserSession) userSession).setUserDataDb((XMLDatabase) activeOverlayDb);
+    				}
+    				
+    				setPullAllAttributesIntoCurrentLayer(true);
+    				
+    				// Move the old activeoverlay into the middle deltas
+    				pushMiddleOverlay(oldActiveReferenceMap);
+    				
+    				// Update all of the existing composite data objects to refresh their middle deltas
+    				pushMiddleDeltas();
+	    		} finally {
+	    			writeUnlock();
+	    		}
 	        }
         };
 		if (! EventQueue.isDispatchThread()) {

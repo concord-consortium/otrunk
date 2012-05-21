@@ -141,29 +141,34 @@ public class CompositeDataObject
 	 */
 	public Object getResource(String key)
 	{
-		// If we are not a composite then do the basic thing
-		if(!composite){
-			return baseObject.getResource(key);
+		try {
+			database.readLock();
+    		// If we are not a composite then do the basic thing
+    		if(!composite){
+    			return baseObject.getResource(key);
+    		}
+    		
+    		// first look in the userObject
+    		// then look in the middle deltas
+    		// then look in the authoringObject
+    
+    		Object value = null;
+    		OTDataObject localActiveDelta = getActiveDeltaObject();
+    		if (localActiveDelta != null) {
+    			value = localActiveDelta.getResource(key);
+    			if(value != null) {
+    				return value;
+    			} else if(localActiveDelta.containsKey(key)){
+    				// check if the localActiveDelta contains this key in which we should
+    				// return null, otherwise we should go on down the line
+    				return null;
+    			}
+    		}
+    
+    		return getNonActiveDeltaResource(key);
+		} finally {
+			database.readUnlock();
 		}
-		
-		// first look in the userObject
-		// then look in the middle deltas
-		// then look in the authoringObject
-
-		Object value = null;
-		OTDataObject localActiveDelta = getActiveDeltaObject();
-		if (localActiveDelta != null) {
-			value = localActiveDelta.getResource(key);
-			if(value != null) {
-				return value;
-			} else if(localActiveDelta.containsKey(key)){
-				// check if the localActiveDelta contains this key in which we should
-				// return null, otherwise we should go on down the line
-				return null;
-			}
-		}
-
-		return getNonActiveDeltaResource(key);
 	}
 
 	public Object getNonActiveDeltaResource(String key)
@@ -194,48 +199,57 @@ public class CompositeDataObject
 	 */
 	public String[] getResourceKeys()
 	{
-
-        HashMap<String, OTDataObject> keyTable = new HashMap<String, OTDataObject>();
-        OTDataObject localActiveDelta = getActiveDeltaObject();
-        if (localActiveDelta != null) {
-            String [] userKeys = localActiveDelta.getResourceKeys();
-            for (String userKey : userKeys) {
-                // we can put any object, but lets use the userObject
-                // so we might take advantage of that later
-                keyTable.put(userKey, localActiveDelta);
+		try {
+			database.readLock();
+            HashMap<String, OTDataObject> keyTable = new HashMap<String, OTDataObject>();
+            OTDataObject localActiveDelta = getActiveDeltaObject();
+            if (localActiveDelta != null) {
+                String [] userKeys = localActiveDelta.getResourceKeys();
+                for (String userKey : userKeys) {
+                    // we can put any object, but lets use the userObject
+                    // so we might take advantage of that later
+                    keyTable.put(userKey, localActiveDelta);
+                }
             }
-        }
-        
-		if(middleDeltas != null){
-			for (OTDataObject delta : middleDeltas) {
-	            String [] userKeys = delta.getResourceKeys();
-	            for (String userKey : userKeys) {
-	                keyTable.put(userKey, delta);
-	            }				
-			}
+            
+    		if(middleDeltas != null){
+    			for (OTDataObject delta : middleDeltas) {
+    	            String [] userKeys = delta.getResourceKeys();
+    	            for (String userKey : userKeys) {
+    	                keyTable.put(userKey, delta);
+    	            }				
+    			}
+    		}
+            
+            if(baseObject != null) {
+                String [] authorKeys = baseObject.getResourceKeys();
+                for (String key : authorKeys) {
+                	keyTable.put(key, baseObject);
+                }
+            }
+    
+            Set<String> keySet = keyTable.keySet();
+            String [] strKeys = new String [keySet.size()];
+            strKeys = keySet.toArray(strKeys);
+            return strKeys;
+		} finally {
+			database.readUnlock();
 		}
-        
-        if(baseObject != null) {
-            String [] authorKeys = baseObject.getResourceKeys();
-            for (String key : authorKeys) {
-            	keyTable.put(key, baseObject);
-            }
-        }
-
-        Set<String> keySet = keyTable.keySet();
-        String [] strKeys = new String [keySet.size()];
-        strKeys = keySet.toArray(strKeys);
-        return strKeys;
 	}
 
 	public OTDataObject getOrCreateActiveDeltaObject()
 	{
 		if(activeDeltaObject == null) {
-			activeDeltaObject = database.createActiveDeltaObject(baseObject);			
-			activeDeltaObject.setContainer(this.container);
-			activeDeltaObject.setContainerResourceKey(this.containerResourceKey);
-			if (database.shouldPullAllAttributesIntoCurrentLayer()) {
-				pullUpModifiedResources(activeDeltaObject);
+			try {
+				database.readLock();
+    			activeDeltaObject = database.createActiveDeltaObject(baseObject);			
+    			activeDeltaObject.setContainer(this.container);
+    			activeDeltaObject.setContainerResourceKey(this.containerResourceKey);
+    			if (database.shouldPullAllAttributesIntoCurrentLayer()) {
+    				pullUpModifiedResources(activeDeltaObject);
+    			}
+			} finally {
+				database.readUnlock();
 			}
 		}
 		
@@ -246,6 +260,16 @@ public class CompositeDataObject
 	 * @see org.concord.otrunk.OTDataObject#setResource(java.lang.String, java.lang.Object)
 	 */
 	public boolean setResource(String key, Object resource)
+	{
+		try {
+			database.readLock();
+			return realSetResource(key, resource);
+		} finally {
+			database.readUnlock();
+		}
+	}
+	
+	private boolean realSetResource(String key, Object resource)
 	{
 	    // Need to check if the object being passed in 
 	    // is a translated id that we created. If it is we want to strip off our translation
@@ -341,27 +365,32 @@ public class CompositeDataObject
     public <T extends OTDataCollection> T getResourceCollection(String key, 
 		Class<T> collectionClass)
 	{
-		OTDataCollection collection = resourceCollections.get(key);
-	    if(collection != null) {
-	        return (T)collection;
-	    }
-
-	    // Get the base list that a delta will be built against
-		Object resourceObj = getNonActiveDeltaResource(key);
-
-		// Create a wrapper list so changes to the list will create a new list resource in
-		// the active delta object.
-		if(collectionClass.equals(OTDataList.class)) {
-			collection =  
-				new CompositeDataList(this, (OTDataList)resourceObj, key, composite);
-		} else if(collectionClass.equals(OTDataMap.class)) {
-			collection =  
-				new CompositeDataMap(this, (OTDataMap)resourceObj, key, composite);
+		try {
+			database.readLock();
+    		OTDataCollection collection = resourceCollections.get(key);
+    	    if(collection != null) {
+    	        return (T)collection;
+    	    }
+    
+    	    // Get the base list that a delta will be built against
+    		Object resourceObj = getNonActiveDeltaResource(key);
+    
+    		// Create a wrapper list so changes to the list will create a new list resource in
+    		// the active delta object.
+    		if(collectionClass.equals(OTDataList.class)) {
+    			collection =  
+    				new CompositeDataList(this, (OTDataList)resourceObj, key, composite);
+    		} else if(collectionClass.equals(OTDataMap.class)) {
+    			collection =  
+    				new CompositeDataMap(this, (OTDataMap)resourceObj, key, composite);
+    		}
+    
+    		resourceCollections.put(key, collection);
+    
+    	    return (T)collection;
+		} finally {
+			database.readUnlock();
 		}
-
-		resourceCollections.put(key, collection);
-
-	    return (T)collection;
 	}
 
 	/**
@@ -410,30 +439,40 @@ public class CompositeDataObject
 	
 	public boolean hasOverrideInTopOverlay(String key)
 	{
-		OTDataObject deltaObject = getActiveDeltaObject();
-		if(deltaObject == null){
-			return false;
+		try {
+			database.readLock();
+    		OTDataObject deltaObject = getActiveDeltaObject();
+    		if(deltaObject == null){
+    			return false;
+    		}
+    		
+    		return deltaObject.containsKey(key);
+		} finally {
+			database.readUnlock();
 		}
-		
-		return deltaObject.containsKey(key);
 	}
 
 	public void removeOverrideInTopOverlay(String name)
     {
-		OTDataObject deltaObject = getActiveDeltaObject();
-		if(deltaObject == null){
-			logger.warning("Doesn't have a delta object");
-			return;
+		try {
+			database.readLock();
+    		OTDataObject deltaObject = getActiveDeltaObject();
+    		if(deltaObject == null){
+    			logger.warning("Doesn't have a delta object");
+    			return;
+    		}
+    		
+    		if(!(deltaObject instanceof XMLDataObject)){
+    			logger.warning("Can only remove overrides on xml data objects");
+    			return;			
+    		}
+    		
+    		((XMLDataObject)deltaObject).setSaveNulls(false);
+    		deltaObject.setResource(name, null);
+    		((XMLDataObject)deltaObject).setSaveNulls(true);
+		} finally {
+			database.readUnlock();
 		}
-		
-		if(!(deltaObject instanceof XMLDataObject)){
-			logger.warning("Can only remove overrides on xml data objects");
-			return;			
-		}
-		
-		((XMLDataObject)deltaObject).setSaveNulls(false);
-		deltaObject.setResource(name, null);
-		((XMLDataObject)deltaObject).setSaveNulls(true);		
     }
 
 	void setMiddleDeltas(OTDataObject [] middleDeltas)
@@ -456,8 +495,13 @@ public class CompositeDataObject
 	 */
 	public boolean isModified() {
 		if (composite) {
-			if (getActiveDeltaObject() != null) {
-				return true;
+			try {
+				database.readLock();
+    			if (getActiveDeltaObject() != null) {
+    				return true;
+    			}
+			} finally {
+				database.readUnlock();
 			}
 		} else {
 			return true;

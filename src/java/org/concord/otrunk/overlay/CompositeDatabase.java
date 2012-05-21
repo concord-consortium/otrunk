@@ -37,6 +37,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import org.concord.framework.otrunk.OTID;
@@ -163,15 +164,20 @@ public class CompositeDatabase
      */
     public OTDataObject createDataObject(OTDataObjectType type) throws Exception
     {
-        // in this case we need to create a new state object and wrap it
-        OTDataObject childObject = activeOverlayDb.createDataObject(type);
-        CompositeDataObject compositeDataObject = 
-        	new CompositeDataObject(childObject, this, null, false);
-        activeOverlay.registerNonDeltaObject(childObject);
-        dataObjectMap.put(compositeDataObject.getGlobalId(), compositeDataObject);
-        dataObjectMap.put(childObject.getGlobalId(), compositeDataObject);
-        //System.out.println("v3. " + userDataObject.getGlobalId());
-        return compositeDataObject;
+    	try {
+    		readLock();
+            // in this case we need to create a new state object and wrap it
+            OTDataObject childObject = activeOverlayDb.createDataObject(type);
+            CompositeDataObject compositeDataObject = 
+            	new CompositeDataObject(childObject, this, null, false);
+            activeOverlay.registerNonDeltaObject(childObject);
+            dataObjectMap.put(compositeDataObject.getGlobalId(), compositeDataObject);
+            dataObjectMap.put(childObject.getGlobalId(), compositeDataObject);
+            //System.out.println("v3. " + userDataObject.getGlobalId());
+            return compositeDataObject;
+    	} finally {
+    		readUnlock();
+    	}
     }
 
     /* (non-Javadoc)
@@ -179,32 +185,47 @@ public class CompositeDatabase
      */
     public OTDataObject createDataObject(OTDataObjectType type, OTID id) throws Exception
     {
-        // in this case we need to create a new state object and wrap it
-        OTDataObject childObject = activeOverlayDb.createDataObject(type, id);
-        CompositeDataObject userDataObject = 
-        	new CompositeDataObject(childObject, this, null, false);
-        activeOverlay.registerNonDeltaObject(childObject);
-        dataObjectMap.put(id, userDataObject);
-        //System.out.println("v3. " + userDataObject.getGlobalId());
-        return userDataObject;
+    	try {
+    		readLock();
+            // in this case we need to create a new state object and wrap it
+            OTDataObject childObject = activeOverlayDb.createDataObject(type, id);
+            CompositeDataObject userDataObject = 
+            	new CompositeDataObject(childObject, this, null, false);
+            activeOverlay.registerNonDeltaObject(childObject);
+            dataObjectMap.put(id, userDataObject);
+            //System.out.println("v3. " + userDataObject.getGlobalId());
+            return userDataObject;
+        } finally {
+        	readUnlock();
+        }
     }
 
     public OTDataObject getActiveDeltaObject(OTDataObject baseObject)
     {
-    	OTDataObject deltaObject = activeOverlay.getDeltaObject(baseObject);
-    	if(deltaObject instanceof XMLDataObject){
-    		((XMLDataObject) deltaObject).setSaveNulls(true);
+    	try {
+    		readLock();
+        	OTDataObject deltaObject = activeOverlay.getDeltaObject(baseObject);
+        	if(deltaObject instanceof XMLDataObject){
+        		((XMLDataObject) deltaObject).setSaveNulls(true);
+        	}
+    		return deltaObject;
+    	} finally {
+    		readUnlock();
     	}
-		return deltaObject;
     }
     
     public OTDataObject createActiveDeltaObject(OTDataObject baseObject)
     {
-    	OTDataObject deltaObject = activeOverlay.createDeltaObject(baseObject);
-    	if(deltaObject instanceof XMLDataObject){
-    		((XMLDataObject) deltaObject).setSaveNulls(true);
-    	}    	
-		return deltaObject;
+    	try {
+    		readLock();
+        	OTDataObject deltaObject = activeOverlay.createDeltaObject(baseObject);
+        	if(deltaObject instanceof XMLDataObject){
+        		((XMLDataObject) deltaObject).setSaveNulls(true);
+        	}    	
+    		return deltaObject;
+    	} finally {
+    		readUnlock();
+    	}
     }
     
     public OTDatabase getActiveOverlayDb() {
@@ -225,6 +246,17 @@ public class CompositeDatabase
      * @see org.concord.otrunk.datamodel.OTDatabase#getOTDataObject(org.concord.otrunk.datamodel.OTDataObject, org.concord.framework.otrunk.OTID)
      */
     public OTDataObject getOTDataObject(OTDataObject dataParent, OTID childId)
+            throws Exception
+    {
+    	try {
+    		readLock();
+    		return realGetOTDataObject(dataParent, childId);
+    	} finally {
+    		readUnlock();
+    	}
+    }
+    
+    public OTDataObject realGetOTDataObject(OTDataObject dataParent, OTID childId)
             throws Exception
     {
     	childId = resolveID(childId);
@@ -594,4 +626,20 @@ public class CompositeDatabase
 	    return outgoingReferences;
     }
 
+	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+	void writeLock() {
+		lock.writeLock().lock();
+	}
+	
+	void writeUnlock() {
+		lock.writeLock().unlock();
+	}
+	
+	void readLock() {
+		lock.readLock().lock();
+	}
+	
+	void readUnlock() {
+		lock.readLock().unlock();
+	}
 }
