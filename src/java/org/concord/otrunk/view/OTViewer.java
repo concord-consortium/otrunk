@@ -643,8 +643,11 @@ public class OTViewer extends JFrame
         	final PeriodicUploadingStatusPanel periodicUploadingStatusPanel = new PeriodicUploadingStatusPanel();
 			statusPanel.add(periodicUploadingStatusPanel);
         	statusPanel.add(Box.createHorizontalStrut(5));
-            statusPanel.add(saveStateLabel);
-            statusPanel.add(Box.createHorizontalStrut(20));
+        	if (OTConfig.isAuthorMode()) {
+        		// TODO If we update this to also check the student db for changes, then we can add it back in for everyone
+                statusPanel.add(saveStateLabel);
+                statusPanel.add(Box.createHorizontalStrut(20));
+        	}
             statusPanel.add(new MemoryMonitorPanel());
             statusPanel.add(Box.createHorizontalStrut(5));
             
@@ -662,98 +665,101 @@ public class OTViewer extends JFrame
                     
                     periodicUploadingStatusPanel.setOtrunk(otrunk);
                     
-                    xmlDB.addXMLDatabaseChangeListener(new XMLDatabaseChangeListener() {
 
-                        public void stateChanged(XMLDatabaseChangeEvent e)
-                        {
-                            if (xmlDB.isDirty()) {
-                                saveStateLabel.setText("Unsaved changes");
-                            } else {
-                                saveStateLabel.setText("File saved");
-                                
-                                if (!settingUp){
-                                	// show save confirmation dialog
-                                    final JWindow savedWindow = new JWindow();
-                                    JLabel savedLabel = new JLabel("File saved");
-                                    savedLabel.setFont(saveStateLabel.getFont().deriveFont(Font.BOLD));
-                                    String fileName = currentAuthoredFile.getAbsolutePath();
-                                    if (fileName.length() > 35){
-                                    	fileName = "... "+fileName.substring(fileName.length()-35);
+                	if (OTConfig.isAuthorMode()) {
+                        xmlDB.addXMLDatabaseChangeListener(new XMLDatabaseChangeListener() {
+    
+                            public void stateChanged(XMLDatabaseChangeEvent e)
+                            {
+                                if (xmlDB.isDirty()) {
+                                    saveStateLabel.setText("Unsaved changes");
+                                } else {
+                                    saveStateLabel.setText("File saved");
+                                    
+                                    if (!settingUp){
+                                    	// show save confirmation dialog
+                                        final JWindow savedWindow = new JWindow();
+                                        JLabel savedLabel = new JLabel("File saved");
+                                        savedLabel.setFont(saveStateLabel.getFont().deriveFont(Font.BOLD));
+                                        String fileName = currentAuthoredFile.getAbsolutePath();
+                                        if (fileName.length() > 35){
+                                        	fileName = "... "+fileName.substring(fileName.length()-35);
+                                        }
+        								JLabel locationLabel = new JLabel(fileName);
+        								locationLabel.setBorder(BorderFactory.createCompoundBorder(
+        								    BorderFactory.createLineBorder(Color.BLACK),
+        								    BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+        								final JPanel savedPanel = new JPanel(new GridBagLayout());
+        								GridBagConstraints gbc = new GridBagConstraints();
+        								gbc.insets = new Insets(8, 8, 8, 8);
+                            	        gbc.gridwidth = GridBagConstraints.REMAINDER;
+                                        savedPanel.add(savedLabel, gbc);
+                                        savedPanel.add(locationLabel, gbc);
+                                        savedPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+                                        savedWindow.add(savedPanel);
+                                        savedWindow.pack();
+                                        
+                                        final int desiredHeight = savedWindow.getHeight();
+                                        savedWindow.getContentPane().setLayout(null);
+                                        savedWindow.setSize(savedWindow.getWidth(), 0);
+                                        
+                                        bottomCorner = new Point(OTViewer.this.getLocationOnScreen().x + OTViewer.this.getWidth(),
+                                        	OTViewer.this.getLocationOnScreen().y + OTViewer.this.getHeight());
+                                        savedWindow.setLocation(bottomCorner.x - savedWindow.getWidth(), bottomCorner.y);
+                                        
+                                        savedWindow.setVisible(true);
+                                        
+                                        javax.swing.Timer timer = new javax.swing.Timer(0, new ActionListener() {
+                                            public void actionPerformed(ActionEvent e) {
+                                                int newHeight = Math.min(savedWindow.getHeight()+6, desiredHeight);
+                                 
+                                                savedWindow.setSize(savedWindow.getWidth(),newHeight);
+                                                savedWindow.setLocation(bottomCorner.x - savedWindow.getWidth(), bottomCorner.y-savedWindow.getHeight());
+                                                savedPanel.repaint();
+                                 
+                                                if(newHeight >= desiredHeight) {
+                                                    ((javax.swing.Timer) e.getSource()).stop();
+                                                    //restore original layout
+                                                    savedWindow.getContentPane().setLayout(new BorderLayout());
+                                                    savedWindow.validate();
+                                                }
+                                            }
+                                        });
+                                        timer.start();
+                                        
+                                        javax.swing.Timer timer2 = new javax.swing.Timer(0, new ActionListener() {
+                                            public void actionPerformed(ActionEvent e) {
+                                                int newHeight = Math.max(savedWindow.getHeight()-6, 0);
+                                 
+                                                savedWindow.setSize(savedWindow.getWidth(),newHeight);
+                                                savedWindow.setLocation(bottomCorner.x - savedWindow.getWidth(), bottomCorner.y-savedWindow.getHeight());
+                                                savedPanel.repaint();
+                                 
+                                                if(newHeight <= 0) {
+                                                    ((javax.swing.Timer) e.getSource()).stop();
+                                                    savedWindow.dispose();
+                                                }
+                                            }
+                                        });
+                                        timer2.setInitialDelay(2500);
+                                        timer2.start();
+                                        
+    //                                    TimerTask closeTask = new TimerTask() {
+    //    									
+    //    									@Override
+    //    									public void run()
+    //    									{
+    //    										savedWindow.setVisible(false);
+    //    									}
+    //    								};
+    //    								Timer timer2 = new Timer();
+    //    								timer2.schedule(closeTask, 2500);
                                     }
-    								JLabel locationLabel = new JLabel(fileName);
-    								locationLabel.setBorder(BorderFactory.createCompoundBorder(
-    								    BorderFactory.createLineBorder(Color.BLACK),
-    								    BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-    								final JPanel savedPanel = new JPanel(new GridBagLayout());
-    								GridBagConstraints gbc = new GridBagConstraints();
-    								gbc.insets = new Insets(8, 8, 8, 8);
-                        	        gbc.gridwidth = GridBagConstraints.REMAINDER;
-                                    savedPanel.add(savedLabel, gbc);
-                                    savedPanel.add(locationLabel, gbc);
-                                    savedPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-                                    savedWindow.add(savedPanel);
-                                    savedWindow.pack();
-                                    
-                                    final int desiredHeight = savedWindow.getHeight();
-                                    savedWindow.getContentPane().setLayout(null);
-                                    savedWindow.setSize(savedWindow.getWidth(), 0);
-                                    
-                                    bottomCorner = new Point(OTViewer.this.getLocationOnScreen().x + OTViewer.this.getWidth(),
-                                    	OTViewer.this.getLocationOnScreen().y + OTViewer.this.getHeight());
-                                    savedWindow.setLocation(bottomCorner.x - savedWindow.getWidth(), bottomCorner.y);
-                                    
-                                    savedWindow.setVisible(true);
-                                    
-                                    javax.swing.Timer timer = new javax.swing.Timer(0, new ActionListener() {
-                                        public void actionPerformed(ActionEvent e) {
-                                            int newHeight = Math.min(savedWindow.getHeight()+6, desiredHeight);
-                             
-                                            savedWindow.setSize(savedWindow.getWidth(),newHeight);
-                                            savedWindow.setLocation(bottomCorner.x - savedWindow.getWidth(), bottomCorner.y-savedWindow.getHeight());
-                                            savedPanel.repaint();
-                             
-                                            if(newHeight >= desiredHeight) {
-                                                ((javax.swing.Timer) e.getSource()).stop();
-                                                //restore original layout
-                                                savedWindow.getContentPane().setLayout(new BorderLayout());
-                                                savedWindow.validate();
-                                            }
-                                        }
-                                    });
-                                    timer.start();
-                                    
-                                    javax.swing.Timer timer2 = new javax.swing.Timer(0, new ActionListener() {
-                                        public void actionPerformed(ActionEvent e) {
-                                            int newHeight = Math.max(savedWindow.getHeight()-6, 0);
-                             
-                                            savedWindow.setSize(savedWindow.getWidth(),newHeight);
-                                            savedWindow.setLocation(bottomCorner.x - savedWindow.getWidth(), bottomCorner.y-savedWindow.getHeight());
-                                            savedPanel.repaint();
-                             
-                                            if(newHeight <= 0) {
-                                                ((javax.swing.Timer) e.getSource()).stop();
-                                                savedWindow.dispose();
-                                            }
-                                        }
-                                    });
-                                    timer2.setInitialDelay(2500);
-                                    timer2.start();
-                                    
-//                                    TimerTask closeTask = new TimerTask() {
-//    									
-//    									@Override
-//    									public void run()
-//    									{
-//    										savedWindow.setVisible(false);
-//    									}
-//    								};
-//    								Timer timer2 = new Timer();
-//    								timer2.schedule(closeTask, 2500);
                                 }
+                                statusPanel.repaint();
                             }
-                            statusPanel.repaint();
-                        }
-                    });
+                        });
+                	}
                 }
             };
             waitForDB.start();
