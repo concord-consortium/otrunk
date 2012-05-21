@@ -110,4 +110,7 @@ public interface OTDataObject
 
 	public String getContainerResourceKey();
 	public void setContainerResourceKey(String containerResourceKey);
+	
+	public void lock();
+	public void unlock();
 }

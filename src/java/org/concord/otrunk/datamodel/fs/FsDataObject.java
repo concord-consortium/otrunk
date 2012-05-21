@@ -229,4 +229,12 @@ public class FsDataObject
     {
 	    this.containerResourceKey = containerResourceKey;
     }
+	
+	public void lock() {
+		// not needed
+	}
+	
+	public void unlock() {
+		// not needed
+	}
 }

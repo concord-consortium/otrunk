@@ -363,4 +363,12 @@ public class XMLDataObject
 	public void nullifyElement() {
 		this.element = null;
 	}
+	
+	public void lock() {
+		// not needed
+	}
+	
+	public void unlock() {
+		// not needed
+	}
 }

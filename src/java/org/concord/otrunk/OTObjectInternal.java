@@ -120,9 +120,30 @@ public class OTObjectInternal implements OTObjectInterface
 	/* (non-Javadoc)
      * @see org.concord.otrunk.OTObjectInternal#setDoNotifyListeners(boolean)
      */
+    /**
+     * Tells the otobject to (not) notify change listeners.
+     * Note: Because this method takes out a lock on the underlying data object,
+     * the calling code needs to obey the following restrictions:
+     *  1) the call to disable notification and re-enable notification must occur on the same thread
+     *  2) the calling code should ensure that setDoNotifyChangeListeners(true) gets called in all cases, and so should probably
+     *       call this code from a block like:
+     *       try {
+     *         object.setDoNotifyChangeListeners(false);
+     *         ... make changes to object ..
+     *       } finally {
+     *         object.setDoNotifyChangeListeners(true);
+     *       }
+     */
 	public void setDoNotifyChangeListeners(boolean doNotify)
 	{
 	    doNotifyListeners = doNotify;
+	    // also take out/release a lock on the undelying data object so that the database responsible can know
+	    // that a batch update is taking place on one of its objects.
+	    if (doNotify) {
+	    	dataObject.unlock();
+	    } else {
+	    	dataObject.lock();
+	    }
 	}
 	
     /* (non-Javadoc)

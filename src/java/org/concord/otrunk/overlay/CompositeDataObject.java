@@ -597,4 +597,12 @@ public class CompositeDataObject
 		}
 		this.containerResourceKey = containerResourceKey;
     }
+	
+	public void lock() {
+		database.readLock();
+	}
+	
+	public void unlock() {
+		database.readUnlock();
+	}
 }
