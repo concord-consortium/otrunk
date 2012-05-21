@@ -81,6 +81,8 @@ public class CompositeDataObject
 	private OTDataObject container;
 	private String containerResourceKey;
 	
+	private boolean alreadyPulledUp = true;
+	
 	public CompositeDataObject(OTDataObject baseObject, 
 	        CompositeDatabase db, OTDataObject[] middleDeltas, boolean composite)
 	{
@@ -95,6 +97,7 @@ public class CompositeDataObject
     {
 	    if(composite){
 			activeDeltaObject = database.getActiveDeltaObject(baseObject);
+			alreadyPulledUp = false;
 		}
     }
 	
@@ -232,12 +235,7 @@ public class CompositeDataObject
 			activeDeltaObject.setContainer(this.container);
 			activeDeltaObject.setContainerResourceKey(this.containerResourceKey);
 			if (database.shouldPullAllAttributesIntoCurrentLayer()) {
-				for (String key : getResourceKeys()) {
-					Object resource = getResource(key);
-					if (resource != null) {
-						activeDeltaObject.setResource(key, resource);
-					}
-				}
+				pullUpModifiedResources(activeDeltaObject);
 			}
 		}
 		
@@ -289,14 +287,32 @@ public class CompositeDataObject
     	}
 		boolean ret = localActiveDelta.setResource(key, resource);
 		if (database.shouldPullAllAttributesIntoCurrentLayer()) {
-    		for (String rKey : getResourceKeys()) {
-    			localActiveDelta.setResource(rKey, getResource(rKey));
-    		}
+			pullUpModifiedResources(localActiveDelta);
 		}
 		return ret;
 	}
 	
-    /**
+    private void pullUpModifiedResources(OTDataObject localActiveDelta)
+    {
+		// Only set resources that have been set/modified in any of the overlay layers or the loaded student data
+		if (!alreadyPulledUp && middleDeltas != null) {
+			for (String key : getResourceKeys()) {
+				for (OTDataObject middle : middleDeltas) {
+					if (middle.containsKey(key)) {
+						Object resource = getResource(key);
+						if (resource != null) {
+							localActiveDelta.setResource(key, resource);
+							break; // go to the next key
+						}
+					}
+				}
+			}
+		}
+		alreadyPulledUp = true;
+    }
+    
+
+	/**
      * This method is to handle the case where a resource is an
      * id.  Some of the passed in ids will be from our template
      * database.  So they are really just temporary ids.  These ids are

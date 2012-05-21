@@ -65,16 +65,18 @@ public class PeriodicUploadingLearnerDataTest
 		helper.initOTrunk(OTPrimitivesTestObject.class);
 		
 		OTPrimitivesTestObject root = (OTPrimitivesTestObject) helper.getRootObject();
+		OTPrimitivesTestObject authoredRoot = (OTPrimitivesTestObject) helper.getAuthoredRootObject();
 		
 		String name = "Object-name";
 		String s = "Some test string";
 		int i = 34;
 		float f = 67.89f;
 		
-		root.setName(name);
+		authoredRoot.setName(name);
+		authoredRoot.setFloat(f);
+		
 		root.setString(s);
 		root.setInt(i);
-		root.setFloat(f);
 		
 		assertThat(root.getString()).as("String attribute").isEqualTo(s);
 		assertThat(root.getInt()).as("Int attribute").isEqualTo(i);
@@ -94,6 +96,7 @@ public class PeriodicUploadingLearnerDataTest
 		
 		root.setDouble(d);
 		root.setBoolean(b);
+		
 		root.otUnSet(root.otClass().getProperty("string"));
 		root.otUnSet(root.otClass().getProperty("name"));
 		
@@ -112,7 +115,6 @@ public class PeriodicUploadingLearnerDataTest
 		assertThat(root.getString()).as("String attribute").isEqualTo("");
 		assertThat(root.getName()).as("Name attribute").isEqualTo(null);
 		
-
 		root.setBoolean(false); // set an attribute so the object will get written out
 		
 		// Verify exported otml looks like we expect
