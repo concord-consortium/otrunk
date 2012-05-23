@@ -656,7 +656,7 @@ public class OTViewer extends JFrame
                 @Override
                 public void run()
                 {
-                    while (xmlDB == null && otrunk == null) {
+                    while (xmlDB == null || otrunk == null) {
                         try {
                             sleep(1000);
                         } catch (Exception e) {
