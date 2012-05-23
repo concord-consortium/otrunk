@@ -35,6 +35,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.Reference;
@@ -45,6 +46,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -70,6 +72,7 @@ import org.concord.framework.otrunk.OTServiceContext;
 import org.concord.framework.otrunk.OTUser;
 import org.concord.framework.otrunk.OTrunk;
 import org.concord.framework.otrunk.otcore.OTClass;
+import org.concord.framework.otrunk.wrapper.OTString;
 import org.concord.otrunk.datamodel.OTDataObject;
 import org.concord.otrunk.datamodel.OTDataObjectFinder;
 import org.concord.otrunk.datamodel.OTDataObjectType;
@@ -356,6 +359,7 @@ public class OTrunkImpl implements OTrunk
 			System.out.println("Running rotate task.");
 			rotateTask.run();
         	queueUploaderTask.run();
+        	saveBundlesNotUploaded();
 		}
 		notifySessionClosed();
 		rootDb.close();
@@ -695,6 +699,7 @@ public class OTrunkImpl implements OTrunk
         	rotateTask.run();
         	rotateTask.cancel();
         	queueUploaderTask.run();
+        	saveBundlesNotUploaded();
         	queueUploaderTask.cancel();
         }
         
@@ -732,6 +737,7 @@ public class OTrunkImpl implements OTrunk
     TimerTask queueUploaderTask = null;
     private void setupPeriodicUploading(final RotatingReferenceMapDatabase db) throws Exception {
 	    // Rotate the db to set up the current active layer
+    	loadBundlesNotUploaded(db);
     	OTReferenceMap oldActiveReferenceMap = rotateUserDatabase(db);
     	
     	rotateTask = new TimerTask() {
@@ -756,26 +762,39 @@ public class OTrunkImpl implements OTrunk
 		    	// Set up a time-based task for:
 		    	  // Rotating
 		    	  // Uploading old rotated layers
-                URL saveUrl = OTConfig.getPeriodicUploadingUserDataUrl();
-        		if (saveUrl != null) {
-        			OTReferenceMap refMap = null;
-        			synchronized(uploadQueue) {
-    			    	try {
-    			    		// Work through the queue, but if we have any problems uploading, abort processing anything else, and leave the
-    			    		// problematic reference map in the queue to be tried again later.
-    		    			while ((refMap = uploadQueue.peek()) != null) {
-    		    				remoteSaveData(refMap.getOverlayDatabase(), saveUrl, "POST");
-    		    				uploadQueue.remove();
+    			OTReferenceMap refMap = null;
+                URL defaultSaveUrl = OTConfig.getPeriodicUploadingUserDataUrl();
+    			synchronized(uploadQueue) {
+			    	try {
+			    		// Work through the queue, but if we have any problems uploading, abort processing anything else, and leave the
+			    		// problematic reference map in the queue to be tried again later.
+		    			while ((refMap = uploadQueue.peek()) != null) {
+		    				// Check if the ref map has a save url annotation
+		    				URL saveUrl = defaultSaveUrl;
+
+		    	            OTObject saveUrlStringObj = refMap.getAnnotations().getObject(PERIODIC_SAVE_URL_ANNOTATION);
+		    				if (saveUrlStringObj != null && saveUrlStringObj instanceof OTString && ((OTString) saveUrlStringObj).getString() != null) {
+		    					try {
+		    						saveUrl = new URL(((OTString) saveUrlStringObj).getString());
+		    					} catch (MalformedURLException e) {
+		    						saveUrl = null;
+		    					}
+		    				}
+		    				if (saveUrl != null) {
+		    					remoteSaveData(refMap.getOverlayDatabase(), saveUrl, "POST");
     		    				notifyPeriodicUploadingEventListeners(refMap, null);
-    		    			}
-    	                } catch (Exception e) {
-    		                logger.log(Level.SEVERE, "Failed to rotate and save user learner database!", e);
-    		                // We need to put up some sort of indication to the user that things aren't saving...
-		    				notifyPeriodicUploadingEventListeners(refMap, e);
-    	                }
-        			}
-                }
-			}
+		    				}
+		    				uploadQueue.remove();
+		    			}
+	                } catch (Exception e) {
+		                logger.log(Level.SEVERE, "Failed to rotate and save user learner database!", e);
+		                // We need to put up some sort of indication to the user that things aren't saving...
+		                if (refMap != null) {
+		                	notifyPeriodicUploadingEventListeners(refMap, e);
+		                }
+	                }
+    			}
+            }
 		};
 		
 	    Timer globalTimer = getGlobalTimer();
@@ -788,6 +807,106 @@ public class OTrunkImpl implements OTrunk
     
     public void triggerPeriodicUploading() {
     	queueUploaderTask.run();
+    }
+    
+    public static final String PERIODIC_SAVE_URL_ANNOTATION = "periodic-save-url";
+    private void saveBundlesNotUploaded() {
+    	// We need to take all of the reference maps in the upload queue and save them to disk to be uploaded later
+    	synchronized(uploadQueue) {
+    		OTReferenceMap refMap = null;
+    		int bundleCounter = 0;
+    		while ((refMap = uploadQueue.poll()) != null) {
+    			bundleCounter++;
+    			// Make sure to set the ref map saveurl annotation to the current periodic bundle save url if the annotation doesn't exist
+    			if (setSaveUrlAnnotation(refMap)) {
+    				// the refMap has a save url, so go ahead and save it to disk
+    				OTDatabase db = refMap.getOverlayDatabase();
+    				try {
+    					File directory = getSavedPeriodicBundleFolder();
+    					String filename = String.format("periodic-bundle-%03d.bundle", bundleCounter);
+	                    File outputFile = new File(directory, filename);
+    					System.out.println("Saving failed bundle to: " + outputFile.getAbsolutePath());
+						ExporterJDOM.export(outputFile, db.getRoot(), db);
+                    } catch (Exception e) {
+	                    logger.log(Level.WARNING, "Failed to save bundle to disk!", e);
+                    }
+    			}
+    		}
+    	}
+    }
+    
+    private void loadBundlesNotUploaded(RotatingReferenceMapDatabase db) {
+    	// We need to load in any bundles from disk that weren't uploaded in prior sessions, and
+    	// 1) queue them to uploaded in the correct order and
+    	// uploadQueue.add(loadedRefmap);
+    	// 2) insert them into the current reference map's overlay list if they belong to the same learner as is currently runnings
+    	// db.rotate(loadedRefmap);
+    	File directory = getSavedPeriodicBundleFolder();
+    	File[] oldBundles = directory.listFiles(new FilenameFilter() {
+			public boolean accept(File dir, String name)
+			{
+				return name.startsWith("periodic-bundle-") && name.endsWith(".bundle");
+			}
+		});
+    	Arrays.sort(oldBundles);
+    	for (File b : oldBundles) {
+    		try {
+	            XMLDatabase oldBundleDb = new XMLDatabase(b);
+	            oldBundleDb.loadObjects();
+	            OTObjectService objService = createObjectService(oldBundleDb);
+	            OTReferenceMap map = (OTReferenceMap) objService.getOTObject(oldBundleDb.getRoot().getGlobalId());
+	            OTObject saveUrl = map.getAnnotations().getObject(PERIODIC_SAVE_URL_ANNOTATION);
+				if (saveUrl != null && saveUrl instanceof OTString && ((OTString) saveUrl).getString() != null) {
+	            	uploadQueue.add(map);
+	            	if (OTConfig.getPeriodicUploadingUserDataUrl() != null && ((OTString) saveUrl).getString().equals(OTConfig.getPeriodicUploadingUserDataUrl().toExternalForm())) {
+	            		db.rotate(map);
+	            	}
+	            }
+            }
+    		catch (ClassCastException e) {
+    			// root object wasn't a reference map!
+    		}
+    		catch (Exception e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+            }
+    		b.delete();
+    	}
+    }
+    
+    private File savedPeriodicBundleFolder;
+    private File getSavedPeriodicBundleFolder() {
+    	if (savedPeriodicBundleFolder == null) {
+    	File relPath =  new File("ConcordConsortium", "sessionData");
+    	savedPeriodicBundleFolder = ResourceFinder.findWriteableCacheFolder(relPath, true);
+    	}
+    	return savedPeriodicBundleFolder;
+    }
+
+	private boolean setSaveUrlAnnotation(OTReferenceMap refMap)
+    {
+	    OTString saveUrl = null;
+	    try {
+	    	saveUrl = (OTString) refMap.getAnnotations().getObject(PERIODIC_SAVE_URL_ANNOTATION);
+	    } catch (ClassCastException e) {
+	    	// something unexpected was there, so reset it.
+	    	saveUrl = null;
+	    }
+	    if (saveUrl == null) {
+	    	if (OTConfig.getPeriodicUploadingUserDataUrl() != null) {
+    	    	try {
+    	            saveUrl = refMap.getOTObjectService().createObject(OTString.class);
+    	            saveUrl.setString(OTConfig.getPeriodicUploadingUserDataUrl().toExternalForm());
+    	            refMap.getAnnotations().putObject(PERIODIC_SAVE_URL_ANNOTATION, saveUrl);
+    	            return true;
+    	        } catch (Exception e) {
+    	            logger.log(Level.WARNING, "Failed to set the save url on a reference map!", e);
+    	        }
+	    	}
+	    } else {
+	    	return true;
+	    }
+	    return false;
     }
     
     private ArrayList<PeriodicUploadingEventListener> periodicUploadingEventListeners = new ArrayList<PeriodicUploadingEventListener>();
@@ -1440,4 +1559,220 @@ public class OTrunkImpl implements OTrunk
 	    }
 	    return this.createObjectService(db);
     }
+}
+
+/**
+ * A class for finding a writable location to store files, preferring a global system folder.
+ * 
+ * FIXME PUB This code is an almost exact copy of the code in LaunchJnlp.ResourceFinder in the jnlp2shell
+ * project. We should consider DRY'ing this up at some point.
+ * 
+ * @author Aaron
+ *
+ */
+class ResourceFinder {
+	public static enum Platform { WinXP, WinVista, Win7, Win764BitOrNT, WinOther, MacOSX, Other }
+	private static Platform currentPlatform = null;
+	public static final String TEMP_DIR_PREFIX = "ccsoftware";
+
+	private static Platform getPlatform() {
+		if (currentPlatform != null) {
+			return currentPlatform;
+		}
+		String name = System.getProperty("os.name");
+		if (name.startsWith("Mac")) {
+			currentPlatform = Platform.MacOSX;
+		} else if (name.startsWith("Windows")) {
+			if (name.endsWith("XP") || name.endsWith("NT") || name.endsWith("2000")) { 
+				currentPlatform = Platform.WinXP;
+			} else if (name.endsWith("Vista")) {
+				currentPlatform = Platform.WinVista;
+			} else if (name.endsWith("7")) {
+				currentPlatform = Platform.Win7;
+			} else if (name.endsWith("_NT")) {
+				// Not sure why, OS.name on Win 7 (AMD64) was Windows_NT
+				currentPlatform = Platform.Win764BitOrNT; 
+			} else {
+				currentPlatform = Platform.WinOther;
+			}
+		} else {
+			currentPlatform = Platform.Other;
+		}
+		System.out.println("Current platform is: " + currentPlatform + " (" + name + ")");
+		return currentPlatform;
+	}
+	
+	public static File findWriteableCacheFolder(File relPath, boolean trySystemFolder) {
+		if (relPath == null) {
+			relPath = new File("");
+		}
+		
+		if (trySystemFolder) {
+			File systemFolder = getSystemFolder(relPath);
+			if (isValidWriteableFolder(systemFolder)) {
+				setWorldWriteable(systemFolder); // this will be ../ConcordConsortium/sessionData
+				setWorldWriteable(systemFolder.getParentFile()); // also do the ../ConcordConsortium folder
+				return systemFolder;
+			}
+		}
+
+		File userSharedFolder = getUserSharedFolder(relPath);
+		if(isValidWriteableFolder(userSharedFolder)){
+			setWorldWriteable(userSharedFolder); // this will be ../ConcordConsortium/sessionData
+			setWorldWriteable(userSharedFolder.getParentFile()); // also do the ../ConcordConsortium folder
+			return userSharedFolder;
+		}
+		
+		File userFolder = getUserFolder(relPath);
+		if(isValidWriteableFolder(userFolder)){
+			return userFolder;
+		}
+		
+		try {
+			File tempFolder = File.createTempFile(TEMP_DIR_PREFIX, "");
+			// delete first, because createTempFile() actually creates an empty file in the
+			// filesystem, not just a File object.
+			tempFolder.delete();
+			if(isValidWriteableFolder(tempFolder)){
+				return tempFolder;
+			}
+		} catch (IOException e) { }
+		return null;
+	}
+	
+	private static boolean isValidWriteableFolder(File folder) {
+		if (folder != null) {
+			System.out.println("Checking folder: " + folder.getAbsolutePath());
+			if (!folder.exists()) {
+				folder.mkdirs();
+			}
+			if (folder.exists()) {
+				if (folder.canWrite()) {
+					// actually attempt to make a file in the folder
+					try {
+						File testFile = new File(folder, "test.txt");
+						if (testFile.createNewFile()) {
+							testFile.delete();
+							System.out.println("It's writable!");
+							return true;
+						}
+					} catch (IOException e) {
+					}
+				}
+			}
+		}
+		System.out.println("Not writable!");
+		return false;
+	}
+	
+	private static void setWorldWriteable(File file) {
+		switch (getPlatform()) {
+		case MacOSX:
+			// On MacOSX, acls are probably enabled (they are by default on 10.5+)
+			String[] aclRead = new String[] {"ls", "-el", "."};
+			String[] chmodAcl = new String[] {"chmod", "+a", "everyone allow list,search,add_file,add_subdirectory,delete_file,file_inherit,directory_inherit", file.getName() };
+			String[] chmodNonAcl = new String[] {"chmod", "go+rw", file.getName() };
+			executeAndLog(aclRead, file.getParentFile());
+			executeAndLog(chmodNonAcl, file.getParentFile());
+			executeAndLog(chmodAcl, file.getParentFile());
+			executeAndLog(aclRead, file.getParentFile());
+			break;
+		case WinXP:
+		case WinVista:
+		case Win7:
+		case Win764BitOrNT:
+			String[] caclsRead = new String[] {"cacls", file.getName()};
+			String[] caclsChange = new String[] {"cacls", file.getName(), "/e", "/t", "/p", "Everyone:f"};
+			executeAndLog(caclsRead, file.getParentFile());
+			executeAndLog(caclsChange, file.getParentFile());
+			executeAndLog(caclsRead, file.getParentFile());
+			break;
+		case Other:
+			break;
+		default:
+			break;
+		}
+	}
+	private static File getSystemFolder(File relPath) {
+		File folder = null;
+		
+		switch (getPlatform()) {
+		case MacOSX:
+			folder = new File(new File("/Library/Application Support"), relPath.getPath());
+			break;
+		case WinXP:
+			String sysDrive = System.getenv("SYSTEMDRIVE");
+			folder = new File(new File(sysDrive + "\\Documents and Settings\\All Users\\Application Data"), relPath.getPath());
+			break;
+		case WinVista:
+		case Win7:
+		case Win764BitOrNT:
+			String programData = System.getenv("ProgramData");
+			folder = new File(new File(programData), relPath.getPath());
+			break;
+		case Other:
+			folder = null;
+			break;
+		default:
+			folder = null;
+		}
+		
+		return folder;
+	}
+	
+	private static File getUserSharedFolder(File relPath) {
+		File folder = null;
+		
+		switch (getPlatform()) {
+		case MacOSX:
+			folder = new File(new File("/Users/Shared/Library"), relPath.getPath());
+			break;
+		case WinXP:
+		case WinVista:
+		case Win7:
+		case Win764BitOrNT:
+		case Other:
+			folder = null;
+			break;
+		default:
+			folder = null;
+		}
+		
+		return folder;
+	}
+	
+	private static File getUserFolder(File relPath) {
+		File userHome = new File(System.getProperty("user.home"));
+		File folder = null;
+		switch (getPlatform())	{
+		case MacOSX:
+			folder = new File(userHome, "Library/Application Support/" + relPath.getPath());
+			break;
+		case WinXP:
+			folder = new File(userHome, "Application Data\\" + relPath.getPath());
+			break;
+		case WinVista:
+		case Win7:
+			String localAppData = System.getenv("LOCALAPPDATA");
+			folder = new File(localAppData, relPath.getPath());
+			break;
+		case Other:
+			folder = null;
+			break;
+		default:
+			folder = null;
+		}
+
+		return folder;
+	}
+	
+	private static void executeAndLog(String[] cmdArr, File dir) {
+		try {
+			ProcessBuilder pb = new ProcessBuilder(cmdArr);
+			pb.redirectErrorStream(true);
+			pb.directory(dir);
+			Process p = pb.start();
+		} catch (IOException e) {
+		}
+	}
 }
