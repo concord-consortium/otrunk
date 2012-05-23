@@ -44,6 +44,8 @@ public class PeriodicUploadingStatusPanel extends JPanel implements PeriodicUplo
     	    saveErrorButton.setVisible(false);
     	    saveErrorButton.setEnabled(false);
     	    
+    	    saveErrorButton.setToolTipText("There was an error uploading your data! Make sure your computer is connected to the internet.");
+    	    
     	    this.add(saveErrorButton);
     		
     		otrunk.addPeriodicUploadingEventListener(this);
